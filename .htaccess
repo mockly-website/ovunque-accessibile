@@ -1,0 +1,49 @@
+# Ovunque Accessibile – configurazione Apache (se il sito statico è su hosting Apache)
+# SEGNAPOSTO: sostituire [PROJECT-REF] nella Content-Security-Policy con il riferimento del progetto Supabase.
+
+Options -Indexes
+
+# Blocca file che non servono al pubblico: documentazione, cartella supabase, file nascosti
+<FilesMatch "\.(md|toml|ts|sql|txt|log|example)$">
+  Require all denied
+</FilesMatch>
+<FilesMatch "^\.">
+  Require all denied
+</FilesMatch>
+RedirectMatch 404 /supabase(/|$)
+
+# Sicurezza: nessuna risorsa esterna, nessun tracker. Il modulo invia solo alla Edge Function di Supabase.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set X-Frame-Options "DENY"
+  Header always set Strict-Transport-Security "max-age=31536000"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), interest-cohort=()"
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self'; connect-src 'self' https://[PROJECT-REF].supabase.co; form-action 'self' https://[PROJECT-REF].supabase.co; frame-ancestors 'none'; base-uri 'self'; object-src 'none'; upgrade-insecure-requests"
+</IfModule>
+
+# Cache: asset statici a lungo, HTML sempre aggiornato
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 month"
+  ExpiresByType application/javascript "access plus 1 month"
+  ExpiresByType text/javascript "access plus 1 month"
+  ExpiresByType font/woff2 "access plus 1 year"
+  ExpiresByType image/webp "access plus 1 month"
+  ExpiresByType image/png "access plus 1 month"
+  ExpiresByType image/jpeg "access plus 1 month"
+  ExpiresByType image/x-icon "access plus 1 month"
+  ExpiresByType text/html "access plus 0 seconds"
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css application/javascript text/javascript image/svg+xml
+</IfModule>
+
+AddType font/woff2 .woff2
+AddType image/webp .webp
+
+# HTTPS obbligatorio
+RewriteEngine On
+RewriteCond %{HTTPS} off
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

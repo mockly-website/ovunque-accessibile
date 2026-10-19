@@ -1,0 +1,12 @@
+# Configurazione minima per la Supabase CLI (supabase link / db push / functions deploy).
+# Se esegui "supabase init" la CLI completa questo file con i valori predefiniti.
+project_id = "ovunque-accessibile"
+
+[api]
+# Lo schema "private" NON va mai aggiunto qui: deve restare fuori dalle API.
+schemas = ["public", "graphql_public"]
+
+[functions.subscribe]
+# Il sito non contiene chiavi Supabase: la funzione è pubblica e si protegge da sola
+# (Origin consentiti, token firmato, honeypot, validazione, limite anti-flood).
+verify_jwt = false
