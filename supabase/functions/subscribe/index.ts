@@ -25,7 +25,7 @@ const ALLOWED_ORIGINS = env('ALLOWED_ORIGINS', SITE_URL)
   .map((o) => o.trim().replace(/\/+$/, ''))
   .filter(Boolean);
 const FORM_SECRET = env('FORM_SECRET');
-const PRIVACY_VERSION = env('PRIVACY_VERSION', '2026-10-v1');
+const PRIVACY_VERSION = env('PRIVACY_VERSION', '2026-10-v2');
 const MIN_FILL_SECONDS = Number(env('MIN_FILL_SECONDS', '3'));
 const TOKEN_TTL_SECONDS = Number(env('TOKEN_TTL_SECONDS', '7200'));
 const NOTIFY_TO = env('NOTIFY_TO');
@@ -123,8 +123,8 @@ const EMAIL_RE = /^[^\s@<>()[\]\\,;:"]+@[^\s@<>()[\]\\,;:"]+\.[^\s@<>()[\]\\,;:"
 
 function validate(d: Data): Record<string, string> {
   const errors: Record<string, string> = {};
-  if (!d.name) errors.name = 'Scrivi il tuo nome.';
-  else if (d.name.length > LIMITS.name) errors.name = `Il nome può avere al massimo ${LIMITS.name} caratteri.`;
+  // Il nome è facoltativo (la pagina "in arrivo" chiede solo l'email)
+  if (d.name.length > LIMITS.name) errors.name = `Il nome può avere al massimo ${LIMITS.name} caratteri.`;
 
   if (!d.email) errors.email = 'Scrivi il tuo indirizzo email.';
   else if (d.email.length > LIMITS.email || !EMAIL_RE.test(d.email)) {
@@ -205,7 +205,7 @@ function success(name: string, withNote: boolean, wantsJson: boolean, origin: st
   return json(200, {
     status: 'ok',
     title: name ? `Grazie, ${name}!` : 'Grazie!',
-    message: 'Il tuo indirizzo è nella lista: ti scriveremo quando Ovunque Accessibile sarà pronta.' +
+    message: 'Ti avviseremo appena il sito e la web-app di Ovunque Accessibile saranno online.' +
       ' Se eri già iscritto o iscritta, non devi fare altro.' +
       (withNote ? ' Grazie anche per il luogo che ci hai raccontato.' : ''),
   }, origin);
@@ -223,7 +223,7 @@ const ROLE_LABELS: Record<string, string> = {
 async function notify(d: Data): Promise<void> {
   if (!BREVO_API_KEY || !NOTIFY_TO || !NOTIFY_FROM) return;
   const text = 'Nuova iscrizione a Ovunque Accessibile\n\n' +
-    `Nome: ${d.name}\nEmail: ${d.email}\n` +
+    `Nome: ${d.name || '-'}\nEmail: ${d.email}\n` +
     `Chi è: ${ROLE_LABELS[d.role] ?? '-'}\nCittà: ${d.city || '-'}\n` +
     `Luogo segnalato:\n${d.place_note || '-'}\n`;
   try {

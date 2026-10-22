@@ -5,3 +5,8 @@ supabase/.temp/
 supabase/.branches/
 .claude/
 .DS_Store
+
+# Documenti del brief del cliente: restano solo in locale
+Ovunque Accessibile – *
+*.pages
+*.docx

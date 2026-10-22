@@ -1,45 +1,60 @@
 /* Ovunque Accessibile – progressive enhancement.
-   Senza JS il form funziona comunque: POST classico alla Edge Function "subscribe" (Supabase). */
+   Senza JS: la carrozzina resta ferma sulla stradina e il form fa un POST classico
+   alla Edge Function "subscribe" (Supabase). */
 (function () {
   'use strict';
 
-  /* Animazioni allo scroll: solo se il movimento è consentito. Senza JS il contenuto è già visibile. */
-  (function initReveal() {
-    var motionOk = window.matchMedia && window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
-    if (!motionOk || !('IntersectionObserver' in window)) return;
+  /* Stradina: la carrozzina percorre il sentiero (SMIL). Parte da sola solo se l'utente
+     non ha chiesto di ridurre il movimento; il pulsante la ferma o la riavvia (WCAG 2.2.2). */
+  (function initTrail() {
+    var svg = document.querySelector('.trail__svg');
+    var rider = document.getElementById('trail-rider');
+    var toggle = document.querySelector('.trail__toggle');
+    if (!svg || !rider || !toggle || typeof svg.pauseAnimations !== 'function') return;
 
-    var targets = document.querySelectorAll('.reveal, .path-divider, .phone');
-    if (!targets.length) return;
-    document.documentElement.classList.add('motion');
+    var anims = svg.querySelectorAll('.trail__anim');
+    var label = toggle.querySelector('.trail__toggle-label');
+    var icon = toggle.querySelector('use');
+    var started = false;
+    var running = false;
 
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        var el = entry.target;
-        el.classList.add('is-visible', 'is-revealing');
-        /* Finita la comparsa, niente più ritardi: l'hover resta immediato */
-        setTimeout(function () { el.classList.remove('is-revealing'); }, 1200);
-        observer.unobserve(el);
-      });
-    }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+    function render() {
+      label.textContent = running ? "Ferma l'animazione" : "Avvia l'animazione";
+      icon.setAttribute('href', running ? '#icon-pause' : '#icon-play');
+    }
 
-    targets.forEach(function (el) { observer.observe(el); });
-
-    /* Un elemento che riceve il focus da tastiera deve essere subito visibile */
-    document.addEventListener('focusin', function (e) {
-      var hidden = e.target.closest && e.target.closest('.reveal:not(.is-visible)');
-      if (hidden) {
-        hidden.classList.add('is-visible');
-        observer.unobserve(hidden);
+    function play() {
+      if (!started) {
+        /* La posizione fissa (senza JS) lascia il posto al movimento lungo il percorso */
+        rider.removeAttribute('transform');
+        anims.forEach(function (a) { a.beginElement(); });
+        started = true;
+      } else {
+        svg.unpauseAnimations();
       }
+      running = true;
+      render();
+    }
+
+    function pause() {
+      svg.pauseAnimations();
+      running = false;
+      render();
+    }
+
+    toggle.addEventListener('click', function () {
+      if (running) pause(); else play();
     });
+
+    toggle.hidden = false;
+    var motionOk = window.matchMedia && window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
+    if (motionOk) play(); else render();
   })();
 
   var form = document.getElementById('subscribe-form');
   if (!form || !window.fetch || !window.FormData) return;
 
   var MIN_SECONDS = 3;          /* deve coincidere con MIN_FILL_SECONDS nei secrets della funzione */
-  var NOTE_MAX = 1000;
 
   var statusBox = document.getElementById('form-status');
   var summary = document.getElementById('error-summary');
@@ -48,9 +63,6 @@
   var submitBtn = form.querySelector('[type="submit"]');
   var submitLabel = submitBtn.textContent;
   var tokenInput = form.elements.form_token;
-  var note = form.elements.place_note;
-  var counter = document.getElementById('place_note-counter');
-  var counterLive = document.getElementById('place_note-live');
 
   var tokenPromise = null;
   var tokenIssuedAt = 0;
@@ -60,34 +72,22 @@
   /* Con JS i messaggi di validazione sono nostri, in italiano */
   form.setAttribute('novalidate', '');
 
-  var labels = {
-    name: 'Nome',
-    email: 'Email',
-    city: 'Città',
-    place_note: 'Luogo accessibile',
-    consent: 'Consenso'
-  };
+  /* Campi validati (solo quelli presenti nel form) */
+  var labels = { email: 'Email', consent: 'Consenso' };
 
   /* Validazione lato client (quella vera resta lato server) */
   function validateField(name) {
     var el = form.elements[name];
+    if (!el) return '';
     var value = el.type === 'checkbox' ? el.checked : el.value.trim();
 
     switch (name) {
-      case 'name':
-        if (!value) return 'Scrivi il tuo nome.';
-        if (value.length > 100) return 'Il nome può avere al massimo 100 caratteri.';
-        return '';
       case 'email':
         if (!value) return 'Scrivi il tuo indirizzo email.';
         if (value.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value)) {
           return 'Controlla l\'indirizzo email: deve essere nel formato nome@esempio.it.';
         }
         return '';
-      case 'city':
-        return value.length > 100 ? 'La città può avere al massimo 100 caratteri.' : '';
-      case 'place_note':
-        return value.length > NOTE_MAX ? 'Il racconto può avere al massimo ' + NOTE_MAX + ' caratteri.' : '';
       case 'consent':
         return value ? '' : 'Per iscriverti serve il tuo consenso a ricevere gli aggiornamenti via email.';
     }
@@ -103,14 +103,14 @@
     return errors;
   }
 
-  function errorIcon() {
+  function makeIcon(id) {
     var ns = 'http://www.w3.org/2000/svg';
     var svg = document.createElementNS(ns, 'svg');
     svg.setAttribute('class', 'icon');
     svg.setAttribute('aria-hidden', 'true');
     svg.setAttribute('focusable', 'false');
     var use = document.createElementNS(ns, 'use');
-    use.setAttribute('href', '#icon-error');
+    use.setAttribute('href', id);
     svg.appendChild(use);
     return svg;
   }
@@ -134,10 +134,6 @@
       return;
     }
 
-    /* Se il campo è nel blocco "Raccontaci di più" chiuso, lo apriamo */
-    var details = el.closest('details');
-    if (details) details.open = true;
-
     if (!box) {
       box = document.createElement('p');
       box.className = 'field__error';
@@ -146,7 +142,7 @@
       anchor.insertAdjacentElement('afterend', box);
     }
     box.textContent = '';
-    box.appendChild(errorIcon());
+    box.appendChild(makeIcon('#icon-error'));
     var text = document.createElement('span');
     var prefix = document.createElement('span');
     prefix.className = 'visually-hidden';
@@ -161,7 +157,7 @@
 
   /* Riepilogo in cima al form con link ai campi */
   function renderSummary(errors) {
-    var names = Object.keys(errors);
+    var names = Object.keys(errors).filter(function (n) { return labels[n]; });
     summaryList.textContent = '';
     if (!names.length) {
       summary.hidden = true;
@@ -181,14 +177,12 @@
     summary.hidden = false;
   }
 
-  /* Link del riepilogo: portano il focus sul campo (anche nel riepilogo generato dal server) */
+  /* Link del riepilogo: portano il focus sul campo */
   summaryList.addEventListener('click', function (e) {
     var link = e.target.closest('a[href^="#"]');
     var field = link && document.getElementById(link.getAttribute('href').slice(1));
     if (!field) return;
     e.preventDefault();
-    var details = field.closest('details');
-    if (details) details.open = true;
     var label = form.querySelector('label[for="' + field.id + '"]');
     (label || field).scrollIntoView({ block: 'center' });
     field.focus({ preventScroll: true });
@@ -199,7 +193,7 @@
       setFieldError(name, errors[name] || '');
     });
     renderSummary(errors);
-    if (Object.keys(errors).length) summary.focus();
+    if (Object.keys(errors).some(function (n) { return labels[n]; })) summary.focus();
   }
 
   /* Dopo il primo tentativo, gli errori si aggiornano mentre l'utente corregge */
@@ -218,27 +212,6 @@
   form.addEventListener('input', revalidate);
   form.addEventListener('change', revalidate);
   form.addEventListener('focusout', revalidate);
-
-  /* Contatore caratteri: visibile sempre, annunciato solo vicino al limite */
-  var lastAnnounced = null;
-  function updateCounter() {
-    var len = note.value.length;
-    var left = NOTE_MAX - len;
-    counter.textContent = len + ' caratteri su ' + NOTE_MAX;
-    counter.classList.toggle('field__counter--warning', left <= 100);
-    var step = [0, 20, 50, 100].filter(function (n) { return left <= n; })[0];
-    if (step !== undefined && step !== lastAnnounced) {
-      counterLive.textContent = left === 0
-        ? 'Hai raggiunto il limite di ' + NOTE_MAX + ' caratteri.'
-        : 'Restano ' + left + ' caratteri.';
-      lastAnnounced = step;
-    } else if (step === undefined) {
-      lastAnnounced = null;
-    }
-  }
-  counter.hidden = false;
-  note.addEventListener('input', updateCounter);
-  updateCounter();
 
   /* Token firmato (anti-bot, tempo minimo): richiesto al primo contatto col form. Nessun cookie. */
   function ensureToken(force) {
@@ -273,14 +246,6 @@
   function showStatus(type, title, text) {
     statusBox.className = 'form-status form-status--' + type;
     statusBox.textContent = '';
-    var ns = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('class', 'icon');
-    svg.setAttribute('aria-hidden', 'true');
-    svg.setAttribute('focusable', 'false');
-    var use = document.createElementNS(ns, 'use');
-    use.setAttribute('href', type === 'error' ? '#icon-error' : '#icon-check');
-    svg.appendChild(use);
     var body = document.createElement('div');
     var strong = document.createElement('strong');
     strong.className = 'form-status__title';
@@ -289,7 +254,7 @@
     p.textContent = text;
     body.appendChild(strong);
     body.appendChild(p);
-    statusBox.appendChild(svg);
+    statusBox.appendChild(makeIcon(type === 'error' ? '#icon-error' : '#icon-check'));
     statusBox.appendChild(body);
     statusBox.focus();
   }
@@ -358,7 +323,7 @@
           return;
         }
         showStatus('error', 'Non siamo riusciti a inviare il modulo',
-          'Controlla la connessione e riprova. I dati che hai scritto sono ancora nel modulo.');
+          'Controlla la connessione e riprova. La tua email è ancora nel modulo.');
       });
   });
 })();
