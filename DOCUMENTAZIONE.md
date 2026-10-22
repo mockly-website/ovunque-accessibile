@@ -162,7 +162,7 @@ Migrazioni applicate da utente non superuser con i ruoli di Supabase simulati; f
 
 | # | Cosa | Dove |
 |---|---|---|
-| 1 | **Email di contatto** `[EMAIL DA DEFINIRE]` | footer `index.html`, `privacy.html`, secret `NOTIFY_TO` |
+| 1 | **Email di contatto** ✅ `ovunqueaccessibile@gmail.com` (già inserita) | footer `index.html`, `privacy.html`, secret `NOTIFY_TO` |
 | 2 | **Titolare del trattamento** | `privacy.html` sezione 1 |
 | 3 | **Blu del logo**: brief `#2F5B9C` (in uso), PNG `#215A9F` | `--color-brand` |
 | 4 | **Logo vettoriale** (SVG o PNG ≥ 1000 px) | `assets/img/` |

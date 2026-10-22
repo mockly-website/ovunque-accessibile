@@ -572,6 +572,65 @@ section:focus {
   height: 1.25rem;
 }
 
+/* Telefono e tablet: una colonna centrata (il modulo resta allineato a sinistra dentro la card) */
+@media (max-width: 59.99em) {
+  .home__main {
+    justify-items: center;
+    padding-top: var(--space-sm);
+  }
+
+  .home__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 34rem;
+    text-align: center;
+  }
+
+  .home__title {
+    max-width: 13ch;
+  }
+
+  .home__form {
+    width: 100%;
+    text-align: left;
+  }
+
+  .italy {
+    width: 100%;
+  }
+}
+
+@media (max-width: 29.99em) {
+  .home__title {
+    font-size: clamp(2.1rem, 1.2rem + 5.5vw, 2.6rem);
+  }
+
+  .home__lead {
+    font-size: 1.0625rem;
+  }
+
+  .home__card {
+    padding: var(--space-md);
+    border-radius: var(--radius-lg);
+  }
+
+  .form__submit {
+    flex-basis: 100%;
+  }
+
+  .home__footer-inner {
+    flex-direction: column;
+    gap: 0;
+    padding-block: var(--space-sm);
+  }
+
+  .home__footer-inner > span {
+    min-height: 2rem;
+  }
+}
+
 /* 7. Mappa dell'Italia a puntini (statica in HTML; main.js accende i punti) */
 .italy {
   display: flex;
