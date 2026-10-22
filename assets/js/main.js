@@ -4,119 +4,200 @@
 (function () {
   'use strict';
 
-  /* Paesaggio: colline, alberi, sole e stradina disegnati in base alla larghezza reale dello
-     schermo (niente deformazioni); la carrozzina percorre la strada da sinistra a destra.
-     Parte da sola solo se l'utente non ha chiesto di ridurre il movimento; il pulsante la ferma (WCAG 2.2.2). */
-  (function initScene() {
-    var svg = document.getElementById('scene');
-    var road = document.getElementById('journey-road');
-    var line = document.getElementById('journey-line');
-    var pins = document.getElementById('journey-pins');
-    var trees = document.getElementById('scene-trees');
-    var rider = document.getElementById('journey-rider');
-    var wheel = document.getElementById('journey-wheel');
+  /* Paesaggio all'alba: colline a strati, strada in prospettiva verso il segnaposto luminoso
+     all'orizzonte, carrozzina che si allontana. Tutto è calcolato sulle dimensioni reali dello
+     schermo. Su computer gli strati seguono leggermente il mouse (profondità).
+     Parte da solo solo se l'utente non ha chiesto di ridurre il movimento; il pulsante lo ferma (WCAG 2.2.2). */
+  (function initLandscape() {
+    var svg = document.getElementById('landscape');
+    var main = document.getElementById('main');
     var toggle = document.querySelector('.trail__toggle');
-    if (!svg || !road || !toggle || !window.requestAnimationFrame) return;
+    if (!svg || !main || !toggle || !window.requestAnimationFrame) return;
 
     var NS = 'http://www.w3.org/2000/svg';
-    var SPEED = 90;                  /* px al secondo */
-    var MAX_TILT = 22;
-    var WHEEL_R = 22;
-    var total = 0;
-    var dist = 0;
-    var scale = 1;
+    var $ = function (id) { return document.getElementById(id); };
+    var road = $('ls-road');
+    var dashes = $('ls-dashes');
+    var rider = $('ls-rider');
+    var wheel = $('ls-wheel');
+    var goal = $('ls-goal');
+    var layers = svg.querySelectorAll('.landscape__layer');
+
+    var LOOP = 16;                   /* secondi per percorrere la strada */
+    var t = 0.18;                    /* posizione lungo la strada: 0 = primo piano, 1 = orizzonte */
+    var spin = 0;
     var running = false;
     var last = 0;
     var raf = 0;
-
-    function el(name, attrs, parent) {
-      var n = document.createElementNS(NS, name);
-      Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
-      parent.appendChild(n);
-      return n;
-    }
+    var curve = null;                /* punti di controllo della strada (bezier cubica) */
+    var horizon = 0;
+    var W = 0;
+    var H = 0;
 
     function f(v) { return v.toFixed(1); }
+    function lerp(a, b, k) { return a + (b - a) * k; }
 
-    /* Collina: onda morbida da sinistra a destra, chiusa in basso */
-    function hill(W, H, y0, y1, amp, phase) {
-      return 'M -10 ' + f(H + 10) + ' L -10 ' + f(y0) +
-        ' C ' + f(W * 0.25) + ' ' + f(y0 - amp * phase) + ', ' + f(W * 0.45) + ' ' + f(y0 + amp * phase) + ', ' + f(W * 0.6) + ' ' + f((y0 + y1) / 2) +
-        ' S ' + f(W * 0.9) + ' ' + f(y1 - amp) + ', ' + f(W + 10) + ' ' + f(y1) +
-        ' L ' + f(W + 10) + ' ' + f(H + 10) + ' Z';
+    function bez(k) {
+      var u = 1 - k, c = curve;
+      return {
+        x: u * u * u * c[0] + 3 * u * u * k * c[2] + 3 * u * k * k * c[4] + k * k * k * c[6],
+        y: u * u * u * c[1] + 3 * u * u * k * c[3] + 3 * u * k * k * c[5] + k * k * k * c[7]
+      };
     }
 
-    function tree(x, y, size, parent) {
-      var g = el('g', { transform: 'translate(' + f(x) + ' ' + f(y) + ')' }, parent);
-      el('rect', { class: 'scene__trunk', x: f(-size * 0.08), y: f(-size * 0.55), width: f(size * 0.16), height: f(size * 0.55), rx: '2' }, g);
-      el('circle', { class: 'scene__crown', cx: '0', cy: f(-size * 0.78), r: f(size * 0.38) }, g);
+    /* Larghezza della strada: grande in primo piano, sottile all'orizzonte */
+    function width(k) { return lerp(Math.min(W * (W < 700 ? 0.42 : 0.2), 260), 4, Math.pow(k, 0.7)); }
+
+    /* Bordo sinistro/destro della strada nel punto k */
+    function edges(k) {
+      var p = bez(k);
+      var q = bez(Math.min(1, k + 0.002));
+      var dx = q.x - p.x, dy = q.y - p.y;
+      var len = Math.hypot(dx, dy) || 1;
+      var nx = -dy / len, ny = dx / len;
+      var w = width(k) / 2;
+      return { l: [p.x + nx * w, p.y + ny * w], r: [p.x - nx * w, p.y - ny * w], p: p };
     }
 
-    function pin(x, y) {
-      var g = el('g', { transform: 'translate(' + f(x) + ' ' + f(y - 16) + ')' }, pins);
-      el('path', { class: 'journey__pin', d: 'M0 0 C -13 -15, -15 -21, -15 -28 A 15 15 0 1 1 15 -28 C 15 -21, 13 -15, 0 0 Z' }, g);
-      el('circle', { cx: '0', cy: '-28', r: '6.5', fill: '#ffffff' }, g);
+    function ridge(y0, amp, waves, phase) {
+      var d = 'M -20 ' + f(H + 20) + ' L -20 ' + f(y0);
+      var steps = 24;
+      for (var i = 0; i <= steps; i++) {
+        var x = -20 + (W + 40) * i / steps;
+        var y = y0 - amp * Math.sin(i / steps * Math.PI * waves + phase) * (0.6 + 0.4 * Math.sin(i * 1.7 + phase));
+        d += ' L ' + f(x) + ' ' + f(y);
+      }
+      return d + ' L ' + f(W + 20) + ' ' + f(H + 20) + ' Z';
+    }
+
+    function tree(parent, x, y, h) {
+      var g = document.createElementNS(NS, 'path');
+      /* Abete stilizzato: tre triangoli sovrapposti + tronco */
+      var w = h * 0.42;
+      g.setAttribute('d',
+        'M ' + f(x) + ' ' + f(y - h) + ' L ' + f(x + w * 0.6) + ' ' + f(y - h * 0.55) + ' L ' + f(x - w * 0.6) + ' ' + f(y - h * 0.55) + ' Z ' +
+        'M ' + f(x) + ' ' + f(y - h * 0.78) + ' L ' + f(x + w * 0.8) + ' ' + f(y - h * 0.28) + ' L ' + f(x - w * 0.8) + ' ' + f(y - h * 0.28) + ' Z ' +
+        'M ' + f(x) + ' ' + f(y - h * 0.55) + ' L ' + f(x + w) + ' ' + f(y - h * 0.08) + ' L ' + f(x - w) + ' ' + f(y - h * 0.08) + ' Z ' +
+        'M ' + f(x - w * 0.09) + ' ' + f(y - h * 0.1) + ' h ' + f(w * 0.18) + ' v ' + f(h * 0.12) + ' h ' + f(-w * 0.18) + ' Z');
+      parent.appendChild(g);
     }
 
     function build() {
-      var W = svg.clientWidth;
-      var H = svg.clientHeight;
+      W = main.clientWidth;
+      H = main.clientHeight;
       if (!W || !H) return;
       svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
-      var narrow = W < 600;
+      var narrow = W < 700;
+      /* Su telefono l'orizzonte sta sotto il modulo (il paesaggio si scopre scorrendo);
+         su computer a due terzi dello schermo, con la destinazione accanto al modulo */
+      var card = document.querySelector('.launch__form');
+      var cardBottom = card ? card.getBoundingClientRect().bottom - main.getBoundingClientRect().top : H * 0.6;
+      horizon = narrow ? Math.min(H - 140, cardBottom + 70) : Math.max(H * 0.62, Math.min(H * 0.7, cardBottom - 120));
 
-      document.getElementById('scene-sun').setAttribute('cx', f(W * (narrow ? 0.82 : 0.5)));
-      document.getElementById('scene-sun').setAttribute('cy', f(H * 0.32));
-      document.getElementById('scene-hill-back').setAttribute('d', hill(W, H, H * 0.42, H * 0.3, H * 0.08, 1));
-      document.getElementById('scene-hill-mid').setAttribute('d', hill(W, H, H * 0.5, H * 0.58, H * 0.07, -1));
-      document.getElementById('scene-hill-front').setAttribute('d', hill(W, H, H * 0.7, H * 0.66, H * 0.05, 1));
+      /* Alba dietro l'orizzonte */
+      var glow = $('ls-glow');
+      var gx = narrow ? W * 0.5 : W * 0.8;
+      glow.setAttribute('cx', f(gx));
+      glow.setAttribute('cy', f(horizon));
+      glow.setAttribute('r', f(Math.min(W, 900) * (narrow ? 0.6 : 0.42)));
 
-      /* Alberelli sulla collina di mezzo */
-      trees.textContent = '';
-      var spots = narrow ? [0.08, 0.9] : [0.06, 0.11, 0.33, 0.7, 0.88, 0.93];
-      spots.forEach(function (fx, i) {
-        var size = (narrow ? 34 : 46) * (i % 2 ? 0.8 : 1);
-        tree(W * fx, H * (0.56 + (i % 3) * 0.015), size, trees);
-      });
+      $('ls-far').setAttribute('d', ridge(horizon - H * 0.03, H * 0.05, 3, 0.4));
+      $('ls-mid').setAttribute('d', ridge(horizon + H * 0.025, H * 0.04, 2.2, 2.1));
+      $('ls-near').setAttribute('d', ridge(horizon + H * 0.075, H * 0.025, 1.6, 4));
 
-      /* Stradina sulla collina davanti: entra da sinistra ed esce a destra */
-      var o = 120;
-      var y = H * 0.84;
-      var a = Math.min(26, H * 0.08);
-      var d = 'M ' + (-o) + ' ' + f(y) +
-        ' C ' + f(W * 0.2) + ' ' + f(y - a * 2) + ', ' + f(W * 0.38) + ' ' + f(y + a) + ', ' + f(W * 0.55) + ' ' + f(y - a * 0.4) +
-        ' S ' + f(W * 0.85) + ' ' + f(y - a * 1.6) + ', ' + f(W + o) + ' ' + f(y - a * 0.5);
-      road.setAttribute('d', d);
-      line.setAttribute('d', d);
-      total = road.getTotalLength();
-      scale = narrow ? 0.75 : 1.1;
+      /* Strada: dal basso (fuori schermo) fino all'orizzonte, con una curva a S */
+      var below = H - horizon;
+      curve = narrow ? [
+        W * 0.55, H + 60,
+        W * 0.02, horizon + below * 0.75,
+        W * 0.98, horizon + below * 0.35,
+        gx, horizon + 6
+      ] : [
+        W * 0.9, H + 60,
+        W * 0.66, horizon + below * 0.7,
+        W * 1.02, horizon + below * 0.3,
+        gx, horizon + 6
+      ];
+      var left = [], right = [];
+      for (var i = 0; i <= 60; i++) {
+        var e = edges(i / 60);
+        left.push(f(e.l[0]) + ' ' + f(e.l[1]));
+        right.unshift(f(e.r[0]) + ' ' + f(e.r[1]));
+      }
+      road.setAttribute('d', 'M ' + left.join(' L ') + ' L ' + right.join(' L ') + ' Z');
 
-      pins.textContent = '';
-      [0.3, 0.68].forEach(function (fr) {
-        var pt = road.getPointAtLength(total * fr);
-        pin(pt.x, pt.y);
-      });
+      /* Tratteggio centrale: trattini che rimpiccioliscono con la distanza */
+      dashes.textContent = '';
+      var k = 0, on = true;
+      while (k < 0.97) {
+        var step = 0.035 * Math.pow(1 - k, 0.9) + 0.006;
+        if (on) {
+          var p1 = bez(k), p2 = bez(Math.min(1, k + step));
+          var hw = Math.max(0.6, width(k) * 0.025);
+          var dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy) || 1;
+          var nx = -dy / len * hw, ny = dx / len * hw;
+          var d = document.createElementNS(NS, 'path');
+          d.setAttribute('d', 'M ' + f(p1.x + nx) + ' ' + f(p1.y + ny) + ' L ' + f(p2.x + nx) + ' ' + f(p2.y + ny) +
+            ' L ' + f(p2.x - nx) + ' ' + f(p2.y - ny) + ' L ' + f(p1.x - nx) + ' ' + f(p1.y - ny) + ' Z');
+          dashes.appendChild(d);
+        }
+        k += step;
+        on = !on;
+      }
+
+      /* Destinazione: il segnaposto luminoso dove finisce la strada */
+      var end = bez(1);
+      var gs = narrow ? 0.9 : 1.2;
+      goal.setAttribute('transform', 'translate(' + f(end.x) + ' ' + f(end.y - 2) + ') scale(' + gs + ')');
+
+      /* Abeti: lontani piccoli sulla collina di mezzo, vicini grandi ai lati */
+      var mid = $('ls-trees-mid'), near = $('ls-trees-near');
+      mid.textContent = ''; near.textContent = '';
+      var farSpots = narrow ? [0.06, 0.13, 0.82, 0.9] : [0.04, 0.09, 0.15, 0.24, 0.71, 0.8, 0.86, 0.93];
+      farSpots.forEach(function (fx, i) { tree(mid, W * fx, horizon + H * 0.03 + (i % 2) * 6, (narrow ? 22 : 30) + (i % 3) * 6); });
+      var nearSpots = narrow ? [[0.04, 1.0], [0.96, 0.9]] : [[0.03, 1.1], [0.1, 0.8], [0.9, 0.95], [0.97, 1.15]];
+      nearSpots.forEach(function (s) { tree(near, W * s[0], H * 0.97, (narrow ? 90 : 140) * s[1]); });
+
       place();
     }
 
     function place() {
-      var s = dist % total;
-      var p = road.getPointAtLength(s);
-      var q = road.getPointAtLength(Math.min(total, s + 4));
-      var tilt = Math.atan2(q.y - p.y, (q.x - p.x) || 0.001) * 180 / Math.PI;
-      tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, tilt));
-      rider.setAttribute('transform', 'translate(' + f(p.x) + ' ' + f(p.y + 5) + ') rotate(' + f(tilt) + ') scale(' + scale + ')');
-      wheel.setAttribute('transform', 'rotate(' + f((dist / WHEEL_R) * 180 / Math.PI % 360) + ')');
+      if (!curve) return;
+      var p = bez(t);
+      var q = bez(Math.min(1, t + 0.01));
+      var dir = q.x >= p.x ? 1 : -1;
+      var sc = lerp(narrowScale(), 0.08, Math.pow(t, 0.75));
+      /* Compare dal basso e svanisce all'orizzonte */
+      var op = t < 0.04 ? t / 0.04 : t > 0.86 ? Math.max(0, (1 - t) / 0.14) : 1;
+      rider.setAttribute('transform', 'translate(' + f(p.x) + ' ' + f(p.y) + ') scale(' + f(sc * dir) + ' ' + f(sc) + ')');
+      rider.setAttribute('opacity', op.toFixed(2));
+      wheel.setAttribute('transform', 'rotate(' + f(spin % 360) + ')');
     }
 
-    function frame(t) {
+    function narrowScale() { return W < 700 ? 1.05 : 1.6; }
+
+    function frame(now) {
       if (!running) return;
-      var dt = last ? Math.min(0.1, (t - last) / 1000) : 0;
-      last = t;
-      dist += SPEED * dt;
+      var dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
+      last = now;
+      t += dt / LOOP;
+      if (t >= 1) t = 0;
+      spin += dt * 360 * (1.2 - t);    /* le ruote rallentano con la distanza */
       place();
       raf = requestAnimationFrame(frame);
     }
+
+    /* Profondità: gli strati si spostano un po' seguendo il puntatore (solo mouse, solo se in movimento) */
+    function parallax(e) {
+      if (!running || e.pointerType !== 'mouse') return;
+      var mx = (e.clientX / window.innerWidth - 0.5) * 2;
+      var my = (e.clientY / window.innerHeight - 0.5) * 2;
+      layers.forEach(function (l) {
+        var dpt = parseFloat(l.getAttribute('data-depth')) || 0;
+        l.style.transform = 'translate(' + f(-mx * 18 * dpt) + 'px, ' + f(-my * 8 * dpt) + 'px)';
+      });
+    }
+    window.addEventListener('pointermove', parallax, { passive: true });
 
     var label = toggle.querySelector('.trail__toggle-label');
     var icon = toggle.querySelector('use');
@@ -125,21 +206,24 @@
       icon.setAttribute('href', running ? '#icon-pause' : '#icon-play');
     }
     function play() { running = true; last = 0; raf = requestAnimationFrame(frame); render(); }
-    function pause() { running = false; cancelAnimationFrame(raf); render(); }
+    function pause() {
+      running = false;
+      cancelAnimationFrame(raf);
+      layers.forEach(function (l) { l.style.transform = ''; });
+      render();
+    }
     toggle.addEventListener('click', function () { if (running) pause(); else play(); });
 
     svg.hidden = false;
     toggle.hidden = false;
     build();
-    dist = total * 0.42;             /* posizione di partenza: al centro, ben visibile */
-    place();
 
     var resizeTimer = 0;
     function rebuildSoon() {
       clearTimeout(resizeTimer);
       resizeTimer = setTimeout(build, 120);
     }
-    if (window.ResizeObserver) new ResizeObserver(rebuildSoon).observe(svg);
+    if (window.ResizeObserver) new ResizeObserver(rebuildSoon).observe(main);
     else window.addEventListener('resize', rebuildSoon);
 
     var motionOk = window.matchMedia && window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
@@ -233,7 +317,7 @@
       box = document.createElement('p');
       box.className = 'field__error';
       box.id = id;
-      var anchor = el.type === 'checkbox' ? el.parentNode.lastElementChild : el;
+      var anchor = el.type === 'checkbox' ? el.parentNode.lastElementChild : (el.closest('.form__inline') || el);
       anchor.insertAdjacentElement('afterend', box);
     }
     box.textContent = '';

@@ -395,24 +395,164 @@ section:focus {
   line-height: 1.1;
 }
 
-/* 6. Pagina "in arrivo": header leggero + hero a tutto schermo */
-/* Header + hero riempiono il primo schermo; il footer arriva scorrendo */
-.soon {
+/* 6. Pagina "in arrivo": alba sul paesaggio, contenuto al centro */
+.launch {
+  --color-focus: var(--color-card);    /* focus chiaro su fondo scuro: 13,8:1 */
+  --night: #0b1626;
+  --dawn: #f3d7a8;
+  --error-light: #ffc9bf;              /* errori su fondo scuro: >= 10:1 */
   display: flex;
   flex-direction: column;
   min-height: 100svh;
-  background:
-    radial-gradient(60rem 30rem at 15% 25%, rgba(251, 246, 236, 0.9), transparent 70%),
-    linear-gradient(180deg, var(--color-sky) 0%, #f1ece1 55%, var(--color-beige) 100%);
-  background-attachment: scroll;
+  color: var(--color-white);
+  background: var(--night);
 }
 
-.soon-header {
+.launch a {
+  color: var(--color-card);
+}
+
+.launch a:hover {
+  color: var(--color-white);
+}
+
+.launch__main {
+  position: relative;
+  isolation: isolate;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* Cielo: notte in alto, luce calda all'orizzonte; stelle e grana in CSS (restano anche senza JS) */
+  background:
+    radial-gradient(1.5px 1.5px at 12% 18%, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1px 1px at 24% 8%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(1.5px 1.5px at 38% 26%, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1px 1px at 52% 12%, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1.5px 1.5px at 66% 6%, rgba(255, 255, 255, 0.8), transparent 60%),
+    radial-gradient(1px 1px at 74% 22%, rgba(255, 255, 255, 0.7), transparent 60%),
+    radial-gradient(1.5px 1.5px at 86% 14%, rgba(255, 255, 255, 0.9), transparent 60%),
+    radial-gradient(1px 1px at 93% 30%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(1px 1px at 6% 34%, rgba(255, 255, 255, 0.6), transparent 60%),
+    radial-gradient(70rem 26rem at 50% 78%, rgba(243, 215, 168, 0.45), transparent 70%),
+    linear-gradient(180deg, #0b1626 0%, #13264a 38%, #2d4c78 64%, #8a8a9a 82%, #d9b98c 100%);
+}
+
+/* Grana leggera: toglie l'effetto "piatto" (rumore SVG in data URI, nessuna risorsa esterna) */
+.launch__main::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* 7. Paesaggio (svg disegnato da main.js) */
+.landscape {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.landscape__layer {
+  transition: transform 0.6s var(--ease-out);
+}
+
+.landscape__trees {
+  fill: #0d1a2d;
+}
+
+.landscape__dashes {
+  fill: var(--color-card);
+  opacity: 0.85;
+}
+
+.landscape__goal path {
+  fill: var(--color-brand);
+  stroke: var(--color-card);
+  stroke-width: 2;
+}
+
+.landscape__goal circle {
+  fill: var(--color-card);
+}
+
+.landscape__goal {
+  filter: drop-shadow(0 0 14px rgba(255, 243, 220, 0.9));
+}
+
+/* Carrozzina nei blu del logo: risalta sulla strada chiara */
+.rider__wheel {
+  fill: rgba(251, 246, 236, 0.35);
+  stroke: var(--color-navy);
+  stroke-width: 4;
+}
+
+.rider__spokes {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+}
+
+.rider__hub,
+.rider__head {
+  fill: var(--color-navy);
+}
+
+.rider__caster {
+  fill: var(--color-card);
+  stroke: var(--color-navy);
+  stroke-width: 3;
+}
+
+.rider__frame,
+.rider__arm,
+.rider__legs,
+.rider__shoe,
+.rider__body {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.rider__frame,
+.rider__arm {
+  stroke: var(--color-navy);
+}
+
+.rider__frame {
+  stroke-width: 4;
+}
+
+.rider__arm {
+  stroke-width: 5;
+}
+
+.rider__body {
+  stroke: var(--color-brand);
+  stroke-width: 13;
+}
+
+.rider__legs {
+  stroke: var(--color-navy);
+  stroke-width: 9;
+}
+
+.rider__shoe {
+  stroke: var(--color-navy);
+  stroke-width: 6;
+}
+
+/* Barra in alto: logo e Instagram */
+.launch__top {
   position: relative;
   z-index: 2;
-}
-
-.soon-header__inner {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -420,31 +560,43 @@ section:focus {
   padding-block: var(--space-md);
 }
 
-.soon-header .brand__logo {
-  width: 2.75rem;
+.launch__brand {
+  display: inline-flex;
+  min-height: var(--target-min);
+  align-items: center;
 }
 
-.soon-header__social {
+.launch__brand-mark {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--color-card);
+  box-shadow: 0 0 0 6px rgba(251, 246, 236, 0.12), 0 8px 24px rgba(0, 0, 0, 0.35);
+}
+
+.launch__brand-mark img {
+  width: 1.75rem;
+}
+
+.launch__social {
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
   min-height: var(--target-min);
-  min-width: var(--target-min);
-  justify-content: center;
   padding: var(--space-xs) var(--space-md);
+  border: 1px solid rgba(251, 246, 236, 0.25);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, 0.7);
-  color: var(--color-navy);
+  background: rgba(11, 22, 38, 0.35);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: var(--text-sm);
   text-decoration: none;
 }
 
-.soon-header__social:hover {
-  background: var(--color-white);
-  color: var(--color-navy);
-}
-
 @media (max-width: 29.99em) {
-  .soon-header__social-label {
+  .launch__social-label {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -453,216 +605,303 @@ section:focus {
     white-space: nowrap;
   }
 
-  .soon-header__social {
-    padding: var(--space-xs);
+  .launch__social {
+    width: var(--target-min);
+    justify-content: center;
+    padding: 0;
   }
 }
 
-.hero {
+/* Centro: badge, nome, una riga, tre etichette, modulo */
+.launch__center {
   position: relative;
-  flex: 1 0 auto;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-}
-
-.hero__grid {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  gap: var(--space-lg);
   align-items: center;
-  padding-top: var(--space-sm);
+  text-align: center;
+  padding-top: clamp(0.5rem, 3vh, 2.5rem);
 }
 
-@media (min-width: 60em) {
-  .hero__grid {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    grid-template-areas:
-      "copy form"
-      "controls form";
-    column-gap: var(--space-2xl);
-    row-gap: 0;
-    padding-top: clamp(1rem, 4vh, 3.5rem);
+.launch__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-md);
+  padding: 0.35rem 0.9rem;
+  border: 1px solid rgba(243, 215, 168, 0.45);
+  border-radius: var(--radius-pill);
+  background: rgba(243, 215, 168, 0.12);
+  color: var(--dawn);                  /* 12:1 sul cielo notturno */
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.launch__dot {
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: var(--dawn);
+  box-shadow: 0 0 0 4px rgba(243, 215, 168, 0.25);
+}
+
+.launch__title {
+  margin-bottom: var(--space-md);
+  font-size: clamp(3rem, 1.4rem + 6vw, 5.75rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+  background: linear-gradient(180deg, #ffffff 30%, #f3d7a8 120%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 10px 40px rgba(243, 215, 168, 0.15);
+}
+
+/* Se il testo con gradiente non è supportato, resta bianco */
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .launch__title {
+    color: var(--color-white);
   }
-
-  .hero__copy { grid-area: copy; align-self: end; }
-  .hero__form { grid-area: form; }
-  .hero__controls { grid-area: controls; align-self: start; margin-top: var(--space-lg); }
 }
 
-.hero__controls:empty,
-.hero__controls:has(> [hidden]:only-child) {
-  display: none;
+.launch__lead {
+  max-width: 30ch;
+  margin-bottom: var(--space-lg);
+  color: #dce9f7;                      /* 12:1 sul cielo */
+  font-size: clamp(1.15rem, 1rem + 0.6vw, 1.45rem);
+  line-height: 1.45;
 }
 
-.hero__title {
-  max-width: 16ch;
-  font-size: clamp(2rem, 1.3rem + 3.6vw, 4.25rem);
-  line-height: 1.05;
-  letter-spacing: -0.01em;
+.launch__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
   margin-bottom: var(--space-lg);
 }
 
-/* Evidenziatore color sentiero sotto "la normalità" (decorativo, il testo resta blu scuro) */
-.hero__highlight {
-  background: linear-gradient(transparent 58%, rgba(139, 125, 107, 0.32) 58%, rgba(139, 125, 107, 0.32) 92%, transparent 92%);
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
+.launch__chips li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(251, 246, 236, 0.18);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  color: var(--color-card);
+  font-size: var(--text-sm);
 }
 
-.hero__text {
-  max-width: 40ch;
-  margin-bottom: 0;
-  line-height: 1.55;
+.launch__chips .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--dawn);
 }
 
-@media (min-width: 40em) {
-  .hero__text {
-    font-size: var(--text-lg);
-  }
-}
-
-@media (max-width: 59.99em) {
-  .hero__controls {
-    display: flex;
-    justify-content: center;
-  }
-}
-
-/* 7. Paesaggio con stradina e carrozzina (svg disegnato da main.js) */
-.scene {
-  position: relative;
-  z-index: 0;
-  display: block;
+/* Modulo in vetro scuro: leggibile su qualsiasi punto del paesaggio */
+.launch__form {
   width: 100%;
-  height: clamp(10rem, 24vh, 17rem);
-  margin-top: auto;              /* sempre in fondo all'hero */
+  max-width: 34rem;
+}
+
+.glass {
+  padding: var(--space-lg);
+  border: 1px solid rgba(251, 246, 236, 0.22);
+  border-radius: var(--radius-xl);
+  background: linear-gradient(160deg, rgba(31, 52, 86, 0.78), rgba(11, 22, 38, 0.82));
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  backdrop-filter: blur(14px) saturate(1.2);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  text-align: left;
+}
+
+.launch .field__label {
+  color: var(--color-white);
+}
+
+.launch .field--checkbox .field__label {
+  color: #dce9f7;
+  font-size: var(--text-sm);
+}
+
+.launch .field__input {
+  border-color: transparent;
+  background: var(--color-white);
+  color: var(--color-navy);
+}
+
+.launch .field__input:focus,
+.launch .field__input:focus-visible {
+  outline-color: var(--dawn);
+}
+
+.launch .field__checkbox {
+  accent-color: var(--dawn);
+}
+
+.launch .field__error,
+.launch .field__error .icon {
+  color: var(--error-light);
+}
+
+.launch .field__input[aria-invalid="true"] {
+  border-color: var(--error-light);
+}
+
+.launch .field__checkbox[aria-invalid="true"] {
+  outline-color: var(--error-light);
+}
+
+.launch .form__note {
+  margin-top: var(--space-xs);
+  color: #b9cbe2;                      /* 7:1 sul vetro scuro */
+  text-align: left;
+}
+
+.launch .field {
+  margin-bottom: var(--space-md);
+}
+
+.launch .error-summary {
+  color: var(--color-navy);
+}
+
+.launch .error-summary a {
+  color: var(--color-error);
+}
+
+.launch .form-status {
+  color: var(--color-navy);
+  text-align: left;
+}
+
+/* Pulsante principale: luce dell'alba */
+.btn--glow {
+  border: 0;
+  background: linear-gradient(180deg, #fff3dc, var(--dawn));
+  color: var(--color-navy);            /* 11:1 */
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.4) inset, 0 10px 30px rgba(243, 215, 168, 0.35);
+}
+
+.btn--glow:hover {
+  background: linear-gradient(180deg, #ffffff, #f7e2bd);
+  color: var(--color-navy);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6) inset, 0 14px 40px rgba(243, 215, 168, 0.55);
+}
+
+.form__inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.form__inline .field__input {
+  flex: 1 1 12rem;
+  width: auto;
+  min-height: 3.5rem;
+}
+
+.form__submit {
+  flex: 1 0 auto;
+  min-height: 3.5rem;
+  padding-inline: var(--space-lg);
+  font-size: var(--text-lg);
+}
+
+@media (min-width: 30em) {
+  .form__submit {
+    flex: 0 0 auto;
+  }
+}
+
+.form__submit .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+/* In fondo: firma e pulsante dell'animazione */
+.launch__bottom {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-top: auto;
+  padding-top: var(--space-2xl);
+  padding-bottom: var(--space-md);
+}
+
+/* Telefono: spazio per il paesaggio sotto il modulo */
+@media (max-width: 43.74em) {
+  .launch__bottom {
+    padding-top: 17rem;
+  }
+}
+
+/* Sfumatura scura sotto firma e pulsante: leggibili anche sopra la strada chiara */
+.launch__bottom::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 50%;
+  bottom: 0;
+  width: 100vw;
+  height: 9rem;
+  transform: translateX(-50%);
+  background: linear-gradient(180deg, rgba(11, 22, 38, 0), rgba(11, 22, 38, 0.92) 55%);
   pointer-events: none;
 }
 
-@media (min-width: 60em) {
-  .scene {
-    margin-top: calc(-1 * clamp(3rem, 10vh, 7rem));   /* le colline salgono dietro al contenuto */
-  }
+.launch__sign {
+  margin: 0;
+  color: var(--color-card);
+  font-size: var(--text-sm);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
 }
 
-.scene__sun {
-  fill: var(--color-card);
-  filter: drop-shadow(0 0 24px rgba(251, 246, 236, 0.9));
+.launch .trail__toggle {
+  border-color: rgba(251, 246, 236, 0.35);
+  background: rgba(11, 22, 38, 0.55);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  color: var(--color-card);
 }
 
-.scene__hill--back {
-  fill: #d4e7f5;
+.launch .trail__toggle:hover {
+  background: var(--color-card);
+  color: var(--color-navy);
 }
 
-.scene__hill--mid {
-  fill: #dcc8a5;
+.launch__footer {
+  background: var(--night);
+  color: #b9cbe2;
+  font-size: var(--text-sm);
 }
 
-.scene__hill--front {
-  fill: #efe3cb;
+.launch__footer-inner {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0 var(--space-lg);
+  padding-block: var(--space-sm);
 }
 
-.scene__trunk {
-  fill: var(--color-path);
+.launch__footer-inner a,
+.launch__footer-inner > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+  min-height: var(--target-min);
 }
 
-.scene__crown {
-  fill: var(--color-brand);
-}
-
-.journey__road,
-.journey__line {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.journey__road {
-  stroke: var(--color-path);
-  stroke-width: 20;
-}
-
-.journey__line {
-  stroke: var(--color-card);
-  stroke-width: 2.5;
-  stroke-dasharray: 12 16;
-}
-
-.journey__pin {
-  fill: var(--color-brand);
-}
-
-.trail__wheel {
-  fill: none;
-  stroke: var(--color-navy);
-  stroke-width: 4;
-}
-
-.trail__rim {
-  fill: none;
-  stroke: var(--color-brand);
-  stroke-width: 2;
-}
-
-.trail__spokes {
-  fill: none;
-  stroke: var(--color-brand);
-  stroke-width: 1.5;
-}
-
-.trail__hub,
-.trail__person {
-  fill: var(--color-navy);
-}
-
-.trail__caster {
-  fill: var(--color-card);
-  stroke: var(--color-navy);
-  stroke-width: 3;
-}
-
-.trail__frame {
-  fill: none;
-  stroke: var(--color-navy);
-  stroke-width: 4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.trail__body,
-.trail__legs,
-.trail__shoe {
-  fill: none;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.trail__body {
-  stroke: var(--color-brand);
-  stroke-width: 13;
-}
-
-.trail__legs {
-  stroke: var(--color-navy);
-  stroke-width: 9;
-}
-
-.trail__shoe {
-  stroke: var(--color-navy);
-  stroke-width: 6;
-}
-
-.trail__arm {
-  fill: none;
-  stroke: var(--color-navy);
-  stroke-width: 5;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-/* Pulsante pausa/avvio dell'animazione (visibile solo se l'animazione è disponibile) */
 .trail__toggle {
   display: inline-flex;
   align-items: center;
@@ -1107,27 +1346,21 @@ svg.card__icon.icon--error {
     transform: translateY(-2px);
   }
 
-  /* Ingresso a cascata dell'annuncio */
-  .hero__item {
-    animation: rise 0.7s var(--ease-out) both;
+  /* Ingresso: il contenuto sale a cascata, il paesaggio emerge, il modulo "compare" */
+  .launch__item {
+    animation: rise 0.8s var(--ease-out) both;
   }
 
-  .hero__item:nth-child(2) { animation-delay: 0.08s; }
-  .hero__item:nth-child(3) { animation-delay: 0.16s; }
-  .hero__item:nth-child(4) { animation-delay: 0.24s; }
+  .launch__item:nth-child(2) { animation-delay: 0.1s; }
+  .launch__item:nth-child(3) { animation-delay: 0.2s; }
+  .launch__item:nth-child(4) { animation-delay: 0.3s; }
 
-  .scene {
-    animation: fade-in 1.2s 0.2s ease both;
+  .landscape {
+    animation: dawn-in 1.6s ease both;
   }
 
-  /* Il modulo "compare": sale, si ingrandisce appena e la campanella suona una volta */
-  .form-card {
-    animation: card-in 0.9s 0.35s var(--ease-out) both;
-  }
-
-  .form-card__bell .icon {
-    transform-origin: 50% 10%;
-    animation: ring 0.9s 1.2s ease-in-out both;
+  .launch__form {
+    animation: card-in 0.9s 0.45s var(--ease-out) both;
   }
 
   .btn:hover .icon {
@@ -1166,6 +1399,11 @@ svg.card__icon.icon--error {
   80% { transform: rotate(-4deg); }
 }
 
+@keyframes dawn-in {
+  from { opacity: 0; transform: translateY(2rem); }
+  to { opacity: 1; transform: none; }
+}
+
 @keyframes fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -1198,7 +1436,7 @@ svg.card__icon.icon--error {
 
 @media print {
   .skip-links,
-  .scene,
+  .landscape,
   .trail__toggle {
     display: none;
   }
@@ -1206,6 +1444,9 @@ svg.card__icon.icon--error {
   body,
   .soon,
   .hero,
+  .launch,
+  .launch__main,
+  .launch__footer,
   .site-footer {
     background: none;
     color: #000;
