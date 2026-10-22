@@ -21,11 +21,11 @@
   src: url("../fonts/atkinson-hyperlegible-700-latin.woff2") format("woff2");
 }
 @font-face {
-  font-family: "Comic Neue";
+  font-family: "Fredoka";
   font-style: normal;
-  font-weight: 700;
+  font-weight: 600 700;           /* file statico 600: evita il grassetto sintetico */
   font-display: swap;
-  src: url("../fonts/comic-neue-700-latin.woff2") format("woff2");
+  src: url("../fonts/fredoka-latin.woff2") format("woff2");
 }
 
 /* 2. Token: colori, font, spaziature, raggi, ombre */
@@ -44,7 +44,8 @@
   --color-text: var(--color-navy);
   --color-focus: var(--color-navy);
 
-  --font-heading: "Comic Neue", "Chalkboard SE", "Comic Sans MS", cursive;
+  --font-heading: "Fredoka", "Atkinson Hyperlegible", system-ui, sans-serif;  /* titoli: arrotondato come il logo */
+  --font-heading-weight: 600;
   --font-body: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --text-sm: 1rem;
@@ -107,7 +108,7 @@ h1,
 h2,
 h3 {
   font-family: var(--font-heading);
-  font-weight: 700;
+  font-weight: var(--font-heading-weight);
   line-height: 1.15;
   margin: 0 0 var(--space-md);
   text-wrap: balance;
@@ -428,7 +429,7 @@ section:focus {
   max-width: 26ch;
   font-family: var(--font-heading);
   font-size: var(--text-xl);
-  font-weight: 700;
+  font-weight: var(--font-heading-weight);
   line-height: 1.3;
 }
 
@@ -1019,13 +1020,3 @@ svg.card__icon.icon--error {
   }
 }
 
-/* Etichetta delle pagine di anteprima font (variante-1/2.html): da togliere dopo la scelta */
-.variant-note {
-  margin: 0;
-  padding: var(--space-xs) var(--space-md);
-  background: var(--color-navy);
-  color: var(--color-beige);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  text-align: center;
-}

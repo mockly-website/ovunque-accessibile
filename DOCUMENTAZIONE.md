@@ -20,7 +20,7 @@ Realizzata da Mockly.
 ├── assets/
 │   ├── css/style.css
 │   ├── js/main.js           animazione della carrozzina + modulo
-│   ├── fonts/               Comic Neue 700, Atkinson Hyperlegible 400/700 (woff2, licenza OFL inclusa)
+│   ├── fonts/               Fredoka 600 (titoli), Atkinson Hyperlegible 400/700 (testi); woff2, licenza OFL inclusa
 │   └── img/                 logo, favicon, apple-touch-icon, og-image
 ├── supabase/                NON va pubblicato con il sito
 │   ├── config.toml
