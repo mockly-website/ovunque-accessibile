@@ -395,93 +395,202 @@ section:focus {
   line-height: 1.1;
 }
 
-/* 6. Pagina "in arrivo" */
+/* 6. Pagina "in arrivo": header leggero + hero a tutto schermo */
+/* Header + hero riempiono il primo schermo; il footer arriva scorrendo */
 .soon {
-  background:
-    radial-gradient(circle at 12% 8%, var(--color-sky) 0 10rem, transparent 10.05rem),
-    radial-gradient(circle at 92% 30%, rgba(251, 246, 236, 0.75) 0 12rem, transparent 12.05rem),
-    var(--color-beige);
-}
-
-.soon__main {
-  padding-top: var(--space-2xl);
-}
-
-.soon__intro {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  min-height: 100svh;
+  background:
+    radial-gradient(60rem 30rem at 15% 25%, rgba(251, 246, 236, 0.9), transparent 70%),
+    linear-gradient(180deg, var(--color-sky) 0%, #f1ece1 55%, var(--color-beige) 100%);
+  background-attachment: scroll;
 }
 
-.soon__logo {
-  width: 5.5rem;
-  margin-bottom: var(--space-md);
-}
-
-.soon__title {
-  font-size: var(--text-3xl);
-  line-height: 1.02;
-  margin-bottom: var(--space-md);
-}
-
-.soon__slogan {
-  max-width: 26ch;
-  font-family: var(--font-heading);
-  font-size: var(--text-xl);
-  font-weight: var(--font-heading-weight);
-  line-height: 1.3;
-}
-
-.soon__text {
-  max-width: 44ch;
-  margin-bottom: 0;
-  font-size: var(--text-lg);
-  line-height: 1.5;
-}
-
-.soon__join {
-  max-width: 34rem;
-  padding-bottom: var(--space-2xl);
-}
-
-/* 7. Stradina animata */
-.trail {
+.soon-header {
   position: relative;
-  margin-top: var(--space-md);
+  z-index: 2;
 }
 
-.trail__svg {
+.soon-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  padding-block: var(--space-md);
+}
+
+.soon-header .brand__logo {
+  width: 2.75rem;
+}
+
+.soon-header__social {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  min-width: var(--target-min);
+  justify-content: center;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--color-navy);
+  text-decoration: none;
+}
+
+.soon-header__social:hover {
+  background: var(--color-white);
+  color: var(--color-navy);
+}
+
+@media (max-width: 29.99em) {
+  .soon-header__social-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .soon-header__social {
+    padding: var(--space-xs);
+  }
+}
+
+.hero {
+  position: relative;
+  flex: 1 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.hero__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--space-lg);
+  align-items: center;
+  padding-top: var(--space-sm);
+}
+
+@media (min-width: 60em) {
+  .hero__grid {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+    grid-template-areas:
+      "copy form"
+      "controls form";
+    column-gap: var(--space-2xl);
+    row-gap: 0;
+    padding-top: clamp(1rem, 4vh, 3.5rem);
+  }
+
+  .hero__copy { grid-area: copy; align-self: end; }
+  .hero__form { grid-area: form; }
+  .hero__controls { grid-area: controls; align-self: start; margin-top: var(--space-lg); }
+}
+
+.hero__controls:empty,
+.hero__controls:has(> [hidden]:only-child) {
+  display: none;
+}
+
+.hero__title {
+  max-width: 16ch;
+  font-size: clamp(2rem, 1.3rem + 3.6vw, 4.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-lg);
+}
+
+/* Evidenziatore color sentiero sotto "la normalità" (decorativo, il testo resta blu scuro) */
+.hero__highlight {
+  background: linear-gradient(transparent 58%, rgba(139, 125, 107, 0.32) 58%, rgba(139, 125, 107, 0.32) 92%, transparent 92%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+
+.hero__text {
+  max-width: 40ch;
+  margin-bottom: 0;
+  line-height: 1.55;
+}
+
+@media (min-width: 40em) {
+  .hero__text {
+    font-size: var(--text-lg);
+  }
+}
+
+@media (max-width: 59.99em) {
+  .hero__controls {
+    display: flex;
+    justify-content: center;
+  }
+}
+
+/* 7. Paesaggio con stradina e carrozzina (svg disegnato da main.js) */
+.scene {
+  position: relative;
+  z-index: 0;
+  display: block;
   width: 100%;
-  height: clamp(11rem, 7rem + 12vw, 17rem);
+  height: clamp(10rem, 24vh, 17rem);
+  margin-top: auto;              /* sempre in fondo all'hero */
+  pointer-events: none;
 }
 
-.trail__hill--back {
-  fill: var(--color-sky);
+@media (min-width: 60em) {
+  .scene {
+    margin-top: calc(-1 * clamp(3rem, 10vh, 7rem));   /* le colline salgono dietro al contenuto */
+  }
 }
 
-.trail__hill--front {
+.scene__sun {
   fill: var(--color-card);
+  filter: drop-shadow(0 0 24px rgba(251, 246, 236, 0.9));
 }
 
-.trail__road,
-.trail__line {
+.scene__hill--back {
+  fill: #d4e7f5;
+}
+
+.scene__hill--mid {
+  fill: #dcc8a5;
+}
+
+.scene__hill--front {
+  fill: #efe3cb;
+}
+
+.scene__trunk {
+  fill: var(--color-path);
+}
+
+.scene__crown {
+  fill: var(--color-brand);
+}
+
+.journey__road,
+.journey__line {
   fill: none;
   stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.trail__road {
+.journey__road {
   stroke: var(--color-path);
   stroke-width: 20;
 }
 
-.trail__line {
+.journey__line {
   stroke: var(--color-card);
   stroke-width: 2.5;
   stroke-dasharray: 12 16;
 }
 
-.trail__pin {
+.journey__pin {
   fill: var(--color-brand);
 }
 
@@ -553,16 +662,7 @@ section:focus {
   stroke-linejoin: round;
 }
 
-/* Pulsante pausa/avvio: sotto la scena, sulla fascia del colle (visibile solo se l'animazione è disponibile) */
-.trail__controls {
-  display: flex;
-  justify-content: flex-end;
-  max-width: none;
-  margin-top: -1px;              /* nessuna riga tra svg e fascia */
-  padding-bottom: var(--space-md);
-  background: var(--color-card);
-}
-
+/* Pulsante pausa/avvio dell'animazione (visibile solo se l'animazione è disponibile) */
 .trail__toggle {
   display: inline-flex;
   align-items: center;
@@ -593,9 +693,10 @@ section:focus {
 .form-card {
   position: relative;
   padding: var(--space-lg);
+  border: 1px solid rgba(22, 40, 65, 0.08);
   border-radius: var(--radius-xl);
-  background: var(--color-card);
-  box-shadow: var(--shadow-md);
+  background: var(--color-white);
+  box-shadow: 0 2px 6px rgba(22, 40, 65, 0.06), 0 24px 60px rgba(22, 40, 65, 0.16);
 }
 
 @media (min-width: 40em) {
@@ -604,12 +705,60 @@ section:focus {
   }
 }
 
+.form-card__head {
+  display: flex;
+  gap: var(--space-md);
+  align-items: flex-start;
+  margin-bottom: var(--space-lg);
+}
+
+.form-card__bell {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-brand);
+  color: var(--color-white);
+}
+
 .form-card__title {
-  margin-bottom: var(--space-xs);
+  margin-bottom: var(--space-2xs);
+  font-size: var(--text-xl);
 }
 
 .form-card__text {
-  margin-bottom: var(--space-lg);
+  margin-bottom: 0;
+}
+
+/* Email e pulsante sulla stessa riga (in colonna sui telefoni stretti) */
+.form__inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.form__inline .field__input {
+  flex: 1 1 11rem;
+  width: auto;
+  min-height: 3.5rem;
+}
+
+.form__submit {
+  flex: 1 0 auto;
+  padding-inline: var(--space-lg);
+}
+
+@media (min-width: 30em) {
+  .form__submit {
+    flex: 0 0 auto;
+  }
+}
+
+.form__submit .icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .form-status + .form {
@@ -959,25 +1108,34 @@ svg.card__icon.icon--error {
   }
 
   /* Ingresso a cascata dell'annuncio */
-  .soon__item {
+  .hero__item {
     animation: rise 0.7s var(--ease-out) both;
   }
 
-  .soon__item:nth-child(2) { animation-delay: 0.08s; }
-  .soon__item:nth-child(3) { animation-delay: 0.16s; }
-  .soon__item:nth-child(4) { animation-delay: 0.24s; }
-  .soon__item:nth-child(5) { animation-delay: 0.32s; }
+  .hero__item:nth-child(2) { animation-delay: 0.08s; }
+  .hero__item:nth-child(3) { animation-delay: 0.16s; }
+  .hero__item:nth-child(4) { animation-delay: 0.24s; }
 
-  .soon__logo {
-    animation-name: pop-in;
+  .scene {
+    animation: fade-in 1.2s 0.2s ease both;
   }
 
-  .trail {
-    animation: rise 0.8s 0.4s var(--ease-out) both;
-  }
-
+  /* Il modulo "compare": sale, si ingrandisce appena e la campanella suona una volta */
   .form-card {
-    animation: rise 0.8s 0.55s var(--ease-out) both;
+    animation: card-in 0.9s 0.35s var(--ease-out) both;
+  }
+
+  .form-card__bell .icon {
+    transform-origin: 50% 10%;
+    animation: ring 0.9s 1.2s ease-in-out both;
+  }
+
+  .btn:hover .icon {
+    transform: translateX(3px);
+  }
+
+  .btn .icon {
+    transition: transform 0.25s var(--ease-out);
   }
 
   /* Esito del modulo */
@@ -993,6 +1151,24 @@ svg.card__icon.icon--error {
 @keyframes rise {
   from { opacity: 0; transform: translateY(1.25rem); }
   to { opacity: 1; transform: none; }
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(2rem) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes ring {
+  0%, 100% { transform: rotate(0); }
+  20% { transform: rotate(14deg); }
+  40% { transform: rotate(-12deg); }
+  60% { transform: rotate(8deg); }
+  80% { transform: rotate(-4deg); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes pop-in {
@@ -1022,12 +1198,14 @@ svg.card__icon.icon--error {
 
 @media print {
   .skip-links,
-  .trail {
+  .scene,
+  .trail__toggle {
     display: none;
   }
 
   body,
   .soon,
+  .hero,
   .site-footer {
     background: none;
     color: #000;

@@ -4,49 +4,144 @@
 (function () {
   'use strict';
 
-  /* Stradina: la carrozzina percorre il sentiero (SMIL). Parte da sola solo se l'utente
-     non ha chiesto di ridurre il movimento; il pulsante la ferma o la riavvia (WCAG 2.2.2). */
-  (function initTrail() {
-    var svg = document.querySelector('.trail__svg');
-    var rider = document.getElementById('trail-rider');
+  /* Paesaggio: colline, alberi, sole e stradina disegnati in base alla larghezza reale dello
+     schermo (niente deformazioni); la carrozzina percorre la strada da sinistra a destra.
+     Parte da sola solo se l'utente non ha chiesto di ridurre il movimento; il pulsante la ferma (WCAG 2.2.2). */
+  (function initScene() {
+    var svg = document.getElementById('scene');
+    var road = document.getElementById('journey-road');
+    var line = document.getElementById('journey-line');
+    var pins = document.getElementById('journey-pins');
+    var trees = document.getElementById('scene-trees');
+    var rider = document.getElementById('journey-rider');
+    var wheel = document.getElementById('journey-wheel');
     var toggle = document.querySelector('.trail__toggle');
-    if (!svg || !rider || !toggle || typeof svg.pauseAnimations !== 'function') return;
+    if (!svg || !road || !toggle || !window.requestAnimationFrame) return;
 
-    var anims = svg.querySelectorAll('.trail__anim');
+    var NS = 'http://www.w3.org/2000/svg';
+    var SPEED = 90;                  /* px al secondo */
+    var MAX_TILT = 22;
+    var WHEEL_R = 22;
+    var total = 0;
+    var dist = 0;
+    var scale = 1;
+    var running = false;
+    var last = 0;
+    var raf = 0;
+
+    function el(name, attrs, parent) {
+      var n = document.createElementNS(NS, name);
+      Object.keys(attrs).forEach(function (k) { n.setAttribute(k, attrs[k]); });
+      parent.appendChild(n);
+      return n;
+    }
+
+    function f(v) { return v.toFixed(1); }
+
+    /* Collina: onda morbida da sinistra a destra, chiusa in basso */
+    function hill(W, H, y0, y1, amp, phase) {
+      return 'M -10 ' + f(H + 10) + ' L -10 ' + f(y0) +
+        ' C ' + f(W * 0.25) + ' ' + f(y0 - amp * phase) + ', ' + f(W * 0.45) + ' ' + f(y0 + amp * phase) + ', ' + f(W * 0.6) + ' ' + f((y0 + y1) / 2) +
+        ' S ' + f(W * 0.9) + ' ' + f(y1 - amp) + ', ' + f(W + 10) + ' ' + f(y1) +
+        ' L ' + f(W + 10) + ' ' + f(H + 10) + ' Z';
+    }
+
+    function tree(x, y, size, parent) {
+      var g = el('g', { transform: 'translate(' + f(x) + ' ' + f(y) + ')' }, parent);
+      el('rect', { class: 'scene__trunk', x: f(-size * 0.08), y: f(-size * 0.55), width: f(size * 0.16), height: f(size * 0.55), rx: '2' }, g);
+      el('circle', { class: 'scene__crown', cx: '0', cy: f(-size * 0.78), r: f(size * 0.38) }, g);
+    }
+
+    function pin(x, y) {
+      var g = el('g', { transform: 'translate(' + f(x) + ' ' + f(y - 16) + ')' }, pins);
+      el('path', { class: 'journey__pin', d: 'M0 0 C -13 -15, -15 -21, -15 -28 A 15 15 0 1 1 15 -28 C 15 -21, 13 -15, 0 0 Z' }, g);
+      el('circle', { cx: '0', cy: '-28', r: '6.5', fill: '#ffffff' }, g);
+    }
+
+    function build() {
+      var W = svg.clientWidth;
+      var H = svg.clientHeight;
+      if (!W || !H) return;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      var narrow = W < 600;
+
+      document.getElementById('scene-sun').setAttribute('cx', f(W * (narrow ? 0.82 : 0.5)));
+      document.getElementById('scene-sun').setAttribute('cy', f(H * 0.32));
+      document.getElementById('scene-hill-back').setAttribute('d', hill(W, H, H * 0.42, H * 0.3, H * 0.08, 1));
+      document.getElementById('scene-hill-mid').setAttribute('d', hill(W, H, H * 0.5, H * 0.58, H * 0.07, -1));
+      document.getElementById('scene-hill-front').setAttribute('d', hill(W, H, H * 0.7, H * 0.66, H * 0.05, 1));
+
+      /* Alberelli sulla collina di mezzo */
+      trees.textContent = '';
+      var spots = narrow ? [0.08, 0.9] : [0.06, 0.11, 0.33, 0.7, 0.88, 0.93];
+      spots.forEach(function (fx, i) {
+        var size = (narrow ? 34 : 46) * (i % 2 ? 0.8 : 1);
+        tree(W * fx, H * (0.56 + (i % 3) * 0.015), size, trees);
+      });
+
+      /* Stradina sulla collina davanti: entra da sinistra ed esce a destra */
+      var o = 120;
+      var y = H * 0.84;
+      var a = Math.min(26, H * 0.08);
+      var d = 'M ' + (-o) + ' ' + f(y) +
+        ' C ' + f(W * 0.2) + ' ' + f(y - a * 2) + ', ' + f(W * 0.38) + ' ' + f(y + a) + ', ' + f(W * 0.55) + ' ' + f(y - a * 0.4) +
+        ' S ' + f(W * 0.85) + ' ' + f(y - a * 1.6) + ', ' + f(W + o) + ' ' + f(y - a * 0.5);
+      road.setAttribute('d', d);
+      line.setAttribute('d', d);
+      total = road.getTotalLength();
+      scale = narrow ? 0.75 : 1.1;
+
+      pins.textContent = '';
+      [0.3, 0.68].forEach(function (fr) {
+        var pt = road.getPointAtLength(total * fr);
+        pin(pt.x, pt.y);
+      });
+      place();
+    }
+
+    function place() {
+      var s = dist % total;
+      var p = road.getPointAtLength(s);
+      var q = road.getPointAtLength(Math.min(total, s + 4));
+      var tilt = Math.atan2(q.y - p.y, (q.x - p.x) || 0.001) * 180 / Math.PI;
+      tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, tilt));
+      rider.setAttribute('transform', 'translate(' + f(p.x) + ' ' + f(p.y + 5) + ') rotate(' + f(tilt) + ') scale(' + scale + ')');
+      wheel.setAttribute('transform', 'rotate(' + f((dist / WHEEL_R) * 180 / Math.PI % 360) + ')');
+    }
+
+    function frame(t) {
+      if (!running) return;
+      var dt = last ? Math.min(0.1, (t - last) / 1000) : 0;
+      last = t;
+      dist += SPEED * dt;
+      place();
+      raf = requestAnimationFrame(frame);
+    }
+
     var label = toggle.querySelector('.trail__toggle-label');
     var icon = toggle.querySelector('use');
-    var started = false;
-    var running = false;
-
     function render() {
       label.textContent = running ? "Ferma l'animazione" : "Avvia l'animazione";
       icon.setAttribute('href', running ? '#icon-pause' : '#icon-play');
     }
+    function play() { running = true; last = 0; raf = requestAnimationFrame(frame); render(); }
+    function pause() { running = false; cancelAnimationFrame(raf); render(); }
+    toggle.addEventListener('click', function () { if (running) pause(); else play(); });
 
-    function play() {
-      if (!started) {
-        /* La posizione fissa (senza JS) lascia il posto al movimento lungo il percorso */
-        rider.removeAttribute('transform');
-        anims.forEach(function (a) { a.beginElement(); });
-        started = true;
-      } else {
-        svg.unpauseAnimations();
-      }
-      running = true;
-      render();
-    }
-
-    function pause() {
-      svg.pauseAnimations();
-      running = false;
-      render();
-    }
-
-    toggle.addEventListener('click', function () {
-      if (running) pause(); else play();
-    });
-
+    svg.hidden = false;
     toggle.hidden = false;
+    build();
+    dist = total * 0.42;             /* posizione di partenza: al centro, ben visibile */
+    place();
+
+    var resizeTimer = 0;
+    function rebuildSoon() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(build, 120);
+    }
+    if (window.ResizeObserver) new ResizeObserver(rebuildSoon).observe(svg);
+    else window.addEventListener('resize', rebuildSoon);
+
     var motionOk = window.matchMedia && window.matchMedia('(prefers-reduced-motion: no-preference)').matches;
     if (motionOk) play(); else render();
   })();
