@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ovunque Accessibile – In arrivo</title>
   <meta name="description" content="Il sito e la web-app di Ovunque Accessibile stanno arrivando: una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia. Lascia la tua email per essere avvisato.">
-  <meta name="theme-color" content="#0b1626">
-  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#fbf6ec">
+  <meta name="color-scheme" content="light">
 
   <!-- SEGNAPOSTO: quando il dominio è definito, aggiungere canonical e og:url e rendere assoluto og:image -->
   <meta property="og:type" content="website">
@@ -29,8 +29,8 @@
 
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-23g">
-  <script src="assets/js/main.js?v=2026-10-23g" defer></script>
+  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-23j">
+  <script src="assets/js/main.js?v=2026-10-23j" defer></script>
 
   <script type="application/ld+json">
   {
@@ -47,7 +47,7 @@
   }
   </script>
 </head>
-<body class="launch">
+<body class="home">
   <!-- Sprite delle icone: tutte decorative, accanto c'è sempre il testo -->
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
     <symbol id="icon-external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
@@ -61,6 +61,7 @@
     <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
     <symbol id="icon-review" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.1 11.6L12 13l-.9.6-2.6 1.6.7-3-2.3-2 3-.3L12 7l1.2 2.9 3 .3-2.3 2 .7 3-1.7-1.6z"/></symbol>
     <symbol id="icon-camera" viewBox="0 0 24 24"><circle cx="12" cy="12.5" r="3.2"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 14.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></symbol>
+    <symbol id="icon-check-small" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
   </svg>
 
   <ul class="skip-links">
@@ -68,101 +69,32 @@
     <li><a class="skip-links__link" href="#avvisami">Vai al modulo di iscrizione</a></li>
   </ul>
 
-  <main id="main" class="launch__main" tabindex="-1">
+  <header class="home__top container">
+    <a class="brand" href="./">
+      <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
+      <span class="brand__name">Ovunque Accessibile</span>
+    </a>
+    <a class="home__social" href="https://www.instagram.com/ovunque_accessibile">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
+      <span class="home__social-label">Instagram</span><span class="visually-hidden"> (sito esterno)</span>
+    </a>
+  </header>
 
-    <!-- Paesaggio all'alba: strada in prospettiva verso il segnaposto luminoso all'orizzonte.
-         Decorativo, disegnato da main.js in base allo schermo. Senza JavaScript restano cielo e stelle (CSS). -->
-    <svg class="landscape" id="landscape" aria-hidden="true" focusable="false" hidden>
-      <defs>
-        <linearGradient id="g-far" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#6b7fa3"/>
-          <stop offset="1" stop-color="#3b5378"/>
-        </linearGradient>
-        <linearGradient id="g-mid" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#3d5c88"/>
-          <stop offset="1" stop-color="#22395c"/>
-        </linearGradient>
-        <linearGradient id="g-near" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#1f3456"/>
-          <stop offset="1" stop-color="#0b1626"/>
-        </linearGradient>
-        <linearGradient id="g-road" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#d9c3a0"/>
-          <stop offset="1" stop-color="#8b7d6b"/>
-        </linearGradient>
-        <radialGradient id="g-glow">
-          <stop offset="0" stop-color="#fff3dc" stop-opacity="0.95"/>
-          <stop offset="0.35" stop-color="#f3d7a8" stop-opacity="0.55"/>
-          <stop offset="1" stop-color="#f3d7a8" stop-opacity="0"/>
-        </radialGradient>
-      </defs>
-      <g class="landscape__layer" data-depth="0.15" id="ls-glow-layer">
-        <circle id="ls-glow" fill="url(#g-glow)"/>
-      </g>
-      <g class="landscape__layer" data-depth="0.3"><path id="ls-far" fill="url(#g-far)"/></g>
-      <g class="landscape__layer" data-depth="0.5">
-        <path id="ls-mid" fill="url(#g-mid)"/>
-        <g id="ls-trees-mid" class="landscape__trees"></g>
-      </g>
-      <g class="landscape__layer" data-depth="0.8">
-        <path id="ls-near" fill="url(#g-near)"/>
-        <path id="ls-road" fill="url(#g-road)"/>
-        <g id="ls-dashes" class="landscape__dashes"></g>
-        <g id="ls-goal" class="landscape__goal">
-          <path d="M0 0 C -13 -15, -15 -21, -15 -28 A 15 15 0 1 1 15 -28 C 15 -21, 13 -15, 0 0 Z"/>
-          <circle cx="0" cy="-28" r="6.5"/>
-        </g>
-        <g id="ls-trees-near" class="landscape__trees"></g>
-        <g id="ls-rider" class="landscape__rider">
-          <g transform="translate(-2 -24)">
-            <g id="ls-wheel">
-              <circle class="rider__wheel" r="22"/>
-              <path class="rider__spokes" d="M0 -22 V 22 M-22 0 H 22 M-15.5 -15.5 L 15.5 15.5 M-15.5 15.5 L 15.5 -15.5"/>
-              <circle class="rider__hub" r="3.5"/>
-            </g>
-          </g>
-          <path class="rider__frame" d="M-12 -30 L 26 -30 L 32 -14 M-12 -30 L -16 -62 M26 -30 L 30 -8"/>
-          <circle class="rider__caster" cx="30" cy="-6" r="6"/>
-          <path class="rider__legs" d="M-4 -37 L 21 -37 L 27 -17"/>
-          <path class="rider__shoe" d="M27 -15 L 36 -14"/>
-          <path class="rider__body" d="M-1 -62 L -4 -40"/>
-          <circle class="rider__head" cx="3" cy="-74" r="8.5"/>
-          <path class="rider__arm" d="M0 -57 L 10 -46 L 9 -34"/>
-        </g>
-      </g>
-    </svg>
+  <main id="main" class="home__main container" tabindex="-1">
+    <div class="home__copy">
+      <p class="home__badge home__item"><span class="home__dot" aria-hidden="true"></span>In arrivo · sito e web&#8209;app</p>
+      <h1 class="home__title home__item">La mappa dei luoghi <span class="home__accent">davvero accessibili</span></h1>
+      <p class="home__lead home__item">In tutta Italia, raccontati da chi ci è stato. Lasciaci la tua email: ti avvisiamo al lancio.</p>
 
-    <header class="launch__top container">
-      <a class="launch__brand" href="./">
-        <span class="launch__brand-mark"><img src="assets/img/logo.webp" alt="" width="180" height="225"></span>
-        <span class="visually-hidden">Ovunque Accessibile – home</span>
-      </a>
-      <a class="launch__social" href="https://www.instagram.com/ovunque_accessibile">
-        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
-        <span class="launch__social-label">@ovunque_accessibile</span><span class="visually-hidden"> su Instagram (sito esterno)</span>
-      </a>
-    </header>
-
-    <div class="container launch__center">
-      <p class="launch__badge launch__item"><span class="launch__dot" aria-hidden="true"></span>In arrivo</p>
-      <h1 class="launch__title launch__item">Ovunque<br>Accessibile</h1>
-      <p class="launch__lead launch__item">La mappa dei luoghi davvero accessibili, in&nbsp;tutta&nbsp;Italia.</p>
-
-      <ul class="launch__chips launch__item" role="list">
-        <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg>Mappa</li>
-        <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-review"/></svg>Recensioni reali</li>
-        <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-camera"/></svg>Foto dei luoghi</li>
-      </ul>
-
-      <!-- Avvisami: subito visibile, compare con un'animazione d'ingresso -->
-      <section id="avvisami" class="launch__form" aria-labelledby="avvisami-title" tabindex="-1">
+      <!-- Avvisami: subito visibile -->
+      <section id="avvisami" class="home__form home__item" aria-labelledby="avvisami-title" tabindex="-1">
         <h2 id="avvisami-title" class="visually-hidden">Iscriviti per essere avvisato</h2>
 
         <!-- Regione di esito: riceve il focus dopo l'invio via fetch -->
         <div id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
 
         <!-- SEGNAPOSTO: sostituire [PROJECT-REF] con il riferimento del progetto Supabase (Settings → General) -->
-        <form id="subscribe-form" class="form glass" action="https://[PROJECT-REF].supabase.co/functions/v1/subscribe" method="post">
+        <form id="subscribe-form" class="form home__card" action="https://[PROJECT-REF].supabase.co/functions/v1/subscribe" method="post">
           <div id="error-summary" class="error-summary" tabindex="-1" hidden>
             <h3 class="error-summary__title">
               <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-error"/></svg>
@@ -174,10 +106,10 @@
           <input type="hidden" name="form_token" value="">
 
           <div class="field">
-            <label class="field__label" for="email">Avvisami quando siete online</label>
+            <label class="field__label" for="email">La tua email</label>
             <div class="form__inline">
               <input class="field__input" type="email" id="email" name="email" autocomplete="email" inputmode="email" maxlength="254" spellcheck="false" required>
-              <button class="btn btn--glow form__submit" type="submit">
+              <button class="btn btn--primary form__submit" type="submit">
                 Avvisami
                 <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
               </button>
@@ -200,19 +132,1021 @@
           <p class="form__note">Email e consenso sono obbligatori. Niente spam, solo il lancio.</p>
         </form>
       </section>
+
+      <p class="home__sign home__item">Un progetto di <strong>Angelo e Lorenzo</strong></p>
     </div>
 
-    <div class="container launch__bottom">
-      <p class="launch__sign">Un progetto di <strong>Angelo e Lorenzo</strong></p>
-      <button class="trail__toggle" type="button" hidden>
+    <!-- Mappa dell'Italia a puntini: illustrazione (i punti accesi non sono luoghi reali, mostrano l'idea
+         della community che aggiunge luoghi). Contorno da Natural Earth. Decorativa. -->
+    <div class="italy">
+      <div class="italy__stage" aria-hidden="true">
+        <svg class="italy__map" id="italy-map" viewBox="-12 -12 875 1024" focusable="false">
+<g class="italy__dots">
+<circle cx="398" cy="8" r="5.5"/>
+<circle cx="341" cy="22" r="5.5"/>
+<circle cx="357" cy="22" r="5.5"/>
+<circle cx="374" cy="22" r="5.5"/>
+<circle cx="390" cy="22" r="5.5"/>
+<circle cx="284" cy="36" r="5.5"/>
+<circle cx="301" cy="36" r="5.5"/>
+<circle cx="317" cy="36" r="5.5"/>
+<circle cx="333" cy="36" r="5.5"/>
+<circle cx="349" cy="36" r="5.5"/>
+<circle cx="366" cy="36" r="5.5"/>
+<circle cx="382" cy="36" r="5.5"/>
+<circle cx="398" cy="36" r="5.5"/>
+<circle cx="292" cy="50" r="5.5"/>
+<circle cx="309" cy="50" r="5.5"/>
+<circle cx="325" cy="50" r="5.5"/>
+<circle cx="341" cy="50" r="5.5"/>
+<circle cx="357" cy="50" r="5.5"/>
+<circle cx="374" cy="50" r="5.5"/>
+<circle cx="390" cy="50" r="5.5"/>
+<circle cx="406" cy="50" r="5.5"/>
+<circle cx="422" cy="50" r="5.5"/>
+<circle cx="439" cy="50" r="5.5"/>
+<circle cx="203" cy="64" r="5.5"/>
+<circle cx="252" cy="64" r="5.5"/>
+<circle cx="268" cy="64" r="5.5"/>
+<circle cx="284" cy="64" r="5.5"/>
+<circle cx="301" cy="64" r="5.5"/>
+<circle cx="317" cy="64" r="5.5"/>
+<circle cx="333" cy="64" r="5.5"/>
+<circle cx="349" cy="64" r="5.5"/>
+<circle cx="366" cy="64" r="5.5"/>
+<circle cx="382" cy="64" r="5.5"/>
+<circle cx="398" cy="64" r="5.5"/>
+<circle cx="414" cy="64" r="5.5"/>
+<circle cx="431" cy="64" r="5.5"/>
+<circle cx="447" cy="64" r="5.5"/>
+<circle cx="463" cy="64" r="5.5"/>
+<circle cx="479" cy="64" r="5.5"/>
+<circle cx="496" cy="64" r="5.5"/>
+<circle cx="130" cy="78" r="5.5"/>
+<circle cx="211" cy="78" r="5.5"/>
+<circle cx="244" cy="78" r="5.5"/>
+<circle cx="260" cy="78" r="5.5"/>
+<circle cx="276" cy="78" r="5.5"/>
+<circle cx="292" cy="78" r="5.5"/>
+<circle cx="309" cy="78" r="5.5"/>
+<circle cx="325" cy="78" r="5.5"/>
+<circle cx="341" cy="78" r="5.5"/>
+<circle cx="357" cy="78" r="5.5" class="is-lit"/>
+<circle cx="374" cy="78" r="5.5"/>
+<circle cx="390" cy="78" r="5.5"/>
+<circle cx="406" cy="78" r="5.5"/>
+<circle cx="422" cy="78" r="5.5"/>
+<circle cx="439" cy="78" r="5.5"/>
+<circle cx="455" cy="78" r="5.5"/>
+<circle cx="471" cy="78" r="5.5"/>
+<circle cx="487" cy="78" r="5.5"/>
+<circle cx="122" cy="93" r="5.5"/>
+<circle cx="138" cy="93" r="5.5" class="is-lit"/>
+<circle cx="203" cy="93" r="5.5"/>
+<circle cx="219" cy="93" r="5.5"/>
+<circle cx="236" cy="93" r="5.5"/>
+<circle cx="252" cy="93" r="5.5"/>
+<circle cx="268" cy="93" r="5.5"/>
+<circle cx="284" cy="93" r="5.5"/>
+<circle cx="301" cy="93" r="5.5"/>
+<circle cx="317" cy="93" r="5.5"/>
+<circle cx="333" cy="93" r="5.5"/>
+<circle cx="349" cy="93" r="5.5"/>
+<circle cx="366" cy="93" r="5.5"/>
+<circle cx="382" cy="93" r="5.5"/>
+<circle cx="398" cy="93" r="5.5"/>
+<circle cx="414" cy="93" r="5.5"/>
+<circle cx="431" cy="93" r="5.5" class="is-lit"/>
+<circle cx="447" cy="93" r="5.5"/>
+<circle cx="463" cy="93" r="5.5"/>
+<circle cx="479" cy="93" r="5.5"/>
+<circle cx="496" cy="93" r="5.5"/>
+<circle cx="114" cy="107" r="5.5"/>
+<circle cx="130" cy="107" r="5.5"/>
+<circle cx="146" cy="107" r="5.5"/>
+<circle cx="162" cy="107" r="5.5"/>
+<circle cx="179" cy="107" r="5.5"/>
+<circle cx="195" cy="107" r="5.5"/>
+<circle cx="211" cy="107" r="5.5"/>
+<circle cx="227" cy="107" r="5.5"/>
+<circle cx="244" cy="107" r="5.5"/>
+<circle cx="260" cy="107" r="5.5"/>
+<circle cx="276" cy="107" r="5.5"/>
+<circle cx="292" cy="107" r="5.5"/>
+<circle cx="309" cy="107" r="5.5"/>
+<circle cx="325" cy="107" r="5.5"/>
+<circle cx="341" cy="107" r="5.5"/>
+<circle cx="357" cy="107" r="5.5"/>
+<circle cx="374" cy="107" r="5.5"/>
+<circle cx="390" cy="107" r="5.5" class="is-lit"/>
+<circle cx="406" cy="107" r="5.5"/>
+<circle cx="422" cy="107" r="5.5"/>
+<circle cx="439" cy="107" r="5.5"/>
+<circle cx="455" cy="107" r="5.5"/>
+<circle cx="471" cy="107" r="5.5"/>
+<circle cx="487" cy="107" r="5.5"/>
+<circle cx="41" cy="121" r="5.5"/>
+<circle cx="57" cy="121" r="5.5"/>
+<circle cx="73" cy="121" r="5.5"/>
+<circle cx="89" cy="121" r="5.5"/>
+<circle cx="106" cy="121" r="5.5"/>
+<circle cx="122" cy="121" r="5.5"/>
+<circle cx="138" cy="121" r="5.5"/>
+<circle cx="154" cy="121" r="5.5"/>
+<circle cx="187" cy="121" r="5.5"/>
+<circle cx="203" cy="121" r="5.5"/>
+<circle cx="219" cy="121" r="5.5"/>
+<circle cx="236" cy="121" r="5.5"/>
+<circle cx="252" cy="121" r="5.5"/>
+<circle cx="268" cy="121" r="5.5"/>
+<circle cx="284" cy="121" r="5.5"/>
+<circle cx="301" cy="121" r="5.5"/>
+<circle cx="317" cy="121" r="5.5"/>
+<circle cx="333" cy="121" r="5.5"/>
+<circle cx="349" cy="121" r="5.5"/>
+<circle cx="366" cy="121" r="5.5"/>
+<circle cx="382" cy="121" r="5.5"/>
+<circle cx="398" cy="121" r="5.5"/>
+<circle cx="414" cy="121" r="5.5"/>
+<circle cx="431" cy="121" r="5.5"/>
+<circle cx="447" cy="121" r="5.5"/>
+<circle cx="463" cy="121" r="5.5"/>
+<circle cx="479" cy="121" r="5.5"/>
+<circle cx="496" cy="121" r="5.5"/>
+<circle cx="32" cy="135" r="5.5"/>
+<circle cx="49" cy="135" r="5.5"/>
+<circle cx="65" cy="135" r="5.5"/>
+<circle cx="81" cy="135" r="5.5"/>
+<circle cx="97" cy="135" r="5.5"/>
+<circle cx="114" cy="135" r="5.5"/>
+<circle cx="130" cy="135" r="5.5"/>
+<circle cx="146" cy="135" r="5.5"/>
+<circle cx="162" cy="135" r="5.5"/>
+<circle cx="179" cy="135" r="5.5"/>
+<circle cx="195" cy="135" r="5.5"/>
+<circle cx="211" cy="135" r="5.5"/>
+<circle cx="227" cy="135" r="5.5"/>
+<circle cx="244" cy="135" r="5.5"/>
+<circle cx="260" cy="135" r="5.5"/>
+<circle cx="276" cy="135" r="5.5"/>
+<circle cx="292" cy="135" r="5.5"/>
+<circle cx="309" cy="135" r="5.5"/>
+<circle cx="325" cy="135" r="5.5"/>
+<circle cx="341" cy="135" r="5.5"/>
+<circle cx="357" cy="135" r="5.5"/>
+<circle cx="374" cy="135" r="5.5"/>
+<circle cx="390" cy="135" r="5.5"/>
+<circle cx="406" cy="135" r="5.5" class="is-lit"/>
+<circle cx="422" cy="135" r="5.5"/>
+<circle cx="439" cy="135" r="5.5"/>
+<circle cx="455" cy="135" r="5.5"/>
+<circle cx="471" cy="135" r="5.5"/>
+<circle cx="487" cy="135" r="5.5"/>
+<circle cx="41" cy="149" r="5.5"/>
+<circle cx="57" cy="149" r="5.5"/>
+<circle cx="73" cy="149" r="5.5"/>
+<circle cx="89" cy="149" r="5.5"/>
+<circle cx="106" cy="149" r="5.5"/>
+<circle cx="122" cy="149" r="5.5"/>
+<circle cx="138" cy="149" r="5.5"/>
+<circle cx="154" cy="149" r="5.5"/>
+<circle cx="171" cy="149" r="5.5"/>
+<circle cx="187" cy="149" r="5.5"/>
+<circle cx="203" cy="149" r="5.5"/>
+<circle cx="219" cy="149" r="5.5"/>
+<circle cx="236" cy="149" r="5.5"/>
+<circle cx="252" cy="149" r="5.5"/>
+<circle cx="268" cy="149" r="5.5"/>
+<circle cx="284" cy="149" r="5.5"/>
+<circle cx="301" cy="149" r="5.5"/>
+<circle cx="317" cy="149" r="5.5"/>
+<circle cx="333" cy="149" r="5.5"/>
+<circle cx="349" cy="149" r="5.5"/>
+<circle cx="366" cy="149" r="5.5"/>
+<circle cx="382" cy="149" r="5.5"/>
+<circle cx="398" cy="149" r="5.5"/>
+<circle cx="414" cy="149" r="5.5"/>
+<circle cx="431" cy="149" r="5.5"/>
+<circle cx="447" cy="149" r="5.5"/>
+<circle cx="49" cy="163" r="5.5"/>
+<circle cx="65" cy="163" r="5.5"/>
+<circle cx="81" cy="163" r="5.5"/>
+<circle cx="97" cy="163" r="5.5"/>
+<circle cx="114" cy="163" r="5.5"/>
+<circle cx="130" cy="163" r="5.5"/>
+<circle cx="146" cy="163" r="5.5"/>
+<circle cx="162" cy="163" r="5.5"/>
+<circle cx="179" cy="163" r="5.5"/>
+<circle cx="195" cy="163" r="5.5"/>
+<circle cx="211" cy="163" r="5.5"/>
+<circle cx="227" cy="163" r="5.5"/>
+<circle cx="244" cy="163" r="5.5"/>
+<circle cx="260" cy="163" r="5.5"/>
+<circle cx="276" cy="163" r="5.5"/>
+<circle cx="292" cy="163" r="5.5"/>
+<circle cx="309" cy="163" r="5.5"/>
+<circle cx="325" cy="163" r="5.5"/>
+<circle cx="341" cy="163" r="5.5"/>
+<circle cx="357" cy="163" r="5.5"/>
+<circle cx="374" cy="163" r="5.5"/>
+<circle cx="390" cy="163" r="5.5"/>
+<circle cx="406" cy="163" r="5.5"/>
+<circle cx="57" cy="177" r="5.5"/>
+<circle cx="73" cy="177" r="5.5"/>
+<circle cx="89" cy="177" r="5.5"/>
+<circle cx="106" cy="177" r="5.5"/>
+<circle cx="122" cy="177" r="5.5"/>
+<circle cx="138" cy="177" r="5.5"/>
+<circle cx="154" cy="177" r="5.5"/>
+<circle cx="171" cy="177" r="5.5"/>
+<circle cx="187" cy="177" r="5.5"/>
+<circle cx="203" cy="177" r="5.5"/>
+<circle cx="219" cy="177" r="5.5" class="is-lit"/>
+<circle cx="236" cy="177" r="5.5"/>
+<circle cx="252" cy="177" r="5.5"/>
+<circle cx="268" cy="177" r="5.5"/>
+<circle cx="284" cy="177" r="5.5"/>
+<circle cx="301" cy="177" r="5.5"/>
+<circle cx="317" cy="177" r="5.5"/>
+<circle cx="333" cy="177" r="5.5"/>
+<circle cx="349" cy="177" r="5.5"/>
+<circle cx="366" cy="177" r="5.5"/>
+<circle cx="382" cy="177" r="5.5"/>
+<circle cx="398" cy="177" r="5.5"/>
+<circle cx="32" cy="191" r="5.5"/>
+<circle cx="49" cy="191" r="5.5"/>
+<circle cx="65" cy="191" r="5.5"/>
+<circle cx="81" cy="191" r="5.5"/>
+<circle cx="97" cy="191" r="5.5"/>
+<circle cx="114" cy="191" r="5.5"/>
+<circle cx="130" cy="191" r="5.5"/>
+<circle cx="146" cy="191" r="5.5"/>
+<circle cx="162" cy="191" r="5.5"/>
+<circle cx="179" cy="191" r="5.5"/>
+<circle cx="195" cy="191" r="5.5"/>
+<circle cx="211" cy="191" r="5.5"/>
+<circle cx="227" cy="191" r="5.5"/>
+<circle cx="244" cy="191" r="5.5"/>
+<circle cx="260" cy="191" r="5.5"/>
+<circle cx="276" cy="191" r="5.5"/>
+<circle cx="292" cy="191" r="5.5"/>
+<circle cx="309" cy="191" r="5.5"/>
+<circle cx="325" cy="191" r="5.5"/>
+<circle cx="341" cy="191" r="5.5"/>
+<circle cx="357" cy="191" r="5.5"/>
+<circle cx="374" cy="191" r="5.5"/>
+<circle cx="390" cy="191" r="5.5"/>
+<circle cx="406" cy="191" r="5.5"/>
+<circle cx="24" cy="205" r="5.5"/>
+<circle cx="41" cy="205" r="5.5"/>
+<circle cx="57" cy="205" r="5.5"/>
+<circle cx="73" cy="205" r="5.5"/>
+<circle cx="89" cy="205" r="5.5"/>
+<circle cx="106" cy="205" r="5.5"/>
+<circle cx="122" cy="205" r="5.5"/>
+<circle cx="138" cy="205" r="5.5"/>
+<circle cx="154" cy="205" r="5.5"/>
+<circle cx="171" cy="205" r="5.5"/>
+<circle cx="187" cy="205" r="5.5"/>
+<circle cx="203" cy="205" r="5.5"/>
+<circle cx="219" cy="205" r="5.5"/>
+<circle cx="236" cy="205" r="5.5"/>
+<circle cx="252" cy="205" r="5.5"/>
+<circle cx="268" cy="205" r="5.5"/>
+<circle cx="284" cy="205" r="5.5"/>
+<circle cx="301" cy="205" r="5.5"/>
+<circle cx="317" cy="205" r="5.5"/>
+<circle cx="333" cy="205" r="5.5"/>
+<circle cx="349" cy="205" r="5.5"/>
+<circle cx="366" cy="205" r="5.5"/>
+<circle cx="382" cy="205" r="5.5"/>
+<circle cx="398" cy="205" r="5.5"/>
+<circle cx="414" cy="205" r="5.5"/>
+<circle cx="32" cy="219" r="5.5"/>
+<circle cx="49" cy="219" r="5.5"/>
+<circle cx="65" cy="219" r="5.5"/>
+<circle cx="81" cy="219" r="5.5"/>
+<circle cx="97" cy="219" r="5.5"/>
+<circle cx="114" cy="219" r="5.5"/>
+<circle cx="130" cy="219" r="5.5"/>
+<circle cx="146" cy="219" r="5.5"/>
+<circle cx="162" cy="219" r="5.5"/>
+<circle cx="179" cy="219" r="5.5"/>
+<circle cx="195" cy="219" r="5.5"/>
+<circle cx="211" cy="219" r="5.5"/>
+<circle cx="227" cy="219" r="5.5"/>
+<circle cx="244" cy="219" r="5.5"/>
+<circle cx="260" cy="219" r="5.5"/>
+<circle cx="276" cy="219" r="5.5"/>
+<circle cx="292" cy="219" r="5.5"/>
+<circle cx="309" cy="219" r="5.5"/>
+<circle cx="325" cy="219" r="5.5"/>
+<circle cx="341" cy="219" r="5.5"/>
+<circle cx="357" cy="219" r="5.5"/>
+<circle cx="374" cy="219" r="5.5"/>
+<circle cx="390" cy="219" r="5.5"/>
+<circle cx="406" cy="219" r="5.5"/>
+<circle cx="422" cy="219" r="5.5"/>
+<circle cx="41" cy="233" r="5.5"/>
+<circle cx="57" cy="233" r="5.5"/>
+<circle cx="73" cy="233" r="5.5"/>
+<circle cx="89" cy="233" r="5.5"/>
+<circle cx="106" cy="233" r="5.5"/>
+<circle cx="122" cy="233" r="5.5"/>
+<circle cx="138" cy="233" r="5.5"/>
+<circle cx="154" cy="233" r="5.5"/>
+<circle cx="171" cy="233" r="5.5"/>
+<circle cx="187" cy="233" r="5.5"/>
+<circle cx="203" cy="233" r="5.5"/>
+<circle cx="219" cy="233" r="5.5"/>
+<circle cx="236" cy="233" r="5.5"/>
+<circle cx="252" cy="233" r="5.5"/>
+<circle cx="268" cy="233" r="5.5"/>
+<circle cx="284" cy="233" r="5.5"/>
+<circle cx="301" cy="233" r="5.5"/>
+<circle cx="317" cy="233" r="5.5"/>
+<circle cx="333" cy="233" r="5.5"/>
+<circle cx="349" cy="233" r="5.5"/>
+<circle cx="366" cy="233" r="5.5"/>
+<circle cx="382" cy="233" r="5.5"/>
+<circle cx="398" cy="233" r="5.5"/>
+<circle cx="32" cy="247" r="5.5"/>
+<circle cx="49" cy="247" r="5.5"/>
+<circle cx="65" cy="247" r="5.5"/>
+<circle cx="81" cy="247" r="5.5" class="is-lit"/>
+<circle cx="97" cy="247" r="5.5"/>
+<circle cx="114" cy="247" r="5.5"/>
+<circle cx="130" cy="247" r="5.5"/>
+<circle cx="146" cy="247" r="5.5"/>
+<circle cx="162" cy="247" r="5.5"/>
+<circle cx="179" cy="247" r="5.5"/>
+<circle cx="195" cy="247" r="5.5"/>
+<circle cx="211" cy="247" r="5.5"/>
+<circle cx="227" cy="247" r="5.5"/>
+<circle cx="244" cy="247" r="5.5"/>
+<circle cx="260" cy="247" r="5.5"/>
+<circle cx="276" cy="247" r="5.5"/>
+<circle cx="292" cy="247" r="5.5"/>
+<circle cx="309" cy="247" r="5.5"/>
+<circle cx="325" cy="247" r="5.5"/>
+<circle cx="341" cy="247" r="5.5"/>
+<circle cx="357" cy="247" r="5.5"/>
+<circle cx="374" cy="247" r="5.5"/>
+<circle cx="390" cy="247" r="5.5"/>
+<circle cx="406" cy="247" r="5.5"/>
+<circle cx="41" cy="261" r="5.5"/>
+<circle cx="57" cy="261" r="5.5"/>
+<circle cx="73" cy="261" r="5.5"/>
+<circle cx="89" cy="261" r="5.5"/>
+<circle cx="106" cy="261" r="5.5"/>
+<circle cx="122" cy="261" r="5.5"/>
+<circle cx="138" cy="261" r="5.5"/>
+<circle cx="154" cy="261" r="5.5"/>
+<circle cx="171" cy="261" r="5.5"/>
+<circle cx="187" cy="261" r="5.5"/>
+<circle cx="203" cy="261" r="5.5"/>
+<circle cx="219" cy="261" r="5.5"/>
+<circle cx="236" cy="261" r="5.5"/>
+<circle cx="252" cy="261" r="5.5"/>
+<circle cx="268" cy="261" r="5.5"/>
+<circle cx="284" cy="261" r="5.5"/>
+<circle cx="301" cy="261" r="5.5"/>
+<circle cx="317" cy="261" r="5.5"/>
+<circle cx="333" cy="261" r="5.5"/>
+<circle cx="349" cy="261" r="5.5"/>
+<circle cx="366" cy="261" r="5.5"/>
+<circle cx="382" cy="261" r="5.5"/>
+<circle cx="398" cy="261" r="5.5" class="is-lit"/>
+<circle cx="49" cy="275" r="5.5"/>
+<circle cx="65" cy="275" r="5.5"/>
+<circle cx="81" cy="275" r="5.5"/>
+<circle cx="97" cy="275" r="5.5"/>
+<circle cx="114" cy="275" r="5.5"/>
+<circle cx="130" cy="275" r="5.5"/>
+<circle cx="211" cy="275" r="5.5"/>
+<circle cx="227" cy="275" r="5.5"/>
+<circle cx="244" cy="275" r="5.5"/>
+<circle cx="260" cy="275" r="5.5"/>
+<circle cx="276" cy="275" r="5.5"/>
+<circle cx="292" cy="275" r="5.5"/>
+<circle cx="309" cy="275" r="5.5"/>
+<circle cx="325" cy="275" r="5.5"/>
+<circle cx="341" cy="275" r="5.5"/>
+<circle cx="357" cy="275" r="5.5"/>
+<circle cx="374" cy="275" r="5.5"/>
+<circle cx="390" cy="275" r="5.5"/>
+<circle cx="406" cy="275" r="5.5"/>
+<circle cx="89" cy="290" r="5.5"/>
+<circle cx="106" cy="290" r="5.5"/>
+<circle cx="122" cy="290" r="5.5"/>
+<circle cx="236" cy="290" r="5.5"/>
+<circle cx="252" cy="290" r="5.5"/>
+<circle cx="268" cy="290" r="5.5"/>
+<circle cx="284" cy="290" r="5.5"/>
+<circle cx="301" cy="290" r="5.5"/>
+<circle cx="317" cy="290" r="5.5"/>
+<circle cx="333" cy="290" r="5.5"/>
+<circle cx="349" cy="290" r="5.5" class="is-lit"/>
+<circle cx="366" cy="290" r="5.5"/>
+<circle cx="382" cy="290" r="5.5"/>
+<circle cx="398" cy="290" r="5.5"/>
+<circle cx="414" cy="290" r="5.5"/>
+<circle cx="81" cy="304" r="5.5"/>
+<circle cx="97" cy="304" r="5.5"/>
+<circle cx="114" cy="304" r="5.5"/>
+<circle cx="260" cy="304" r="5.5"/>
+<circle cx="276" cy="304" r="5.5"/>
+<circle cx="292" cy="304" r="5.5"/>
+<circle cx="309" cy="304" r="5.5"/>
+<circle cx="325" cy="304" r="5.5"/>
+<circle cx="341" cy="304" r="5.5"/>
+<circle cx="357" cy="304" r="5.5"/>
+<circle cx="374" cy="304" r="5.5"/>
+<circle cx="390" cy="304" r="5.5"/>
+<circle cx="406" cy="304" r="5.5"/>
+<circle cx="439" cy="304" r="5.5"/>
+<circle cx="73" cy="318" r="5.5"/>
+<circle cx="89" cy="318" r="5.5"/>
+<circle cx="268" cy="318" r="5.5"/>
+<circle cx="284" cy="318" r="5.5"/>
+<circle cx="301" cy="318" r="5.5"/>
+<circle cx="317" cy="318" r="5.5"/>
+<circle cx="333" cy="318" r="5.5"/>
+<circle cx="349" cy="318" r="5.5"/>
+<circle cx="366" cy="318" r="5.5"/>
+<circle cx="382" cy="318" r="5.5"/>
+<circle cx="398" cy="318" r="5.5"/>
+<circle cx="414" cy="318" r="5.5"/>
+<circle cx="431" cy="318" r="5.5"/>
+<circle cx="447" cy="318" r="5.5"/>
+<circle cx="463" cy="318" r="5.5"/>
+<circle cx="276" cy="332" r="5.5"/>
+<circle cx="292" cy="332" r="5.5"/>
+<circle cx="309" cy="332" r="5.5"/>
+<circle cx="325" cy="332" r="5.5"/>
+<circle cx="341" cy="332" r="5.5"/>
+<circle cx="357" cy="332" r="5.5"/>
+<circle cx="374" cy="332" r="5.5"/>
+<circle cx="390" cy="332" r="5.5"/>
+<circle cx="406" cy="332" r="5.5"/>
+<circle cx="422" cy="332" r="5.5"/>
+<circle cx="439" cy="332" r="5.5"/>
+<circle cx="455" cy="332" r="5.5"/>
+<circle cx="471" cy="332" r="5.5"/>
+<circle cx="284" cy="346" r="5.5"/>
+<circle cx="301" cy="346" r="5.5"/>
+<circle cx="317" cy="346" r="5.5"/>
+<circle cx="333" cy="346" r="5.5"/>
+<circle cx="349" cy="346" r="5.5"/>
+<circle cx="366" cy="346" r="5.5"/>
+<circle cx="382" cy="346" r="5.5"/>
+<circle cx="398" cy="346" r="5.5"/>
+<circle cx="414" cy="346" r="5.5"/>
+<circle cx="431" cy="346" r="5.5"/>
+<circle cx="447" cy="346" r="5.5"/>
+<circle cx="463" cy="346" r="5.5"/>
+<circle cx="479" cy="346" r="5.5"/>
+<circle cx="496" cy="346" r="5.5"/>
+<circle cx="292" cy="360" r="5.5"/>
+<circle cx="309" cy="360" r="5.5"/>
+<circle cx="325" cy="360" r="5.5"/>
+<circle cx="341" cy="360" r="5.5"/>
+<circle cx="357" cy="360" r="5.5"/>
+<circle cx="374" cy="360" r="5.5"/>
+<circle cx="390" cy="360" r="5.5"/>
+<circle cx="406" cy="360" r="5.5"/>
+<circle cx="422" cy="360" r="5.5"/>
+<circle cx="439" cy="360" r="5.5"/>
+<circle cx="455" cy="360" r="5.5"/>
+<circle cx="471" cy="360" r="5.5"/>
+<circle cx="487" cy="360" r="5.5"/>
+<circle cx="504" cy="360" r="5.5"/>
+<circle cx="301" cy="374" r="5.5"/>
+<circle cx="317" cy="374" r="5.5"/>
+<circle cx="333" cy="374" r="5.5"/>
+<circle cx="349" cy="374" r="5.5"/>
+<circle cx="366" cy="374" r="5.5"/>
+<circle cx="382" cy="374" r="5.5"/>
+<circle cx="398" cy="374" r="5.5"/>
+<circle cx="414" cy="374" r="5.5"/>
+<circle cx="431" cy="374" r="5.5"/>
+<circle cx="447" cy="374" r="5.5"/>
+<circle cx="463" cy="374" r="5.5"/>
+<circle cx="479" cy="374" r="5.5"/>
+<circle cx="496" cy="374" r="5.5"/>
+<circle cx="512" cy="374" r="5.5"/>
+<circle cx="292" cy="388" r="5.5"/>
+<circle cx="309" cy="388" r="5.5"/>
+<circle cx="325" cy="388" r="5.5"/>
+<circle cx="341" cy="388" r="5.5"/>
+<circle cx="357" cy="388" r="5.5"/>
+<circle cx="374" cy="388" r="5.5"/>
+<circle cx="390" cy="388" r="5.5"/>
+<circle cx="406" cy="388" r="5.5"/>
+<circle cx="422" cy="388" r="5.5"/>
+<circle cx="439" cy="388" r="5.5"/>
+<circle cx="455" cy="388" r="5.5"/>
+<circle cx="471" cy="388" r="5.5"/>
+<circle cx="487" cy="388" r="5.5"/>
+<circle cx="504" cy="388" r="5.5"/>
+<circle cx="520" cy="388" r="5.5"/>
+<circle cx="301" cy="402" r="5.5"/>
+<circle cx="317" cy="402" r="5.5"/>
+<circle cx="333" cy="402" r="5.5"/>
+<circle cx="349" cy="402" r="5.5"/>
+<circle cx="366" cy="402" r="5.5"/>
+<circle cx="382" cy="402" r="5.5"/>
+<circle cx="398" cy="402" r="5.5"/>
+<circle cx="414" cy="402" r="5.5"/>
+<circle cx="431" cy="402" r="5.5"/>
+<circle cx="447" cy="402" r="5.5"/>
+<circle cx="463" cy="402" r="5.5"/>
+<circle cx="479" cy="402" r="5.5" class="is-lit"/>
+<circle cx="496" cy="402" r="5.5"/>
+<circle cx="512" cy="402" r="5.5"/>
+<circle cx="260" cy="416" r="5.5"/>
+<circle cx="276" cy="416" r="5.5"/>
+<circle cx="309" cy="416" r="5.5"/>
+<circle cx="325" cy="416" r="5.5"/>
+<circle cx="341" cy="416" r="5.5"/>
+<circle cx="357" cy="416" r="5.5"/>
+<circle cx="374" cy="416" r="5.5"/>
+<circle cx="390" cy="416" r="5.5"/>
+<circle cx="406" cy="416" r="5.5"/>
+<circle cx="422" cy="416" r="5.5"/>
+<circle cx="439" cy="416" r="5.5"/>
+<circle cx="455" cy="416" r="5.5"/>
+<circle cx="471" cy="416" r="5.5"/>
+<circle cx="487" cy="416" r="5.5"/>
+<circle cx="504" cy="416" r="5.5"/>
+<circle cx="520" cy="416" r="5.5"/>
+<circle cx="333" cy="430" r="5.5"/>
+<circle cx="349" cy="430" r="5.5"/>
+<circle cx="366" cy="430" r="5.5"/>
+<circle cx="382" cy="430" r="5.5"/>
+<circle cx="398" cy="430" r="5.5"/>
+<circle cx="414" cy="430" r="5.5"/>
+<circle cx="431" cy="430" r="5.5"/>
+<circle cx="447" cy="430" r="5.5"/>
+<circle cx="463" cy="430" r="5.5"/>
+<circle cx="479" cy="430" r="5.5"/>
+<circle cx="496" cy="430" r="5.5" class="is-lit"/>
+<circle cx="512" cy="430" r="5.5"/>
+<circle cx="528" cy="430" r="5.5"/>
+<circle cx="341" cy="444" r="5.5"/>
+<circle cx="357" cy="444" r="5.5"/>
+<circle cx="374" cy="444" r="5.5"/>
+<circle cx="390" cy="444" r="5.5"/>
+<circle cx="406" cy="444" r="5.5"/>
+<circle cx="422" cy="444" r="5.5"/>
+<circle cx="439" cy="444" r="5.5"/>
+<circle cx="455" cy="444" r="5.5"/>
+<circle cx="471" cy="444" r="5.5"/>
+<circle cx="487" cy="444" r="5.5"/>
+<circle cx="504" cy="444" r="5.5"/>
+<circle cx="520" cy="444" r="5.5"/>
+<circle cx="536" cy="444" r="5.5"/>
+<circle cx="366" cy="458" r="5.5"/>
+<circle cx="382" cy="458" r="5.5"/>
+<circle cx="398" cy="458" r="5.5"/>
+<circle cx="414" cy="458" r="5.5"/>
+<circle cx="431" cy="458" r="5.5"/>
+<circle cx="447" cy="458" r="5.5"/>
+<circle cx="463" cy="458" r="5.5"/>
+<circle cx="479" cy="458" r="5.5"/>
+<circle cx="496" cy="458" r="5.5"/>
+<circle cx="512" cy="458" r="5.5"/>
+<circle cx="528" cy="458" r="5.5"/>
+<circle cx="544" cy="458" r="5.5"/>
+<circle cx="374" cy="472" r="5.5"/>
+<circle cx="390" cy="472" r="5.5"/>
+<circle cx="406" cy="472" r="5.5"/>
+<circle cx="422" cy="472" r="5.5"/>
+<circle cx="439" cy="472" r="5.5"/>
+<circle cx="455" cy="472" r="5.5"/>
+<circle cx="471" cy="472" r="5.5"/>
+<circle cx="487" cy="472" r="5.5"/>
+<circle cx="504" cy="472" r="5.5"/>
+<circle cx="520" cy="472" r="5.5"/>
+<circle cx="536" cy="472" r="5.5"/>
+<circle cx="552" cy="472" r="5.5"/>
+<circle cx="569" cy="472" r="5.5"/>
+<circle cx="382" cy="487" r="5.5"/>
+<circle cx="398" cy="487" r="5.5"/>
+<circle cx="414" cy="487" r="5.5"/>
+<circle cx="431" cy="487" r="5.5"/>
+<circle cx="447" cy="487" r="5.5"/>
+<circle cx="463" cy="487" r="5.5"/>
+<circle cx="479" cy="487" r="5.5"/>
+<circle cx="496" cy="487" r="5.5" class="is-lit"/>
+<circle cx="512" cy="487" r="5.5"/>
+<circle cx="528" cy="487" r="5.5"/>
+<circle cx="544" cy="487" r="5.5"/>
+<circle cx="561" cy="487" r="5.5"/>
+<circle cx="577" cy="487" r="5.5"/>
+<circle cx="593" cy="487" r="5.5"/>
+<circle cx="406" cy="501" r="5.5"/>
+<circle cx="422" cy="501" r="5.5"/>
+<circle cx="439" cy="501" r="5.5"/>
+<circle cx="455" cy="501" r="5.5"/>
+<circle cx="471" cy="501" r="5.5"/>
+<circle cx="487" cy="501" r="5.5"/>
+<circle cx="504" cy="501" r="5.5"/>
+<circle cx="520" cy="501" r="5.5"/>
+<circle cx="536" cy="501" r="5.5"/>
+<circle cx="552" cy="501" r="5.5"/>
+<circle cx="569" cy="501" r="5.5"/>
+<circle cx="585" cy="501" r="5.5"/>
+<circle cx="601" cy="501" r="5.5"/>
+<circle cx="617" cy="501" r="5.5"/>
+<circle cx="634" cy="501" r="5.5"/>
+<circle cx="650" cy="501" r="5.5"/>
+<circle cx="666" cy="501" r="5.5"/>
+<circle cx="682" cy="501" r="5.5"/>
+<circle cx="414" cy="515" r="5.5"/>
+<circle cx="431" cy="515" r="5.5"/>
+<circle cx="447" cy="515" r="5.5"/>
+<circle cx="463" cy="515" r="5.5"/>
+<circle cx="479" cy="515" r="5.5"/>
+<circle cx="496" cy="515" r="5.5"/>
+<circle cx="512" cy="515" r="5.5"/>
+<circle cx="528" cy="515" r="5.5"/>
+<circle cx="544" cy="515" r="5.5"/>
+<circle cx="561" cy="515" r="5.5"/>
+<circle cx="577" cy="515" r="5.5"/>
+<circle cx="593" cy="515" r="5.5"/>
+<circle cx="609" cy="515" r="5.5"/>
+<circle cx="626" cy="515" r="5.5"/>
+<circle cx="642" cy="515" r="5.5"/>
+<circle cx="658" cy="515" r="5.5"/>
+<circle cx="674" cy="515" r="5.5"/>
+<circle cx="422" cy="529" r="5.5"/>
+<circle cx="439" cy="529" r="5.5"/>
+<circle cx="455" cy="529" r="5.5"/>
+<circle cx="471" cy="529" r="5.5"/>
+<circle cx="487" cy="529" r="5.5"/>
+<circle cx="504" cy="529" r="5.5"/>
+<circle cx="520" cy="529" r="5.5"/>
+<circle cx="536" cy="529" r="5.5"/>
+<circle cx="552" cy="529" r="5.5"/>
+<circle cx="569" cy="529" r="5.5"/>
+<circle cx="585" cy="529" r="5.5"/>
+<circle cx="601" cy="529" r="5.5"/>
+<circle cx="617" cy="529" r="5.5"/>
+<circle cx="634" cy="529" r="5.5"/>
+<circle cx="650" cy="529" r="5.5"/>
+<circle cx="666" cy="529" r="5.5"/>
+<circle cx="447" cy="543" r="5.5"/>
+<circle cx="463" cy="543" r="5.5"/>
+<circle cx="479" cy="543" r="5.5"/>
+<circle cx="496" cy="543" r="5.5"/>
+<circle cx="512" cy="543" r="5.5"/>
+<circle cx="528" cy="543" r="5.5"/>
+<circle cx="544" cy="543" r="5.5"/>
+<circle cx="561" cy="543" r="5.5"/>
+<circle cx="577" cy="543" r="5.5"/>
+<circle cx="593" cy="543" r="5.5"/>
+<circle cx="609" cy="543" r="5.5"/>
+<circle cx="626" cy="543" r="5.5"/>
+<circle cx="642" cy="543" r="5.5" class="is-lit"/>
+<circle cx="658" cy="543" r="5.5"/>
+<circle cx="471" cy="557" r="5.5"/>
+<circle cx="487" cy="557" r="5.5"/>
+<circle cx="504" cy="557" r="5.5"/>
+<circle cx="520" cy="557" r="5.5"/>
+<circle cx="536" cy="557" r="5.5"/>
+<circle cx="552" cy="557" r="5.5"/>
+<circle cx="569" cy="557" r="5.5"/>
+<circle cx="585" cy="557" r="5.5"/>
+<circle cx="601" cy="557" r="5.5"/>
+<circle cx="617" cy="557" r="5.5"/>
+<circle cx="634" cy="557" r="5.5"/>
+<circle cx="650" cy="557" r="5.5"/>
+<circle cx="666" cy="557" r="5.5"/>
+<circle cx="682" cy="557" r="5.5"/>
+<circle cx="203" cy="571" r="5.5"/>
+<circle cx="528" cy="571" r="5.5"/>
+<circle cx="544" cy="571" r="5.5"/>
+<circle cx="561" cy="571" r="5.5"/>
+<circle cx="577" cy="571" r="5.5"/>
+<circle cx="593" cy="571" r="5.5"/>
+<circle cx="609" cy="571" r="5.5"/>
+<circle cx="626" cy="571" r="5.5"/>
+<circle cx="642" cy="571" r="5.5"/>
+<circle cx="658" cy="571" r="5.5"/>
+<circle cx="674" cy="571" r="5.5"/>
+<circle cx="691" cy="571" r="5.5"/>
+<circle cx="707" cy="571" r="5.5"/>
+<circle cx="723" cy="571" r="5.5"/>
+<circle cx="179" cy="585" r="5.5"/>
+<circle cx="195" cy="585" r="5.5"/>
+<circle cx="211" cy="585" r="5.5"/>
+<circle cx="536" cy="585" r="5.5"/>
+<circle cx="552" cy="585" r="5.5"/>
+<circle cx="569" cy="585" r="5.5"/>
+<circle cx="585" cy="585" r="5.5"/>
+<circle cx="601" cy="585" r="5.5"/>
+<circle cx="617" cy="585" r="5.5"/>
+<circle cx="634" cy="585" r="5.5"/>
+<circle cx="650" cy="585" r="5.5"/>
+<circle cx="666" cy="585" r="5.5"/>
+<circle cx="682" cy="585" r="5.5"/>
+<circle cx="699" cy="585" r="5.5"/>
+<circle cx="715" cy="585" r="5.5"/>
+<circle cx="731" cy="585" r="5.5"/>
+<circle cx="747" cy="585" r="5.5"/>
+<circle cx="122" cy="599" r="5.5"/>
+<circle cx="154" cy="599" r="5.5"/>
+<circle cx="171" cy="599" r="5.5"/>
+<circle cx="187" cy="599" r="5.5"/>
+<circle cx="203" cy="599" r="5.5"/>
+<circle cx="219" cy="599" r="5.5"/>
+<circle cx="544" cy="599" r="5.5"/>
+<circle cx="561" cy="599" r="5.5"/>
+<circle cx="577" cy="599" r="5.5"/>
+<circle cx="593" cy="599" r="5.5"/>
+<circle cx="609" cy="599" r="5.5"/>
+<circle cx="626" cy="599" r="5.5"/>
+<circle cx="642" cy="599" r="5.5"/>
+<circle cx="658" cy="599" r="5.5"/>
+<circle cx="674" cy="599" r="5.5"/>
+<circle cx="691" cy="599" r="5.5"/>
+<circle cx="707" cy="599" r="5.5"/>
+<circle cx="723" cy="599" r="5.5"/>
+<circle cx="739" cy="599" r="5.5"/>
+<circle cx="756" cy="599" r="5.5"/>
+<circle cx="772" cy="599" r="5.5"/>
+<circle cx="130" cy="613" r="5.5"/>
+<circle cx="146" cy="613" r="5.5"/>
+<circle cx="162" cy="613" r="5.5"/>
+<circle cx="179" cy="613" r="5.5"/>
+<circle cx="195" cy="613" r="5.5"/>
+<circle cx="211" cy="613" r="5.5"/>
+<circle cx="227" cy="613" r="5.5"/>
+<circle cx="569" cy="613" r="5.5"/>
+<circle cx="585" cy="613" r="5.5"/>
+<circle cx="601" cy="613" r="5.5"/>
+<circle cx="617" cy="613" r="5.5"/>
+<circle cx="634" cy="613" r="5.5"/>
+<circle cx="650" cy="613" r="5.5"/>
+<circle cx="666" cy="613" r="5.5"/>
+<circle cx="682" cy="613" r="5.5"/>
+<circle cx="699" cy="613" r="5.5"/>
+<circle cx="715" cy="613" r="5.5"/>
+<circle cx="731" cy="613" r="5.5"/>
+<circle cx="747" cy="613" r="5.5"/>
+<circle cx="764" cy="613" r="5.5"/>
+<circle cx="780" cy="613" r="5.5"/>
+<circle cx="796" cy="613" r="5.5"/>
+<circle cx="138" cy="627" r="5.5"/>
+<circle cx="154" cy="627" r="5.5"/>
+<circle cx="171" cy="627" r="5.5"/>
+<circle cx="187" cy="627" r="5.5"/>
+<circle cx="203" cy="627" r="5.5"/>
+<circle cx="219" cy="627" r="5.5"/>
+<circle cx="609" cy="627" r="5.5"/>
+<circle cx="626" cy="627" r="5.5"/>
+<circle cx="642" cy="627" r="5.5"/>
+<circle cx="658" cy="627" r="5.5"/>
+<circle cx="674" cy="627" r="5.5"/>
+<circle cx="691" cy="627" r="5.5"/>
+<circle cx="707" cy="627" r="5.5"/>
+<circle cx="723" cy="627" r="5.5"/>
+<circle cx="739" cy="627" r="5.5"/>
+<circle cx="756" cy="627" r="5.5"/>
+<circle cx="772" cy="627" r="5.5"/>
+<circle cx="788" cy="627" r="5.5"/>
+<circle cx="804" cy="627" r="5.5"/>
+<circle cx="146" cy="641" r="5.5"/>
+<circle cx="162" cy="641" r="5.5"/>
+<circle cx="179" cy="641" r="5.5"/>
+<circle cx="195" cy="641" r="5.5"/>
+<circle cx="211" cy="641" r="5.5"/>
+<circle cx="227" cy="641" r="5.5"/>
+<circle cx="601" cy="641" r="5.5"/>
+<circle cx="617" cy="641" r="5.5"/>
+<circle cx="634" cy="641" r="5.5"/>
+<circle cx="650" cy="641" r="5.5"/>
+<circle cx="666" cy="641" r="5.5"/>
+<circle cx="682" cy="641" r="5.5"/>
+<circle cx="699" cy="641" r="5.5"/>
+<circle cx="715" cy="641" r="5.5"/>
+<circle cx="731" cy="641" r="5.5"/>
+<circle cx="764" cy="641" r="5.5"/>
+<circle cx="780" cy="641" r="5.5"/>
+<circle cx="796" cy="641" r="5.5"/>
+<circle cx="812" cy="641" r="5.5"/>
+<circle cx="829" cy="641" r="5.5"/>
+<circle cx="154" cy="655" r="5.5"/>
+<circle cx="171" cy="655" r="5.5"/>
+<circle cx="187" cy="655" r="5.5"/>
+<circle cx="203" cy="655" r="5.5"/>
+<circle cx="219" cy="655" r="5.5"/>
+<circle cx="609" cy="655" r="5.5"/>
+<circle cx="626" cy="655" r="5.5"/>
+<circle cx="642" cy="655" r="5.5"/>
+<circle cx="658" cy="655" r="5.5"/>
+<circle cx="674" cy="655" r="5.5"/>
+<circle cx="691" cy="655" r="5.5"/>
+<circle cx="707" cy="655" r="5.5"/>
+<circle cx="723" cy="655" r="5.5"/>
+<circle cx="804" cy="655" r="5.5"/>
+<circle cx="821" cy="655" r="5.5"/>
+<circle cx="837" cy="655" r="5.5"/>
+<circle cx="146" cy="669" r="5.5"/>
+<circle cx="162" cy="669" r="5.5"/>
+<circle cx="179" cy="669" r="5.5"/>
+<circle cx="195" cy="669" r="5.5"/>
+<circle cx="211" cy="669" r="5.5"/>
+<circle cx="617" cy="669" r="5.5"/>
+<circle cx="634" cy="669" r="5.5"/>
+<circle cx="650" cy="669" r="5.5"/>
+<circle cx="666" cy="669" r="5.5"/>
+<circle cx="682" cy="669" r="5.5"/>
+<circle cx="699" cy="669" r="5.5"/>
+<circle cx="715" cy="669" r="5.5"/>
+<circle cx="829" cy="669" r="5.5"/>
+<circle cx="845" cy="669" r="5.5"/>
+<circle cx="138" cy="684" r="5.5"/>
+<circle cx="154" cy="684" r="5.5"/>
+<circle cx="171" cy="684" r="5.5"/>
+<circle cx="187" cy="684" r="5.5"/>
+<circle cx="203" cy="684" r="5.5"/>
+<circle cx="219" cy="684" r="5.5"/>
+<circle cx="658" cy="684" r="5.5"/>
+<circle cx="674" cy="684" r="5.5"/>
+<circle cx="691" cy="684" r="5.5"/>
+<circle cx="707" cy="684" r="5.5"/>
+<circle cx="821" cy="684" r="5.5"/>
+<circle cx="837" cy="684" r="5.5"/>
+<circle cx="146" cy="698" r="5.5"/>
+<circle cx="162" cy="698" r="5.5"/>
+<circle cx="179" cy="698" r="5.5"/>
+<circle cx="195" cy="698" r="5.5" class="is-lit"/>
+<circle cx="211" cy="698" r="5.5"/>
+<circle cx="666" cy="698" r="5.5"/>
+<circle cx="682" cy="698" r="5.5"/>
+<circle cx="699" cy="698" r="5.5"/>
+<circle cx="154" cy="712" r="5.5"/>
+<circle cx="171" cy="712" r="5.5"/>
+<circle cx="187" cy="712" r="5.5"/>
+<circle cx="203" cy="712" r="5.5"/>
+<circle cx="219" cy="712" r="5.5"/>
+<circle cx="674" cy="712" r="5.5"/>
+<circle cx="691" cy="712" r="5.5"/>
+<circle cx="707" cy="712" r="5.5"/>
+<circle cx="146" cy="726" r="5.5"/>
+<circle cx="162" cy="726" r="5.5"/>
+<circle cx="179" cy="726" r="5.5"/>
+<circle cx="195" cy="726" r="5.5"/>
+<circle cx="211" cy="726" r="5.5"/>
+<circle cx="682" cy="726" r="5.5"/>
+<circle cx="699" cy="726" r="5.5"/>
+<circle cx="715" cy="726" r="5.5"/>
+<circle cx="731" cy="726" r="5.5"/>
+<circle cx="138" cy="740" r="5.5"/>
+<circle cx="154" cy="740" r="5.5"/>
+<circle cx="171" cy="740" r="5.5"/>
+<circle cx="187" cy="740" r="5.5"/>
+<circle cx="203" cy="740" r="5.5"/>
+<circle cx="219" cy="740" r="5.5"/>
+<circle cx="674" cy="740" r="5.5"/>
+<circle cx="691" cy="740" r="5.5"/>
+<circle cx="707" cy="740" r="5.5"/>
+<circle cx="723" cy="740" r="5.5"/>
+<circle cx="739" cy="740" r="5.5"/>
+<circle cx="146" cy="754" r="5.5"/>
+<circle cx="162" cy="754" r="5.5"/>
+<circle cx="179" cy="754" r="5.5"/>
+<circle cx="195" cy="754" r="5.5"/>
+<circle cx="211" cy="754" r="5.5"/>
+<circle cx="682" cy="754" r="5.5"/>
+<circle cx="699" cy="754" r="5.5"/>
+<circle cx="715" cy="754" r="5.5"/>
+<circle cx="731" cy="754" r="5.5"/>
+<circle cx="747" cy="754" r="5.5"/>
+<circle cx="154" cy="768" r="5.5"/>
+<circle cx="171" cy="768" r="5.5"/>
+<circle cx="691" cy="768" r="5.5"/>
+<circle cx="707" cy="768" r="5.5"/>
+<circle cx="723" cy="768" r="5.5"/>
+<circle cx="739" cy="768" r="5.5"/>
+<circle cx="162" cy="782" r="5.5"/>
+<circle cx="699" cy="782" r="5.5"/>
+<circle cx="715" cy="782" r="5.5"/>
+<circle cx="731" cy="782" r="5.5"/>
+<circle cx="747" cy="782" r="5.5"/>
+<circle cx="691" cy="796" r="5.5"/>
+<circle cx="707" cy="796" r="5.5"/>
+<circle cx="682" cy="810" r="5.5"/>
+<circle cx="699" cy="810" r="5.5"/>
+<circle cx="674" cy="824" r="5.5"/>
+<circle cx="691" cy="824" r="5.5"/>
+<circle cx="707" cy="824" r="5.5"/>
+<circle cx="666" cy="838" r="5.5"/>
+<circle cx="682" cy="838" r="5.5"/>
+<circle cx="699" cy="838" r="5.5"/>
+<circle cx="642" cy="852" r="5.5"/>
+<circle cx="658" cy="852" r="5.5"/>
+<circle cx="674" cy="852" r="5.5"/>
+<circle cx="691" cy="852" r="5.5"/>
+<circle cx="439" cy="866" r="5.5"/>
+<circle cx="471" cy="866" r="5.5"/>
+<circle cx="487" cy="866" r="5.5"/>
+<circle cx="585" cy="866" r="5.5"/>
+<circle cx="601" cy="866" r="5.5"/>
+<circle cx="617" cy="866" r="5.5"/>
+<circle cx="634" cy="866" r="5.5"/>
+<circle cx="650" cy="866" r="5.5"/>
+<circle cx="666" cy="866" r="5.5"/>
+<circle cx="682" cy="866" r="5.5"/>
+<circle cx="431" cy="881" r="5.5"/>
+<circle cx="447" cy="881" r="5.5"/>
+<circle cx="463" cy="881" r="5.5"/>
+<circle cx="479" cy="881" r="5.5"/>
+<circle cx="496" cy="881" r="5.5"/>
+<circle cx="512" cy="881" r="5.5"/>
+<circle cx="528" cy="881" r="5.5"/>
+<circle cx="544" cy="881" r="5.5"/>
+<circle cx="561" cy="881" r="5.5"/>
+<circle cx="577" cy="881" r="5.5"/>
+<circle cx="593" cy="881" r="5.5"/>
+<circle cx="609" cy="881" r="5.5"/>
+<circle cx="626" cy="881" r="5.5"/>
+<circle cx="422" cy="895" r="5.5" class="is-lit"/>
+<circle cx="439" cy="895" r="5.5"/>
+<circle cx="455" cy="895" r="5.5"/>
+<circle cx="471" cy="895" r="5.5"/>
+<circle cx="487" cy="895" r="5.5"/>
+<circle cx="504" cy="895" r="5.5"/>
+<circle cx="520" cy="895" r="5.5"/>
+<circle cx="536" cy="895" r="5.5"/>
+<circle cx="552" cy="895" r="5.5"/>
+<circle cx="569" cy="895" r="5.5"/>
+<circle cx="585" cy="895" r="5.5"/>
+<circle cx="601" cy="895" r="5.5"/>
+<circle cx="617" cy="895" r="5.5"/>
+<circle cx="447" cy="909" r="5.5"/>
+<circle cx="463" cy="909" r="5.5"/>
+<circle cx="479" cy="909" r="5.5"/>
+<circle cx="496" cy="909" r="5.5"/>
+<circle cx="512" cy="909" r="5.5"/>
+<circle cx="528" cy="909" r="5.5"/>
+<circle cx="544" cy="909" r="5.5"/>
+<circle cx="561" cy="909" r="5.5"/>
+<circle cx="577" cy="909" r="5.5"/>
+<circle cx="593" cy="909" r="5.5"/>
+<circle cx="609" cy="909" r="5.5"/>
+<circle cx="471" cy="923" r="5.5"/>
+<circle cx="487" cy="923" r="5.5"/>
+<circle cx="504" cy="923" r="5.5"/>
+<circle cx="520" cy="923" r="5.5"/>
+<circle cx="536" cy="923" r="5.5"/>
+<circle cx="552" cy="923" r="5.5"/>
+<circle cx="569" cy="923" r="5.5"/>
+<circle cx="585" cy="923" r="5.5"/>
+<circle cx="601" cy="923" r="5.5"/>
+<circle cx="496" cy="937" r="5.5"/>
+<circle cx="512" cy="937" r="5.5"/>
+<circle cx="528" cy="937" r="5.5"/>
+<circle cx="544" cy="937" r="5.5"/>
+<circle cx="561" cy="937" r="5.5"/>
+<circle cx="577" cy="937" r="5.5"/>
+<circle cx="593" cy="937" r="5.5" class="is-lit"/>
+<circle cx="609" cy="937" r="5.5"/>
+<circle cx="520" cy="951" r="5.5"/>
+<circle cx="536" cy="951" r="5.5"/>
+<circle cx="552" cy="951" r="5.5"/>
+<circle cx="569" cy="951" r="5.5"/>
+<circle cx="585" cy="951" r="5.5"/>
+<circle cx="601" cy="951" r="5.5"/>
+<circle cx="561" cy="965" r="5.5"/>
+<circle cx="577" cy="965" r="5.5"/>
+<circle cx="593" cy="965" r="5.5"/>
+<circle cx="609" cy="965" r="5.5"/>
+<circle cx="569" cy="979" r="5.5"/>
+<circle cx="585" cy="979" r="5.5"/>
+<circle cx="601" cy="979" r="5.5"/>
+<circle cx="593" cy="993" r="5.5"/>
+<circle cx="609" cy="993" r="5.5"/>
+</g>
+          <g id="italy-fx"></g>
+        </svg>
+        <ul class="italy__tags" role="list">
+          <li class="italy__tag italy__tag--1"><svg class="icon" focusable="false"><use href="#icon-check-small"/></svg>Ingresso senza gradini</li>
+          <li class="italy__tag italy__tag--2"><svg class="icon" focusable="false"><use href="#icon-check-small"/></svg>Bagno attrezzato</li>
+          <li class="italy__tag italy__tag--3"><svg class="icon" focusable="false"><use href="#icon-check-small"/></svg>Parcheggio riservato</li>
+        </ul>
+      </div>
+      <button class="trail__toggle italy__toggle" type="button" hidden>
         <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pause"/></svg>
         <span class="trail__toggle-label">Ferma l'animazione</span>
       </button>
     </div>
   </main>
 
-  <footer class="launch__footer">
-    <div class="container launch__footer-inner">
+  <footer class="home__footer">
+    <div class="container home__footer-inner">
       <a href="privacy.html">Privacy</a>
       <!-- SEGNAPOSTO: sostituire con <a href="mailto:indirizzo@dominio.it">indirizzo@dominio.it</a> -->
       <span>[EMAIL DA DEFINIRE]</span>
