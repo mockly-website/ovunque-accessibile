@@ -1,9 +1,8 @@
 /* ==========================================================================
-   Ovunque Accessibile – sito preview
-   Indice: 1. Font · 2. Token · 3. Base · 4. Utility · 5. Layout
-           6. Componenti · 7. Sezioni · 8. Form · 9. Footer · 10. Pagine interne
-           11. Animazioni (solo con prefers-reduced-motion: no-preference)
-           12. Forced colors e stampa
+   Ovunque Accessibile – pagina "in arrivo"
+   Indice: 1. Font · 2. Token · 3. Base · 4. Utility · 5. Componenti
+           6. Pagina "in arrivo" · 7. Stradina animata · 8. Form · 9. Footer
+           10. Pagine interne · 11. Animazioni · 12. Forced colors e stampa
    ========================================================================== */
 
 /* 1. Font ospitati in locale (niente Google Fonts: GDPR) */
@@ -51,8 +50,8 @@
   --text-sm: 1rem;
   --text-base: 1.125rem;        /* 18px */
   --text-lg: 1.3125rem;
-  --text-xl: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
-  --text-2xl: clamp(1.875rem, 1.4rem + 2vw, 2.75rem);
+  --text-xl: clamp(1.4rem, 1.2rem + 1vw, 1.875rem);
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.6vw, 2.5rem);
   --text-3xl: clamp(2.5rem, 1.6rem + 4vw, 4.5rem);
 
   --space-2xs: 0.25rem;
@@ -62,7 +61,6 @@
   --space-lg: 1.5rem;
   --space-xl: 2rem;
   --space-2xl: 3rem;
-  --space-section: clamp(3.5rem, 2.5rem + 4vw, 6rem);
 
   --radius-sm: 0.75rem;
   --radius-md: 1rem;
@@ -72,7 +70,6 @@
 
   --shadow-sm: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 12px rgba(22, 40, 65, 0.06);
   --shadow-md: 0 2px 4px rgba(22, 40, 65, 0.06), 0 12px 32px rgba(22, 40, 65, 0.12);
-  --shadow-lg: 0 24px 60px rgba(22, 40, 65, 0.22);
 
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
 
@@ -104,7 +101,6 @@ body {
   color: var(--color-text);
   background: var(--color-beige);
   overflow-wrap: break-word;
-  overflow-x: clip;
 }
 
 h1,
@@ -220,6 +216,27 @@ section:focus {
   color: var(--color-error);
 }
 
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-md);
+}
+
+.container--narrow {
+  max-width: 44rem;
+}
+
+.prose {
+  max-width: var(--measure);
+}
+
+@media (min-width: 40em) {
+  .container {
+    padding-inline: var(--space-xl);
+  }
+}
+
 /* Skip link: fuori schermo finché non ricevono il focus */
 .skip-links {
   list-style: none;
@@ -247,86 +264,7 @@ section:focus {
   color: var(--color-white);
 }
 
-/* 5. Layout */
-.container {
-  width: 100%;
-  max-width: var(--container);
-  margin-inline: auto;
-  padding-inline: var(--space-md);
-}
-
-.container--narrow {
-  max-width: 44rem;
-}
-
-.prose {
-  max-width: var(--measure);
-}
-
-.section {
-  position: relative;
-  padding-block: var(--space-section);
-}
-
-.section--beige {
-  background: var(--color-beige);
-}
-
-.section--light {
-  background: var(--color-sky);
-}
-
-.section-head {
-  max-width: var(--measure);
-  margin-bottom: var(--space-xl);
-}
-
-.section-head p:last-child {
-  margin-bottom: 0;
-}
-
-@media (min-width: 40em) {
-  .container {
-    padding-inline: var(--space-xl);
-  }
-}
-
-/* Sentiero decorativo tra le sezioni (ripreso dal logo) */
-.path-divider {
-  position: absolute;
-  top: -1.25rem;
-  left: 0;
-  z-index: 1;
-  width: 100%;
-  height: 2.5rem;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.hero > .path-divider {
-  top: auto;
-  bottom: -1.25rem;
-}
-
-.path-divider__road,
-.path-divider__line {
-  fill: none;
-  vector-effect: non-scaling-stroke;
-  stroke-linecap: round;
-}
-
-.path-divider__road {
-  stroke: var(--color-path);
-  stroke-width: 12;
-}
-
-.path-divider__line {
-  stroke: var(--color-card);
-  stroke-width: 2;
-  stroke-dasharray: 10 14;
-}
-
-/* 6. Componenti */
+/* 5. Componenti */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -384,11 +322,6 @@ section:focus {
   width: 100%;
 }
 
-.btn .icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
 .btn[aria-disabled="true"] {
   cursor: progress;
   background: var(--color-navy);
@@ -417,52 +350,14 @@ section:focus {
   color: var(--color-beige);      /* 10,4:1 */
 }
 
-.badge--soon {
-  margin: 0;
-  border: var(--border-control) solid var(--color-navy);
-  color: var(--color-navy);
-  background: var(--color-card);
-  vertical-align: middle;
-}
-
-.badge--soon::before {
-  content: "";
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background: var(--color-brand);
-}
-
-.eyebrow {
-  display: inline-block;
-  margin-bottom: var(--space-sm);
-  padding: var(--space-2xs) var(--space-sm);
-  border-radius: var(--radius-pill);
-  background: var(--color-navy);
-  color: var(--color-beige);       /* 10,4:1 */
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.02em;
-}
-
-.lead {
-  font-size: var(--text-lg);
-  font-weight: 700;
-  line-height: 1.5;
-}
-
 .back-link {
   display: inline-flex;
   align-items: center;
   min-height: var(--target-min);
 }
 
-/* 7. Sezioni */
-
-/* Header (non sticky: non deve mai coprire l'elemento a fuoco, WCAG 2.4.11) */
+/* Header delle pagine interne (non sticky: non copre mai l'elemento a fuoco, WCAG 2.4.11) */
 .site-header {
-  position: relative;
-  z-index: 2;
   background: var(--color-beige);
 }
 
@@ -499,410 +394,197 @@ section:focus {
   line-height: 1.1;
 }
 
-/* Telefoni stretti: solo il logo (il nome resta per gli screen reader ed è nel titolo subito sotto) */
-@media (max-width: 29.99em) {
-  .site-header .brand__name {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-}
-
-/* Hero: testo + anteprima illustrata dell'app */
-.hero {
-  position: relative;
-  padding-block: var(--space-lg) calc(var(--space-section) + 1rem);
+/* 6. Pagina "in arrivo" */
+.soon {
   background:
-    radial-gradient(circle at 88% 18%, var(--color-sky) 0 14rem, transparent 14.05rem),
-    radial-gradient(circle at 70% 95%, rgba(251, 246, 236, 0.7) 0 10rem, transparent 10.05rem),
+    radial-gradient(circle at 12% 8%, var(--color-sky) 0 10rem, transparent 10.05rem),
+    radial-gradient(circle at 92% 30%, rgba(251, 246, 236, 0.75) 0 12rem, transparent 12.05rem),
     var(--color-beige);
 }
 
-.hero__inner {
-  display: grid;
-  gap: var(--space-2xl);
-  align-items: center;
+.soon__main {
+  padding-top: var(--space-2xl);
 }
 
-.hero__title {
+.soon__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.soon__logo {
+  width: 5.5rem;
+  margin-bottom: var(--space-md);
+}
+
+.soon__title {
   font-size: var(--text-3xl);
   line-height: 1.02;
   margin-bottom: var(--space-md);
 }
 
-.hero__slogan {
-  max-width: 24ch;
+.soon__slogan {
+  max-width: 26ch;
   font-family: var(--font-heading);
   font-size: var(--text-xl);
   font-weight: 700;
   line-height: 1.3;
 }
 
-.hero__text {
-  max-width: 38ch;
+.soon__text {
+  max-width: 44ch;
+  margin-bottom: 0;
   font-size: var(--text-lg);
   line-height: 1.5;
 }
 
-.hero__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-top: var(--space-lg);
+.soon__join {
+  max-width: 34rem;
+  padding-bottom: var(--space-2xl);
 }
 
-.hero__visual {
-  justify-self: center;
-  width: min(100%, 19rem);
-}
-
-@media (min-width: 52em) {
-  .hero {
-    padding-top: var(--space-2xl);
-  }
-
-  .hero__inner {
-    grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
-  }
-
-  .hero__visual {
-    width: min(100%, 21rem);
-  }
-}
-
-/* Telefono illustrato (decorativo, con descrizione in aria-label) */
-.phone {
+/* 7. Stradina animata */
+.trail {
   position: relative;
-  padding: 0.6rem;
-  border-radius: 2.6rem;
-  background: var(--color-navy);
-  box-shadow: var(--shadow-lg);
-  transform: rotate(2deg);
+  margin-top: var(--space-md);
 }
 
-.phone__screen {
-  position: relative;
-  overflow: hidden;
-  aspect-ratio: 9 / 17;
-  border-radius: 2rem;
-  background: var(--color-sky);
-}
-
-.phone__search {
-  position: absolute;
-  top: 0.9rem;
-  left: 0.9rem;
-  right: 0.9rem;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.55rem 0.9rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-white);
-  box-shadow: var(--shadow-sm);
-  font-size: 0.875rem;
-}
-
-.phone__search img {
-  width: 1.1rem;
-}
-
-.phone__map {
+.trail__svg {
   width: 100%;
-  height: 100%;
+  height: clamp(11rem, 7rem + 12vw, 17rem);
 }
 
-.phone__sheet {
+.trail__hill--back {
+  fill: var(--color-sky);
+}
+
+.trail__hill--front {
+  fill: var(--color-card);
+}
+
+.trail__road,
+.trail__line {
+  fill: none;
+  stroke-linecap: round;
+}
+
+.trail__road {
+  stroke: var(--color-path);
+  stroke-width: 20;
+}
+
+.trail__line {
+  stroke: var(--color-card);
+  stroke-width: 2.5;
+  stroke-dasharray: 12 16;
+}
+
+.trail__pin {
+  fill: var(--color-brand);
+}
+
+.trail__wheel {
+  fill: none;
+  stroke: var(--color-navy);
+  stroke-width: 4;
+}
+
+.trail__rim {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 2;
+}
+
+.trail__spokes {
+  fill: none;
+  stroke: var(--color-brand);
+  stroke-width: 1.5;
+}
+
+.trail__hub,
+.trail__person {
+  fill: var(--color-navy);
+}
+
+.trail__caster {
+  fill: var(--color-card);
+  stroke: var(--color-navy);
+  stroke-width: 3;
+}
+
+.trail__frame {
+  fill: none;
+  stroke: var(--color-navy);
+  stroke-width: 4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trail__body,
+.trail__legs,
+.trail__shoe {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.trail__body {
+  stroke: var(--color-brand);
+  stroke-width: 13;
+}
+
+.trail__legs {
+  stroke: var(--color-navy);
+  stroke-width: 9;
+}
+
+.trail__shoe {
+  stroke: var(--color-navy);
+  stroke-width: 6;
+}
+
+.trail__arm {
+  fill: none;
+  stroke: var(--color-navy);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Pulsante pausa/avvio (visibile solo se l'animazione è disponibile) */
+.trail__toggle {
   position: absolute;
-  left: 0.6rem;
-  right: 0.6rem;
-  bottom: 0.6rem;
-  padding: 0.9rem 1rem 1rem;
-  border-radius: 1.4rem;
-  background: var(--color-white);
-  box-shadow: var(--shadow-md);
-}
-
-.phone__eyebrow {
-  margin: 0;
-  font-size: 0.8125rem;
-  font-weight: 700;
-}
-
-.phone__place {
-  margin: 0 0 0.4rem;
-  font-family: var(--font-heading);
-  font-size: 1.25rem;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.phone__checks {
-  list-style: none;
-  font-size: 0.875rem;
-  line-height: 1.35;
-}
-
-.phone__checks li {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding-block: 0.15rem;
-}
-
-.phone__checks .icon {
-  width: 1.05rem;
-  height: 1.05rem;
-  color: var(--color-success);
-}
-
-/* Chi siamo */
-.about {
-  display: grid;
-  gap: var(--space-xl);
-  align-items: center;
-}
-
-.about__media {
-  margin: 0;
-  justify-self: center;
-  width: min(100%, 24rem);
-}
-
-.about__photo {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border: 0.5rem solid var(--color-white);
-  border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  transform: rotate(-2deg);
-}
-
-.about__text {
-  max-width: var(--measure);
-}
-
-.about__text p:last-child {
-  margin-bottom: 0;
-}
-
-@media (min-width: 52em) {
-  .about {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    gap: var(--space-2xl);
-  }
-}
-
-/* Card dei problemi */
-.cards {
-  display: grid;
-  gap: var(--space-md);
-}
-
-@media (min-width: 48em) {
-  .cards {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: var(--space-lg);
-  }
-}
-
-.card {
-  padding: var(--space-lg);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.card__icon {
-  display: inline-grid;
-  place-items: center;
-  width: 3.25rem;
-  height: 3.25rem;
-  margin-bottom: var(--space-sm);
-  border-radius: var(--radius-md);
-  background: var(--color-sky);
-  color: var(--color-brand);
-}
-
-.card__icon .icon {
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-/* Icona usata direttamente come svg (pagine interne) */
-svg.card__icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: none;
-}
-
-.card__title {
-  margin-bottom: var(--space-2xs);
-}
-
-.card p:last-child {
-  margin-bottom: 0;
-}
-
-.goal {
-  max-width: 48rem;
-  margin: var(--space-xl) 0 0;
-  padding: var(--space-lg) var(--space-xl);
-  border-left: 0.5rem solid var(--color-brand);
-  border-radius: var(--radius-md);
-  background: var(--color-card);
-  box-shadow: var(--shadow-sm);
-  font-size: var(--text-lg);
-  line-height: 1.5;
-}
-
-.goal__label {
-  display: block;
-  margin-bottom: var(--space-2xs);
-  font-family: var(--font-heading);
-}
-
-/* Funzioni in arrivo */
-/* 5 card: 1 colonna su telefono, 2+2+1 centrata, poi 3+2 centrate */
-.features {
-  display: grid;
-  gap: var(--space-md);
-}
-
-@media (min-width: 36em) {
-  .features {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .feature {
-    grid-column: span 2;
-  }
-
-  .feature:last-child {
-    grid-column: 2 / span 2;
-  }
-}
-
-@media (min-width: 60em) {
-  .features {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: var(--space-lg);
-  }
-
-  .feature:nth-child(4) {
-    grid-column: 2 / span 2;
-  }
-
-  .feature:last-child {
-    grid-column: span 2;
-  }
-}
-
-.feature {
-  padding: var(--space-lg);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-  box-shadow: var(--shadow-sm);
-}
-
-.feature__icon {
-  display: inline-grid;
-  place-items: center;
-  width: 3rem;
-  height: 3rem;
-  margin-bottom: var(--space-sm);
-  border-radius: 50%;
-  background: var(--color-brand);
-  color: var(--color-white);
-}
-
-.feature__title {
-  font-size: 1.1875rem;
-  margin-bottom: var(--space-2xs);
-}
-
-/* Telefono: card compatte, icona a sinistra */
-@media (max-width: 35.99em) {
-  .feature,
-  .cards .card {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-content: start;
-    column-gap: var(--space-md);
-    padding: var(--space-md) var(--space-lg) var(--space-md) var(--space-md);
-  }
-
-  .feature__icon,
-  .cards .card__icon {
-    grid-row: span 2;
-    margin: 0;
-  }
-}
-
-.feature p {
-  margin: 0;
-}
-
-/* Per chi è */
-.audience {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-sm) var(--space-lg);
-  margin-top: var(--space-2xl);
-}
-
-.audience__title {
-  margin: 0;
-}
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-}
-
-.chip {
+  top: var(--space-sm);
+  right: var(--space-md);
   display: inline-flex;
   align-items: center;
+  gap: var(--space-xs);
   min-height: var(--target-min);
   padding: var(--space-xs) var(--space-md);
   border: var(--border-control) solid var(--color-navy);
   border-radius: var(--radius-pill);
   background: var(--color-card);
+  color: var(--color-navy);
+  font: inherit;
+  font-size: var(--text-sm);
   font-weight: 700;
+  cursor: pointer;
 }
 
-/* Unisciti */
-.join__inner {
-  display: grid;
-  gap: var(--space-xl);
-  align-items: start;
+.trail__toggle:hover {
+  background: var(--color-navy);
+  color: var(--color-white);
 }
 
-.join__intro {
-  max-width: var(--measure);
-}
-
-@media (min-width: 60em) {
-  .join__inner {
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: var(--space-2xl);
-  }
-
-  .join__intro {
-    position: sticky;
-    top: var(--space-xl);
-  }
+.trail__toggle .icon {
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 /* 8. Form */
 .form-card {
+  position: relative;
   padding: var(--space-lg);
   border-radius: var(--radius-xl);
   background: var(--color-card);
@@ -915,15 +597,16 @@ svg.card__icon {
   }
 }
 
-.form__row {
-  display: grid;
-  gap: 0 var(--space-md);
+.form-card__title {
+  margin-bottom: var(--space-xs);
 }
 
-@media (min-width: 40em) {
-  .form__row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.form-card__text {
+  margin-bottom: var(--space-lg);
+}
+
+.form-status + .form {
+  margin-top: var(--space-lg);
 }
 
 .form__note {
@@ -955,7 +638,7 @@ svg.card__icon {
 .field__input {
   display: block;
   width: 100%;
-  min-height: 3rem;
+  min-height: 3.25rem;
   padding: var(--space-sm) var(--space-md);
   border: var(--border-control) solid var(--color-navy);   /* 13,8:1 sul bianco caldo */
   border-radius: var(--radius-sm);
@@ -968,29 +651,6 @@ svg.card__icon {
 .field__input:focus {
   outline: var(--focus-width) solid var(--color-focus);
   outline-offset: 2px;
-}
-
-.field__select {
-  appearance: none;
-  padding-right: 3rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23162841' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1.75rem;
-}
-
-.field__textarea {
-  min-height: 8rem;
-  resize: vertical;
-}
-
-.field__counter {
-  margin: var(--space-2xs) 0 0;
-  font-size: var(--text-sm);
-}
-
-.field__counter--warning {
-  font-weight: 700;
 }
 
 .field--checkbox {
@@ -1014,48 +674,6 @@ svg.card__icon {
   margin: 0;
   font-weight: 400;
   cursor: pointer;
-}
-
-/* Blocco "Raccontaci di più" (details/summary nativi: tastiera e screen reader gratis) */
-.more {
-  margin-bottom: var(--space-lg);
-  border: var(--border-control) solid var(--color-navy);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-}
-
-.more__summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  min-height: 3.25rem;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: calc(var(--radius-md) - 2px);
-  font-weight: 700;
-  cursor: pointer;
-  list-style: none;
-}
-
-.more__summary::-webkit-details-marker {
-  display: none;
-}
-
-.more__summary:hover {
-  background: var(--color-sky);
-}
-
-.more__chevron {
-  width: 1.75rem;
-  height: 1.75rem;
-}
-
-.more[open] .more__chevron {
-  transform: rotate(180deg);
-}
-
-.more__body {
-  padding: var(--space-xs) var(--space-md) 0;
 }
 
 /* Errori: icona + testo + bordo spesso, mai solo il colore */
@@ -1147,10 +765,6 @@ svg.card__icon {
   font-size: var(--text-lg);
 }
 
-.form-status + .form {
-  margin-top: var(--space-lg);
-}
-
 .form-status .icon {
   width: 2.5rem;
   height: 2.5rem;
@@ -1187,15 +801,10 @@ svg.card__icon {
 
 /* 9. Footer */
 .site-footer {
-  position: relative;
-  padding-block: var(--space-section) var(--space-xl);
+  padding-block: var(--space-xl);
   background: var(--color-navy);
   color: var(--color-beige);
   --color-focus: var(--color-beige);   /* focus beige su blu scuro: 10,4:1 */
-}
-
-.path-divider--footer .path-divider__line {
-  stroke: var(--color-beige);
 }
 
 .site-footer a {
@@ -1208,38 +817,15 @@ svg.card__icon {
 
 .site-footer__inner {
   display: grid;
-  gap: var(--space-lg);
-}
-
-.site-footer__top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-md) var(--space-xl);
-}
-
-.site-footer__brand {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  margin: 0;
-  font-family: var(--font-heading);
-  font-size: var(--text-xl);
-  font-weight: 700;
-}
-
-.site-footer__brand img {
-  width: 2rem;
-  padding: 0.2rem;
-  box-sizing: content-box;
-  border-radius: var(--radius-sm);
-  background: var(--color-card);
+  gap: var(--space-md);
+  justify-items: center;
+  text-align: center;
 }
 
 .footer-links {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: var(--space-xs) var(--space-xl);
 }
 
@@ -1257,11 +843,10 @@ svg.card__icon {
 .site-footer__meta {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
   gap: var(--space-xs) var(--space-lg);
   margin: 0;
-  padding-top: var(--space-lg);
-  border-top: 1px solid rgba(231, 214, 185, 0.35);
   font-size: var(--text-sm);
 }
 
@@ -1271,8 +856,16 @@ svg.card__icon {
 }
 
 /* 10. Pagine interne (privacy, grazie, errore) */
+.section {
+  position: relative;
+}
+
+.section--light {
+  background: var(--color-sky);
+}
+
 .page {
-  padding-block: var(--space-2xl) var(--space-section);
+  padding-block: var(--space-2xl);
 }
 
 .page__title {
@@ -1306,6 +899,24 @@ svg.card__icon {
   }
 }
 
+.page-card .hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+svg.card__icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--space-sm);
+  color: var(--color-brand);
+}
+
+svg.card__icon.icon--error {
+  color: var(--color-error);
+}
+
 .placeholder {
   padding: 0 0.25em;
   border-radius: 0.25em;
@@ -1314,18 +925,15 @@ svg.card__icon {
 }
 
 /* 11. Animazioni: solo se l'utente non ha chiesto di ridurle.
-   Nessuna animazione infinita o lampeggiante: tutte durano meno di 5 secondi (WCAG 2.2.2). */
+   La carrozzina (SMIL) è avviata da main.js, che rispetta la stessa preferenza
+   e mostra un pulsante per fermarla (WCAG 2.2.2). */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
   }
 
-  /* Interazioni */
   .btn,
-  .card,
-  .feature,
-  .chip,
-  .more__chevron,
+  .trail__toggle,
   .skip-links__link,
   a {
     transition: background-color 0.2s ease, color 0.2s ease, transform 0.25s var(--ease-out), box-shadow 0.25s ease;
@@ -1335,105 +943,26 @@ svg.card__icon {
     transform: translateY(-2px);
   }
 
-  .btn__arrow {
-    transition: transform 0.25s var(--ease-out);
-  }
-
-  .btn:hover .btn__arrow {
-    transform: translateX(3px);
-  }
-
-  .card:hover,
-  .feature:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-md);
-  }
-
-  .chip:hover {
-    transform: translateY(-2px);
-  }
-
-  /* Hero: ingresso a cascata */
-  .hero__item {
+  /* Ingresso a cascata dell'annuncio */
+  .soon__item {
     animation: rise 0.7s var(--ease-out) both;
   }
 
-  .hero__item:nth-child(2) { animation-delay: 0.08s; }
-  .hero__item:nth-child(3) { animation-delay: 0.16s; }
-  .hero__item:nth-child(4) { animation-delay: 0.24s; }
-  .hero__item:nth-child(5) { animation-delay: 0.32s; }
+  .soon__item:nth-child(2) { animation-delay: 0.08s; }
+  .soon__item:nth-child(3) { animation-delay: 0.16s; }
+  .soon__item:nth-child(4) { animation-delay: 0.24s; }
+  .soon__item:nth-child(5) { animation-delay: 0.32s; }
 
-  /* Telefono: entra, il sentiero si disegna, cadono i segnaposto, sale la scheda, compaiono le spunte */
-  .phone {
-    animation: phone-in 0.9s 0.2s var(--ease-out) both;
+  .soon__logo {
+    animation-name: pop-in;
   }
 
-  .phone__route {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    animation: draw 1.2s 0.8s ease-out forwards;
+  .trail {
+    animation: rise 0.8s 0.4s var(--ease-out) both;
   }
 
-  .phone__pin {
-    transform-box: fill-box;
-    transform-origin: 50% 100%;
-    animation: pin-drop 0.55s var(--ease-out) both;
-  }
-
-  .phone__pin--4 { animation-delay: 0.7s; transform-origin: 50% 50%; }
-  .phone__pin--2 { animation-delay: 1.2s; }
-  .phone__pin--3 { animation-delay: 1.35s; }
-  .phone__pin--1 { animation-delay: 1.8s; }
-
-  .phone__sheet {
-    animation: sheet-up 0.6s 2s var(--ease-out) both;
-  }
-
-  .phone__checks li {
-    animation: tick 0.4s var(--ease-out) both;
-  }
-
-  .phone__checks li:nth-child(1) { animation-delay: 2.4s; }
-  .phone__checks li:nth-child(2) { animation-delay: 2.55s; }
-  .phone__checks li:nth-child(3) { animation-delay: 2.7s; }
-  .phone__checks li:nth-child(4) { animation-delay: 2.85s; }
-
-  /* Con JS: il telefono parte solo quando è visibile (su mobile è sotto la piega) */
-  .motion .phone:not(.is-visible),
-  .motion .phone:not(.is-visible) * {
-    animation-play-state: paused;
-  }
-
-  /* Comparsa allo scroll (classe .motion aggiunta da main.js: senza JS tutto è subito visibile) */
-  .motion .reveal {
-    transition: opacity 0.7s ease, transform 0.7s var(--ease-out), box-shadow 0.25s ease;
-  }
-
-  .motion .reveal:not(.is-visible) {
-    opacity: 0;
-    transform: translateY(1.75rem);
-  }
-
-  /* Cascata tra card vicine: il ritardo vale solo durante la comparsa (.is-revealing, tolta da main.js) */
-  .motion .cards .reveal:nth-child(2),
-  .motion .features .reveal:nth-child(2) { --reveal-delay: 0.08s; }
-  .motion .cards .reveal:nth-child(3),
-  .motion .features .reveal:nth-child(3) { --reveal-delay: 0.16s; }
-  .motion .features .reveal:nth-child(4) { --reveal-delay: 0.24s; }
-  .motion .features .reveal:nth-child(5) { --reveal-delay: 0.32s; }
-
-  .motion .reveal.is-revealing {
-    transition-delay: var(--reveal-delay, 0s);
-  }
-
-  /* Sentiero tra le sezioni: si "disegna" da sinistra a destra */
-  /* (il clip va sui tracciati, non sull'svg: così l'IntersectionObserver vede l'area intera) */
-  .motion .path-divider > path {
-    transition: clip-path 1.4s var(--ease-out);
-  }
-
-  .motion .path-divider:not(.is-visible) > path {
-    clip-path: inset(0 100% 0 0);
+  .form-card {
+    animation: rise 0.8s 0.55s var(--ease-out) both;
   }
 
   /* Esito del modulo */
@@ -1442,11 +971,7 @@ svg.card__icon {
   }
 
   .form-status--success .icon {
-    animation: pop 0.5s 0.15s var(--ease-out) both;
-  }
-
-  .more[open] .more__body {
-    animation: rise 0.35s var(--ease-out) both;
+    animation: pop-in 0.5s 0.15s var(--ease-out) both;
   }
 }
 
@@ -1455,48 +980,19 @@ svg.card__icon {
   to { opacity: 1; transform: none; }
 }
 
-@keyframes phone-in {
-  from { opacity: 0; transform: translateY(2.5rem) rotate(6deg); }
-  to { opacity: 1; transform: rotate(2deg); }
-}
-
-@keyframes draw {
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes pin-drop {
-  0% { opacity: 0; transform: translateY(-40%) scale(0.6); }
-  70% { opacity: 1; transform: translateY(4%) scale(1.05); }
-  100% { opacity: 1; transform: none; }
-}
-
-@keyframes sheet-up {
-  from { opacity: 0; transform: translateY(110%); }
-  to { opacity: 1; transform: none; }
-}
-
-@keyframes tick {
-  from { opacity: 0; transform: translateX(-0.5rem); }
-  to { opacity: 1; transform: none; }
-}
-
-@keyframes pop {
-  0% { transform: scale(0.4); }
-  70% { transform: scale(1.15); }
-  100% { transform: scale(1); }
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.5); }
+  70% { opacity: 1; transform: scale(1.08); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 /* 12. Modalità a contrasto elevato di Windows e stampa */
 @media (forced-colors: active) {
   .btn,
-  .chip,
   .badge,
-  .eyebrow,
-  .card,
-  .feature,
   .form-card,
   .form-status,
-  .phone {
+  .trail__toggle {
     border: 2px solid CanvasText;
   }
 
@@ -1511,23 +1007,25 @@ svg.card__icon {
 
 @media print {
   .skip-links,
-  .site-header__nav,
-  .path-divider,
-  .hero__actions,
-  .hero__visual {
+  .trail {
     display: none;
   }
 
   body,
-  .section,
-  .hero,
+  .soon,
   .site-footer {
     background: none;
     color: #000;
   }
+}
 
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
+/* Etichetta delle pagine di anteprima font (variante-1/2.html): da togliere dopo la scelta */
+.variant-note {
+  margin: 0;
+  padding: var(--space-xs) var(--space-md);
+  background: var(--color-navy);
+  color: var(--color-beige);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-align: center;
 }

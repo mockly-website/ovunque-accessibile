@@ -1,0 +1,21 @@
+/* Variante 1 (solo anteprima): titoli in Fredoka, testi in Atkinson Hyperlegible */
+@font-face {
+  font-family: "Fredoka";
+  font-style: normal;
+  font-weight: 600 700;           /* file statico 600: evita il grassetto sintetico */
+  font-display: swap;
+  src: url("../fonts/fredoka-latin.woff2") format("woff2");
+}
+
+:root {
+  --font-heading: "Fredoka", "Atkinson Hyperlegible", system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3,
+.soon__slogan,
+.form-status__title {
+  font-weight: 600;
+  letter-spacing: 0.005em;
+}

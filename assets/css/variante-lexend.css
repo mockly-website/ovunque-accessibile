@@ -1,0 +1,28 @@
+/* Variante 2 (solo anteprima): titoli e testi in Lexend (font variabile 100–900) */
+@font-face {
+  font-family: "Lexend";
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url("../fonts/lexend-latin.woff2") format("woff2");
+}
+
+:root {
+  --font-heading: "Lexend", system-ui, sans-serif;
+  --font-body: "Lexend", system-ui, sans-serif;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.soon__slogan {
+  font-weight: 500;
+}
+
+body {
+  line-height: 1.65;
+}

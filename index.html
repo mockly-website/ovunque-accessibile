@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ovunque Accessibile – Trova e condividi luoghi davvero accessibili</title>
-  <meta name="description" content="Siamo Angelo e Lorenzo: stiamo costruendo una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia. Iscriviti per rimanere aggiornato.">
+  <title>Ovunque Accessibile – In arrivo</title>
+  <meta name="description" content="Il sito e la web-app di Ovunque Accessibile stanno arrivando: una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia. Lascia la tua email per essere avvisato.">
   <meta name="theme-color" content="#162841">
   <meta name="color-scheme" content="light">
 
@@ -13,14 +13,14 @@
   <meta property="og:locale" content="it_IT">
   <meta property="og:site_name" content="Ovunque Accessibile">
   <meta property="og:title" content="Ovunque Accessibile – In arrivo">
-  <meta property="og:description" content="L'accessibilità non dovrebbe essere un privilegio, ma la normalità. Una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia.">
+  <meta property="og:description" content="L'accessibilità non dovrebbe essere un privilegio, ma la normalità. Il sito e la web-app stanno arrivando.">
   <meta property="og:image" content="assets/img/og-image.jpg">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:image:alt" content="Logo di Ovunque Accessibile con lo slogan: L'accessibilità non dovrebbe essere un privilegio, ma la normalità.">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Ovunque Accessibile – In arrivo">
-  <meta name="twitter:description" content="Una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia.">
+  <meta name="twitter:description" content="Il sito e la web-app per trovare luoghi davvero accessibili stanno arrivando.">
   <meta name="twitter:image" content="assets/img/og-image.jpg">
 
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
@@ -47,341 +47,157 @@
   }
   </script>
 </head>
-<body>
+<body class="soon">
   <!-- Sprite delle icone: tutte decorative, accanto c'è sempre il testo -->
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-    <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
-    <symbol id="icon-review" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.1 11.6L12 13l-.9.6-2.6 1.6.7-3-2.3-2 3-.3L12 7l1.2 2.9 3 .3-2.3 2 .7 3-1.7-1.6z"/></symbol>
-    <symbol id="icon-camera" viewBox="0 0 24 24"><circle cx="12" cy="12.5" r="3.2"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 14.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></symbol>
-    <symbol id="icon-checklist" viewBox="0 0 24 24"><path d="M20 3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM10 17H5v-2h5v2zm0-4H5v-2h5v2zm0-4H5V7h5v2zm4.82 6L12 12.16l1.41-1.41 1.41 1.42L17.99 9l1.42 1.42L14.82 15z"/></symbol>
-    <symbol id="icon-community" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
-    <symbol id="icon-hotel" viewBox="0 0 24 24"><path d="M7 13c1.66 0 3-1.34 3-3S8.66 7 7 7s-3 1.34-3 3 1.34 3 3 3zm12-6h-8v7H3V5H1v15h2v-3h18v3h2v-9c0-2.21-1.79-4-4-4z"/></symbol>
-    <symbol id="icon-restaurant" viewBox="0 0 24 24"><path d="M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z"/></symbol>
-    <symbol id="icon-beach" viewBox="0 0 24 24"><path d="M13.13 14.56l1.43-1.43 6.44 6.44L19.57 21zm4.29-5.73l2.86-2.86c-3.95-3.95-10.35-3.96-14.3-.02 3.93-1.3 8.31-.25 11.44 2.88zM5.95 5.98c-3.94 3.95-3.93 10.35.02 14.3l2.86-2.86C5.7 14.29 4.65 9.91 5.95 5.98zm.02-.02l-.01.01c-.38 3.01 1.17 6.88 4.3 10.02l5.73-5.73c-3.13-3.13-7.01-4.68-10.02-4.3z"/></symbol>
     <symbol id="icon-external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
     <symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-3.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/></symbol>
     <symbol id="icon-mail" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></symbol>
     <symbol id="icon-error" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></symbol>
     <symbol id="icon-check" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
     <symbol id="icon-soon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></symbol>
-    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
-    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></symbol>
+    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></symbol>
+    <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
   </svg>
 
   <ul class="skip-links">
     <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
-    <li><a class="skip-links__link" href="#iscriviti">Vai al modulo di iscrizione</a></li>
+    <li><a class="skip-links__link" href="#avvisami">Vai al modulo di iscrizione</a></li>
   </ul>
 
-  <header class="site-header">
-    <div class="container site-header__inner">
-      <a class="brand" href="./">
-        <img class="brand__logo" src="assets/img/logo.png" alt="" width="40" height="50">
-        <span class="brand__name">Ovunque Accessibile</span>
-      </a>
-      <nav class="site-header__nav" aria-label="Principale">
-        <a class="btn btn--primary btn--small" href="#iscriviti">Rimani aggiornato</a>
-      </nav>
+  <main id="main" class="soon__main" tabindex="-1">
+
+    <!-- Annuncio -->
+    <div class="container soon__intro">
+      <img class="soon__logo soon__item" src="assets/img/logo.webp" alt="" width="180" height="225" fetchpriority="high">
+      <p class="badge badge--dark soon__item">
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-soon"/></svg>
+        In arrivo
+      </p>
+      <h1 class="soon__title soon__item">Ovunque Accessibile</h1>
+      <p class="soon__slogan soon__item">L'accessibilità non dovrebbe essere un privilegio, ma&nbsp;la&nbsp;normalità.</p>
+      <p class="soon__text soon__item">Siamo Angelo e Lorenzo. Stiamo preparando <strong>il sito e la web&#8209;app</strong> per trovare e condividere luoghi davvero accessibili, in tutta Italia.</p>
     </div>
-  </header>
 
-  <main id="main" tabindex="-1">
+    <!-- Stradina con la carrozzina: decorativa. Animata da main.js (SMIL), con pulsante di pausa (WCAG 2.2.2). -->
+    <div class="trail">
+      <svg class="trail__svg" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+        <path class="trail__hill trail__hill--back" d="M-20 150 C 160 95, 330 120, 520 110 S 900 70, 1220 115 L 1220 260 L -20 260 Z"/>
+        <path class="trail__hill trail__hill--front" d="M-20 185 C 200 160, 420 200, 640 180 S 1000 150, 1220 175 L 1220 260 L -20 260 Z"/>
 
-    <!-- Hero -->
-    <section class="hero" aria-labelledby="hero-title">
-      <div class="container hero__inner">
-        <div class="hero__content">
-          <p class="badge badge--dark hero__item">
-            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-soon"/></svg>
-            In arrivo
-          </p>
-          <h1 id="hero-title" class="hero__title hero__item">Ovunque Accessibile</h1>
-          <p class="hero__slogan hero__item">L'accessibilità non dovrebbe essere un privilegio, ma&nbsp;la&nbsp;normalità.</p>
-          <p class="hero__text hero__item">Stiamo costruendo una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia.</p>
-          <div class="hero__actions hero__item">
-            <a class="btn btn--primary btn--large" href="#iscriviti">
-              Rimani aggiornato
-              <svg class="icon btn__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
-            </a>
-            <a class="btn btn--secondary btn--large" href="#chi-siamo">Scopri il progetto</a>
+        <path id="trail-path" class="trail__road" d="M-80 196 C 120 196, 230 136, 400 146 S 660 206, 820 176 S 1060 126, 1280 140"/>
+        <path class="trail__line" d="M-80 196 C 120 196, 230 136, 400 146 S 660 206, 820 176 S 1060 126, 1280 140"/>
+
+        <!-- Segnaposto lungo la strada (forma del logo) -->
+        <g transform="translate(400 128)">
+          <path class="trail__pin" d="M0 0 C -13 -15, -15 -21, -15 -28 A 15 15 0 1 1 15 -28 C 15 -21, 13 -15, 0 0 Z"/>
+          <circle cx="0" cy="-28" r="6.5" fill="#ffffff"/>
+        </g>
+        <g transform="translate(820 158)">
+          <path class="trail__pin" d="M0 0 C -13 -15, -15 -21, -15 -28 A 15 15 0 1 1 15 -28 C 15 -21, 13 -15, 0 0 Z"/>
+          <circle cx="0" cy="-28" r="6.5" fill="#ffffff"/>
+        </g>
+
+        <!-- Carrozzina: senza JS resta ferma qui; con JS percorre la stradina -->
+        <g id="trail-rider" transform="translate(600 168)">
+          <g class="trail__rider" transform="scale(1.25)">
+            <!-- ruota posteriore che gira -->
+            <g transform="translate(-2 -24)">
+              <g>
+                <circle class="trail__wheel" r="22"/>
+                <circle class="trail__rim" r="17"/>
+                <path class="trail__spokes" d="M0 -22 V 22 M-22 0 H 22 M-15.5 -15.5 L 15.5 15.5 M-15.5 15.5 L 15.5 -15.5"/>
+                <circle r="3" class="trail__hub"/>
+                <animateTransform class="trail__anim" attributeName="transform" type="rotate" from="0" to="360" dur="1.4s" repeatCount="indefinite" begin="indefinite"/>
+              </g>
+            </g>
+            <!-- telaio e ruotina anteriore -->
+            <path class="trail__frame" d="M-12 -30 L 26 -30 L 32 -14 M-12 -30 L -16 -62 M26 -30 L 30 -8"/>
+            <circle class="trail__caster" cx="30" cy="-6" r="6"/>
+            <!-- persona -->
+            <path class="trail__legs" d="M-4 -37 L 21 -37 L 27 -17"/>
+            <path class="trail__shoe" d="M27 -15 L 36 -14"/>
+            <path class="trail__body" d="M-1 -62 L -4 -40"/>
+            <circle class="trail__person" cx="3" cy="-74" r="8.5"/>
+            <path class="trail__arm" d="M0 -57 L 10 -46 L 9 -34"/>
+          </g>
+          <animateMotion class="trail__anim" dur="14s" repeatCount="indefinite" rotate="auto" begin="indefinite">
+            <mpath href="#trail-path"/>
+          </animateMotion>
+        </g>
+      </svg>
+      <button class="trail__toggle" type="button" hidden>
+        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pause"/></svg>
+        <span class="trail__toggle-label">Ferma l'animazione</span>
+      </button>
+    </div>
+
+    <!-- Avvisami -->
+    <section id="avvisami" class="container soon__join" aria-labelledby="avvisami-title" tabindex="-1">
+      <div class="form-card">
+        <h2 id="avvisami-title" class="form-card__title">Ti avvisiamo noi</h2>
+        <p class="form-card__text">Lasciaci la tua email: ti scriviamo appena il sito e la web&#8209;app sono online.</p>
+
+        <!-- Regione di esito: riceve il focus dopo l'invio via fetch -->
+        <div id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
+
+        <!-- SEGNAPOSTO: sostituire [PROJECT-REF] con il riferimento del progetto Supabase (Settings → General) -->
+        <form id="subscribe-form" class="form" action="https://[PROJECT-REF].supabase.co/functions/v1/subscribe" method="post">
+          <div id="error-summary" class="error-summary" tabindex="-1" hidden>
+            <h3 class="error-summary__title">
+              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-error"/></svg>
+              <span id="error-summary-title">Controlla i campi indicati</span>
+            </h3>
+            <ul class="error-summary__list" id="error-summary-list"></ul>
           </div>
-        </div>
 
-        <!-- Anteprima illustrativa dell'app (non è una schermata reale) -->
-        <div class="hero__visual">
-          <div class="phone" role="img" aria-label="Anteprima illustrativa della piattaforma: una mappa con i luoghi accessibili e la scheda di una spiaggia con rampa, bagno attrezzato, parcheggio riservato e zero gradini.">
-            <div class="phone__screen">
-              <div class="phone__search">
-                <img src="assets/img/logo.png" alt="" width="18" height="22">
-                <span>Cerca una città…</span>
-              </div>
-              <svg class="phone__map" viewBox="0 0 270 510" preserveAspectRatio="xMidYMin slice" aria-hidden="true" focusable="false">
-                <rect width="270" height="510" fill="#e6f4fd"/>
-                <path d="M150 300 C 190 270, 250 290, 290 270 L 290 380 L 150 380 Z" fill="#cfe6f7"/>
-                <g fill="none" stroke="#ffffff" stroke-linecap="round">
-                  <path d="M-10 95 L 290 150" stroke-width="12"/>
-                  <path d="M60 -10 L 105 520" stroke-width="9"/>
-                  <path d="M185 -10 C 165 120, 230 200, 200 520" stroke-width="9"/>
-                  <path d="M-10 235 L 290 210" stroke-width="7"/>
-                  <path d="M-10 320 L 140 300" stroke-width="6"/>
-                </g>
-                <path class="phone__route" d="M38 300 C 70 250, 30 215, 92 195 S 175 175, 196 118" fill="none" stroke="#8b7d6b" stroke-width="7" stroke-linecap="round" pathLength="1"/>
-                <g transform="translate(196 118)"><g class="phone__pin phone__pin--1">
-                  <path d="M0 0 C -13 -15, -15 -21, -15 -28 A 15 15 0 1 1 15 -28 C 15 -21, 13 -15, 0 0 Z" fill="#2f5b9c"/>
-                  <circle cx="0" cy="-28" r="7" fill="#ffffff"/>
-                </g></g>
-                <g transform="translate(92 196)"><g class="phone__pin phone__pin--2">
-                  <path d="M0 0 C -10 -12, -11 -17, -11 -21 A 11 11 0 1 1 11 -21 C 11 -17, 10 -12, 0 0 Z" fill="#2f5b9c"/>
-                  <circle cx="0" cy="-21" r="5" fill="#ffffff"/>
-                </g></g>
-                <g transform="translate(232 262)"><g class="phone__pin phone__pin--3">
-                  <path d="M0 0 C -10 -12, -11 -17, -11 -21 A 11 11 0 1 1 11 -21 C 11 -17, 10 -12, 0 0 Z" fill="#2f5b9c"/>
-                  <circle cx="0" cy="-21" r="5" fill="#ffffff"/>
-                </g></g>
-                <g transform="translate(38 300)"><g class="phone__pin phone__pin--4">
-                  <circle r="9" fill="#162841"/>
-                  <circle r="4" fill="#ffffff"/>
-                </g></g>
-              </svg>
-              <div class="phone__sheet">
-                <p class="phone__eyebrow">Spiaggia · esempio</p>
-                <p class="phone__place">Lido sul mare</p>
-                <ul class="phone__checks">
-                  <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Rampa d'accesso</li>
-                  <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Bagno attrezzato</li>
-                  <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</li>
-                  <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>0 gradini all'ingresso</li>
-                </ul>
-              </div>
-            </div>
+          <input type="hidden" name="form_token" value="">
+
+          <div class="field">
+            <label class="field__label" for="email">La tua email <span class="field__req">(obbligatorio)</span></label>
+            <input class="field__input" type="email" id="email" name="email" autocomplete="email" inputmode="email" maxlength="254" spellcheck="false" required>
           </div>
-        </div>
-      </div>
-      <svg class="path-divider" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="path-divider__road" d="M0 30 C 180 6, 360 46, 600 26 S 1000 4, 1200 28"/><path class="path-divider__line" d="M0 30 C 180 6, 360 46, 600 26 S 1000 4, 1200 28"/></svg>
-    </section>
 
-    <!-- Chi siamo -->
-    <section id="chi-siamo" class="section section--light" aria-labelledby="chi-siamo-title" tabindex="-1">
-      <div class="container about reveal">
-        <figure class="about__media">
-          <!-- SEGNAPOSTO: sostituire con la foto di Angelo e Lorenzo (WebP, 1200×900) e aggiornare alt,
-               es. alt="Angelo e Lorenzo, in carrozzina, sorridono su un lungomare" -->
-          <img class="about__photo" src="assets/img/team-placeholder.webp"
-               srcset="assets/img/team-placeholder-600.webp 600w, assets/img/team-placeholder.webp 1200w"
-               sizes="(min-width: 52em) 24rem, 90vw"
-               alt="Spazio per la foto di Angelo e Lorenzo, in arrivo" width="1200" height="900" loading="lazy" decoding="async">
-        </figure>
-        <div class="about__text">
-          <p class="eyebrow">Chi siamo</p>
-          <h2 id="chi-siamo-title">Ciao, siamo Angelo e&nbsp;Lorenzo</h2>
-          <p class="lead">Due ragazzi in carrozzina che hanno deciso di trasformare le difficoltà di ogni giorno in un progetto utile per tutti.</p>
-          <p>Crediamo che l'accessibilità non debba essere un privilegio, ma un diritto. Per questo vogliamo costruire una community in cui ognuno possa dare il proprio contributo e aiutare gli altri.</p>
-        </div>
-      </div>
-    </section>
+          <!-- Honeypot: nascosto a tutti, solo i bot lo compilano -->
+          <div class="hp" aria-hidden="true">
+            <label for="website">Non compilare questo campo</label>
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
 
-    <!-- Perché nasce -->
-    <section class="section section--beige" aria-labelledby="perche-title">
-      <svg class="path-divider" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="path-divider__road" d="M0 22 C 220 44, 420 4, 640 24 S 1020 44, 1200 18"/><path class="path-divider__line" d="M0 22 C 220 44, 420 4, 640 24 S 1020 44, 1200 18"/></svg>
-      <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">Perché nasce</p>
-          <h2 id="perche-title">“Accessibile” non sempre vuol dire accessibile</h2>
-          <p>Trovare informazioni affidabili su un luogo è ancora difficile: spesso sono incomplete, vecchie o lontane dalla realtà.</p>
-        </div>
-        <ul class="cards" role="list">
-          <li class="card reveal">
-            <span class="card__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-hotel"/></svg></span>
-            <h3 class="card__title">L'hotel</h3>
-            <p>Si definisce “accessibile”, ma le camere sono poco adatte.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-restaurant"/></svg></span>
-            <h3 class="card__title">Il ristorante</h3>
-            <p>Ha un gradino proprio all'ingresso.</p>
-          </li>
-          <li class="card reveal">
-            <span class="card__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-beach"/></svg></span>
-            <h3 class="card__title">La spiaggia</h3>
-            <p>Non ha le attrezzature necessarie.</p>
-          </li>
-        </ul>
-        <p class="goal reveal"><strong class="goal__label">Il nostro obiettivo</strong> Permettere a tutti di uscire, viaggiare e vivere il territorio con più autonomia, sicurezza e consapevolezza.</p>
-      </div>
-    </section>
+          <div class="field field--checkbox">
+            <input class="field__checkbox" type="checkbox" id="consent" name="consent" value="1" required>
+            <label class="field__label field__label--checkbox" for="consent">
+              <span class="field__req">(obbligatorio)</span>
+              Voglio ricevere aggiornamenti su Ovunque Accessibile via email. Ho letto la
+              <a href="privacy.html" target="_blank" rel="noopener">privacy policy<span class="visually-hidden"> (si apre in una nuova scheda)</span><svg class="icon icon--inline" aria-hidden="true" focusable="false"><use href="#icon-external"/></svg></a>.
+            </label>
+          </div>
 
-    <!-- Come funzionerà + Per chi è -->
-    <section class="section section--light" aria-labelledby="come-title">
-      <svg class="path-divider" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="path-divider__road" d="M0 30 C 180 6, 360 46, 600 26 S 1000 4, 1200 28"/><path class="path-divider__line" d="M0 30 C 180 6, 360 46, 600 26 S 1000 4, 1200 28"/></svg>
-      <div class="container">
-        <div class="section-head reveal">
-          <p class="eyebrow">Come funzionerà</p>
-          <h2 id="come-title">Tutto quello che serve sapere, prima di partire</h2>
-          <p>Ristoranti, hotel, spiagge, bagni pubblici e altro, raccontati da chi ci è stato. <span class="badge badge--soon">Funzioni in arrivo</span></p>
-        </div>
-        <ul class="features" role="list">
-          <li class="feature reveal">
-            <span class="feature__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg></span>
-            <h3 class="feature__title">Mappa interattiva</h3>
-            <p>Cerca per città o indirizzo.</p>
-          </li>
-          <li class="feature reveal">
-            <span class="feature__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-checklist"/></svg></span>
-            <h3 class="feature__title">Informazioni dettagliate</h3>
-            <p>Rampe, ascensori, bagni, parcheggi, ingressi.</p>
-          </li>
-          <li class="feature reveal">
-            <span class="feature__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-review"/></svg></span>
-            <h3 class="feature__title">Recensioni sull'accessibilità</h3>
-            <p>Esperienze reali di chi c'è già stato.</p>
-          </li>
-          <li class="feature reveal">
-            <span class="feature__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-camera"/></svg></span>
-            <h3 class="feature__title">Foto delle strutture</h3>
-            <p>Per vedere com'è davvero, prima di andarci.</p>
-          </li>
-          <li class="feature reveal">
-            <span class="feature__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-community"/></svg></span>
-            <h3 class="feature__title">Contributi della community</h3>
-            <p>Chiunque potrà aggiungere e aggiornare luoghi.</p>
-          </li>
-        </ul>
-
-        <div class="audience reveal">
-          <h3 class="audience__title">Per chi è</h3>
-          <ul class="chips" role="list">
-            <li class="chip">Persone in carrozzina</li>
-            <li class="chip">Anziani</li>
-            <li class="chip">Persone con difficoltà motorie</li>
-            <li class="chip">Famiglie con passeggino</li>
-            <li class="chip">Accompagnatori</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <!-- Unisciti / Rimani aggiornato -->
-    <section id="iscriviti" class="section section--beige join" aria-labelledby="iscriviti-title" tabindex="-1">
-      <svg class="path-divider" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="path-divider__road" d="M0 22 C 220 44, 420 4, 640 24 S 1020 44, 1200 18"/><path class="path-divider__line" d="M0 22 C 220 44, 420 4, 640 24 S 1020 44, 1200 18"/></svg>
-      <div class="container join__inner">
-        <div class="join__intro reveal">
-          <p class="eyebrow">Unisciti a noi</p>
-          <h2 id="iscriviti-title">Rimani aggiornato</h2>
-          <p>Lasciaci la tua email: ti scriviamo quando la piattaforma è pronta.</p>
-          <p>Conosci già un luogo accessibile? Raccontacelo: ci aiuterai a riempire la mappa fin dal primo giorno.</p>
-        </div>
-
-        <div class="form-card reveal">
-          <!-- Regione di esito: riceve il focus dopo l'invio via fetch -->
-          <div id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
-
-          <!-- SEGNAPOSTO: sostituire [PROJECT-REF] con il riferimento del progetto Supabase (Settings → General) -->
-          <form id="subscribe-form" class="form" action="https://[PROJECT-REF].supabase.co/functions/v1/subscribe" method="post">
-            <div id="error-summary" class="error-summary" tabindex="-1" hidden>
-              <h3 class="error-summary__title">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-error"/></svg>
-                <span id="error-summary-title">Controlla i campi indicati</span>
-              </h3>
-              <ul class="error-summary__list" id="error-summary-list"></ul>
-            </div>
-
-            <input type="hidden" name="form_token" value="">
-
-            <div class="form__row">
-              <div class="field">
-                <label class="field__label" for="name">Nome <span class="field__req">(obbligatorio)</span></label>
-                <input class="field__input" type="text" id="name" name="name" autocomplete="given-name" maxlength="100" required>
-              </div>
-
-              <div class="field">
-                <label class="field__label" for="email">Email <span class="field__req">(obbligatorio)</span></label>
-                <input class="field__input" type="email" id="email" name="email" autocomplete="email" inputmode="email" maxlength="254" spellcheck="false" required>
-              </div>
-            </div>
-
-            <!-- Campi facoltativi raccolti in un blocco apribile: il modulo resta corto -->
-            <details class="more" id="more-fields">
-              <summary class="more__summary">
-                <span>Raccontaci di più <span class="field__opt">(facoltativo)</span></span>
-                <svg class="icon more__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg>
-              </summary>
-              <div class="more__body">
-                <div class="form__row">
-                  <div class="field">
-                    <label class="field__label" for="role">Chi sei <span class="field__opt">(facoltativo)</span></label>
-                    <select class="field__input field__select" id="role" name="role">
-                      <option value="">Preferisco non dirlo</option>
-                      <option value="disability">Persona con disabilità</option>
-                      <option value="family">Familiare o accompagnatore</option>
-                      <option value="business">Struttura o attività</option>
-                      <option value="other">Altro</option>
-                    </select>
-                  </div>
-
-                  <div class="field">
-                    <label class="field__label" for="city">Città <span class="field__opt">(facoltativo)</span></label>
-                    <input class="field__input" type="text" id="city" name="city" autocomplete="address-level2" maxlength="100">
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label class="field__label" for="place_note">Conosci un luogo accessibile? Raccontacelo <span class="field__opt">(facoltativo)</span></label>
-                  <p class="field__hint" id="place_note-hint">Nome del luogo, città e cosa lo rende accessibile. Massimo 1000 caratteri.</p>
-                  <textarea class="field__input field__textarea" id="place_note" name="place_note" rows="4" maxlength="1000" aria-describedby="place_note-hint place_note-counter"></textarea>
-                  <p class="field__counter" id="place_note-counter" hidden>0 caratteri su 1000</p>
-                  <p class="visually-hidden" id="place_note-live" aria-live="polite"></p>
-                </div>
-              </div>
-            </details>
-
-            <!-- Honeypot: nascosto a tutti, solo i bot lo compilano -->
-            <div class="hp" aria-hidden="true">
-              <label for="website">Non compilare questo campo</label>
-              <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-            </div>
-
-            <div class="field field--checkbox">
-              <input class="field__checkbox" type="checkbox" id="consent" name="consent" value="1" required>
-              <label class="field__label field__label--checkbox" for="consent">
-                <span class="field__req">(obbligatorio)</span>
-                Voglio ricevere aggiornamenti su Ovunque Accessibile via email. Ho letto la
-                <a href="privacy.html" target="_blank" rel="noopener">privacy policy<span class="visually-hidden"> (si apre in una nuova scheda)</span><svg class="icon icon--inline" aria-hidden="true" focusable="false"><use href="#icon-external"/></svg></a>.
-              </label>
-            </div>
-
-            <button class="btn btn--primary btn--block btn--large" type="submit">Iscriviti alla lista</button>
-            <p class="form__note">Niente spam: solo aggiornamenti sul progetto. Puoi cancellarti quando vuoi.</p>
-          </form>
-        </div>
+          <button class="btn btn--primary btn--block btn--large" type="submit">Avvisami</button>
+          <p class="form__note">Solo email sul lancio e sul progetto. Puoi cancellarti quando vuoi.</p>
+        </form>
       </div>
     </section>
   </main>
 
-  <footer class="site-footer">
-    <svg class="path-divider path-divider--footer" viewBox="0 0 1200 48" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="path-divider__road" d="M0 30 C 180 6, 360 46, 600 26 S 1000 4, 1200 28"/><path class="path-divider__line" d="M0 30 C 180 6, 360 46, 600 26 S 1000 4, 1200 28"/></svg>
+  <footer class="site-footer site-footer--soon">
     <div class="container site-footer__inner">
-      <div class="site-footer__top">
-        <p class="site-footer__brand">
-          <img src="assets/img/logo.png" alt="" width="32" height="40" loading="lazy">
-          Ovunque Accessibile
-        </p>
-        <ul class="footer-links" role="list">
-          <li>
-            <a class="footer-links__link" href="https://www.instagram.com/ovunque_accessibile">
-              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
-              Seguici su Instagram<span class="visually-hidden"> (sito esterno)</span>
-            </a>
-          </li>
-          <li>
-            <!-- SEGNAPOSTO: sostituire con <a class="footer-links__link" href="mailto:indirizzo@dominio.it">… -->
-            <span class="footer-links__link footer-links__link--text">
-              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mail"/></svg>
-              Email: [EMAIL DA DEFINIRE]
-            </span>
-          </li>
-          <li><a class="footer-links__link" href="privacy.html">Privacy policy</a></li>
-        </ul>
-      </div>
+      <ul class="footer-links" role="list">
+        <li>
+          <a class="footer-links__link" href="https://www.instagram.com/ovunque_accessibile">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
+            Seguici su Instagram<span class="visually-hidden"> (sito esterno)</span>
+          </a>
+        </li>
+        <li>
+          <!-- SEGNAPOSTO: sostituire con <a class="footer-links__link" href="mailto:indirizzo@dominio.it">… -->
+          <span class="footer-links__link footer-links__link--text">
+            <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mail"/></svg>
+            Email: [EMAIL DA DEFINIRE]
+          </span>
+        </li>
+        <li><a class="footer-links__link" href="privacy.html">Privacy policy</a></li>
+      </ul>
       <p class="site-footer__meta">
         <span>© 2026 Ovunque Accessibile</span>
         <span>Sito realizzato da <a class="site-footer__credit" href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
