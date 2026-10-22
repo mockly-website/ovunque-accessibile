@@ -29,8 +29,8 @@
 
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-22">
-  <script src="assets/js/main.js?v=2026-10-22" defer></script>
+  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-22c">
+  <script src="assets/js/main.js?v=2026-10-22c" defer></script>
 
   <script type="application/ld+json">
   {
@@ -126,10 +126,13 @@
           </animateMotion>
         </g>
       </svg>
-      <button class="trail__toggle" type="button" hidden>
-        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pause"/></svg>
-        <span class="trail__toggle-label">Ferma l'animazione</span>
-      </button>
+      <!-- Pulsante fuori dalla scena: la carrozzina non ci passa mai sotto -->
+      <div class="container trail__controls">
+        <button class="trail__toggle" type="button" hidden>
+          <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pause"/></svg>
+          <span class="trail__toggle-label">Ferma l'animazione</span>
+        </button>
+      </div>
     </div>
 
     <!-- Avvisami -->

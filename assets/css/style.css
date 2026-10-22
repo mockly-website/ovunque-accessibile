@@ -553,11 +553,17 @@ section:focus {
   stroke-linejoin: round;
 }
 
-/* Pulsante pausa/avvio (visibile solo se l'animazione è disponibile) */
+/* Pulsante pausa/avvio: sotto la scena, sulla fascia del colle (visibile solo se l'animazione è disponibile) */
+.trail__controls {
+  display: flex;
+  justify-content: flex-end;
+  max-width: none;
+  margin-top: -1px;              /* nessuna riga tra svg e fascia */
+  padding-bottom: var(--space-md);
+  background: var(--color-card);
+}
+
 .trail__toggle {
-  position: absolute;
-  top: var(--space-sm);
-  right: var(--space-md);
   display: inline-flex;
   align-items: center;
   gap: var(--space-xs);
@@ -757,18 +763,26 @@ section:focus {
 
 .form-status {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-sm);
   align-items: flex-start;
-  padding: var(--space-lg);
+  padding: var(--space-md);
   border: 3px solid var(--color-navy);
   border-radius: var(--radius-lg);
   background: var(--color-white);
-  font-size: var(--text-lg);
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 40em) {
+  .form-status {
+    gap: var(--space-md);
+    padding: var(--space-lg);
+    font-size: var(--text-lg);
+  }
 }
 
 .form-status .icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2rem;
+  height: 2rem;
   color: var(--color-brand);
 }
 

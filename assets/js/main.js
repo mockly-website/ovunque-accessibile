@@ -230,7 +230,10 @@
       .catch(function (err) { tokenPromise = null; throw err; });
     return tokenPromise;
   }
-  form.addEventListener('focusin', function () { ensureToken().catch(function () {}); }, { once: true });
+  form.addEventListener('focusin', function () {
+    if ((form.getAttribute('action') || '').indexOf('[PROJECT-REF]') !== -1) return;
+    ensureToken().catch(function () {});
+  }, { once: true });
 
   function wait(ms) {
     return new Promise(function (resolve) { setTimeout(resolve, ms); });
@@ -254,7 +257,7 @@
     p.textContent = text;
     body.appendChild(strong);
     body.appendChild(p);
-    statusBox.appendChild(makeIcon(type === 'error' ? '#icon-error' : '#icon-check'));
+    statusBox.appendChild(makeIcon(type === 'error' ? '#icon-error' : type === 'info' ? '#icon-soon' : '#icon-check'));
     statusBox.appendChild(body);
     statusBox.focus();
   }
@@ -285,6 +288,13 @@
     var errors = validateAll();
     showErrors(errors);
     if (Object.keys(errors).length) return;
+
+    /* Backend non ancora configurato (segnaposto [PROJECT-REF]): niente errore del browser */
+    if ((form.getAttribute('action') || '').indexOf('[PROJECT-REF]') !== -1) {
+      showStatus('info', 'Le iscrizioni aprono a breve',
+        'Il modulo non è ancora attivo. Nel frattempo puoi seguirci su Instagram: @ovunque_accessibile.');
+      return;
+    }
 
     setSending(true);
     var retried = false;
