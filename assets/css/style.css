@@ -602,6 +602,53 @@ section:focus {
   }
 }
 
+/* Tablet in verticale: titolo su due righe, testo più largo, mappa più piccola (resta vicina al modulo) */
+@media (min-width: 40em) and (max-width: 59.99em) {
+  .home__main {
+    gap: var(--space-lg);
+  }
+
+  .home__copy {
+    max-width: 40rem;
+  }
+
+  .home__title {
+    max-width: 18ch;
+    font-size: clamp(2.8rem, 1rem + 4.4vw, 3.6rem);
+  }
+
+  .home__lead {
+    max-width: 46ch;
+  }
+
+  .home__form {
+    max-width: 36rem;
+  }
+
+  .home .italy__stage {
+    width: min(100%, 26rem);
+  }
+}
+
+/* Tablet in orizzontale e portatili piccoli: colonna del testo un po' più larga, titolo più contenuto */
+@media (min-width: 60em) and (max-width: 74.99em) {
+  .home__main {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--space-xl);
+  }
+
+  .home__title {
+    font-size: clamp(2.6rem, 0.6rem + 4vw, 3.4rem);
+  }
+
+  .home .italy__tag {
+    font-size: 0.85rem;
+  }
+
+  .home .italy__tag--1 { right: 0; }
+  .home .italy__tag--2 { left: 0; }
+}
+
 @media (max-width: 29.99em) {
   .home__title {
     font-size: clamp(2.1rem, 1.2rem + 5.5vw, 2.6rem);
