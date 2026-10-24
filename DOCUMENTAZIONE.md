@@ -116,7 +116,9 @@ Il sito è pubblicato su **Altervista**: https://ovunqueaccessibile.altervista.o
 
 Carica nella cartella principale **solo**: i quattro file `.html`, la cartella `assets/` e il file **`.htaccess`**. **Non** caricare `supabase/`, i file `.md`, `_headers`, `.gitignore`, `.gitattributes` e `.claude/`.
 
-- `.htaccess` aggiunge gli header di sicurezza (CSP, HSTS, `X-Frame-Options`), blocca i file `.md` e la cartella `supabase/` e porta tutti su HTTPS. È un file nascosto: nel client FTP (o nel file manager di Altervista) attiva "mostra file nascosti" per vederlo.
+- `.htaccess` si modifica dal pannello: Gestione File → icona `.htaccess` → "Modifica sorgente .htaccess (Avanzato)". Le modifiche hanno effetto dopo qualche minuto.
+- Verificato il 24 ottobre 2026 sul sito online: `http://` porta a `https://` (nessun loop), i file `.md` e `.htaccess` danno 403, `supabase/` dà 404, la cache degli asset funziona.
+- **Limite di Altervista**: gli header di sicurezza (CSP, HSTS, `X-Frame-Options`) **non vengono inviati**, perché il piano gratuito non attiva `mod_headers` (il blocco `<IfModule mod_headers.c>` viene ignorato senza errori). Il sito resta comunque senza script esterni né tracker; per avere anche gli header serve un hosting che li supporti (es. Netlify, Cloudflare Pages).
 - Dopo il caricamento controlla che la pagina si apra. Se il browser segnala "troppi reindirizzamenti", cancella da `.htaccess` le 4 righe sotto "HTTPS obbligatorio".
 - Se avevi già caricato `DOCUMENTAZIONE.md` o `README.md`, cancellali dal server.
 - Nel pannello di Altervista lascia **disattivati** banner pubblicitari, AdSense e la loro cookie policy: aggiungerebbero cookie e tracker, e la privacy del sito andrebbe riscritta.
