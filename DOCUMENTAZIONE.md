@@ -112,11 +112,18 @@ Notifica email facoltativa: account Brevo con dominio verificato, poi `BREVO_API
 
 ## Pubblicare il sito
 
-Si pubblicano **solo**: `*.html`, `assets/`, `_headers` (Netlify/Cloudflare Pages) oppure `.htaccess` (Apache). **Non** pubblicare `supabase/`, i file `.md` e `.claude/`.
+Il sito è pubblicato su **Altervista**: https://ovunqueaccessibile.altervista.org/ (Apache, HTTPS attivo).
 
-**GitHub Pages** (dove si trova ora l'anteprima, https://mockly-website.github.io/ovunque_accessibile/) va bene per far vedere il sito, ma **ignora `_headers` e `.htaccess`**: niente CSP né gli altri header di sicurezza, e pubblica anche `supabase/` e i `.md` (che non contengono segreti). Per il lancio con il modulo attivo meglio Netlify, Cloudflare Pages o un hosting Apache.
+Carica nella cartella principale **solo**: i quattro file `.html`, la cartella `assets/` e il file **`.htaccess`**. **Non** caricare `supabase/`, i file `.md`, `_headers`, `.gitignore`, `.gitattributes` e `.claude/`.
+
+- `.htaccess` aggiunge gli header di sicurezza (CSP, HSTS, `X-Frame-Options`), blocca i file `.md` e la cartella `supabase/` e porta tutti su HTTPS. È un file nascosto: nel client FTP (o nel file manager di Altervista) attiva "mostra file nascosti" per vederlo.
+- Dopo il caricamento controlla che la pagina si apra. Se il browser segnala "troppi reindirizzamenti", cancella da `.htaccess` le 4 righe sotto "HTTPS obbligatorio".
+- Se avevi già caricato `DOCUMENTAZIONE.md` o `README.md`, cancellali dal server.
+- Nel pannello di Altervista lascia **disattivati** banner pubblicitari, AdSense e la loro cookie policy: aggiungerebbero cookie e tracker, e la privacy del sito andrebbe riscritta.
 
 Dopo ogni modifica a CSS o JS aggiorna la versione `?v=` nei link di tutte e quattro le pagine HTML, così i browser non usano i file vecchi.
+
+`_headers` serve solo se un giorno il sito passa a Netlify o Cloudflare Pages. GitHub Pages (https://mockly-website.github.io/ovunque_accessibile/) resta solo come copia del repository.
 
 ## Vedere la demo in locale
 
@@ -190,12 +197,13 @@ Migrazioni applicate da utente non superuser con i ruoli di Supabase simulati; f
 
 | # | Cosa | Dove |
 |---|---|---|
-| 1 | **Email di contatto** ✅ `ovunqueaccessibile@gmail.com` (già inserita) | footer `index.html`, `privacy.html`, secret `NOTIFY_TO` |
-| 2 | **Titolare del trattamento** | `privacy.html` sezione 1 |
+| 1 | ✅ **Email e telefono**: `ovunqueaccessibile@gmail.com`, Angelo 351 833 2819 | footer di tutte le pagine, `privacy.html` |
+| 2 | ✅ **Titolari**: Angelo e Lorenzo (contitolari). Consigliato aggiungere cognomi e città | `privacy.html` sezione 1 |
 | 3 | **Blu del logo**: brief `#2F5B9C` (in uso), PNG `#215A9F` | `--color-brand` |
 | 4 | **Logo vettoriale** (SVG o PNG ≥ 1000 px) | `assets/img/` |
-| 5 | **Dominio**: canonical, og:url, og:image assoluto, `SITE_URL`, `ALLOWED_ORIGINS`, `NOTIFY_FROM` | `index.html`, secrets |
+| 5 | ✅ **Dominio** `ovunqueaccessibile.altervista.org`: canonical, og:url, og:image | `index.html`, `privacy.html` |
 | 6 | **Conferma del form Formspree** (prima iscrizione) e verifica in due passaggi sull'account | dashboard Formspree |
-| 7 | Privacy: hosting, ruolo di Mockly, conservazione, età minima, log dei fornitori, dati tecnici e DPA di Formspree e Google, data | `privacy.html` |
+| 7 | ✅ Privacy: hosting (Altervista), Mockly responsabile, conservazione 24 mesi dal lancio, età minima 14 anni, data 24/10/2026 | `privacy.html` |
+| 8 | Da verificare: DPA (accordo sul trattamento) di Formspree, Google e Altervista; dati tecnici che Formspree registra | contratti dei fornitori |
 
-> ⚠️ `privacy.html` è un **modello**: non è consulenza legale e va verificato dal titolare del trattamento prima della pubblicazione.
+> ⚠️ `privacy.html` è stata compilata con i dati forniti dai titolari, ma non è consulenza legale: conviene farla rileggere da un esperto privacy.
