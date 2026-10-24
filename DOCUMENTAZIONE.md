@@ -232,3 +232,32 @@ Prima versione funzionante del sito definitivo, separata dalla pagina "in arrivo
 - **Sicurezza**: i testi dei luoghi entrano nella pagina solo con `textContent` (mai `innerHTML`), così i contenuti degli utenti non possono iniettare codice.
 
 **Prossimi passi**: tabella `places` su Supabase con lettura pubblica solo dei luoghi approvati; pagina privacy del sito (tile OSM); link veri a web-app e APK; dati reali raccolti da Angelo e Lorenzo.
+
+---
+
+## Decisioni per il sito definitivo (24 ottobre 2026)
+
+| # | Tema | Decisione |
+|---|---|---|
+| 1 | **Giudizio** | Un giudizio per ogni esigenza: **carrozzina manuale**, **carrozzina elettrica**, **difficoltà a camminare**. Disabilità visive e uditive in una fase successiva (modello dati già pronto). Soglie iniziali proposte da Mockly (sotto), da far correggere ad Angelo e Lorenzo. Sulla mappa l'esigenza si sceglie alla prima visita ("Come ti muovi?") e resta salvata nel browser. |
+| 2 | **Scheda** | Scheda **base obbligatoria** (ingresso, spazi interni, piani, bagno) + voci **facoltative** (tipo di porta, pavimento, sedute, parcheggio, assistenza) + **dettagli per tipo di luogo già al lancio** (tavoli, camere, passerelle, posti in sala, assistenza ai trasporti). Nota libera per ogni voce. Misure salvate come numeri (cm, gradini, %). |
+| 3 | **Verifica** | Niente online senza approvazione. Approvano **Angelo e Lorenzo**, poi **verificatori di fiducia**. Livelli visibili: "Verificato sul posto" / "Segnalato dalla community". **Scadenza 24 mesi** → "Informazioni da ricontrollare". Segnalazioni in conflitto → scheda in revisione. GPS tolto dalle foto; regole per le recensioni e diritto di replica dei gestori. |
+| 4 | **Mappe** | Fornitore europeo (es. **MapTiler**, Svizzera) per mappa e geocodifica, stile nei colori del sito, chiave limitata al dominio. In futuro possibile mappa ospitata (Protomaps). |
+| 5 | **Supabase** | Regione UE. **Gratuito in sviluppo, Pro al lancio** (backup, niente pause). Vista pubblica solo dei contenuti approvati; segnalazioni in tabella "in attesa"; storico di ogni modifica. **Pannello di moderazione nostro**. Accesso all'app con **email e password** (password robuste e controllo di quelle rubate, conferma email e reset via SMTP proprio es. Brevo, limiti ai tentativi, 2FA obbligatoria per moderatori). |
+| 6 | **Google** | **Pagine statiche generate a ogni approvazione** (`/luoghi/citta/nome`), con anteprime social, dati strutturati e sitemap. |
+| 7 | **Hosting** | **Per ora Altervista**: pubblicazione automatica via FTP da GitHub (password FTP nei secrets di GitHub, inserita dai titolari). Header di sicurezza non disponibili su Altervista: già pronti per un hosting futuro. **Dominio da decidere** prima del lancio (`ovunqueaccessibile.it` e `.com` liberi al 24/10/2026). |
+| 8 | **App** | **Un'unica web-app (PWA) + APK Android che la impacchetta (TWA)**: si aggiorna da sola. APK scaricabile dal sito, **Play Store più avanti**. Chiave di firma da custodire con backup. |
+| 9 | **Legale** | Titolari: **Angelo e Lorenzo come persone** (servono cognomi e città). Schede dei luoghi come **dati aperti ODbL**; recensioni e foto restano degli autori (licenza d'uso a Ovunque Accessibile). Servono Privacy, **Termini d'uso** (con procedura di rimozione DSA) e Dichiarazione di accessibilità: bozze di Mockly, **rilette dal cliente e da un suo consulente legale**. |
+
+### Soglie iniziali per esigenza (base DM 236/1989, da confermare)
+
+| Voce | Carrozzina manuale | Carrozzina elettrica | Difficoltà a camminare |
+|---|---|---|---|
+| Ingresso ✓ | nessun gradino (≤ 2,5 cm) o rampa ≤ 8% | nessun gradino o rampa ≤ 8% | nessun gradino o ≤ 3 gradini con corrimano |
+| Ingresso – | un gradino ≤ 5 cm o rampa ≤ 12% | rampa 8–12% | > 3 gradini con corrimano |
+| Porta ✓ | ≥ 80 cm | ≥ 90 cm | ≥ 75 cm |
+| Piani ✓ | un piano o ascensore ≥ 120 × 80 cm | un piano o ascensore ≥ 140 × 110 cm | ascensore o scale con corrimano |
+| Bagno ✓ (dove previsto) | spazio di rotazione 150 cm + maniglioni | come manuale, 150 cm obbligatorio | maniglioni |
+| In più | — | — | sedute, parcheggio entro 50 m |
+
+Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi principali sono ✕; – negli altri casi; ? se mancano le misure dell'ingresso.
