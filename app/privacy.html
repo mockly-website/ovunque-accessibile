@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Privacy dell'app – Ovunque Accessibile</title>
+  <meta name="description" content="Come l'app di Ovunque Accessibile tratta i dati dell'account, delle recensioni e delle segnalazioni.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#fbf6ec">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="../sito/assets/img/favicon.ico" sizes="any">
+  <link rel="icon" href="../sito/assets/img/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/img/icon-180.png">
+  <link rel="preload" href="../sito/assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../sito/assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../sito/assets/css/sito.css?v=p15">
+  <link rel="stylesheet" href="assets/css/app.css?v=a1">
+  <script src="assets/js/config.js?v=a1" defer></script>
+  <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
+  <script src="../sito/assets/js/oa-core.js?v=p15" defer></script>
+  <script src="assets/js/api.js?v=a1" defer></script>
+  <script src="assets/js/app.js?v=a1" defer></script>
+</head>
+<body class="app" data-page="privacy">
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-partial" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></symbol>
+    <symbol id="icon-no" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+    <symbol id="icon-route" viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 0 0-1.41 0l-9 9a1 1 0 0 0 0 1.41l9 9a1 1 0 0 0 1.41 0l9-9a1 1 0 0 0 0-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
+    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
+    <symbol id="icon-locate" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.94 3A8.99 8.99 0 0 0 13 3.06V1h-2v2.06A8.99 8.99 0 0 0 3.06 11H1v2h2.06A8.99 8.99 0 0 0 11 20.94V23h2v-2.06A8.99 8.99 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></symbol>
+    <symbol id="icon-italy" viewBox="0 0 24 24"><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></symbol>
+    <symbol id="icon-wheelchair" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/></symbol>
+    <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><path d="M18 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H12c-.35-.2-.75-.3-1.19-.26C9.76 7.11 9 8.04 9 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/><path d="M21.5 1l-3 4.6h2L19 10l4-5.2h-2.1L22.5 1z"/></symbol>
+    <symbol id="icon-walk" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/><path d="M18.25 13h1.5v10h-1.5z"/></symbol>
+    <symbol id="icon-na" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8z"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></symbol>
+    <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+  </svg>
+
+  <ul class="skip-links">
+    <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
+  </ul>
+
+  <header class="site-header">
+    <p class="proto-banner" id="mode-banner">Versione di prova dell'app.</p>
+    <div class="container site-header__inner">
+      <a class="brand" href="./">
+        <img class="brand__logo" src="../sito/assets/img/logo.webp" alt="" width="180" height="225">
+        <span class="brand__name">Ovunque Accessibile</span>
+      </a>
+      <nav class="app-nav" aria-label="App">
+        <ul class="app-nav__list" role="list">
+          <li><a class="app-nav__link" href="./"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg><span>Mappa</span></a></li>
+          <li><a class="app-nav__link" href="segnala.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg><span>Segnala</span></a></li>
+          <li><a class="app-nav__link" href="profilo.html" data-account-link><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-user"/></svg><span data-account-label>Profilo</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <noscript><div class="container"><p class="empty">L'app ha bisogno di JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p></div></noscript>
+    <!--
+      BOZZA preparata da Mockly: non costituisce consulenza legale. Da rileggere con il consulente del cliente.
+      Da completare: cognomi e città dei titolari, fornitore SMTP definitivo, DPA dei fornitori, tempi di conservazione
+      degli account inattivi. La versione (app-2026-10-v1) è salvata con ogni registrazione: se cambia, aggiornare
+      privacyVersion in assets/js/config.js.
+    -->
+    <div class="container">
+      <article class="card prose legal">
+        <h1>Privacy dell'app</h1>
+        <p>Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (“GDPR”) per chi usa l'app di Ovunque Accessibile.</p>
+        <p>Versione bozza app-2026-10-v1 · Ultimo aggiornamento: 24 ottobre 2026</p>
+
+        <h2>In breve</h2>
+        <ul>
+          <li>Per guardare la mappa e le schede non serve un account.</li>
+          <li>Con l'account trattiamo la tua email, il nome pubblico che scegli e quello che scrivi nell'app.</li>
+          <li>Le recensioni approvate sono pubbliche con il tuo nome pubblico; l'email non la vede nessuno.</li>
+          <li>Niente pubblicità, niente profilazione, niente strumenti di statistica.</li>
+          <li>Puoi scaricare i tuoi dati ed eliminare l'account dal profilo, in qualsiasi momento.</li>
+        </ul>
+
+        <h2>1. Chi è il titolare del trattamento</h2>
+        <p>I titolari del trattamento sono <strong>Angelo e Lorenzo</strong>, fondatori del progetto Ovunque Accessibile (contitolari, art. 26 GDPR). Puoi scriverci a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o chiamare Angelo al <a href="tel:+393518332819">351 833 2819</a>.</p>
+
+        <h2>2. Quali dati trattiamo</h2>
+        <ul>
+          <li><strong>Account:</strong> email, password (salvata solo in forma cifrata, nemmeno noi possiamo leggerla), nome pubblico, la tua esigenza («Come ti muovi?») se la scegli, la conferma di avere almeno 14 anni, la data e la versione dell'informativa che hai accettato.</li>
+          <li><strong>Quello che scrivi:</strong> segnalazioni di luoghi e correzioni, con la nota per i moderatori; recensioni; luoghi salvati nei preferiti.</li>
+          <li><strong>Moderatori:</strong> per chi modera, anche i dati della verifica in due passaggi (l'app di autenticazione che hai collegato).</li>
+          <li><strong>Dati tecnici:</strong> il fornitore del database registra nei propri log l'indirizzo IP e il tipo di browser delle richieste, per sicurezza e per bloccare gli abusi. Noi non li usiamo per altri scopi.</li>
+          <li><strong>Posizione:</strong> «Vicino a me» e «La mia posizione» usano il GPS solo nel tuo browser per centrare la mappa o mettere il segnaposto. Arriva a noi solo la posizione del luogo che segnali, non la tua.</li>
+        </ul>
+
+        <h2>3. Perché e su quale base giuridica</h2>
+        <ul>
+          <li>Creare e gestire l'account e le funzioni che usi (preferiti, recensioni, segnalazioni): esecuzione del servizio che chiedi (art. 6, par. 1, lett. b GDPR).</li>
+          <li>Controllare i contenuti prima di pubblicarli, tenere lo storico delle modifiche alle schede, proteggere l'app da abusi: legittimo interesse (art. 6, par. 1, lett. f GDPR) a offrire informazioni affidabili e sicure.</li>
+          <li>Mandarti le email necessarie (conferma dell'indirizzo, nuova password): esecuzione del servizio.</li>
+        </ul>
+
+        <h2>4. Cosa diventa pubblico</h2>
+        <p>Le schede dei luoghi approvate sono pubbliche e sono <strong>dati aperti</strong> (licenza ODbL): chiunque può riusarle citando la fonte. Non contengono il tuo nome.</p>
+        <p>Le recensioni approvate sono pubbliche con il tuo <strong>nome pubblico</strong>, l'esigenza indicata e la data della visita. Restano tue: ce ne concedi l'uso per mostrarle nel sito e nell'app finché non le cancelli.</p>
+
+        <h2>5. Chi può vedere i dati</h2>
+        <ul>
+          <li>i moderatori del progetto (Angelo, Lorenzo e i verificatori che nominano), per controllare segnalazioni e recensioni;</li>
+          <li>Supabase, che fornisce database e accesso con server nell'Unione europea, come responsabile del trattamento;</li>
+          <li>il fornitore che invia le email dell'app, come responsabile del trattamento;</li>
+          <li>il servizio che ospita le pagine dell'app (oggi Altervista), come responsabile del trattamento;</li>
+          <li>OpenStreetMap Foundation (Regno Unito), che fornisce le immagini della mappa come titolare autonomo: il tuo browser si collega ai suoi server;</li>
+          <li>Mockly, l'agenzia che ha realizzato l'app, come responsabile del trattamento e solo per la manutenzione.</li>
+        </ul>
+        <p>Se un fornitore tratta dati fuori dall'Unione europea, valgono le garanzie degli articoli 45–46 GDPR (decisioni di adeguatezza o clausole contrattuali standard).</p>
+
+        <h2>6. Per quanto tempo</h2>
+        <ul>
+          <li>Account, preferiti e recensioni: finché non elimini l'account (o non cancelli la singola recensione).</li>
+          <li>Segnalazioni: quelle in attesa vengono cancellate con l'account; quelle approvate restano nello storico della scheda, senza collegamento a te e con l'autore indicato come «Utente eliminato».</li>
+          <li>Log tecnici: per il tempo previsto dal fornitore del database.</li>
+        </ul>
+
+        <h2>7. I tuoi diritti</h2>
+        <p>Dal tuo profilo puoi <strong>scaricare tutti i tuoi dati</strong> (portabilità) ed <strong>eliminare l'account</strong>. Puoi anche chiederci di accedere ai dati, correggerli, cancellarli, limitarne il trattamento o opporti, scrivendo a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>. Ti rispondiamo entro un mese. Puoi presentare reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it">garanteprivacy.it<span class="visually-hidden"> (sito esterno)</span></a>).</p>
+
+        <h2>8. Età minima</h2>
+        <p>Per creare un account devi avere almeno 14 anni (art. 2-quinquies del Codice privacy).</p>
+
+        <h2>9. Memoria del browser e cookie</h2>
+        <p>L'app non usa cookie di profilazione né strumenti di statistica. Salva nella memoria del browser (localStorage) solo ciò che serve a funzionare: la sessione di accesso, la tua scelta «Come ti muovi?» e, per usarla anche senza rete, una copia delle pagine dell'app. Uscendo dall'account la sessione viene cancellata.</p>
+
+        <h2>10. Modifiche</h2>
+        <p>Se cambiamo questa informativa in modo importante te lo diciamo nell'app. La versione che hai accettato è salvata con il tuo account.</p>
+
+        <p><a class="back-link" href="./">Torna alla mappa</a></p>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <a href="privacy.html" aria-current="page">Privacy dell'app</a>
+      <a href="../sito/">Il sito</a>
+      <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
+      <span>© 2026 Ovunque Accessibile</span>
+      <span>Realizzata da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
+    </div>
+  </footer>
+</body>
+</html>

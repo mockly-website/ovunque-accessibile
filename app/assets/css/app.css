@@ -1,0 +1,613 @@
+/* ==========================================================================
+   Ovunque Accessibile – web-app. Si aggiunge a ../sito/assets/css/sito.css (token e componenti del sito).
+   Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
+           4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors
+   ========================================================================== */
+
+/* 1. Struttura e navigazione */
+
+/* "hidden" vince sempre, anche su elementi con display impostato (.btn, .card.stack, img…) */
+[hidden] {
+  display: none !important;
+}
+
+.app main:not(.explore) {
+  padding-top: var(--space-lg);
+}
+
+/* I livelli interni di Leaflet (z-index fino a 1000) restano dentro la mappa, sotto la barra dell'app */
+.app .leaflet-container {
+  isolation: isolate;
+}
+
+.container--narrow {
+  max-width: 34rem;
+}
+
+.container--form {
+  max-width: 50rem;
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+.stack > * {
+  margin: 0;
+}
+
+.center {
+  margin-top: var(--space-lg);
+  text-align: center;
+}
+
+.app-nav__list {
+  display: flex;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.app-nav__link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  padding: var(--space-2xs) var(--space-sm);
+  border-radius: var(--radius-pill);
+  color: var(--color-navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.app-nav__link .icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.app-nav__link:hover {
+  background: var(--color-sky);
+}
+
+.app-nav__link[aria-current="page"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.app-nav__link[aria-current="page"] .icon {
+  fill: var(--color-white);
+}
+
+/* Telefono: la navigazione diventa una barra in basso, come nelle app */
+@media (max-width: 47.99em) {
+  html {
+    scroll-padding-bottom: 6rem;     /* il focus non finisce mai sotto la barra (WCAG 2.4.11) */
+  }
+
+  .app {
+    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
+  }
+
+  .app-nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 1000;
+    padding: var(--space-2xs) var(--space-xs) calc(var(--space-2xs) + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--color-line);
+    background: var(--color-card);
+    box-shadow: 0 -6px 18px rgba(22, 40, 65, 0.08);
+  }
+
+  .app-nav__list {
+    justify-content: space-around;
+  }
+
+  .app-nav__list > li {
+    flex: 1 1 0;
+  }
+
+  .app-nav__link {
+    flex-direction: column;
+    gap: 0;
+    width: 100%;
+    min-height: 3.5rem;
+    padding: var(--space-2xs);
+    border-radius: var(--radius-md);
+    font-size: var(--text-sm);
+    line-height: 1.2;
+    justify-content: center;
+  }
+
+  .app .site-header__inner {
+    justify-content: flex-start;
+  }
+}
+
+/* 2. Moduli ed errori */
+.field__help {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.field__req {
+  font-weight: 400;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.field--short .input {
+  max-width: 12rem;
+}
+
+.field--check {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.field--check input,
+.radio input {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0.15rem 0 0;
+  accent-color: var(--color-navy);
+}
+
+.field__counter {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  text-align: right;
+}
+
+textarea.input {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+.input[aria-invalid="true"],
+.select[aria-invalid="true"] {
+  border-color: var(--color-error);
+  box-shadow: 0 0 0 1px var(--color-error);
+}
+
+.field__error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2xs);
+  margin: var(--space-2xs) 0 0;
+  color: var(--color-error);
+  font-weight: 700;
+  font-size: var(--text-sm);
+}
+
+.field__error .icon {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.15rem;
+  fill: currentColor;
+}
+
+.error-summary {
+  padding: var(--space-md) var(--space-lg);
+  border: 3px solid var(--color-error);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.error-summary:focus {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.error-summary__title {
+  margin-bottom: var(--space-xs);
+  color: var(--color-error);
+  font-size: var(--text-lg);
+}
+
+.error-summary ul {
+  margin: 0;
+  padding-left: var(--space-lg);
+}
+
+.error-summary a {
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs) var(--space-md);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  min-width: 0;
+}
+
+.group legend {
+  width: 100%;
+  margin-bottom: var(--space-xs);
+  padding: 0;
+}
+
+.group:not(.group--inline) .radio {
+  width: 100%;
+}
+
+.group .field__error {
+  width: 100%;
+  margin: 0 0 var(--space-xs);
+}
+
+.radio {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+}
+
+.radio label {
+  padding-top: 0.05rem;
+}
+
+.password {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: stretch;
+}
+
+.password .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.password .btn {
+  flex: none;
+  min-width: 6.5rem;
+}
+
+.form-section h2 {
+  font-size: var(--text-lg);
+}
+
+.form-section > .field__help {
+  margin-bottom: var(--space-lg);
+}
+
+.form-grid {
+  display: grid;
+  gap: var(--space-lg);
+  min-width: 0;
+}
+
+.form-grid > [hidden] {
+  display: none;
+}
+
+.pick {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.pick__map {
+  height: 18rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: crosshair;
+}
+
+.pick .btn {
+  justify-self: start;
+}
+
+/* 3. Avvisi e pulsanti */
+.notice {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-left: 5px solid var(--color-brand);
+  border-radius: var(--radius-sm);
+  background: var(--color-sky);
+}
+
+.notice:focus {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.notice--ok {
+  border-left-color: var(--color-success);
+  background: #e8f4ec;
+}
+
+.notice--error {
+  border-left-color: var(--color-error);
+  background: #fbeaea;
+  color: var(--color-error);
+  font-weight: 700;
+}
+
+.btn[aria-disabled="true"] {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+.btn--danger {
+  background: var(--color-white);
+  border-color: var(--color-error);
+  color: var(--color-error);
+}
+
+.btn--danger .icon {
+  fill: currentColor;
+}
+
+.btn--danger:hover {
+  background: var(--color-error);
+  color: var(--color-white);
+}
+
+.card--accent {
+  border: 2px solid var(--color-brand);
+  background: var(--color-sky);
+}
+
+.demo {
+  margin-top: var(--space-xl);
+  border-style: dashed;
+}
+
+.demo__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+/* 4. Scheda luogo */
+.fav .icon {
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.fav[aria-pressed="true"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.fav[aria-pressed="true"] .icon {
+  fill: var(--color-white);
+}
+
+.reviews {
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+}
+
+.review--real {
+  border-style: solid;
+  border-color: var(--color-line);
+  background: var(--color-white);
+}
+
+.review__text {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.review-form {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-line);
+}
+
+.review-form > * {
+  margin: 0;
+}
+
+/* 5. Profilo */
+.activities {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.activity {
+  padding: var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+}
+
+.activity__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+.activity__title {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+.activity__text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.activity__reason {
+  font-style: italic;
+}
+
+.state-pill {
+  font-weight: 700;
+}
+
+.state-pill--approvata,
+.state-pill--pubblicata {
+  background: #e8f4ec;
+  color: var(--color-success);
+}
+
+.state-pill--respinta {
+  background: #fbeaea;
+  color: var(--color-error);
+}
+
+.dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  padding: var(--space-lg);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+}
+
+.dialog::backdrop {
+  background: rgba(22, 40, 65, 0.55);
+}
+
+/* 6. Moderazione */
+.mod-list {
+  display: grid;
+  gap: var(--space-lg);
+  margin: 0 0 var(--space-xl);
+  padding: 0;
+  list-style: none;
+}
+
+.mod-item h3 {
+  font-size: var(--text-lg);
+}
+
+.mod-item h4 {
+  margin: var(--space-lg) 0 var(--space-xs);
+  font-size: var(--text-base);
+}
+
+.mod-item__note {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-left: 4px solid var(--color-beige);
+  background: var(--color-card);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.mod-item__note p {
+  margin: 0;
+}
+
+.verdict-preview {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.verdict-preview li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.verdict-preview__who {
+  min-width: 12rem;
+}
+
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrap:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+}
+
+.diff {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.diff th,
+.diff td {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.diff thead th {
+  background: var(--color-card);
+}
+
+.diff tbody th {
+  font-weight: 700;
+  min-width: 10rem;
+}
+
+.decision {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-line);
+}
+
+.decision > * {
+  margin: 0;
+}
+
+.decision__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.mfa__qr {
+  width: 200px;
+  height: 200px;
+  padding: var(--space-xs);
+  border: 1px solid var(--color-line);
+  background: var(--color-white);
+}
+
+.mfa__secret {
+  font-size: var(--text-base);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* 7. Forced colors */
+@media (forced-colors: active) {
+  .app-nav__link[aria-current="page"],
+  .fav[aria-pressed="true"] {
+    border: 3px solid Highlight;
+  }
+
+  .notice,
+  .error-summary {
+    border: 2px solid CanvasText;
+  }
+}

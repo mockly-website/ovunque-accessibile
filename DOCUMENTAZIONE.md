@@ -224,7 +224,7 @@ Prima versione funzionante del sito definitivo, separata dalla pagina "in arrivo
 | `mappa.html` | Ricerca per città/nome/tipo, filtri, elenco e mappa sincronizzati. I filtri finiscono nell'indirizzo (`?q=roma&f=bagno`), quindi una ricerca si può condividere |
 | `luogo.html?id=…` | Scheda: indirizzo, "Indicazioni stradali" con scelta dell'app (Google Maps, Apple Mappe, Waze, OpenStreetMap; su Android anche "Altra app del telefono" con il link `geo:`), stato di ingresso, porta, interni, piani, bagno e parcheggio, data dell'ultima verifica, "Segnala una correzione" (email) |
 
-- **Giudizi per esigenza** (decisione 1): `sito.js`, sezione 2 «Regole per esigenza». Le soglie sono tutte nell'oggetto `SOGLIE` (un numero cambiato lì aggiorna tutto il sito). Ogni voce (ingresso, porta, spazi, piani, bagno) dà ✓ / – / ✕ / ? / «non previsto» per carrozzina manuale, carrozzina elettrica e difficoltà a camminare; il giudizio complessivo segue le regole della tabella nelle Decisioni.
+- **Giudizi per esigenza** (decisione 1): `oa-core.js` (codice comune a sito e app; `sito.js` lo avvia), sezione 2 «Regole per esigenza». Le soglie sono tutte nell'oggetto `SOGLIE` (un numero cambiato lì aggiorna tutto il sito). Ogni voce (ingresso, porta, spazi, piani, bagno) dà ✓ / – / ✕ / ? / «non previsto» per carrozzina manuale, carrozzina elettrica e difficoltà a camminare; il giudizio complessivo segue le regole della tabella nelle Decisioni.
 - **«Come ti muovi?»**: sulla pagina mappa e nella scheda. Alla prima visita il riquadro è evidenziato e i giudizi provvisori sono per la carrozzina manuale; la scelta resta nel browser (`localStorage`, chiave `oa-esigenza`, nessun cookie) e nell'indirizzo (`?per=manuale|elettrica|cammino`), quindi un link condiviso mostra gli stessi giudizi. Filtri «Solo luoghi accessibili», «Ingresso accessibile», «Bagno accessibile» calcolati per l'esigenza scelta.
 - **Scheda** (decisione 2): tre giudizi affiancati; «Le misure» con descrizione e stato per ognuna delle tre esigenze; «Altre informazioni» (porta, pavimento, sedute, parcheggio, assistenza); dettagli per tipo di luogo; affidabilità («Verificato sul posto», «Segnalato dalla community», «Da ricontrollare» dopo 24 mesi).
 - **Dati** (formato v2): misure in numeri (`gradini`, `gradino_cm`, `rampa_pct`, `porta_cm`, `ascensore_cm` [larghezza, profondità], `rotazione_cm`); `porta_cm: 0` = nessuna porta; `null` = non misurato. `facoltativi`, `dettagli` e `verifica {livello, data}`.
@@ -265,3 +265,46 @@ Prima versione funzionante del sito definitivo, separata dalla pagina "in arrivo
 | In più | — | — | sedute, parcheggio entro 50 m |
 
 Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi principali sono ✕; – negli altri casi; ? se mancano le misure dell'ingresso.
+
+---
+
+## Web-app (cartella `app/`) e database Supabase
+
+**Cosa c'è**: una web-app installabile (PWA) con mappa, scheda del luogo, accesso, profilo, segnalazioni e pannello di moderazione. Usa lo stesso codice del sito per regole e giudizi (`sito/assets/js/oa-core.js`, `window.OA`): una soglia cambiata vale per entrambi.
+
+| Pagina | Cosa fa |
+|---|---|
+| `index.html` | Mappa ed elenco con «Come ti muovi?» e filtri (come il sito) |
+| `luogo.html` | Scheda + **Salva nei preferiti**, **Proponi una correzione**, recensioni approvate e modulo «Racconta la tua visita» |
+| `accedi.html`, `registrati.html`, `password.html` | Accesso con email e password; registrazione con nome pubblico, conferma 14 anni e privacy; password dimenticata |
+| `segnala.html` | Nuovo luogo o correzione (`?id=`): misure base, voci facoltative, dettagli per tipo, posizione sulla mappa o con le coordinate |
+| `profilo.html` | Esigenza salvata nell'account, preferiti, stato delle proprie segnalazioni e recensioni, nome pubblico, password, **scarica i miei dati**, esci, **elimina l'account** |
+| `moderazione.html` | Solo verificatori/admin **con verifica in due passaggi (TOTP)**: proposte con confronto «Ora / Proposto» e anteprima dei giudizi, approva (community o «verificato sul posto») o respingi con motivo; recensioni; stato delle schede (pubblicata / in revisione / archiviata) |
+| `privacy.html` | Bozza dell'informativa dell'app (versione `app-2026-10-v1`), da rileggere con il consulente |
+
+**Modalità prova**: con `app/assets/js/config.js` vuoto l'app usa i luoghi di esempio e account finti salvati solo nel browser (pulsanti «Entra come utente / moderatore di prova»; codice 2FA: qualsiasi numero di 6 cifre). Serve per rivedere grafica e flussi prima di Supabase.
+
+**File**: `assets/js/api.js` (stesse funzioni per Supabase e per la prova), `assets/js/app.js` (pagine), `assets/css/app.css` (si aggiunge a `sito.css`; sul telefono la navigazione è una barra in basso), `manifest.webmanifest`, `sw.js` (pagine dalla rete, file statici in cache, **mai** in cache dati e accessi), `assets/vendor/supabase/` (supabase-js 2.117.3, integrità npm verificata, licenza MIT). CSP nelle pagine con `<meta>` (Altervista non applica gli header). Le icone 192/512 sono ingrandite dal logo 180 × 225: **serve il logo in alta risoluzione**.
+
+### Database (`supabase/migrations/20261024000000_app.sql`)
+
+- `profiles` (nome pubblico, esigenza, ruolo `utente` / `verificatore` / `admin`), creato alla registrazione: senza conferma dei 14 anni e della privacy la registrazione fallisce.
+- `places`: schede; tutti leggono solo `pubblicato` e `in-revisione`; **nessuno scrive direttamente**, solo le funzioni di moderazione. `scheda_valida()` controlla ogni misura (tipi, intervalli, voci ammesse).
+- `proposte` (nuovo luogo / correzione), `recensioni`, `preferiti`: ognuno vede e cancella solo i propri; limite 10 proposte e 10 recensioni al giorno, 500 preferiti. L'id dell'autore non è mai pubblico.
+- `storico_luoghi`: ogni modifica alle schede, con la proposta che l'ha causata.
+- Funzioni: `approva_proposta`, `respingi_proposta`, `modera_recensione`, `stato_luogo`, `imposta_ruolo` (solo admin), `i_miei_dati` (export), `elimina_account`. Moderatore = ruolo giusto **e** token `aal2` (2FA).
+- `supabase/seed.sql`: i 19 luoghi di esempio (`esempio = true`), rigenerabili con `python3 supabase/strumenti/seed_da_json.py`. Prima del lancio: `delete from public.places where esempio;`
+- **Prove**: `sh supabase/tests/esegui.sh` avvia un Postgres locale usa e getta e verifica le regole (`supabase/tests/rls.sql`: anonimi, utenti, moderatori con e senza 2FA, limiti, eliminazione account).
+
+### Configurare Supabase (da fare con i titolari: account e password li inseriscono loro)
+
+1. Su supabase.com crea il progetto **Ovunque Accessibile**, regione **Central EU (Frankfurt)**, piano Free per ora. La password del database va nel gestore di password dei titolari, **mai** nel repository o in chat.
+2. **SQL Editor** → incolla ed esegui, nell'ordine: `supabase/migrations/20261024000000_app.sql`, poi (facoltativo, per avere luoghi da guardare) `supabase/seed.sql`. Le due migrazioni vecchie (`subscribers`) servono solo alla lista d'attesa, non attiva.
+3. **Authentication → Sign In / Providers → Email**: attivo, «Confirm email» attivo, lunghezza minima password **10**, requisiti «lettere e numeri». Sul piano Pro attivare anche «Leaked password protection».
+4. **Authentication → URL Configuration**: Site URL `https://ovunqueaccessibile.altervista.org/app/`; Redirect URLs `https://ovunqueaccessibile.altervista.org/app/**` (e `http://localhost:8091/app/**` per le prove).
+5. **Authentication → Emails**: testi in italiano; **SMTP proprio** (es. Brevo) prima del lancio, perché quello di Supabase manda pochissime email all'ora.
+6. **Authentication → Multi-Factor**: TOTP attivo (lo è di default).
+7. **Project Settings → API**: copia *Project URL* e la chiave **publishable** (o *anon*) in `app/assets/js/config.js`. È pubblica per natura; la chiave *secret / service_role* non va mai nell'app.
+8. Angelo e Lorenzo si registrano dall'app; poi nel SQL Editor: `update public.profiles set ruolo = 'admin' where id = (select id from auth.users where email = '…');`. Al primo ingresso in `moderazione.html` attivano la 2FA. Gli altri verificatori li nomina un admin con `select public.imposta_ruolo('email', 'verificatore');`.
+
+**Da fare dopo**: foto nelle segnalazioni (Storage, GPS tolto), pagine statiche generate a ogni approvazione, MapTiler, APK (TWA), Termini d'uso e Dichiarazione di accessibilità, paginazione oltre 1000 luoghi, diritto di replica dei gestori.

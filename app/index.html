@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Mappa dei luoghi – Ovunque Accessibile</title>
+  <meta name="description" content="Cerca i luoghi accessibili in Italia e salva i tuoi preferiti.">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: https://tile.openstreetmap.org; font-src 'self'; connect-src 'self' https://*.supabase.co; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="theme-color" content="#fbf6ec">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="../sito/assets/img/favicon.ico" sizes="any">
+  <link rel="icon" href="../sito/assets/img/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/img/icon-180.png">
+  <link rel="preload" href="../sito/assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="../sito/assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="../sito/assets/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="../sito/assets/vendor/markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="../sito/assets/css/sito.css?v=p15">
+  <link rel="stylesheet" href="assets/css/app.css?v=a1">
+  <script src="assets/js/config.js?v=a1" defer></script>
+  <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
+  <script src="../sito/assets/vendor/leaflet/leaflet.js" defer></script>
+  <script src="../sito/assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
+  <script src="../sito/assets/js/oa-core.js?v=p15" defer></script>
+  <script src="assets/js/api.js?v=a1" defer></script>
+  <script src="assets/js/app.js?v=a1" defer></script>
+</head>
+<body class="app" data-page="mappa">
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-partial" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></symbol>
+    <symbol id="icon-no" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+    <symbol id="icon-route" viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 0 0-1.41 0l-9 9a1 1 0 0 0 0 1.41l9 9a1 1 0 0 0 1.41 0l9-9a1 1 0 0 0 0-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
+    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
+    <symbol id="icon-locate" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.94 3A8.99 8.99 0 0 0 13 3.06V1h-2v2.06A8.99 8.99 0 0 0 3.06 11H1v2h2.06A8.99 8.99 0 0 0 11 20.94V23h2v-2.06A8.99 8.99 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></symbol>
+    <symbol id="icon-italy" viewBox="0 0 24 24"><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></symbol>
+    <symbol id="icon-wheelchair" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/></symbol>
+    <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><path d="M18 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H12c-.35-.2-.75-.3-1.19-.26C9.76 7.11 9 8.04 9 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/><path d="M21.5 1l-3 4.6h2L19 10l4-5.2h-2.1L22.5 1z"/></symbol>
+    <symbol id="icon-walk" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/><path d="M18.25 13h1.5v10h-1.5z"/></symbol>
+    <symbol id="icon-na" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8z"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></symbol>
+    <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+  </svg>
+
+  <ul class="skip-links">
+    <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
+    <li><a class="skip-links__link" href="#come-ti-muovi">Vai a «Come ti muovi?»</a></li>
+    <li><a class="skip-links__link" href="#results">Vai all'elenco dei luoghi</a></li>
+  </ul>
+
+  <header class="site-header">
+    <p class="proto-banner" id="mode-banner">Versione di prova dell'app.</p>
+    <div class="container site-header__inner">
+      <a class="brand" href="./">
+        <img class="brand__logo" src="../sito/assets/img/logo.webp" alt="" width="180" height="225">
+        <span class="brand__name">Ovunque Accessibile</span>
+      </a>
+      <nav class="app-nav" aria-label="App">
+        <ul class="app-nav__list" role="list">
+          <li><a class="app-nav__link" href="./" aria-current="page"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg><span>Mappa</span></a></li>
+          <li><a class="app-nav__link" href="segnala.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg><span>Segnala</span></a></li>
+          <li><a class="app-nav__link" href="profilo.html" data-account-link><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-user"/></svg><span data-account-label>Profilo</span></a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1" class="explore">
+    <noscript><div class="container"><p class="empty">L'app ha bisogno di JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p></div></noscript>
+    <div class="container">
+      <div class="explore__head">
+        <h1>Mappa dei luoghi</h1>
+        <a class="btn btn--secondary btn--small" href="segnala.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg>Segnala un luogo</a>
+      </div>
+
+      <div class="explore__layout">
+        <div class="explore__controls">
+          <fieldset class="needs" id="come-ti-muovi">
+            <legend class="needs__legend">Come ti muovi?</legend>
+            <p class="needs__help">Scegli come ti muovi: i giudizi cambiano in base alla tua esigenza.</p>
+            <div class="needs__options">
+              <div class="needs__option"><input type="radio" id="need-manuale" name="esigenza" value="manuale"><label for="need-manuale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</label></div>
+              <div class="needs__option"><input type="radio" id="need-elettrica" name="esigenza" value="elettrica"><label for="need-elettrica"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</label></div>
+              <div class="needs__option"><input type="radio" id="need-cammino" name="esigenza" value="cammino"><label for="need-cammino"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</label></div>
+            </div>
+            <p class="needs__live visually-hidden" role="status"></p>
+          </fieldset>
+
+          <form id="filters" class="filters" role="search" aria-label="Cerca e filtra i luoghi" action="./" method="get">
+            <div class="field">
+              <label class="field__label" for="q">Cerca</label>
+              <div class="search">
+                <input class="input" type="search" id="q" name="q" placeholder="Città, nome o tipo di luogo" autocomplete="off">
+                <button class="btn btn--primary" type="submit">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+                  Cerca
+                </button>
+              </div>
+            </div>
+
+            <fieldset>
+              <legend>Filtra</legend>
+              <div class="chips">
+                <div class="chip"><input type="checkbox" id="f-accessibile" name="f" value="accessibile"><label for="f-accessibile"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Solo luoghi accessibili</label></div>
+                <div class="chip"><input type="checkbox" id="f-ingresso" name="f" value="ingresso"><label for="f-ingresso"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Ingresso accessibile</label></div>
+                <div class="chip"><input type="checkbox" id="f-bagno" name="f" value="bagno"><label for="f-bagno"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Bagno accessibile</label></div>
+                <div class="chip"><input type="checkbox" id="f-parcheggio" name="f" value="parcheggio"><label for="f-parcheggio"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</label></div>
+              </div>
+            </fieldset>
+
+            <div class="filters__row">
+            <div class="field">
+              <label class="field__label" for="cat">Tipo di luogo</label>
+              <select class="select" id="cat" name="cat">
+                <option value="">Tutti i tipi</option>
+                <option value="ristorante">Ristoranti e bar</option>
+                <option value="museo">Musei</option>
+                <option value="hotel">Hotel e alloggi</option>
+                <option value="spiaggia">Spiagge</option>
+                <option value="parco">Parchi e natura</option>
+                <option value="cultura">Cinema, teatro e cultura</option>
+                <option value="negozio">Negozi</option>
+                <option value="trasporti">Trasporti</option>
+              </select>
+            </div>
+
+            <button class="btn btn--secondary btn--small filters__reset" type="reset">Azzera</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="explore__map-wrap">
+          <div id="explore-map" class="map" role="region" aria-label="Mappa dei luoghi trovati">
+            <noscript><p class="map__fallback">La mappa ha bisogno di JavaScript.</p></noscript>
+          </div>
+          <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
+            <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
+            <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
+            <li><span class="map-legend__dot pin--no"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-no"/></svg></span>Non accessibile</li>
+            <li><span class="map-legend__dot pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Da verificare</li>
+          </ul>
+          <p id="map-status" class="visually-hidden" role="status"></p>
+          <p class="map__note">La mappa mostra gli stessi luoghi dell'elenco. Con la tastiera usa l'elenco: ogni luogo ha il pulsante «Mostra sulla mappa». Sulla mappa le frecce la spostano e + e − cambiano lo zoom.</p>
+        </div>
+
+        <section id="results" aria-labelledby="results-title" tabindex="-1">
+            <h2 id="results-title" class="visually-hidden">Elenco dei luoghi</h2>
+            <p id="results-count" class="results__count" role="status" tabindex="-1"><span class="js-only">Caricamento dei luoghi…</span></p>
+            <ul id="results-list" class="results__list" role="list"></ul>
+            <noscript><p class="empty">Per vedere i luoghi e la mappa serve JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>: ti mandiamo noi le informazioni sul luogo che ti interessa.</p></noscript>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <a href="privacy.html">Privacy dell'app</a>
+      <a href="../sito/">Il sito</a>
+      <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
+      <span>© 2026 Ovunque Accessibile</span>
+      <span>Realizzata da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
+    </div>
+  </footer>
+</body>
+</html>
