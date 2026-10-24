@@ -3,1156 +3,211 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Ovunque Accessibile – In arrivo</title>
-  <meta name="description" content="Il sito e la web-app di Ovunque Accessibile stanno arrivando: una piattaforma per trovare e condividere luoghi davvero accessibili, in tutta Italia. Lascia la tua email per essere avvisato.">
+  <title>Ovunque Accessibile – Luoghi davvero accessibili in tutta Italia</title>
+  <meta name="description" content="Trova luoghi davvero accessibili in tutta Italia: ingresso, bagno, parcheggio e spazi interni verificati da chi ci è stato.">
   <meta name="theme-color" content="#fbf6ec">
   <meta name="color-scheme" content="light">
-
-  <link rel="canonical" href="https://ovunqueaccessibile.altervista.org/">
-  <meta property="og:url" content="https://ovunqueaccessibile.altervista.org/">
-  <meta property="og:type" content="website">
-  <meta property="og:locale" content="it_IT">
-  <meta property="og:site_name" content="Ovunque Accessibile">
-  <meta property="og:title" content="Ovunque Accessibile – In arrivo">
-  <meta property="og:description" content="L'accessibilità non dovrebbe essere un privilegio, ma la normalità. Il sito e la web-app stanno arrivando.">
-  <meta property="og:image" content="https://ovunqueaccessibile.altervista.org/assets/img/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Logo di Ovunque Accessibile con lo slogan: L'accessibilità non dovrebbe essere un privilegio, ma la normalità.">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Ovunque Accessibile – In arrivo">
-  <meta name="twitter:description" content="Il sito e la web-app per trovare luoghi davvero accessibili stanno arrivando.">
-  <meta name="twitter:image" content="https://ovunqueaccessibile.altervista.org/assets/img/og-image.jpg">
-
+  <meta name="robots" content="noindex">
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-24f">
-  <script src="assets/js/main.js?v=2026-10-24f" defer></script>
-
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Ovunque Accessibile",
-    "slogan": "L'accessibilità non dovrebbe essere un privilegio, ma la normalità.",
-    "description": "Piattaforma nazionale, in arrivo, per trovare e condividere luoghi davvero accessibili, con informazioni basate su esperienze reali.",
-    "founder": [
-      { "@type": "Person", "name": "Angelo" },
-      { "@type": "Person", "name": "Lorenzo" }
-    ],
-    "url": "https://ovunqueaccessibile.altervista.org/",
-    "email": "ovunqueaccessibile@gmail.com",
-    "telephone": "+39 351 833 2819",
-    "sameAs": ["https://www.instagram.com/ovunque_accessibile"]
-  }
-  </script>
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p15">
+  <script src="assets/vendor/leaflet/leaflet.js" defer></script>
+  <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
+  <script src="assets/js/oa-core.js?v=p15" defer></script>
+  <script src="assets/js/sito.js?v=p15" defer></script>
 </head>
-<body class="home">
-  <!-- Sprite delle icone: tutte decorative, accanto c'è sempre il testo -->
+<body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-partial" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></symbol>
+    <symbol id="icon-no" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+    <symbol id="icon-door" viewBox="0 0 24 24"><path d="M19 19V5c0-1.1-.9-2-2-2H7c-1.1 0-2 .9-2 2v14H3v2h18v-2h-2zm-4-6h-2v-2h2v2z"/></symbol>
+    <symbol id="icon-wc" viewBox="0 0 24 24"><path d="M5.5 22v-7.5H4V9c0-1.1.9-2 2-2h3c1.1 0 2 .9 2 2v5.5H9.5V22h-4zM18 22v-6h3l-2.54-7.63A2.01 2.01 0 0 0 16.56 7h-.12a2 2 0 0 0-1.9 1.37L12 16h3v6h3zM7.5 6c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2zm9 0c1.11 0 2-.89 2-2s-.89-2-2-2-2 .89-2 2 .89 2 2 2z"/></symbol>
+    <symbol id="icon-parking" viewBox="0 0 24 24"><path d="M13 3H6v18h4v-6h3c3.31 0 6-2.69 6-6s-2.69-6-6-6zm.2 8H10V7h3.2c1.1 0 2 .9 2 2s-.9 2-2 2z"/></symbol>
+    <symbol id="icon-lift" viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM8.5 6c.69 0 1.25.56 1.25 1.25S9.19 8.5 8.5 8.5s-1.25-.56-1.25-1.25S7.81 6 8.5 6zM11 14h-1v4H7v-4H6v-2.5c0-1.1.9-2 2-2h1c1.1 0 2 .9 2 2V14zm6.5-3h-5L15 7l2.5 4zm-5 2h5L15 17l-2.5-4z"/></symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.93 6h-2.95a15.65 15.65 0 0 0-1.38-3.56A8.03 8.03 0 0 1 18.93 8zM12 4.04c.83 1.2 1.48 2.53 1.91 3.96h-3.82c.43-1.43 1.08-2.76 1.91-3.96zM4.26 14C4.1 13.36 4 12.69 4 12s.1-1.36.26-2h3.38c-.08.66-.14 1.32-.14 2s.06 1.34.14 2H4.26zm.82 2h2.95c.32 1.25.78 2.45 1.38 3.56A7.99 7.99 0 0 1 5.08 16zm2.95-8H5.08a7.99 7.99 0 0 1 4.33-3.56A15.65 15.65 0 0 0 8.03 8zM12 19.96c-.83-1.2-1.48-2.53-1.91-3.96h3.82c-.43 1.43-1.08 2.76-1.91 3.96zM14.34 14H9.66c-.09-.66-.16-1.32-.16-2s.07-1.35.16-2h4.68c.09.65.16 1.32.16 2s-.07 1.34-.16 2zm.25 5.56c.6-1.11 1.06-2.31 1.38-3.56h2.95a8.03 8.03 0 0 1-4.33 3.56zM16.36 14c.08-.66.14-1.32.14-2s-.06-1.34-.14-2h3.38c.16.64.26 1.31.26 2s-.1 1.36-.26 2h-3.38z"/></symbol>
+    <symbol id="icon-android" viewBox="0 0 24 24"><path d="M17.6 9.48l1.84-3.18a.38.38 0 0 0-.65-.38l-1.86 3.22a11.4 11.4 0 0 0-9.86 0L5.2 5.92a.38.38 0 0 0-.65.38L6.4 9.48A10.78 10.78 0 0 0 1 18h22a10.78 10.78 0 0 0-5.4-8.52zM7 15.25a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm10 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z"/></symbol>
     <symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-3.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/></symbol>
-    <symbol id="icon-error" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></symbol>
-    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
-    <symbol id="icon-soon" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67V7z"/></symbol>
-    <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M6 5h4v14H6zm8 0h4v14h-4z"/></symbol>
-    <symbol id="icon-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></symbol>
     <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></symbol>
-    <symbol id="icon-map" viewBox="0 0 24 24"><path d="M20.5 3l-.16.03L15 5.1 9 3 3.36 4.9c-.21.07-.36.25-.36.48V20.5c0 .28.22.5.5.5l.16-.03L9 18.9l6 2.1 5.64-1.9c.21-.07.36-.25.36-.48V3.5c0-.28-.22-.5-.5-.5zM15 19l-6-2.11V5l6 2.11V19z"/></symbol>
-    <symbol id="icon-review" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-7.1 11.6L12 13l-.9.6-2.6 1.6.7-3-2.3-2 3-.3L12 7l1.2 2.9 3 .3-2.3 2 .7 3-1.7-1.6z"/></symbol>
-    <symbol id="icon-camera" viewBox="0 0 24 24"><circle cx="12" cy="12.5" r="3.2"/><path d="M9 3L7.17 5H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-3.17L15 3H9zm3 14.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></symbol>
-    <symbol id="icon-check-small" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
+    <symbol id="icon-locate" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.94 3A8.99 8.99 0 0 0 13 3.06V1h-2v2.06A8.99 8.99 0 0 0 3.06 11H1v2h2.06A8.99 8.99 0 0 0 11 20.94V23h2v-2.06A8.99 8.99 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></symbol>
+    <symbol id="icon-italy" viewBox="0 0 24 24"><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></symbol>
+    <symbol id="icon-wheelchair" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/></symbol>
+    <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><path d="M18 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H12c-.35-.2-.75-.3-1.19-.26C9.76 7.11 9 8.04 9 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/><path d="M21.5 1l-3 4.6h2L19 10l4-5.2h-2.1L22.5 1z"/></symbol>
+    <symbol id="icon-walk" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/><path d="M18.25 13h1.5v10h-1.5z"/></symbol>
+    <symbol id="icon-na" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8z"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
   </svg>
 
   <ul class="skip-links">
     <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
-    <li><a class="skip-links__link" href="#avvisami">Vai al modulo di iscrizione</a></li>
+    <li><a class="skip-links__link" href="#cerca">Vai alla ricerca</a></li>
   </ul>
 
-  <header class="home__top container">
-    <a class="brand" href="./">
-      <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
-      <span class="brand__name">Ovunque Accessibile</span>
-    </a>
-    <a class="home__social" href="https://www.instagram.com/ovunque_accessibile">
-      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
-      <span class="home__social-label">Instagram</span><span class="visually-hidden"> (sito esterno)</span>
-    </a>
+  <header class="site-header">
+    <p class="proto-banner">Prototipo: i luoghi mostrati sono esempi, non dati reali.</p>
+    <div class="container site-header__inner">
+      <a class="brand" href="./" aria-current="page">
+        <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
+        <span class="brand__name">Ovunque Accessibile</span>
+      </a>
+      <nav class="nav" aria-label="Principale">
+        <ul class="nav__list" role="list">
+          <li><a class="nav__link" href="mappa.html">Mappa dei luoghi</a></li>
+          <li><a class="nav__link" href="#come-funziona">Come funziona</a></li>
+          <li><a class="nav__link" href="#chi-siamo">Chi siamo</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--primary btn--small site-header__app" href="app/">Apri la web-app</a>
+    </div>
   </header>
 
-  <main id="main" class="home__main container" tabindex="-1">
-    <div class="home__copy">
-      <p class="home__badge home__item"><span class="home__dot" aria-hidden="true"></span>In arrivo · sito e web&#8209;app</p>
-      <h1 class="home__title home__item">La mappa dei luoghi <span class="home__accent">davvero accessibili</span></h1>
-      <p class="home__lead home__item">In tutta Italia, raccontati da chi ci è stato. Lasciaci la tua email: ti avvisiamo al lancio.</p>
+  <main id="main" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="container hero__inner">
+        <div class="reveal">
+          <h1 id="hero-title" class="hero__title">Trova luoghi <span class="hero__accent">davvero accessibili</span></h1>
+          <p class="hero__lead">Ingresso, bagno, parcheggio e spazi interni: informazioni concrete, raccolte da chi ci è stato. In tutta Italia.</p>
 
-      <!-- Avvisami: subito visibile -->
-      <section id="avvisami" class="home__form home__item" aria-labelledby="avvisami-title" tabindex="-1">
-        <h2 id="avvisami-title" class="visually-hidden">Iscriviti per essere avvisato</h2>
-
-        <!-- Regione di esito: riceve il focus dopo l'invio via fetch -->
-        <div id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
-
-        <!-- Invio a Formspree. Senza JavaScript Formspree mostra la sua pagina di conferma. -->
-        <form id="subscribe-form" class="form home__card" action="https://formspree.io/f/mljjddjo" method="post">
-          <div id="error-summary" class="error-summary" tabindex="-1" hidden>
-            <h3 class="error-summary__title">
-              <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-error"/></svg>
-              <span id="error-summary-title">Controlla i campi indicati</span>
-            </h3>
-            <ul class="error-summary__list" id="error-summary-list"></ul>
-          </div>
-
-          <input type="hidden" name="_subject" value="Nuova iscrizione – Ovunque Accessibile">
-          <input type="hidden" name="privacy_version" value="2026-10-v3">
-
-          <div class="field">
-            <label class="field__label" for="email">La tua email</label>
-            <div class="form__inline">
-              <input class="field__input" type="email" id="email" name="email" autocomplete="email" inputmode="email" maxlength="254" spellcheck="false" required>
-              <button class="btn btn--primary form__submit" type="submit">
-                Avvisami
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>
-              </button>
+          <form id="cerca" class="hero__search" action="mappa.html" method="get" role="search" aria-label="Cerca un luogo">
+            <div class="field">
+              <label class="field__label" for="hero-q">Dove vuoi andare?</label>
+              <div class="search">
+                <input class="input" type="search" id="hero-q" name="q" placeholder="Città, nome o tipo di luogo" autocomplete="off">
+                <button class="btn btn--primary" type="submit">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg>
+                  Cerca
+                </button>
+              </div>
             </div>
+          </form>
+
+          <p class="visually-hidden" id="quick-title">Ricerche rapide</p>
+          <ul class="quick" role="list" aria-labelledby="quick-title">
+            <li><a class="quick__link" href="mappa.html?f=ingresso"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Ingresso accessibile</a></li>
+            <li><a class="quick__link" href="mappa.html?f=bagno"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Bagno accessibile</a></li>
+            <li><a class="quick__link" href="mappa.html?f=parcheggio"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <div id="home-map" class="hero__map" role="region" aria-label="Anteprima della mappa dei luoghi">
+            <noscript><p class="map__fallback">La mappa ha bisogno di JavaScript. Puoi comunque cercare un luogo con il campo qui accanto.</p></noscript>
           </div>
+          <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
+            <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
+            <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
+            <li><span class="map-legend__dot pin--no"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-no"/></svg></span>Non accessibile</li>
+            <li><span class="map-legend__dot pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Da verificare</li>
+          </ul>
+          <p class="map__note">Apri la <a href="mappa.html">mappa completa</a> per cercare e filtrare: lì trovi anche l'elenco dei luoghi.</p>
+        </div>
+      </div>
+    </section>
 
-          <!-- Honeypot: nascosto a tutti, solo i bot lo compilano -->
-          <div class="hp" aria-hidden="true">
-            <label for="gotcha">Non compilare questo campo</label>
-            <input type="text" id="gotcha" name="_gotcha" tabindex="-1" autocomplete="off">
-          </div>
+    <section class="section" aria-labelledby="latest-title">
+      <div class="container">
+        <div class="section__head">
+          <h2 id="latest-title">Ultimi luoghi verificati</h2>
+          <p>Le schede aggiornate più di recente. <a href="mappa.html">Vedi tutti i luoghi</a></p>
+        </div>
+        <ul id="latest-list" class="latest" role="list">
+          <li class="place js-only"><p class="place__meta">Caricamento…</p></li>
+        </ul>
+        <noscript><p class="empty">Per vedere i luoghi serve JavaScript attivo nel browser.</p></noscript>
+      </div>
+    </section>
 
-          <div class="field field--checkbox">
-            <input class="field__checkbox" type="checkbox" id="consent" name="consent" value="sì" required>
-            <label class="field__label field__label--checkbox" for="consent">
-              Voglio ricevere email su Ovunque Accessibile. Ho letto la
-              <a href="privacy.html" target="_blank" rel="noopener">privacy<span class="visually-hidden"> policy (si apre in una nuova scheda)</span><svg class="icon icon--inline" aria-hidden="true" focusable="false"><use href="#icon-external"/></svg></a>.
-            </label>
-          </div>
-          <p class="form__note">Email e consenso sono obbligatori. Niente spam, solo il lancio.</p>
-        </form>
-      </section>
+    <section id="come-funziona" class="section" aria-labelledby="how-title">
+      <div class="container">
+        <div class="section__head">
+          <h2 id="how-title">Come funziona</h2>
+          <p>Niente simboli generici: per ogni luogo diciamo cosa trovi davvero.</p>
+        </div>
+        <ol class="grid grid--3" role="list">
+          <li class="card">
+            <span class="step__num" aria-hidden="true">1</span>
+            <h3>Cerca</h3>
+            <p>Scrivi una città o il nome di un posto e scegli cosa ti serve: ingresso senza gradini, bagno, parcheggio.</p>
+          </li>
+          <li class="card">
+            <span class="step__num" aria-hidden="true">2</span>
+            <h3>Controlla la scheda</h3>
+            <p>Ogni luogo ha una scheda con misure e dettagli, e la data dell'ultima verifica.</p>
+          </li>
+          <li class="card">
+            <span class="step__num" aria-hidden="true">3</span>
+            <h3>Racconta la tua esperienza</h3>
+            <p>Con la <a href="app/">web-app</a> segnali nuovi luoghi e aggiorni quelli che conosci. Ogni segnalazione viene controllata prima di essere pubblicata.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
 
-      <p class="home__sign home__item">Un progetto di <strong>Angelo e Lorenzo</strong></p>
-    </div>
-
-    <!-- Mappa dell'Italia a puntini: illustrazione (i punti accesi non sono luoghi reali, mostrano l'idea
-         della community che aggiunge luoghi). Contorno da Natural Earth. Decorativa. -->
-    <div class="italy">
-      <div class="italy__stage" aria-hidden="true">
-        <svg class="italy__map" id="italy-map" viewBox="-12 -12 875 1024" focusable="false">
-<g class="italy__dots">
-<circle cx="398" cy="8" r="5.5"/>
-<circle cx="341" cy="22" r="5.5"/>
-<circle cx="357" cy="22" r="5.5"/>
-<circle cx="374" cy="22" r="5.5"/>
-<circle cx="390" cy="22" r="5.5"/>
-<circle cx="284" cy="36" r="5.5"/>
-<circle cx="301" cy="36" r="5.5"/>
-<circle cx="317" cy="36" r="5.5"/>
-<circle cx="333" cy="36" r="5.5"/>
-<circle cx="349" cy="36" r="5.5"/>
-<circle cx="366" cy="36" r="5.5"/>
-<circle cx="382" cy="36" r="5.5"/>
-<circle cx="398" cy="36" r="5.5"/>
-<circle cx="292" cy="50" r="5.5"/>
-<circle cx="309" cy="50" r="5.5"/>
-<circle cx="325" cy="50" r="5.5"/>
-<circle cx="341" cy="50" r="5.5"/>
-<circle cx="357" cy="50" r="5.5"/>
-<circle cx="374" cy="50" r="5.5"/>
-<circle cx="390" cy="50" r="5.5"/>
-<circle cx="406" cy="50" r="5.5"/>
-<circle cx="422" cy="50" r="5.5"/>
-<circle cx="439" cy="50" r="5.5"/>
-<circle cx="203" cy="64" r="5.5"/>
-<circle cx="252" cy="64" r="5.5"/>
-<circle cx="268" cy="64" r="5.5"/>
-<circle cx="284" cy="64" r="5.5"/>
-<circle cx="301" cy="64" r="5.5"/>
-<circle cx="317" cy="64" r="5.5"/>
-<circle cx="333" cy="64" r="5.5"/>
-<circle cx="349" cy="64" r="5.5"/>
-<circle cx="366" cy="64" r="5.5"/>
-<circle cx="382" cy="64" r="5.5"/>
-<circle cx="398" cy="64" r="5.5"/>
-<circle cx="414" cy="64" r="5.5"/>
-<circle cx="431" cy="64" r="5.5"/>
-<circle cx="447" cy="64" r="5.5"/>
-<circle cx="463" cy="64" r="5.5"/>
-<circle cx="479" cy="64" r="5.5"/>
-<circle cx="496" cy="64" r="5.5"/>
-<circle cx="130" cy="78" r="5.5"/>
-<circle cx="211" cy="78" r="5.5"/>
-<circle cx="244" cy="78" r="5.5"/>
-<circle cx="260" cy="78" r="5.5"/>
-<circle cx="276" cy="78" r="5.5"/>
-<circle cx="292" cy="78" r="5.5"/>
-<circle cx="309" cy="78" r="5.5"/>
-<circle cx="325" cy="78" r="5.5"/>
-<circle cx="341" cy="78" r="5.5"/>
-<circle cx="357" cy="78" r="5.5" class="is-lit"/>
-<circle cx="374" cy="78" r="5.5"/>
-<circle cx="390" cy="78" r="5.5"/>
-<circle cx="406" cy="78" r="5.5"/>
-<circle cx="422" cy="78" r="5.5"/>
-<circle cx="439" cy="78" r="5.5"/>
-<circle cx="455" cy="78" r="5.5"/>
-<circle cx="471" cy="78" r="5.5"/>
-<circle cx="487" cy="78" r="5.5"/>
-<circle cx="122" cy="93" r="5.5"/>
-<circle cx="138" cy="93" r="5.5" class="is-lit"/>
-<circle cx="203" cy="93" r="5.5"/>
-<circle cx="219" cy="93" r="5.5"/>
-<circle cx="236" cy="93" r="5.5"/>
-<circle cx="252" cy="93" r="5.5"/>
-<circle cx="268" cy="93" r="5.5"/>
-<circle cx="284" cy="93" r="5.5"/>
-<circle cx="301" cy="93" r="5.5"/>
-<circle cx="317" cy="93" r="5.5"/>
-<circle cx="333" cy="93" r="5.5"/>
-<circle cx="349" cy="93" r="5.5"/>
-<circle cx="366" cy="93" r="5.5"/>
-<circle cx="382" cy="93" r="5.5"/>
-<circle cx="398" cy="93" r="5.5"/>
-<circle cx="414" cy="93" r="5.5"/>
-<circle cx="431" cy="93" r="5.5" class="is-lit"/>
-<circle cx="447" cy="93" r="5.5"/>
-<circle cx="463" cy="93" r="5.5"/>
-<circle cx="479" cy="93" r="5.5"/>
-<circle cx="496" cy="93" r="5.5"/>
-<circle cx="114" cy="107" r="5.5"/>
-<circle cx="130" cy="107" r="5.5"/>
-<circle cx="146" cy="107" r="5.5"/>
-<circle cx="162" cy="107" r="5.5"/>
-<circle cx="179" cy="107" r="5.5"/>
-<circle cx="195" cy="107" r="5.5"/>
-<circle cx="211" cy="107" r="5.5"/>
-<circle cx="227" cy="107" r="5.5"/>
-<circle cx="244" cy="107" r="5.5"/>
-<circle cx="260" cy="107" r="5.5"/>
-<circle cx="276" cy="107" r="5.5"/>
-<circle cx="292" cy="107" r="5.5"/>
-<circle cx="309" cy="107" r="5.5"/>
-<circle cx="325" cy="107" r="5.5"/>
-<circle cx="341" cy="107" r="5.5"/>
-<circle cx="357" cy="107" r="5.5"/>
-<circle cx="374" cy="107" r="5.5"/>
-<circle cx="390" cy="107" r="5.5" class="is-lit"/>
-<circle cx="406" cy="107" r="5.5"/>
-<circle cx="422" cy="107" r="5.5"/>
-<circle cx="439" cy="107" r="5.5"/>
-<circle cx="455" cy="107" r="5.5"/>
-<circle cx="471" cy="107" r="5.5"/>
-<circle cx="487" cy="107" r="5.5"/>
-<circle cx="41" cy="121" r="5.5"/>
-<circle cx="57" cy="121" r="5.5"/>
-<circle cx="73" cy="121" r="5.5"/>
-<circle cx="89" cy="121" r="5.5"/>
-<circle cx="106" cy="121" r="5.5"/>
-<circle cx="122" cy="121" r="5.5"/>
-<circle cx="138" cy="121" r="5.5"/>
-<circle cx="154" cy="121" r="5.5"/>
-<circle cx="187" cy="121" r="5.5"/>
-<circle cx="203" cy="121" r="5.5"/>
-<circle cx="219" cy="121" r="5.5"/>
-<circle cx="236" cy="121" r="5.5"/>
-<circle cx="252" cy="121" r="5.5"/>
-<circle cx="268" cy="121" r="5.5"/>
-<circle cx="284" cy="121" r="5.5"/>
-<circle cx="301" cy="121" r="5.5"/>
-<circle cx="317" cy="121" r="5.5"/>
-<circle cx="333" cy="121" r="5.5"/>
-<circle cx="349" cy="121" r="5.5"/>
-<circle cx="366" cy="121" r="5.5"/>
-<circle cx="382" cy="121" r="5.5"/>
-<circle cx="398" cy="121" r="5.5"/>
-<circle cx="414" cy="121" r="5.5"/>
-<circle cx="431" cy="121" r="5.5"/>
-<circle cx="447" cy="121" r="5.5"/>
-<circle cx="463" cy="121" r="5.5"/>
-<circle cx="479" cy="121" r="5.5"/>
-<circle cx="496" cy="121" r="5.5"/>
-<circle cx="32" cy="135" r="5.5"/>
-<circle cx="49" cy="135" r="5.5"/>
-<circle cx="65" cy="135" r="5.5"/>
-<circle cx="81" cy="135" r="5.5"/>
-<circle cx="97" cy="135" r="5.5"/>
-<circle cx="114" cy="135" r="5.5"/>
-<circle cx="130" cy="135" r="5.5"/>
-<circle cx="146" cy="135" r="5.5"/>
-<circle cx="162" cy="135" r="5.5"/>
-<circle cx="179" cy="135" r="5.5"/>
-<circle cx="195" cy="135" r="5.5"/>
-<circle cx="211" cy="135" r="5.5"/>
-<circle cx="227" cy="135" r="5.5"/>
-<circle cx="244" cy="135" r="5.5"/>
-<circle cx="260" cy="135" r="5.5"/>
-<circle cx="276" cy="135" r="5.5"/>
-<circle cx="292" cy="135" r="5.5"/>
-<circle cx="309" cy="135" r="5.5"/>
-<circle cx="325" cy="135" r="5.5"/>
-<circle cx="341" cy="135" r="5.5"/>
-<circle cx="357" cy="135" r="5.5"/>
-<circle cx="374" cy="135" r="5.5"/>
-<circle cx="390" cy="135" r="5.5"/>
-<circle cx="406" cy="135" r="5.5" class="is-lit"/>
-<circle cx="422" cy="135" r="5.5"/>
-<circle cx="439" cy="135" r="5.5"/>
-<circle cx="455" cy="135" r="5.5"/>
-<circle cx="471" cy="135" r="5.5"/>
-<circle cx="487" cy="135" r="5.5"/>
-<circle cx="41" cy="149" r="5.5"/>
-<circle cx="57" cy="149" r="5.5"/>
-<circle cx="73" cy="149" r="5.5"/>
-<circle cx="89" cy="149" r="5.5"/>
-<circle cx="106" cy="149" r="5.5"/>
-<circle cx="122" cy="149" r="5.5"/>
-<circle cx="138" cy="149" r="5.5"/>
-<circle cx="154" cy="149" r="5.5"/>
-<circle cx="171" cy="149" r="5.5"/>
-<circle cx="187" cy="149" r="5.5"/>
-<circle cx="203" cy="149" r="5.5"/>
-<circle cx="219" cy="149" r="5.5"/>
-<circle cx="236" cy="149" r="5.5"/>
-<circle cx="252" cy="149" r="5.5"/>
-<circle cx="268" cy="149" r="5.5"/>
-<circle cx="284" cy="149" r="5.5"/>
-<circle cx="301" cy="149" r="5.5"/>
-<circle cx="317" cy="149" r="5.5"/>
-<circle cx="333" cy="149" r="5.5"/>
-<circle cx="349" cy="149" r="5.5"/>
-<circle cx="366" cy="149" r="5.5"/>
-<circle cx="382" cy="149" r="5.5"/>
-<circle cx="398" cy="149" r="5.5"/>
-<circle cx="414" cy="149" r="5.5"/>
-<circle cx="431" cy="149" r="5.5"/>
-<circle cx="447" cy="149" r="5.5"/>
-<circle cx="49" cy="163" r="5.5"/>
-<circle cx="65" cy="163" r="5.5"/>
-<circle cx="81" cy="163" r="5.5"/>
-<circle cx="97" cy="163" r="5.5"/>
-<circle cx="114" cy="163" r="5.5"/>
-<circle cx="130" cy="163" r="5.5"/>
-<circle cx="146" cy="163" r="5.5"/>
-<circle cx="162" cy="163" r="5.5"/>
-<circle cx="179" cy="163" r="5.5"/>
-<circle cx="195" cy="163" r="5.5"/>
-<circle cx="211" cy="163" r="5.5"/>
-<circle cx="227" cy="163" r="5.5"/>
-<circle cx="244" cy="163" r="5.5"/>
-<circle cx="260" cy="163" r="5.5"/>
-<circle cx="276" cy="163" r="5.5"/>
-<circle cx="292" cy="163" r="5.5"/>
-<circle cx="309" cy="163" r="5.5"/>
-<circle cx="325" cy="163" r="5.5"/>
-<circle cx="341" cy="163" r="5.5"/>
-<circle cx="357" cy="163" r="5.5"/>
-<circle cx="374" cy="163" r="5.5"/>
-<circle cx="390" cy="163" r="5.5"/>
-<circle cx="406" cy="163" r="5.5"/>
-<circle cx="57" cy="177" r="5.5"/>
-<circle cx="73" cy="177" r="5.5"/>
-<circle cx="89" cy="177" r="5.5"/>
-<circle cx="106" cy="177" r="5.5"/>
-<circle cx="122" cy="177" r="5.5"/>
-<circle cx="138" cy="177" r="5.5"/>
-<circle cx="154" cy="177" r="5.5"/>
-<circle cx="171" cy="177" r="5.5"/>
-<circle cx="187" cy="177" r="5.5"/>
-<circle cx="203" cy="177" r="5.5"/>
-<circle cx="219" cy="177" r="5.5" class="is-lit"/>
-<circle cx="236" cy="177" r="5.5"/>
-<circle cx="252" cy="177" r="5.5"/>
-<circle cx="268" cy="177" r="5.5"/>
-<circle cx="284" cy="177" r="5.5"/>
-<circle cx="301" cy="177" r="5.5"/>
-<circle cx="317" cy="177" r="5.5"/>
-<circle cx="333" cy="177" r="5.5"/>
-<circle cx="349" cy="177" r="5.5"/>
-<circle cx="366" cy="177" r="5.5"/>
-<circle cx="382" cy="177" r="5.5"/>
-<circle cx="398" cy="177" r="5.5"/>
-<circle cx="32" cy="191" r="5.5"/>
-<circle cx="49" cy="191" r="5.5"/>
-<circle cx="65" cy="191" r="5.5"/>
-<circle cx="81" cy="191" r="5.5"/>
-<circle cx="97" cy="191" r="5.5"/>
-<circle cx="114" cy="191" r="5.5"/>
-<circle cx="130" cy="191" r="5.5"/>
-<circle cx="146" cy="191" r="5.5"/>
-<circle cx="162" cy="191" r="5.5"/>
-<circle cx="179" cy="191" r="5.5"/>
-<circle cx="195" cy="191" r="5.5"/>
-<circle cx="211" cy="191" r="5.5"/>
-<circle cx="227" cy="191" r="5.5"/>
-<circle cx="244" cy="191" r="5.5"/>
-<circle cx="260" cy="191" r="5.5"/>
-<circle cx="276" cy="191" r="5.5"/>
-<circle cx="292" cy="191" r="5.5"/>
-<circle cx="309" cy="191" r="5.5"/>
-<circle cx="325" cy="191" r="5.5"/>
-<circle cx="341" cy="191" r="5.5"/>
-<circle cx="357" cy="191" r="5.5"/>
-<circle cx="374" cy="191" r="5.5"/>
-<circle cx="390" cy="191" r="5.5"/>
-<circle cx="406" cy="191" r="5.5"/>
-<circle cx="24" cy="205" r="5.5"/>
-<circle cx="41" cy="205" r="5.5"/>
-<circle cx="57" cy="205" r="5.5"/>
-<circle cx="73" cy="205" r="5.5"/>
-<circle cx="89" cy="205" r="5.5"/>
-<circle cx="106" cy="205" r="5.5"/>
-<circle cx="122" cy="205" r="5.5"/>
-<circle cx="138" cy="205" r="5.5"/>
-<circle cx="154" cy="205" r="5.5"/>
-<circle cx="171" cy="205" r="5.5"/>
-<circle cx="187" cy="205" r="5.5"/>
-<circle cx="203" cy="205" r="5.5"/>
-<circle cx="219" cy="205" r="5.5"/>
-<circle cx="236" cy="205" r="5.5"/>
-<circle cx="252" cy="205" r="5.5"/>
-<circle cx="268" cy="205" r="5.5"/>
-<circle cx="284" cy="205" r="5.5"/>
-<circle cx="301" cy="205" r="5.5"/>
-<circle cx="317" cy="205" r="5.5"/>
-<circle cx="333" cy="205" r="5.5"/>
-<circle cx="349" cy="205" r="5.5"/>
-<circle cx="366" cy="205" r="5.5"/>
-<circle cx="382" cy="205" r="5.5"/>
-<circle cx="398" cy="205" r="5.5"/>
-<circle cx="414" cy="205" r="5.5"/>
-<circle cx="32" cy="219" r="5.5"/>
-<circle cx="49" cy="219" r="5.5"/>
-<circle cx="65" cy="219" r="5.5"/>
-<circle cx="81" cy="219" r="5.5"/>
-<circle cx="97" cy="219" r="5.5"/>
-<circle cx="114" cy="219" r="5.5"/>
-<circle cx="130" cy="219" r="5.5"/>
-<circle cx="146" cy="219" r="5.5"/>
-<circle cx="162" cy="219" r="5.5"/>
-<circle cx="179" cy="219" r="5.5"/>
-<circle cx="195" cy="219" r="5.5"/>
-<circle cx="211" cy="219" r="5.5"/>
-<circle cx="227" cy="219" r="5.5"/>
-<circle cx="244" cy="219" r="5.5"/>
-<circle cx="260" cy="219" r="5.5"/>
-<circle cx="276" cy="219" r="5.5"/>
-<circle cx="292" cy="219" r="5.5"/>
-<circle cx="309" cy="219" r="5.5"/>
-<circle cx="325" cy="219" r="5.5"/>
-<circle cx="341" cy="219" r="5.5"/>
-<circle cx="357" cy="219" r="5.5"/>
-<circle cx="374" cy="219" r="5.5"/>
-<circle cx="390" cy="219" r="5.5"/>
-<circle cx="406" cy="219" r="5.5"/>
-<circle cx="422" cy="219" r="5.5"/>
-<circle cx="41" cy="233" r="5.5"/>
-<circle cx="57" cy="233" r="5.5"/>
-<circle cx="73" cy="233" r="5.5"/>
-<circle cx="89" cy="233" r="5.5"/>
-<circle cx="106" cy="233" r="5.5"/>
-<circle cx="122" cy="233" r="5.5"/>
-<circle cx="138" cy="233" r="5.5"/>
-<circle cx="154" cy="233" r="5.5"/>
-<circle cx="171" cy="233" r="5.5"/>
-<circle cx="187" cy="233" r="5.5"/>
-<circle cx="203" cy="233" r="5.5"/>
-<circle cx="219" cy="233" r="5.5"/>
-<circle cx="236" cy="233" r="5.5"/>
-<circle cx="252" cy="233" r="5.5"/>
-<circle cx="268" cy="233" r="5.5"/>
-<circle cx="284" cy="233" r="5.5"/>
-<circle cx="301" cy="233" r="5.5"/>
-<circle cx="317" cy="233" r="5.5"/>
-<circle cx="333" cy="233" r="5.5"/>
-<circle cx="349" cy="233" r="5.5"/>
-<circle cx="366" cy="233" r="5.5"/>
-<circle cx="382" cy="233" r="5.5"/>
-<circle cx="398" cy="233" r="5.5"/>
-<circle cx="32" cy="247" r="5.5"/>
-<circle cx="49" cy="247" r="5.5"/>
-<circle cx="65" cy="247" r="5.5"/>
-<circle cx="81" cy="247" r="5.5" class="is-lit"/>
-<circle cx="97" cy="247" r="5.5"/>
-<circle cx="114" cy="247" r="5.5"/>
-<circle cx="130" cy="247" r="5.5"/>
-<circle cx="146" cy="247" r="5.5"/>
-<circle cx="162" cy="247" r="5.5"/>
-<circle cx="179" cy="247" r="5.5"/>
-<circle cx="195" cy="247" r="5.5"/>
-<circle cx="211" cy="247" r="5.5"/>
-<circle cx="227" cy="247" r="5.5"/>
-<circle cx="244" cy="247" r="5.5"/>
-<circle cx="260" cy="247" r="5.5"/>
-<circle cx="276" cy="247" r="5.5"/>
-<circle cx="292" cy="247" r="5.5"/>
-<circle cx="309" cy="247" r="5.5"/>
-<circle cx="325" cy="247" r="5.5"/>
-<circle cx="341" cy="247" r="5.5"/>
-<circle cx="357" cy="247" r="5.5"/>
-<circle cx="374" cy="247" r="5.5"/>
-<circle cx="390" cy="247" r="5.5"/>
-<circle cx="406" cy="247" r="5.5"/>
-<circle cx="41" cy="261" r="5.5"/>
-<circle cx="57" cy="261" r="5.5"/>
-<circle cx="73" cy="261" r="5.5"/>
-<circle cx="89" cy="261" r="5.5"/>
-<circle cx="106" cy="261" r="5.5"/>
-<circle cx="122" cy="261" r="5.5"/>
-<circle cx="138" cy="261" r="5.5"/>
-<circle cx="154" cy="261" r="5.5"/>
-<circle cx="171" cy="261" r="5.5"/>
-<circle cx="187" cy="261" r="5.5"/>
-<circle cx="203" cy="261" r="5.5"/>
-<circle cx="219" cy="261" r="5.5"/>
-<circle cx="236" cy="261" r="5.5"/>
-<circle cx="252" cy="261" r="5.5"/>
-<circle cx="268" cy="261" r="5.5"/>
-<circle cx="284" cy="261" r="5.5"/>
-<circle cx="301" cy="261" r="5.5"/>
-<circle cx="317" cy="261" r="5.5"/>
-<circle cx="333" cy="261" r="5.5"/>
-<circle cx="349" cy="261" r="5.5"/>
-<circle cx="366" cy="261" r="5.5"/>
-<circle cx="382" cy="261" r="5.5"/>
-<circle cx="398" cy="261" r="5.5" class="is-lit"/>
-<circle cx="49" cy="275" r="5.5"/>
-<circle cx="65" cy="275" r="5.5"/>
-<circle cx="81" cy="275" r="5.5"/>
-<circle cx="97" cy="275" r="5.5"/>
-<circle cx="114" cy="275" r="5.5"/>
-<circle cx="130" cy="275" r="5.5"/>
-<circle cx="211" cy="275" r="5.5"/>
-<circle cx="227" cy="275" r="5.5"/>
-<circle cx="244" cy="275" r="5.5"/>
-<circle cx="260" cy="275" r="5.5"/>
-<circle cx="276" cy="275" r="5.5"/>
-<circle cx="292" cy="275" r="5.5"/>
-<circle cx="309" cy="275" r="5.5"/>
-<circle cx="325" cy="275" r="5.5"/>
-<circle cx="341" cy="275" r="5.5"/>
-<circle cx="357" cy="275" r="5.5"/>
-<circle cx="374" cy="275" r="5.5"/>
-<circle cx="390" cy="275" r="5.5"/>
-<circle cx="406" cy="275" r="5.5"/>
-<circle cx="89" cy="290" r="5.5"/>
-<circle cx="106" cy="290" r="5.5"/>
-<circle cx="122" cy="290" r="5.5"/>
-<circle cx="236" cy="290" r="5.5"/>
-<circle cx="252" cy="290" r="5.5"/>
-<circle cx="268" cy="290" r="5.5"/>
-<circle cx="284" cy="290" r="5.5"/>
-<circle cx="301" cy="290" r="5.5"/>
-<circle cx="317" cy="290" r="5.5"/>
-<circle cx="333" cy="290" r="5.5"/>
-<circle cx="349" cy="290" r="5.5" class="is-lit"/>
-<circle cx="366" cy="290" r="5.5"/>
-<circle cx="382" cy="290" r="5.5"/>
-<circle cx="398" cy="290" r="5.5"/>
-<circle cx="414" cy="290" r="5.5"/>
-<circle cx="81" cy="304" r="5.5"/>
-<circle cx="97" cy="304" r="5.5"/>
-<circle cx="114" cy="304" r="5.5"/>
-<circle cx="260" cy="304" r="5.5"/>
-<circle cx="276" cy="304" r="5.5"/>
-<circle cx="292" cy="304" r="5.5"/>
-<circle cx="309" cy="304" r="5.5"/>
-<circle cx="325" cy="304" r="5.5"/>
-<circle cx="341" cy="304" r="5.5"/>
-<circle cx="357" cy="304" r="5.5"/>
-<circle cx="374" cy="304" r="5.5"/>
-<circle cx="390" cy="304" r="5.5"/>
-<circle cx="406" cy="304" r="5.5"/>
-<circle cx="439" cy="304" r="5.5"/>
-<circle cx="73" cy="318" r="5.5"/>
-<circle cx="89" cy="318" r="5.5"/>
-<circle cx="268" cy="318" r="5.5"/>
-<circle cx="284" cy="318" r="5.5"/>
-<circle cx="301" cy="318" r="5.5"/>
-<circle cx="317" cy="318" r="5.5"/>
-<circle cx="333" cy="318" r="5.5"/>
-<circle cx="349" cy="318" r="5.5"/>
-<circle cx="366" cy="318" r="5.5"/>
-<circle cx="382" cy="318" r="5.5"/>
-<circle cx="398" cy="318" r="5.5"/>
-<circle cx="414" cy="318" r="5.5"/>
-<circle cx="431" cy="318" r="5.5"/>
-<circle cx="447" cy="318" r="5.5"/>
-<circle cx="463" cy="318" r="5.5"/>
-<circle cx="276" cy="332" r="5.5"/>
-<circle cx="292" cy="332" r="5.5"/>
-<circle cx="309" cy="332" r="5.5"/>
-<circle cx="325" cy="332" r="5.5"/>
-<circle cx="341" cy="332" r="5.5"/>
-<circle cx="357" cy="332" r="5.5"/>
-<circle cx="374" cy="332" r="5.5"/>
-<circle cx="390" cy="332" r="5.5"/>
-<circle cx="406" cy="332" r="5.5"/>
-<circle cx="422" cy="332" r="5.5"/>
-<circle cx="439" cy="332" r="5.5"/>
-<circle cx="455" cy="332" r="5.5"/>
-<circle cx="471" cy="332" r="5.5"/>
-<circle cx="284" cy="346" r="5.5"/>
-<circle cx="301" cy="346" r="5.5"/>
-<circle cx="317" cy="346" r="5.5"/>
-<circle cx="333" cy="346" r="5.5"/>
-<circle cx="349" cy="346" r="5.5"/>
-<circle cx="366" cy="346" r="5.5"/>
-<circle cx="382" cy="346" r="5.5"/>
-<circle cx="398" cy="346" r="5.5"/>
-<circle cx="414" cy="346" r="5.5"/>
-<circle cx="431" cy="346" r="5.5"/>
-<circle cx="447" cy="346" r="5.5"/>
-<circle cx="463" cy="346" r="5.5"/>
-<circle cx="479" cy="346" r="5.5"/>
-<circle cx="496" cy="346" r="5.5"/>
-<circle cx="292" cy="360" r="5.5"/>
-<circle cx="309" cy="360" r="5.5"/>
-<circle cx="325" cy="360" r="5.5"/>
-<circle cx="341" cy="360" r="5.5"/>
-<circle cx="357" cy="360" r="5.5"/>
-<circle cx="374" cy="360" r="5.5"/>
-<circle cx="390" cy="360" r="5.5"/>
-<circle cx="406" cy="360" r="5.5"/>
-<circle cx="422" cy="360" r="5.5"/>
-<circle cx="439" cy="360" r="5.5"/>
-<circle cx="455" cy="360" r="5.5"/>
-<circle cx="471" cy="360" r="5.5"/>
-<circle cx="487" cy="360" r="5.5"/>
-<circle cx="504" cy="360" r="5.5"/>
-<circle cx="301" cy="374" r="5.5"/>
-<circle cx="317" cy="374" r="5.5"/>
-<circle cx="333" cy="374" r="5.5"/>
-<circle cx="349" cy="374" r="5.5"/>
-<circle cx="366" cy="374" r="5.5"/>
-<circle cx="382" cy="374" r="5.5"/>
-<circle cx="398" cy="374" r="5.5"/>
-<circle cx="414" cy="374" r="5.5"/>
-<circle cx="431" cy="374" r="5.5"/>
-<circle cx="447" cy="374" r="5.5"/>
-<circle cx="463" cy="374" r="5.5"/>
-<circle cx="479" cy="374" r="5.5"/>
-<circle cx="496" cy="374" r="5.5"/>
-<circle cx="512" cy="374" r="5.5"/>
-<circle cx="292" cy="388" r="5.5"/>
-<circle cx="309" cy="388" r="5.5"/>
-<circle cx="325" cy="388" r="5.5"/>
-<circle cx="341" cy="388" r="5.5"/>
-<circle cx="357" cy="388" r="5.5"/>
-<circle cx="374" cy="388" r="5.5"/>
-<circle cx="390" cy="388" r="5.5"/>
-<circle cx="406" cy="388" r="5.5"/>
-<circle cx="422" cy="388" r="5.5"/>
-<circle cx="439" cy="388" r="5.5"/>
-<circle cx="455" cy="388" r="5.5"/>
-<circle cx="471" cy="388" r="5.5"/>
-<circle cx="487" cy="388" r="5.5"/>
-<circle cx="504" cy="388" r="5.5"/>
-<circle cx="520" cy="388" r="5.5"/>
-<circle cx="301" cy="402" r="5.5"/>
-<circle cx="317" cy="402" r="5.5"/>
-<circle cx="333" cy="402" r="5.5"/>
-<circle cx="349" cy="402" r="5.5"/>
-<circle cx="366" cy="402" r="5.5"/>
-<circle cx="382" cy="402" r="5.5"/>
-<circle cx="398" cy="402" r="5.5"/>
-<circle cx="414" cy="402" r="5.5"/>
-<circle cx="431" cy="402" r="5.5"/>
-<circle cx="447" cy="402" r="5.5"/>
-<circle cx="463" cy="402" r="5.5"/>
-<circle cx="479" cy="402" r="5.5" class="is-lit"/>
-<circle cx="496" cy="402" r="5.5"/>
-<circle cx="512" cy="402" r="5.5"/>
-<circle cx="260" cy="416" r="5.5"/>
-<circle cx="276" cy="416" r="5.5"/>
-<circle cx="309" cy="416" r="5.5"/>
-<circle cx="325" cy="416" r="5.5"/>
-<circle cx="341" cy="416" r="5.5"/>
-<circle cx="357" cy="416" r="5.5"/>
-<circle cx="374" cy="416" r="5.5"/>
-<circle cx="390" cy="416" r="5.5"/>
-<circle cx="406" cy="416" r="5.5"/>
-<circle cx="422" cy="416" r="5.5"/>
-<circle cx="439" cy="416" r="5.5"/>
-<circle cx="455" cy="416" r="5.5"/>
-<circle cx="471" cy="416" r="5.5"/>
-<circle cx="487" cy="416" r="5.5"/>
-<circle cx="504" cy="416" r="5.5"/>
-<circle cx="520" cy="416" r="5.5"/>
-<circle cx="333" cy="430" r="5.5"/>
-<circle cx="349" cy="430" r="5.5"/>
-<circle cx="366" cy="430" r="5.5"/>
-<circle cx="382" cy="430" r="5.5"/>
-<circle cx="398" cy="430" r="5.5"/>
-<circle cx="414" cy="430" r="5.5"/>
-<circle cx="431" cy="430" r="5.5"/>
-<circle cx="447" cy="430" r="5.5"/>
-<circle cx="463" cy="430" r="5.5"/>
-<circle cx="479" cy="430" r="5.5"/>
-<circle cx="496" cy="430" r="5.5" class="is-lit"/>
-<circle cx="512" cy="430" r="5.5"/>
-<circle cx="528" cy="430" r="5.5"/>
-<circle cx="341" cy="444" r="5.5"/>
-<circle cx="357" cy="444" r="5.5"/>
-<circle cx="374" cy="444" r="5.5"/>
-<circle cx="390" cy="444" r="5.5"/>
-<circle cx="406" cy="444" r="5.5"/>
-<circle cx="422" cy="444" r="5.5"/>
-<circle cx="439" cy="444" r="5.5"/>
-<circle cx="455" cy="444" r="5.5"/>
-<circle cx="471" cy="444" r="5.5"/>
-<circle cx="487" cy="444" r="5.5"/>
-<circle cx="504" cy="444" r="5.5"/>
-<circle cx="520" cy="444" r="5.5"/>
-<circle cx="536" cy="444" r="5.5"/>
-<circle cx="366" cy="458" r="5.5"/>
-<circle cx="382" cy="458" r="5.5"/>
-<circle cx="398" cy="458" r="5.5"/>
-<circle cx="414" cy="458" r="5.5"/>
-<circle cx="431" cy="458" r="5.5"/>
-<circle cx="447" cy="458" r="5.5"/>
-<circle cx="463" cy="458" r="5.5"/>
-<circle cx="479" cy="458" r="5.5"/>
-<circle cx="496" cy="458" r="5.5"/>
-<circle cx="512" cy="458" r="5.5"/>
-<circle cx="528" cy="458" r="5.5"/>
-<circle cx="544" cy="458" r="5.5"/>
-<circle cx="374" cy="472" r="5.5"/>
-<circle cx="390" cy="472" r="5.5"/>
-<circle cx="406" cy="472" r="5.5"/>
-<circle cx="422" cy="472" r="5.5"/>
-<circle cx="439" cy="472" r="5.5"/>
-<circle cx="455" cy="472" r="5.5"/>
-<circle cx="471" cy="472" r="5.5"/>
-<circle cx="487" cy="472" r="5.5"/>
-<circle cx="504" cy="472" r="5.5"/>
-<circle cx="520" cy="472" r="5.5"/>
-<circle cx="536" cy="472" r="5.5"/>
-<circle cx="552" cy="472" r="5.5"/>
-<circle cx="569" cy="472" r="5.5"/>
-<circle cx="382" cy="487" r="5.5"/>
-<circle cx="398" cy="487" r="5.5"/>
-<circle cx="414" cy="487" r="5.5"/>
-<circle cx="431" cy="487" r="5.5"/>
-<circle cx="447" cy="487" r="5.5"/>
-<circle cx="463" cy="487" r="5.5"/>
-<circle cx="479" cy="487" r="5.5"/>
-<circle cx="496" cy="487" r="5.5" class="is-lit"/>
-<circle cx="512" cy="487" r="5.5"/>
-<circle cx="528" cy="487" r="5.5"/>
-<circle cx="544" cy="487" r="5.5"/>
-<circle cx="561" cy="487" r="5.5"/>
-<circle cx="577" cy="487" r="5.5"/>
-<circle cx="593" cy="487" r="5.5"/>
-<circle cx="406" cy="501" r="5.5"/>
-<circle cx="422" cy="501" r="5.5"/>
-<circle cx="439" cy="501" r="5.5"/>
-<circle cx="455" cy="501" r="5.5"/>
-<circle cx="471" cy="501" r="5.5"/>
-<circle cx="487" cy="501" r="5.5"/>
-<circle cx="504" cy="501" r="5.5"/>
-<circle cx="520" cy="501" r="5.5"/>
-<circle cx="536" cy="501" r="5.5"/>
-<circle cx="552" cy="501" r="5.5"/>
-<circle cx="569" cy="501" r="5.5"/>
-<circle cx="585" cy="501" r="5.5"/>
-<circle cx="601" cy="501" r="5.5"/>
-<circle cx="617" cy="501" r="5.5"/>
-<circle cx="634" cy="501" r="5.5"/>
-<circle cx="650" cy="501" r="5.5"/>
-<circle cx="666" cy="501" r="5.5"/>
-<circle cx="682" cy="501" r="5.5"/>
-<circle cx="414" cy="515" r="5.5"/>
-<circle cx="431" cy="515" r="5.5"/>
-<circle cx="447" cy="515" r="5.5"/>
-<circle cx="463" cy="515" r="5.5"/>
-<circle cx="479" cy="515" r="5.5"/>
-<circle cx="496" cy="515" r="5.5"/>
-<circle cx="512" cy="515" r="5.5"/>
-<circle cx="528" cy="515" r="5.5"/>
-<circle cx="544" cy="515" r="5.5"/>
-<circle cx="561" cy="515" r="5.5"/>
-<circle cx="577" cy="515" r="5.5"/>
-<circle cx="593" cy="515" r="5.5"/>
-<circle cx="609" cy="515" r="5.5"/>
-<circle cx="626" cy="515" r="5.5"/>
-<circle cx="642" cy="515" r="5.5"/>
-<circle cx="658" cy="515" r="5.5"/>
-<circle cx="674" cy="515" r="5.5"/>
-<circle cx="422" cy="529" r="5.5"/>
-<circle cx="439" cy="529" r="5.5"/>
-<circle cx="455" cy="529" r="5.5"/>
-<circle cx="471" cy="529" r="5.5"/>
-<circle cx="487" cy="529" r="5.5"/>
-<circle cx="504" cy="529" r="5.5"/>
-<circle cx="520" cy="529" r="5.5"/>
-<circle cx="536" cy="529" r="5.5"/>
-<circle cx="552" cy="529" r="5.5"/>
-<circle cx="569" cy="529" r="5.5"/>
-<circle cx="585" cy="529" r="5.5"/>
-<circle cx="601" cy="529" r="5.5"/>
-<circle cx="617" cy="529" r="5.5"/>
-<circle cx="634" cy="529" r="5.5"/>
-<circle cx="650" cy="529" r="5.5"/>
-<circle cx="666" cy="529" r="5.5"/>
-<circle cx="447" cy="543" r="5.5"/>
-<circle cx="463" cy="543" r="5.5"/>
-<circle cx="479" cy="543" r="5.5"/>
-<circle cx="496" cy="543" r="5.5"/>
-<circle cx="512" cy="543" r="5.5"/>
-<circle cx="528" cy="543" r="5.5"/>
-<circle cx="544" cy="543" r="5.5"/>
-<circle cx="561" cy="543" r="5.5"/>
-<circle cx="577" cy="543" r="5.5"/>
-<circle cx="593" cy="543" r="5.5"/>
-<circle cx="609" cy="543" r="5.5"/>
-<circle cx="626" cy="543" r="5.5"/>
-<circle cx="642" cy="543" r="5.5" class="is-lit"/>
-<circle cx="658" cy="543" r="5.5"/>
-<circle cx="471" cy="557" r="5.5"/>
-<circle cx="487" cy="557" r="5.5"/>
-<circle cx="504" cy="557" r="5.5"/>
-<circle cx="520" cy="557" r="5.5"/>
-<circle cx="536" cy="557" r="5.5"/>
-<circle cx="552" cy="557" r="5.5"/>
-<circle cx="569" cy="557" r="5.5"/>
-<circle cx="585" cy="557" r="5.5"/>
-<circle cx="601" cy="557" r="5.5"/>
-<circle cx="617" cy="557" r="5.5"/>
-<circle cx="634" cy="557" r="5.5"/>
-<circle cx="650" cy="557" r="5.5"/>
-<circle cx="666" cy="557" r="5.5"/>
-<circle cx="682" cy="557" r="5.5"/>
-<circle cx="203" cy="571" r="5.5"/>
-<circle cx="528" cy="571" r="5.5"/>
-<circle cx="544" cy="571" r="5.5"/>
-<circle cx="561" cy="571" r="5.5"/>
-<circle cx="577" cy="571" r="5.5"/>
-<circle cx="593" cy="571" r="5.5"/>
-<circle cx="609" cy="571" r="5.5"/>
-<circle cx="626" cy="571" r="5.5"/>
-<circle cx="642" cy="571" r="5.5"/>
-<circle cx="658" cy="571" r="5.5"/>
-<circle cx="674" cy="571" r="5.5"/>
-<circle cx="691" cy="571" r="5.5"/>
-<circle cx="707" cy="571" r="5.5"/>
-<circle cx="723" cy="571" r="5.5"/>
-<circle cx="179" cy="585" r="5.5"/>
-<circle cx="195" cy="585" r="5.5"/>
-<circle cx="211" cy="585" r="5.5"/>
-<circle cx="536" cy="585" r="5.5"/>
-<circle cx="552" cy="585" r="5.5"/>
-<circle cx="569" cy="585" r="5.5"/>
-<circle cx="585" cy="585" r="5.5"/>
-<circle cx="601" cy="585" r="5.5"/>
-<circle cx="617" cy="585" r="5.5"/>
-<circle cx="634" cy="585" r="5.5"/>
-<circle cx="650" cy="585" r="5.5"/>
-<circle cx="666" cy="585" r="5.5"/>
-<circle cx="682" cy="585" r="5.5"/>
-<circle cx="699" cy="585" r="5.5"/>
-<circle cx="715" cy="585" r="5.5"/>
-<circle cx="731" cy="585" r="5.5"/>
-<circle cx="747" cy="585" r="5.5"/>
-<circle cx="122" cy="599" r="5.5"/>
-<circle cx="154" cy="599" r="5.5"/>
-<circle cx="171" cy="599" r="5.5"/>
-<circle cx="187" cy="599" r="5.5"/>
-<circle cx="203" cy="599" r="5.5"/>
-<circle cx="219" cy="599" r="5.5"/>
-<circle cx="544" cy="599" r="5.5"/>
-<circle cx="561" cy="599" r="5.5"/>
-<circle cx="577" cy="599" r="5.5"/>
-<circle cx="593" cy="599" r="5.5"/>
-<circle cx="609" cy="599" r="5.5"/>
-<circle cx="626" cy="599" r="5.5"/>
-<circle cx="642" cy="599" r="5.5"/>
-<circle cx="658" cy="599" r="5.5"/>
-<circle cx="674" cy="599" r="5.5"/>
-<circle cx="691" cy="599" r="5.5"/>
-<circle cx="707" cy="599" r="5.5"/>
-<circle cx="723" cy="599" r="5.5"/>
-<circle cx="739" cy="599" r="5.5"/>
-<circle cx="756" cy="599" r="5.5"/>
-<circle cx="772" cy="599" r="5.5"/>
-<circle cx="130" cy="613" r="5.5"/>
-<circle cx="146" cy="613" r="5.5"/>
-<circle cx="162" cy="613" r="5.5"/>
-<circle cx="179" cy="613" r="5.5"/>
-<circle cx="195" cy="613" r="5.5"/>
-<circle cx="211" cy="613" r="5.5"/>
-<circle cx="227" cy="613" r="5.5"/>
-<circle cx="569" cy="613" r="5.5"/>
-<circle cx="585" cy="613" r="5.5"/>
-<circle cx="601" cy="613" r="5.5"/>
-<circle cx="617" cy="613" r="5.5"/>
-<circle cx="634" cy="613" r="5.5"/>
-<circle cx="650" cy="613" r="5.5"/>
-<circle cx="666" cy="613" r="5.5"/>
-<circle cx="682" cy="613" r="5.5"/>
-<circle cx="699" cy="613" r="5.5"/>
-<circle cx="715" cy="613" r="5.5"/>
-<circle cx="731" cy="613" r="5.5"/>
-<circle cx="747" cy="613" r="5.5"/>
-<circle cx="764" cy="613" r="5.5"/>
-<circle cx="780" cy="613" r="5.5"/>
-<circle cx="796" cy="613" r="5.5"/>
-<circle cx="138" cy="627" r="5.5"/>
-<circle cx="154" cy="627" r="5.5"/>
-<circle cx="171" cy="627" r="5.5"/>
-<circle cx="187" cy="627" r="5.5"/>
-<circle cx="203" cy="627" r="5.5"/>
-<circle cx="219" cy="627" r="5.5"/>
-<circle cx="609" cy="627" r="5.5"/>
-<circle cx="626" cy="627" r="5.5"/>
-<circle cx="642" cy="627" r="5.5"/>
-<circle cx="658" cy="627" r="5.5"/>
-<circle cx="674" cy="627" r="5.5"/>
-<circle cx="691" cy="627" r="5.5"/>
-<circle cx="707" cy="627" r="5.5"/>
-<circle cx="723" cy="627" r="5.5"/>
-<circle cx="739" cy="627" r="5.5"/>
-<circle cx="756" cy="627" r="5.5"/>
-<circle cx="772" cy="627" r="5.5"/>
-<circle cx="788" cy="627" r="5.5"/>
-<circle cx="804" cy="627" r="5.5"/>
-<circle cx="146" cy="641" r="5.5"/>
-<circle cx="162" cy="641" r="5.5"/>
-<circle cx="179" cy="641" r="5.5"/>
-<circle cx="195" cy="641" r="5.5"/>
-<circle cx="211" cy="641" r="5.5"/>
-<circle cx="227" cy="641" r="5.5"/>
-<circle cx="601" cy="641" r="5.5"/>
-<circle cx="617" cy="641" r="5.5"/>
-<circle cx="634" cy="641" r="5.5"/>
-<circle cx="650" cy="641" r="5.5"/>
-<circle cx="666" cy="641" r="5.5"/>
-<circle cx="682" cy="641" r="5.5"/>
-<circle cx="699" cy="641" r="5.5"/>
-<circle cx="715" cy="641" r="5.5"/>
-<circle cx="731" cy="641" r="5.5"/>
-<circle cx="764" cy="641" r="5.5"/>
-<circle cx="780" cy="641" r="5.5"/>
-<circle cx="796" cy="641" r="5.5"/>
-<circle cx="812" cy="641" r="5.5"/>
-<circle cx="829" cy="641" r="5.5"/>
-<circle cx="154" cy="655" r="5.5"/>
-<circle cx="171" cy="655" r="5.5"/>
-<circle cx="187" cy="655" r="5.5"/>
-<circle cx="203" cy="655" r="5.5"/>
-<circle cx="219" cy="655" r="5.5"/>
-<circle cx="609" cy="655" r="5.5"/>
-<circle cx="626" cy="655" r="5.5"/>
-<circle cx="642" cy="655" r="5.5"/>
-<circle cx="658" cy="655" r="5.5"/>
-<circle cx="674" cy="655" r="5.5"/>
-<circle cx="691" cy="655" r="5.5"/>
-<circle cx="707" cy="655" r="5.5"/>
-<circle cx="723" cy="655" r="5.5"/>
-<circle cx="804" cy="655" r="5.5"/>
-<circle cx="821" cy="655" r="5.5"/>
-<circle cx="837" cy="655" r="5.5"/>
-<circle cx="146" cy="669" r="5.5"/>
-<circle cx="162" cy="669" r="5.5"/>
-<circle cx="179" cy="669" r="5.5"/>
-<circle cx="195" cy="669" r="5.5"/>
-<circle cx="211" cy="669" r="5.5"/>
-<circle cx="617" cy="669" r="5.5"/>
-<circle cx="634" cy="669" r="5.5"/>
-<circle cx="650" cy="669" r="5.5"/>
-<circle cx="666" cy="669" r="5.5"/>
-<circle cx="682" cy="669" r="5.5"/>
-<circle cx="699" cy="669" r="5.5"/>
-<circle cx="715" cy="669" r="5.5"/>
-<circle cx="829" cy="669" r="5.5"/>
-<circle cx="845" cy="669" r="5.5"/>
-<circle cx="138" cy="684" r="5.5"/>
-<circle cx="154" cy="684" r="5.5"/>
-<circle cx="171" cy="684" r="5.5"/>
-<circle cx="187" cy="684" r="5.5"/>
-<circle cx="203" cy="684" r="5.5"/>
-<circle cx="219" cy="684" r="5.5"/>
-<circle cx="658" cy="684" r="5.5"/>
-<circle cx="674" cy="684" r="5.5"/>
-<circle cx="691" cy="684" r="5.5"/>
-<circle cx="707" cy="684" r="5.5"/>
-<circle cx="821" cy="684" r="5.5"/>
-<circle cx="837" cy="684" r="5.5"/>
-<circle cx="146" cy="698" r="5.5"/>
-<circle cx="162" cy="698" r="5.5"/>
-<circle cx="179" cy="698" r="5.5"/>
-<circle cx="195" cy="698" r="5.5" class="is-lit"/>
-<circle cx="211" cy="698" r="5.5"/>
-<circle cx="666" cy="698" r="5.5"/>
-<circle cx="682" cy="698" r="5.5"/>
-<circle cx="699" cy="698" r="5.5"/>
-<circle cx="154" cy="712" r="5.5"/>
-<circle cx="171" cy="712" r="5.5"/>
-<circle cx="187" cy="712" r="5.5"/>
-<circle cx="203" cy="712" r="5.5"/>
-<circle cx="219" cy="712" r="5.5"/>
-<circle cx="674" cy="712" r="5.5"/>
-<circle cx="691" cy="712" r="5.5"/>
-<circle cx="707" cy="712" r="5.5"/>
-<circle cx="146" cy="726" r="5.5"/>
-<circle cx="162" cy="726" r="5.5"/>
-<circle cx="179" cy="726" r="5.5"/>
-<circle cx="195" cy="726" r="5.5"/>
-<circle cx="211" cy="726" r="5.5"/>
-<circle cx="682" cy="726" r="5.5"/>
-<circle cx="699" cy="726" r="5.5"/>
-<circle cx="715" cy="726" r="5.5"/>
-<circle cx="731" cy="726" r="5.5"/>
-<circle cx="138" cy="740" r="5.5"/>
-<circle cx="154" cy="740" r="5.5"/>
-<circle cx="171" cy="740" r="5.5"/>
-<circle cx="187" cy="740" r="5.5"/>
-<circle cx="203" cy="740" r="5.5"/>
-<circle cx="219" cy="740" r="5.5"/>
-<circle cx="674" cy="740" r="5.5"/>
-<circle cx="691" cy="740" r="5.5"/>
-<circle cx="707" cy="740" r="5.5"/>
-<circle cx="723" cy="740" r="5.5"/>
-<circle cx="739" cy="740" r="5.5"/>
-<circle cx="146" cy="754" r="5.5"/>
-<circle cx="162" cy="754" r="5.5"/>
-<circle cx="179" cy="754" r="5.5"/>
-<circle cx="195" cy="754" r="5.5"/>
-<circle cx="211" cy="754" r="5.5"/>
-<circle cx="682" cy="754" r="5.5"/>
-<circle cx="699" cy="754" r="5.5"/>
-<circle cx="715" cy="754" r="5.5"/>
-<circle cx="731" cy="754" r="5.5"/>
-<circle cx="747" cy="754" r="5.5"/>
-<circle cx="154" cy="768" r="5.5"/>
-<circle cx="171" cy="768" r="5.5"/>
-<circle cx="691" cy="768" r="5.5"/>
-<circle cx="707" cy="768" r="5.5"/>
-<circle cx="723" cy="768" r="5.5"/>
-<circle cx="739" cy="768" r="5.5"/>
-<circle cx="162" cy="782" r="5.5"/>
-<circle cx="699" cy="782" r="5.5"/>
-<circle cx="715" cy="782" r="5.5"/>
-<circle cx="731" cy="782" r="5.5"/>
-<circle cx="747" cy="782" r="5.5"/>
-<circle cx="691" cy="796" r="5.5"/>
-<circle cx="707" cy="796" r="5.5"/>
-<circle cx="682" cy="810" r="5.5"/>
-<circle cx="699" cy="810" r="5.5"/>
-<circle cx="674" cy="824" r="5.5"/>
-<circle cx="691" cy="824" r="5.5"/>
-<circle cx="707" cy="824" r="5.5"/>
-<circle cx="666" cy="838" r="5.5"/>
-<circle cx="682" cy="838" r="5.5"/>
-<circle cx="699" cy="838" r="5.5"/>
-<circle cx="642" cy="852" r="5.5"/>
-<circle cx="658" cy="852" r="5.5"/>
-<circle cx="674" cy="852" r="5.5"/>
-<circle cx="691" cy="852" r="5.5"/>
-<circle cx="439" cy="866" r="5.5"/>
-<circle cx="471" cy="866" r="5.5"/>
-<circle cx="487" cy="866" r="5.5"/>
-<circle cx="585" cy="866" r="5.5"/>
-<circle cx="601" cy="866" r="5.5"/>
-<circle cx="617" cy="866" r="5.5"/>
-<circle cx="634" cy="866" r="5.5"/>
-<circle cx="650" cy="866" r="5.5"/>
-<circle cx="666" cy="866" r="5.5"/>
-<circle cx="682" cy="866" r="5.5"/>
-<circle cx="431" cy="881" r="5.5"/>
-<circle cx="447" cy="881" r="5.5"/>
-<circle cx="463" cy="881" r="5.5"/>
-<circle cx="479" cy="881" r="5.5"/>
-<circle cx="496" cy="881" r="5.5"/>
-<circle cx="512" cy="881" r="5.5"/>
-<circle cx="528" cy="881" r="5.5"/>
-<circle cx="544" cy="881" r="5.5"/>
-<circle cx="561" cy="881" r="5.5"/>
-<circle cx="577" cy="881" r="5.5"/>
-<circle cx="593" cy="881" r="5.5"/>
-<circle cx="609" cy="881" r="5.5"/>
-<circle cx="626" cy="881" r="5.5"/>
-<circle cx="422" cy="895" r="5.5" class="is-lit"/>
-<circle cx="439" cy="895" r="5.5"/>
-<circle cx="455" cy="895" r="5.5"/>
-<circle cx="471" cy="895" r="5.5"/>
-<circle cx="487" cy="895" r="5.5"/>
-<circle cx="504" cy="895" r="5.5"/>
-<circle cx="520" cy="895" r="5.5"/>
-<circle cx="536" cy="895" r="5.5"/>
-<circle cx="552" cy="895" r="5.5"/>
-<circle cx="569" cy="895" r="5.5"/>
-<circle cx="585" cy="895" r="5.5"/>
-<circle cx="601" cy="895" r="5.5"/>
-<circle cx="617" cy="895" r="5.5"/>
-<circle cx="447" cy="909" r="5.5"/>
-<circle cx="463" cy="909" r="5.5"/>
-<circle cx="479" cy="909" r="5.5"/>
-<circle cx="496" cy="909" r="5.5"/>
-<circle cx="512" cy="909" r="5.5"/>
-<circle cx="528" cy="909" r="5.5"/>
-<circle cx="544" cy="909" r="5.5"/>
-<circle cx="561" cy="909" r="5.5"/>
-<circle cx="577" cy="909" r="5.5"/>
-<circle cx="593" cy="909" r="5.5"/>
-<circle cx="609" cy="909" r="5.5"/>
-<circle cx="471" cy="923" r="5.5"/>
-<circle cx="487" cy="923" r="5.5"/>
-<circle cx="504" cy="923" r="5.5"/>
-<circle cx="520" cy="923" r="5.5"/>
-<circle cx="536" cy="923" r="5.5"/>
-<circle cx="552" cy="923" r="5.5"/>
-<circle cx="569" cy="923" r="5.5"/>
-<circle cx="585" cy="923" r="5.5"/>
-<circle cx="601" cy="923" r="5.5"/>
-<circle cx="496" cy="937" r="5.5"/>
-<circle cx="512" cy="937" r="5.5"/>
-<circle cx="528" cy="937" r="5.5"/>
-<circle cx="544" cy="937" r="5.5"/>
-<circle cx="561" cy="937" r="5.5"/>
-<circle cx="577" cy="937" r="5.5"/>
-<circle cx="593" cy="937" r="5.5" class="is-lit"/>
-<circle cx="609" cy="937" r="5.5"/>
-<circle cx="520" cy="951" r="5.5"/>
-<circle cx="536" cy="951" r="5.5"/>
-<circle cx="552" cy="951" r="5.5"/>
-<circle cx="569" cy="951" r="5.5"/>
-<circle cx="585" cy="951" r="5.5"/>
-<circle cx="601" cy="951" r="5.5"/>
-<circle cx="561" cy="965" r="5.5"/>
-<circle cx="577" cy="965" r="5.5"/>
-<circle cx="593" cy="965" r="5.5"/>
-<circle cx="609" cy="965" r="5.5"/>
-<circle cx="569" cy="979" r="5.5"/>
-<circle cx="585" cy="979" r="5.5"/>
-<circle cx="601" cy="979" r="5.5"/>
-<circle cx="593" cy="993" r="5.5"/>
-<circle cx="609" cy="993" r="5.5"/>
-</g>
-          <g id="italy-fx"></g>
-        </svg>
-        <ul class="italy__tags" role="list">
-          <li class="italy__tag italy__tag--1"><svg class="icon" focusable="false"><use href="#icon-check-small"/></svg>Ingresso senza gradini</li>
-          <li class="italy__tag italy__tag--2"><svg class="icon" focusable="false"><use href="#icon-check-small"/></svg>Bagno attrezzato</li>
-          <li class="italy__tag italy__tag--3"><svg class="icon" focusable="false"><use href="#icon-check-small"/></svg>Parcheggio riservato</li>
+    <section class="section" aria-labelledby="facts-title">
+      <div class="container">
+        <div class="section__head">
+          <h2 id="facts-title">Cosa trovi in ogni scheda</h2>
+        </div>
+        <ul class="check-list" role="list">
+          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg><span><strong>Ingresso e porte</strong>Gradini, rampe e larghezza della porta in centimetri.</span></li>
+          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg><span><strong>Bagno</strong>Se c'è un bagno accessibile e com'è attrezzato.</span></li>
+          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg><span><strong>Parcheggio</strong>Posti riservati vicini all'ingresso.</span></li>
+          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg><span><strong>Spazi interni e piani</strong>Percorsi, ascensori e zone raggiungibili.</span></li>
         </ul>
       </div>
-      <p class="italy__note">Illustrazione: i luoghi veri arriveranno al lancio, segnalati da voi.</p>
-      <button class="trail__toggle italy__toggle" type="button" hidden>
-        <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pause"/></svg>
-        <span class="trail__toggle-label">Ferma l'animazione</span>
-      </button>
-    </div>
+    </section>
+
+    <section id="app" class="section" aria-labelledby="app-title" tabindex="-1">
+      <div class="container">
+        <div class="apps">
+          <h2 id="app-title">Porta Ovunque Accessibile con te</h2>
+          <p>Con la web-app accedi con il tuo account, salvi i luoghi preferiti e segnali quelli che conosci.</p>
+          <div class="apps__grid">
+            <div class="app-card">
+              <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-globe"/></svg>Web-app</h3>
+              <p>Usala dal browser, su telefono e computer. Puoi aggiungerla alla schermata Home.</p>
+              <a class="btn btn--primary" href="app/">Apri la web-app</a>
+            </div>
+            <!-- SEGNAPOSTO: quando l'APK è pronto, sostituire la pill con
+                 <a class="btn btn--primary" href="download/ovunque-accessibile.apk" download>Scarica l'APK (XX MB)</a> -->
+            <div class="app-card">
+              <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-android"/></svg>App per Android</h3>
+              <p>Scarica il file APK e installalo sul telefono. Per ora solo per Android.</p>
+              <span class="pill">In arrivo</span>
+              <p class="app-card__note">Android ti chiederà di consentire l'installazione da questa fonte: è normale per le app scaricate fuori dal Play Store.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="chi-siamo" class="section" aria-labelledby="about-title">
+      <div class="container">
+        <div class="about card">
+          <img class="about__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
+          <div>
+            <h2 id="about-title">Chi siamo</h2>
+            <p>Siamo Angelo e Lorenzo. Ci muoviamo in carrozzina e sappiamo quanto conta sapere prima se un posto è davvero accessibile. Per questo abbiamo creato Ovunque Accessibile.</p>
+            <p>Scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o seguici su <a href="https://www.instagram.com/ovunque_accessibile">Instagram<span class="visually-hidden"> (sito esterno)</span></a>.</p>
+          </div>
+        </div>
+      </div>
+    </section>
   </main>
 
-  <footer class="home__footer">
-    <div class="container home__footer-inner">
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
       <a href="privacy.html">Privacy</a>
       <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
       <a href="tel:+393518332819">Angelo: 351 833 2819</a>

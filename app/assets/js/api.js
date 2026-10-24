@@ -350,7 +350,7 @@
     var base = null;
     function basePlaces() {
       if (base) return Promise.resolve(base);
-      return fetch('../sito/assets/data/luoghi.json', { credentials: 'omit' })
+      return fetch('../assets/data/luoghi.json', { credentials: 'omit' })
         .then(function (r) { if (!r.ok) throw new Error(); return r.json(); })
         .then(function (d) {
           base = (d.luoghi || []).map(function (p) { p.stato = 'pubblicato'; p.esempio = true; return p; });

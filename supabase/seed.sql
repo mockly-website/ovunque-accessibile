@@ -1,4 +1,4 @@
--- LUOGHI DI ESEMPIO (inventati) generati da sito/assets/data/luoghi.json con
+-- LUOGHI DI ESEMPIO (inventati) generati da assets/data/luoghi.json con
 -- supabase/strumenti/seed_da_json.py. Prima del lancio: delete from public.places where esempio;
 insert into public.places (slug, nome, categoria, indirizzo, cap, citta, provincia, regione, lat, lng,
   descrizione, misure, facoltativi, dettagli, verifica_livello, verifica_data, esempio)

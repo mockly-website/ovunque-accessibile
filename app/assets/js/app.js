@@ -1,5 +1,5 @@
 /* Ovunque Accessibile – web-app.
-   Usa il codice comune del sito (window.OA, ../sito/assets/js/oa-core.js) e i dati di window.OAApi (api.js).
+   Usa il codice comune del sito (window.OA, ../assets/js/oa-core.js) e i dati di window.OAApi (api.js).
    Ogni pagina ha <body data-page="…">: mappa, luogo, accedi, registrati, password, segnala, profilo, moderazione, privacy.
    Tutti i testi arrivati dal database entrano nel DOM con textContent, mai con innerHTML.
    Indice: 1. Utilità · 2. Moduli e errori · 3. Avvio comune · 4. Accesso e registrazione

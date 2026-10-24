@@ -4,133 +4,112 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy policy – Ovunque Accessibile</title>
-  <meta name="description" content="Informativa sul trattamento dei dati personali raccolti con il modulo di iscrizione di Ovunque Accessibile.">
+  <meta name="description" content="Come Ovunque Accessibile tratta i dati di chi visita il sito: mappa, posizione, contatti.">
   <meta name="theme-color" content="#fbf6ec">
   <meta name="color-scheme" content="light">
-  <link rel="canonical" href="https://ovunqueaccessibile.altervista.org/privacy.html">
+  <meta name="robots" content="noindex">
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-24f">
+  <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/css/sito.css?v=p15">
 </head>
-<body class="home">
+<body>
   <!--
-    Testo preparato da Mockly con i dati forniti dai titolari: non costituisce consulenza legale.
-    Da verificare: cognomi e città dei titolari (consigliati), DPA di Formspree, Google e Altervista,
-    dati tecnici registrati da Formspree e per quanto tempo. Se modifichi il testo, aggiorna la versione qui sotto e nel campo nascosto privacy_version di index.html.
+    BOZZA per il sito definitivo, preparata da Mockly: non costituisce consulenza legale.
+    Da verificare prima della pubblicazione: cognomi e città dei titolari, fornitore di hosting definitivo,
+    fornitore delle mappe (oggi i server di OpenStreetMap), DPA dei fornitori.
+    La web-app (login, preferiti, segnalazioni) ha una sua informativa: app/privacy.html
   -->
-  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
-    <symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-3.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/></symbol>
-  </svg>
-
   <ul class="skip-links">
     <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
   </ul>
 
-  <header class="home__top container">
-    <a class="brand" href="./">
-      <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
-      <span class="brand__name">Ovunque Accessibile</span>
-    </a>
-    <a class="home__social" href="https://www.instagram.com/ovunque_accessibile">
-      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
-      <span class="home__social-label">Instagram</span><span class="visually-hidden"> (sito esterno)</span>
-    </a>
+  <header class="site-header">
+    <p class="proto-banner">Prototipo: i luoghi mostrati sono esempi, non dati reali.</p>
+    <div class="container site-header__inner">
+      <a class="brand" href="./">
+        <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
+        <span class="brand__name">Ovunque Accessibile</span>
+      </a>
+      <nav class="nav" aria-label="Principale">
+        <ul class="nav__list" role="list">
+          <li><a class="nav__link" href="mappa.html">Mappa dei luoghi</a></li>
+          <li><a class="nav__link" href="./#come-funziona">Come funziona</a></li>
+          <li><a class="nav__link" href="./#chi-siamo">Chi siamo</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--primary btn--small site-header__app" href="app/">Apri la web-app</a>
+    </div>
   </header>
 
-  <main id="main" class="page" tabindex="-1">
-    <div class="container container--narrow">
-      <article class="page-card prose">
-        <h1 class="page__title">Privacy policy</h1>
-        <p>Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (“GDPR”) per chi si iscrive agli aggiornamenti di Ovunque Accessibile.</p>
-        <p>Versione 2026-10-v3 · Ultimo aggiornamento: 24 ottobre 2026</p>
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <article class="card prose legal">
+        <h1>Privacy policy</h1>
+        <p>Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (“GDPR”) per chi visita il sito di Ovunque Accessibile.</p>
+        <p>Versione bozza 2026-10-sito · Ultimo aggiornamento: 24 ottobre 2026</p>
 
         <h2>In breve</h2>
         <ul>
-          <li>Ti chiediamo solo l'email, e la usiamo solo per avvisarti quando il sito e la web-app saranno online e per aggiornarti sul progetto.</li>
-          <li>Non vendiamo e non cediamo i tuoi dati a nessuno.</li>
-          <li>Non usiamo cookie di profilazione né strumenti di tracciamento.</li>
-          <li>Puoi cancellarti quando vuoi scrivendoci.</li>
+          <li>Per consultare il sito non devi registrarti e non ti chiediamo dati.</li>
+          <li>Il sito non usa cookie né strumenti di tracciamento o statistica.</li>
+          <li>La mappa viene caricata dai server di OpenStreetMap: il tuo browser si collega a loro.</li>
+          <li>La funzione «Vicino a me» usa la tua posizione solo nel tuo browser: non arriva a noi.</li>
         </ul>
 
         <h2>1. Chi è il titolare del trattamento</h2>
-        <p>I titolari del trattamento sono <strong>Angelo e Lorenzo</strong>, fondatori del progetto Ovunque Accessibile, che decidono insieme come e perché vengono trattati i dati (contitolari, art. 26 GDPR).</p>
-        <p>Per qualsiasi domanda sui tuoi dati puoi contattarci:</p>
+        <p>I titolari del trattamento sono <strong>Angelo e Lorenzo</strong>, fondatori del progetto Ovunque Accessibile (contitolari, art. 26 GDPR).</p>
+        <p>Puoi contattarci via email a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o chiamando Angelo al <a href="tel:+393518332819">351 833 2819</a>.</p>
+
+        <h2>2. Quali dati trattiamo</h2>
         <ul>
-          <li>via email: <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>;</li>
-          <li>per telefono, chiamando Angelo: <a href="tel:+393518332819">351 833 2819</a>.</li>
+          <li><strong>Dati tecnici di navigazione.</strong> Come ogni sito, il servizio che ospita le pagine registra nei propri log l'indirizzo IP e il tipo di browser di chi le visita, per sicurezza e funzionamento. Noi non li usiamo per altri scopi.</li>
+          <li><strong>Mappa.</strong> Per mostrarti la mappa, il tuo browser scarica le immagini dai server di OpenStreetMap Foundation (tile.openstreetmap.org). OpenStreetMap riceve quindi il tuo indirizzo IP, il tipo di browser e la zona della mappa che stai guardando.</li>
+          <li><strong>Posizione.</strong> Se premi «Vicino a me», il browser ti chiede il permesso. La posizione serve solo a centrare la mappa sul tuo dispositivo: non viene inviata né salvata da noi. Come per ogni zona della mappa, OpenStreetMap riceve la richiesta delle immagini di quell'area.</li>
+          <li><strong>Segnalazioni e contatti.</strong> Se ci scrivi con «Segnala una correzione» o ci chiami, riceviamo il tuo indirizzo email o numero di telefono e quello che ci racconti. Li usiamo solo per risponderti e correggere la scheda.</li>
         </ul>
 
-        <h2>2. Quali dati raccogliamo</h2>
-        <p>Con il modulo di iscrizione della pagina principale raccogliamo:</p>
+        <h2>3. Perché e su quale base giuridica</h2>
         <ul>
-          <li>il tuo <strong>indirizzo email</strong>;</li>
-          <li>il tuo <strong>consenso</strong>, con la data e l'ora dell'invio.</li>
-        </ul>
-        <p>Il servizio che riceve il modulo (Formspree, vedi sezione 7) può registrare anche dati tecnici della richiesta, come l'indirizzo IP e il tipo di browser, per proteggersi dallo spam.</p>
-
-        <h2>3. Perché usiamo i tuoi dati (finalità)</h2>
-        <ul>
-          <li>Avvisarti via email quando il sito e la web-app di Ovunque Accessibile saranno online.</li>
-          <li>Inviarti, sempre via email, aggiornamenti sul progetto.</li>
+          <li>Far funzionare il sito e la mappa e proteggerli da abusi: legittimo interesse (art. 6, par. 1, lett. f GDPR).</li>
+          <li>Rispondere alle tue segnalazioni: la tua richiesta (art. 6, par. 1, lett. b GDPR).</li>
+          <li>Centrare la mappa sulla tua posizione: lo fai tu, dando il permesso al browser; puoi revocarlo in qualsiasi momento dalle impostazioni del browser.</li>
         </ul>
 
-        <h2>4. Su quale base giuridica</h2>
-        <p>Trattiamo i tuoi dati sulla base del tuo consenso (art. 6, par. 1, lett. a GDPR), che esprimi selezionando la casella nel modulo. Puoi revocare il consenso in qualsiasi momento, senza conseguenze e senza che questo renda illecito il trattamento svolto prima della revoca.</p>
+        <h2>4. Indicazioni stradali e altri siti</h2>
+        <p>Il pulsante «Indicazioni stradali» apre l'app o il sito che scegli (Google Maps, Apple Mappe, Waze, OpenStreetMap o un'altra app del telefono) passando solo le coordinate del luogo. Da quel momento vale l'informativa del servizio scelto. Lo stesso vale per i link a Instagram e agli altri siti esterni.</p>
 
-        <h2>5. Cosa succede se non ci dai i dati</h2>
-        <p>Email e consenso servono per iscriverti: senza, non possiamo avvisarti. Non è obbligatorio iscriversi per consultare il sito.</p>
-
-        <h2>6. Come trattiamo i dati</h2>
-        <p>Le iscrizioni arrivano nell'account Formspree del progetto, protetto da password, e come avviso nella casella email del progetto. Possono consultarle solo le persone autorizzate che gestiscono il progetto, con misure tecniche e organizzative adeguate a proteggerle da accessi non autorizzati, perdita o modifica.</p>
-
-        <h2>7. Chi può vedere i dati</h2>
-        <p>I dati non vengono diffusi né venduti. Possono accedervi solo:</p>
+        <h2>5. Chi può vedere i dati</h2>
         <ul>
-          <li>le persone del progetto Ovunque Accessibile autorizzate al trattamento;</li>
-          <li>Formspree Inc. (Stati Uniti), che riceve il modulo, conserva le iscrizioni e ce le inoltra via email, come responsabile del trattamento (art. 28 GDPR);</li>
-          <li>Google (Gmail), che fornisce la casella email del progetto dove arrivano gli avvisi, come responsabile del trattamento;</li>
-          <li>Altervista, il servizio che ospita le pagine del sito, come responsabile del trattamento: non riceve i dati del modulo, ma come ogni hosting può registrare nei propri log tecnici l'indirizzo IP di chi visita le pagine;</li>
-          <li>Mockly, l'agenzia che ha realizzato il sito e se ne occupa, come responsabile del trattamento, solo quando serve per la manutenzione.</li>
+          <li>le persone del progetto autorizzate, per le segnalazioni e i contatti;</li>
+          <li>il servizio che ospita le pagine del sito, come responsabile del trattamento;</li>
+          <li>OpenStreetMap Foundation (Regno Unito), che fornisce le immagini della mappa come titolare autonomo, secondo la propria informativa;</li>
+          <li>Google (Gmail), che gestisce la casella email del progetto, come responsabile del trattamento;</li>
+          <li>Mockly, l'agenzia che ha realizzato il sito, come responsabile del trattamento e solo per la manutenzione.</li>
         </ul>
+        <p>Il Regno Unito ha una decisione di adeguatezza della Commissione europea. Per Google valgono le garanzie degli articoli 45–46 GDPR (Data Privacy Framework UE–USA o clausole contrattuali standard).</p>
 
-        <h2>8. Dove sono conservati i dati</h2>
-        <p>Formspree conserva i dati su server negli Stati Uniti. Il trasferimento fuori dall'Unione europea avviene con le garanzie previste dagli articoli 45–46 del GDPR: la certificazione del fornitore al Data Privacy Framework UE–USA oppure le clausole contrattuali standard approvate dalla Commissione europea. Lo stesso vale per Google, che gestisce la casella email del progetto.</p>
+        <h2>6. Per quanto tempo</h2>
+        <p>Le email e i messaggi delle segnalazioni li conserviamo per il tempo necessario a gestirle, e comunque non oltre 24 mesi. I log tecnici restano presso i fornitori per il tempo previsto dalle loro informative.</p>
 
-        <h2>9. Per quanto tempo</h2>
-        <p>Conserviamo i tuoi dati fino a quando non revochi il consenso o chiedi la cancellazione, e comunque non oltre <strong>24 mesi dal lancio</strong> del sito e della web-app. Poi li cancelliamo.</p>
+        <h2>7. I tuoi diritti</h2>
+        <p>Puoi chiederci di accedere ai tuoi dati, correggerli, cancellarli, limitarne il trattamento o opporti, scrivendo a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>. Ti rispondiamo entro un mese. Puoi anche presentare reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it">garanteprivacy.it<span class="visually-hidden"> (sito esterno)</span></a>).</p>
 
-        <h2>10. I tuoi diritti</h2>
-        <p>In qualsiasi momento puoi chiederci di:</p>
-        <ul>
-          <li>accedere ai tuoi dati e riceverne una copia;</li>
-          <li>correggerli o aggiornarli;</li>
-          <li>cancellarli;</li>
-          <li>limitarne il trattamento o opporti;</li>
-          <li>riceverli in un formato leggibile da un computer (portabilità);</li>
-          <li>revocare il consenso.</li>
-        </ul>
-        <p>Per farlo scrivi a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> oppure chiama Angelo al <a href="tel:+393518332819">351 833 2819</a>. Ti rispondiamo entro un mese.</p>
-        <p>Se ritieni che il trattamento non sia corretto, puoi presentare un reclamo al Garante per la protezione dei dati personali (<a href="https://www.garanteprivacy.it">garanteprivacy.it<span class="visually-hidden"> (sito esterno)</span></a>).</p>
+        <h2>8. Cookie</h2>
+        <p>Il sito non usa cookie: né tecnici, né di profilazione, né di statistica. Caratteri, icone e programma della mappa sono ospitati sul nostro server.</p>
 
-        <h2>11. Cookie e risorse esterne</h2>
-        <p>Il sito non usa cookie: né tecnici, né di profilazione, né di statistica. Per questo non trovi un banner dei cookie.</p>
-        <p>Per proteggere il modulo da invii automatici usiamo un campo nascosto che solo i programmi automatici compilano: non usa cookie e non salva nulla sul tuo dispositivo.</p>
-        <p>Caratteri tipografici e immagini sono ospitati sul nostro server: navigando il sito non ti colleghi a servizi di terze parti. Solo quando invii il modulo i dati vanno a Formspree. I link verso altri siti, come Instagram, portano a servizi con le loro informative.</p>
-
-        <h2>12. Minori</h2>
-        <p>L'iscrizione è riservata a chi ha almeno 14 anni, l'età minima prevista in Italia per dare da soli il consenso ai servizi online (art. 2-quinquies del Codice privacy). Se hai meno di 14 anni, chiedi a un genitore di iscriversi per te.</p>
-
-        <h2>13. Modifiche a questa informativa</h2>
-        <p>Se cambiamo questa informativa, pubblichiamo qui la nuova versione con la data di aggiornamento. Per ogni iscrizione registriamo la versione accettata.</p>
+        <h2>9. La web-app</h2>
+        <p>Il login, i preferiti e le segnalazioni con foto sono nella <a href="app/">web-app</a> di Ovunque Accessibile, che ha una sua <a href="app/privacy.html">informativa</a>.</p>
 
         <p><a class="back-link" href="./">Torna alla pagina principale</a></p>
       </article>
     </div>
   </main>
 
-  <footer class="home__footer">
-    <div class="container home__footer-inner">
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
       <a href="privacy.html" aria-current="page">Privacy</a>
       <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
       <a href="tel:+393518332819">Angelo: 351 833 2819</a>

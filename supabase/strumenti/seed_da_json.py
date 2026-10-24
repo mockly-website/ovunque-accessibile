@@ -1,4 +1,4 @@
-"""Genera supabase/seed.sql dai luoghi di esempio del prototipo (sito/assets/data/luoghi.json).
+"""Genera supabase/seed.sql dai luoghi di esempio del prototipo (assets/data/luoghi.json).
 
 Uso: python3 supabase/strumenti/seed_da_json.py
 I luoghi vengono inseriti con esempio = true: si tolgono tutti insieme con
@@ -8,7 +8,7 @@ import json
 import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
-SRC = ROOT / 'sito' / 'assets' / 'data' / 'luoghi.json'
+SRC = ROOT / 'assets' / 'data' / 'luoghi.json'
 OUT = ROOT / 'supabase' / 'seed.sql'
 
 
@@ -35,7 +35,7 @@ for p in json.loads(SRC.read_text(encoding='utf-8'))['luoghi']:
     ]) + ')')
 
 OUT.write_text(
-    '-- LUOGHI DI ESEMPIO (inventati) generati da sito/assets/data/luoghi.json con\n'
+    '-- LUOGHI DI ESEMPIO (inventati) generati da assets/data/luoghi.json con\n'
     '-- supabase/strumenti/seed_da_json.py. Prima del lancio: delete from public.places where esempio;\n'
     'insert into public.places (slug, nome, categoria, indirizzo, cap, citta, provincia, regione, lat, lng,\n'
     '  descrizione, misure, facoltativi, dettagli, verifica_livello, verifica_data, esempio)\nvalues\n'
