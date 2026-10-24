@@ -15,10 +15,10 @@
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
-  <link rel="stylesheet" href="assets/css/sito.css?v=p8">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p9">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="assets/js/sito.js?v=p8" defer></script>
+  <script src="assets/js/sito.js?v=p9" defer></script>
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -27,6 +27,8 @@
     <symbol id="icon-no" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
     <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
     <symbol id="icon-route" viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 0 0-1.41 0l-9 9a1 1 0 0 0 0 1.41l9 9a1 1 0 0 0 1.41 0l9-9a1 1 0 0 0 0-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></symbol>
+    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></symbol>
     <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
     <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
     <symbol id="icon-locate" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.94 3A8.99 8.99 0 0 0 13 3.06V1h-2v2.06A8.99 8.99 0 0 0 3.06 11H1v2h2.06A8.99 8.99 0 0 0 11 20.94V23h2v-2.06A8.99 8.99 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></symbol>
@@ -74,10 +76,17 @@
 
           <div id="detail-body" hidden>
             <div class="detail__actions">
-              <a id="detail-directions" class="btn btn--primary" href="#">
-                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-route"/></svg>
-                Indicazioni stradali<span class="visually-hidden"> (OpenStreetMap, sito esterno)</span>
-              </a>
+              <div class="directions">
+                <button id="directions-toggle" class="btn btn--primary" type="button" aria-expanded="false" aria-controls="directions-list">
+                  <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-route"/></svg>
+                  Indicazioni stradali
+                  <svg class="icon directions__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg>
+                </button>
+                <div id="directions-list" class="directions__panel" hidden>
+                  <p class="directions__title">Apri con</p>
+                  <ul class="directions__list" role="list"></ul>
+                </div>
+              </div>
               <a id="detail-report" class="btn btn--secondary" href="#">
                 <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-edit"/></svg>
                 Segnala una correzione

@@ -431,6 +431,64 @@
     });
   }
 
+  /* Indicazioni stradali: si sceglie l'app (Google Maps, Apple Mappe, Waze, OpenStreetMap, altra app su Android) */
+  function directionsLinks(p) {
+    var ll = p.lat + ',' + p.lng;
+    var enc = encodeURIComponent(ll);
+    var links = [
+      ['Google Maps', 'https://www.google.com/maps/dir/?api=1&destination=' + enc],
+      ['Apple Mappe', 'https://maps.apple.com/?daddr=' + enc + '&dirflg=d'],
+      ['Waze', 'https://waze.com/ul?ll=' + enc + '&navigate=yes'],
+      ['OpenStreetMap', 'https://www.openstreetmap.org/directions?to=' + enc]
+    ];
+    /* geo: fa scegliere al telefono tra le app installate (solo Android) */
+    if (/Android/i.test(navigator.userAgent)) {
+      links.push(['Altra app del telefono', 'geo:' + ll + '?q=' + enc + '(' + encodeURIComponent(p.nome) + ')']);
+    }
+    return links;
+  }
+
+  function initDirections(p) {
+    var toggle = document.getElementById('directions-toggle');
+    var panel = document.getElementById('directions-list');
+    if (!toggle || !panel) return;
+    var list = panel.querySelector('ul');
+    list.textContent = '';
+    directionsLinks(p).forEach(function (l) {
+      var external = l[1].indexOf('geo:') !== 0;
+      list.appendChild(el('li', {}, [
+        el('a', { className: 'directions__link', href: l[1], rel: 'noopener' }, [
+          el('span', { text: l[0] }),
+          external ? el('span', { className: 'visually-hidden', text: ' (app o sito esterno)' }) : null,
+          external ? icon('#icon-external') : null
+        ])
+      ]));
+    });
+
+    function setOpen(open, focusToggle) {
+      toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.hidden = !open;
+      if (!open && focusToggle) toggle.focus();
+    }
+    toggle.addEventListener('click', function () {
+      var open = toggle.getAttribute('aria-expanded') !== 'true';
+      setOpen(open);
+      if (open) list.querySelector('a').focus();
+    });
+    panel.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false, true);
+    });
+    toggle.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') setOpen(false);
+    });
+    document.addEventListener('click', function (e) {
+      if (!panel.hidden && !panel.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+    });
+    panel.addEventListener('focusout', function (e) {
+      if (e.relatedTarget && !panel.contains(e.relatedTarget) && e.relatedTarget !== toggle) setOpen(false);
+    });
+  }
+
   /* ---------- Scheda luogo ---------- */
   function initDetail() {
     var root = document.getElementById('detail');
@@ -457,8 +515,7 @@
         ? 'Ultima verifica sul posto: ' + formatDate(p.verificato_il)
         : 'Non ancora verificato sul posto: le informazioni arrivano da una segnalazione.';
 
-      var dirs = document.getElementById('detail-directions');
-      dirs.href = 'https://www.openstreetmap.org/directions?to=' + p.lat + '%2C' + p.lng;
+      initDirections(p);
 
       var report = document.getElementById('detail-report');
       report.href = 'mailto:ovunqueaccessibile@gmail.com?subject=' +

@@ -1358,6 +1358,69 @@ main:focus {
   margin-block: var(--space-md) var(--space-lg);
 }
 
+/* Indicazioni: pulsante che apre la scelta dell'app */
+.directions {
+  position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .directions__chevron {
+    transition: transform 0.2s ease;
+  }
+}
+
+[aria-expanded="true"] .directions__chevron {
+  transform: rotate(180deg);
+}
+
+.directions__panel {
+  position: absolute;
+  top: calc(100% + var(--space-xs));
+  left: 0;
+  z-index: 1100;
+  min-width: 16rem;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+.directions__title {
+  margin: 0 0 var(--space-2xs);
+  padding-inline: var(--space-sm);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.directions__list {
+  display: grid;
+}
+
+.directions__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  min-height: var(--target-min);
+  padding: 0 var(--space-sm);
+  border-radius: var(--radius-sm);
+  color: var(--color-navy);
+  text-decoration: none;
+}
+
+.directions__link:hover {
+  background: var(--color-sky);
+  color: var(--color-navy);
+}
+
+.directions__link .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--color-muted);
+}
+
 .facts {
   display: grid;
   margin: 0;
