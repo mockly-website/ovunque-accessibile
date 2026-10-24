@@ -56,8 +56,11 @@
         return {
           'tutto': ['si', 'Tutti gli spazi accessibili'],
           'parziale': ['parziale', 'Accessibili in parte'],
+          'non-accessibile': ['no', 'Non accessibili'],
           'no': ['no', 'Non accessibili']
         }[v] || ['nv', 'Da verificare'];
+      case 'assistenza':
+        return v === 'si' ? ['si', 'Personale disponibile ad aiutare'] : v === 'no' ? ['no', 'Nessuna assistenza'] : ['nv', 'Da verificare'];
     }
     return ['nv', 'Da verificare'];
   }
@@ -121,6 +124,24 @@
       .then(function (data) { return data.luoghi || []; });
   }
 
+  function labelled(name, node) {
+    node.insertBefore(el('span', { className: 'visually-hidden', text: name + ': ' }), node.firstChild);
+    return node;
+  }
+
+  /* Card di un luogo (elenco della mappa e home) */
+  function placeCard(p, headingTag) {
+    return el('li', { className: 'place', 'data-id': p.id }, [
+      el(headingTag || 'h3', { className: 'place__title' }, [el('a', { className: 'place__link', href: placeUrl(p), text: p.nome })]),
+      el('p', { className: 'place__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
+      el('div', { className: 'place__features' }, [
+        labelled('Ingresso', statusNode(p, 'ingresso')),
+        labelled('Bagno', statusNode(p, 'bagno')),
+        labelled('Parcheggio', statusNode(p, 'parcheggio'))
+      ])
+    ]);
+  }
+
   /* ---------- Mappa (Leaflet + OpenStreetMap) ---------- */
   function createMap(container, options) {
     if (!window.L) return null;
@@ -162,9 +183,18 @@
   /* ---------- Home: mappa d'anteprima ---------- */
   function initHome() {
     var box = document.getElementById('home-map');
-    if (!box) return;
+    var latest = document.getElementById('latest-list');
+    if (!box && !latest) return;
     loadPlaces().then(function (places) {
-      var map = createMap(box, { zoomControl: true });
+      if (latest) {
+        latest.textContent = '';
+        places
+          .filter(function (p) { return p.verificato_il; })
+          .sort(function (a, b) { return a.verificato_il < b.verificato_il ? 1 : -1; })
+          .slice(0, 3)
+          .forEach(function (p) { latest.appendChild(placeCard(p)); });
+      }
+      var map = box && createMap(box, { zoomControl: true });
       if (!map) return;
       map.setView(ITALY.center, ITALY.zoom);
       places.forEach(function (p) { addMarker(map, p); });
@@ -206,23 +236,6 @@
       return normalize(q).split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
     }
 
-    function card(p) {
-      return el('li', { className: 'place', 'data-id': p.id }, [
-        el('h3', { className: 'place__title' }, [el('a', { className: 'place__link', href: placeUrl(p), text: p.nome })]),
-        el('p', { className: 'place__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
-        el('div', { className: 'place__features' }, [
-          labelled('Ingresso', statusNode(p, 'ingresso')),
-          labelled('Bagno', statusNode(p, 'bagno')),
-          labelled('Parcheggio', statusNode(p, 'parcheggio'))
-        ])
-      ]);
-    }
-
-    function labelled(name, node) {
-      node.insertBefore(el('span', { className: 'visually-hidden', text: name + ': ' }), node.firstChild);
-      return node;
-    }
-
     function highlight(id) {
       [].forEach.call(list.querySelectorAll('.place'), function (li) {
         li.classList.toggle('is-active', li.getAttribute('data-id') === id);
@@ -246,7 +259,7 @@
           el('p', { text: 'Prova a togliere qualche filtro o a cercare un\'altra città.' })
         ]));
       } else {
-        found.forEach(function (p) { list.appendChild(card(p)); });
+        found.forEach(function (p) { list.appendChild(placeCard(p)); });
       }
       count.textContent = found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati';
 
@@ -324,7 +337,9 @@
       document.getElementById('detail-title').textContent = p.nome;
       document.getElementById('detail-address').textContent = p.indirizzo + ', ' + p.cap + ' ' + p.citta + ' (' + p.provincia + ')';
       document.getElementById('detail-intro').textContent = p.descrizione || '';
-      document.getElementById('detail-date').textContent = p.verificato_il ? 'Ultima verifica: ' + formatDate(p.verificato_il) : '';
+      document.getElementById('detail-date').textContent = p.verificato_il
+        ? 'Ultima verifica sul posto: ' + formatDate(p.verificato_il)
+        : 'Non ancora verificato sul posto: le informazioni arrivano da una segnalazione.';
 
       var dirs = document.getElementById('detail-directions');
       dirs.href = 'https://www.openstreetmap.org/directions?to=' + p.lat + '%2C' + p.lng;
@@ -337,14 +352,19 @@
       [
         ['ingresso', 'Ingresso'],
         ['porta_cm', 'Porta d\'ingresso'],
-        ['interni', 'Spazi interni'],
+        ['interni', 'Spazi e percorsi'],
         ['ascensore', 'Piani e ascensore'],
         ['bagno', 'Bagno'],
-        ['parcheggio', 'Parcheggio']
+        ['parcheggio', 'Parcheggio'],
+        ['assistenza', 'Assistenza']
       ].forEach(function (row) {
+        var note = p.note && p.note[row[0]];
         facts.appendChild(el('div', { className: 'facts__row' }, [
           el('dt', { text: row[1] }),
-          el('dd', {}, [statusNode(p, row[0])])
+          el('dd', {}, [
+            statusNode(p, row[0]),
+            note ? el('p', { className: 'facts__note', text: note }) : null
+          ])
         ]));
       });
 

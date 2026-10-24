@@ -14,9 +14,9 @@
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="assets/css/sito.css?v=p3">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p4">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
-  <script src="assets/js/sito.js?v=p3" defer></script>
+  <script src="assets/js/sito.js?v=p4" defer></script>
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -100,7 +100,17 @@
           </div>
           <div class="card">
             <h2 class="h3">Recensioni</h2>
-            <p>Le esperienze di chi ci è stato si leggono e si scrivono nell'app.</p>
+            <!-- Modello grafico: nessuna recensione reale. Le recensioni vere arriveranno dall'app. -->
+            <article class="review" aria-label="Esempio di recensione">
+              <div class="review__head">
+                <span class="review__avatar" aria-hidden="true">N</span>
+                <strong>Nome utente</strong>
+                <span class="pill pill--soon">Esempio</span>
+                <span class="review__date">· data della visita</span>
+              </div>
+              <p>Qui comparirà l'esperienza di chi è stato in questo luogo: com'è andata all'ingresso, in bagno, con il personale.</p>
+            </article>
+            <p>Le recensioni si leggono e si scrivono nell'app.</p>
             <a class="btn btn--secondary btn--small" href="./#app">Scopri l'app</a>
           </div>
         </aside>

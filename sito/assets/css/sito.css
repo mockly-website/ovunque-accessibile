@@ -1152,6 +1152,66 @@ main:focus {
   margin: 0;
 }
 
+.facts__note {
+  margin: var(--space-2xs) 0 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
+@media (min-width: 36em) {
+  .facts__row {
+    align-items: start;
+  }
+}
+
+/* Recensione d'esempio (le vere si scrivono nell'app) */
+.review {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+  border: 1px dashed var(--color-muted);
+}
+
+.review__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-sm);
+}
+
+.review__avatar {
+  display: grid;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--color-sky);
+  font-weight: 700;
+}
+
+.review__date {
+  color: var(--color-muted);
+}
+
+.review p {
+  margin: 0;
+}
+
+.latest {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+@media (min-width: 48em) {
+  .latest {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
 .detail__map {
   height: 18rem;
   border-radius: var(--radius-lg);
