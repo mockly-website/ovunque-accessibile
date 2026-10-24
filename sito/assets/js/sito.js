@@ -1,16 +1,22 @@
 /* Ovunque Accessibile – sito (prototipo).
    Dati: assets/data/luoghi.json (esempi). In produzione la stessa forma arriverà da Supabase.
-   Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni. */
+   Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni.
+   Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta "Come ti muovi?"
+           4. Utilità DOM · 5. Componenti · 6. Mappa · 7. Home · 8. Pagina mappa
+           9. Indicazioni stradali · 10. Scheda luogo */
 (function () {
   'use strict';
 
   /* Con JavaScript attivo si mostrano i messaggi "Caricamento…" (classe js-only) */
   document.documentElement.classList.add('js');
 
+  /* ---------- 1. Configurazione ---------- */
   var DATA_URL = 'assets/data/luoghi.json';
   var TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
   var ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
   var ITALY = { center: [42.5, 12.5], zoom: 5 };
+  var SCADENZA_MESI = 24;          /* dopo questo tempo: "Informazioni da ricontrollare" */
+  var STORAGE_KEY = 'oa-esigenza';
 
   var CATEGORIE = {
     ristorante: 'Ristorante e bar',
@@ -23,67 +29,245 @@
     trasporti: 'Trasporti'
   };
 
-  /* Filtri: chiave URL → condizione sul luogo */
-  var FILTRI = {
-    ingresso: function (p) { return p.ingresso === 'senza-gradini' || p.ingresso === 'rampa'; },
-    bagno: function (p) { return p.bagno === 'si'; },
-    parcheggio: function (p) { return p.parcheggio === 'si'; },
-    interni: function (p) { return p.interni === 'tutto'; }
+  /* ---------- 2. Regole per esigenza ----------
+     Soglie iniziali (base DM 236/1989), DA CONFERMARE con Angelo e Lorenzo.
+     Cambiare un numero qui aggiorna tutti i giudizi del sito. */
+  var ESIGENZE = {
+    manuale: { nome: 'Carrozzina manuale', breve: 'Manuale', icona: '#icon-wheelchair' },
+    elettrica: { nome: 'Carrozzina elettrica', breve: 'Elettrica', icona: '#icon-wheelchair-e' },
+    cammino: { nome: 'Difficoltà a camminare', breve: 'Camminare', icona: '#icon-walk' }
+  };
+  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino'];
+
+  var SOGLIE = {
+    manuale: {
+      gradinoSenza: 2.5,           /* cm: un gradino così basso conta come "nessun gradino" */
+      gradinoInParte: 5,           /* cm: un solo gradino fino a questa altezza è "in parte" */
+      rampaOk: 8, rampaInParte: 12, /* % di pendenza */
+      portaOk: 80, portaInParte: 75, /* cm */
+      ascensore: [80, 120],        /* cm: larghezza × profondità minime della cabina */
+      rotazioneBagno: 150          /* cm: spazio per girarsi */
+    },
+    elettrica: {
+      gradinoSenza: 2.5,
+      gradinoInParte: null,        /* nessun gradino è superabile */
+      rampaOk: 8, rampaInParte: 12,
+      portaOk: 90, portaInParte: 80,
+      ascensore: [110, 140],
+      rotazioneBagno: 150,
+      rotazioneObbligatoria: true
+    },
+    cammino: {
+      gradinoSenza: 2.5,
+      gradiniConCorrimano: 3,      /* fino a 3 gradini con corrimano: accessibile */
+      portaOk: 75, portaInParte: 70
+    }
   };
 
-  /* Ogni caratteristica → stato (si, parziale, no, nv) + testo leggibile */
-  function stato(p, key) {
-    var v = p[key];
-    switch (key) {
-      case 'ingresso':
-        return {
-          'senza-gradini': ['si', 'Senza gradini'],
-          'rampa': ['si', 'Con rampa'],
-          'gradino-basso': ['parziale', 'Un gradino basso'],
-          'gradini': ['no', 'Con gradini']
-        }[v] || ['nv', 'Da verificare'];
-      case 'porta_cm':
-        if (typeof v !== 'number') return ['nv', 'Da verificare'];
-        return [v >= 80 ? 'si' : 'parziale', 'Larga ' + v + ' cm'];
-      case 'bagno':
-        return v === 'si' ? ['si', 'Bagno accessibile'] : v === 'no' ? ['no', 'Nessun bagno accessibile'] : ['nv', 'Da verificare'];
-      case 'parcheggio':
-        return v === 'si' ? ['si', 'Posti riservati vicini'] : v === 'no' ? ['no', 'Nessun posto riservato'] : ['nv', 'Da verificare'];
-      case 'ascensore':
-        return {
-          'si': ['si', 'Ascensore presente'],
-          'non-serve': ['si', 'Tutto su un piano'],
-          'no': ['no', 'Nessun ascensore']
-        }[v] || ['nv', 'Da verificare'];
-      case 'interni':
-        return {
-          'tutto': ['si', 'Tutti gli spazi accessibili'],
-          'parziale': ['parziale', 'Accessibili in parte'],
-          'non-accessibile': ['no', 'Non accessibili'],
-          'no': ['no', 'Non accessibili']
-        }[v] || ['nv', 'Da verificare'];
-      case 'assistenza':
-        return v === 'si' ? ['si', 'Personale disponibile ad aiutare'] : v === 'no' ? ['no', 'Nessuna assistenza'] : ['nv', 'Da verificare'];
+  /* Ogni regola restituisce [stato, testo]: stato è si, parziale, no, nv (non verificato) o np (non previsto) */
+  function valutaIngresso(m, e) {
+    var s = SOGLIE[e];
+    if (m.gradini == null && m.rampa == null) return ['nv', 'Da verificare'];
+    var g = m.gradini || 0;
+    var h = m.gradino_cm;
+    var gradiniTxt = g === 0 ? 'nessun gradino'
+      : (g === 1 ? 'un gradino' : g + ' gradini') + (h != null ? (g === 1 ? ' di ' : ' da ') + h + ' cm' : '');
+    var senzaGradini = g === 0 || (g === 1 && h != null && h <= s.gradinoSenza);
+    var testo;
+    if (m.rampa) {
+      testo = 'Rampa' + (m.rampa_pct != null ? ' ' + m.rampa_pct + '%' : ' (pendenza non misurata)') + (g ? ', in alternativa a ' + gradiniTxt : '');
+    } else {
+      testo = senzaGradini ? 'Senza gradini' : gradiniTxt.charAt(0).toUpperCase() + gradiniTxt.slice(1);
+      if (g && m.corrimano) testo += ', con corrimano';
+    }
+
+    if (e === 'cammino') {
+      if (senzaGradini || m.rampa) return ['si', testo];
+      if (m.corrimano === true) return [g <= s.gradiniConCorrimano ? 'si' : 'parziale', testo];
+      if (m.corrimano === false) return [g <= 1 ? 'parziale' : 'no', testo + ', senza corrimano'];
+      return ['parziale', testo];
+    }
+
+    if (senzaGradini) return ['si', testo];
+    if (m.rampa) {
+      if (m.rampa_pct == null) return ['parziale', testo];
+      if (m.rampa_pct <= s.rampaOk) return ['si', testo];
+      if (m.rampa_pct <= s.rampaInParte) return ['parziale', testo];
+      return ['no', testo];
+    }
+    if (s.gradinoInParte && g === 1 && h != null && h <= s.gradinoInParte) return ['parziale', testo];
+    return ['no', testo];
+  }
+
+  function valutaPorta(m, e) {
+    var s = SOGLIE[e];
+    var cm = m.porta_cm;
+    if (cm === 0) return ['np', 'Nessuna porta'];
+    if (cm == null) return ['nv', 'Da verificare'];
+    var testo = 'Larga ' + cm + ' cm';
+    if (cm >= s.portaOk) return ['si', testo];
+    if (cm >= s.portaInParte) return ['parziale', testo];
+    return ['no', testo];
+  }
+
+  function valutaSpazi(m) {
+    return {
+      tutti: ['si', 'Tutti gli spazi accessibili'],
+      parziale: ['parziale', 'Accessibili in parte'],
+      no: ['no', 'Non accessibili']
+    }[m.valore] || ['nv', 'Da verificare'];
+  }
+
+  function valutaPiani(m, e) {
+    var s = SOGLIE[e];
+    if (m.valore === 'uno') return ['si', 'Tutto su un piano'];
+    if (m.valore === 'ascensore') {
+      var d = m.ascensore_cm;
+      var misure = d ? d[0] + ' × ' + d[1] + ' cm' : '';
+      if (e === 'cammino') return ['si', 'Ascensore' + (misure ? ' ' + misure : '')];
+      if (!d) return ['parziale', 'Ascensore (cabina non misurata)'];
+      if (d[0] >= s.ascensore[0] && d[1] >= s.ascensore[1]) return ['si', 'Ascensore ' + misure];
+      return ['parziale', 'Ascensore piccolo: ' + misure];
+    }
+    if (m.valore === 'scale') {
+      if (e === 'cammino') return m.corrimano_scale ? ['si', 'Scale con corrimano'] : ['parziale', 'Scale senza corrimano'];
+      return ['no', 'Solo scale'];
     }
     return ['nv', 'Da verificare'];
   }
 
-  /* Giudizio complessivo per segnaposto e card: dipende da ingresso e spazi interni */
-  function giudizio(p) {
-    var ingresso = stato(p, 'ingresso')[0];
-    var interni = stato(p, 'interni')[0];
-    if (ingresso === 'nv') return 'nv';
-    if (ingresso === 'no' || interni === 'no') return 'no';
-    if (ingresso === 'si' && interni === 'si') return 'si';
-    return 'parziale';
+  function valutaBagno(m, e) {
+    var s = SOGLIE[e];
+    var r = m.rotazione_cm;
+    switch (m.valore) {
+      case 'non-previsto': return ['np', 'Non previsto in questo luogo'];
+      case 'assente': return ['no', 'Nessun bagno accessibile'];
+      case 'non-attrezzato': return [e === 'elettrica' ? 'no' : 'parziale', 'Bagno non attrezzato'];
+      case 'attrezzato':
+        if (e === 'cammino') return m.maniglioni === false ? ['parziale', 'Bagno senza maniglioni'] : ['si', 'Bagno con maniglioni'];
+        if (m.maniglioni === false) return ['parziale', 'Bagno senza maniglioni'];
+        if (r == null) return s.rotazioneObbligatoria ? ['parziale', 'Spazio per girarsi non misurato'] : ['si', 'Bagno attrezzato'];
+        if (r >= s.rotazioneBagno) return ['si', 'Bagno attrezzato, spazio per girarsi ' + r + ' cm'];
+        return [s.rotazioneObbligatoria ? 'no' : 'parziale', 'Spazio per girarsi solo ' + r + ' cm'];
+    }
+    return ['nv', 'Da verificare'];
+  }
+
+  var VOCI = [
+    { key: 'ingresso', nome: 'Ingresso', valuta: function (p, e) { return valutaIngresso(p.misure.ingresso, e); }, nota: function (p) { return p.misure.ingresso.nota; } },
+    { key: 'porta', nome: 'Porta d\'ingresso', valuta: function (p, e) { return valutaPorta(p.misure.ingresso, e); }, nota: function (p) { return p.misure.ingresso.nota_porta; } },
+    { key: 'spazi', nome: 'Spazi e percorsi', valuta: function (p) { return valutaSpazi(p.misure.spazi); }, nota: function (p) { return p.misure.spazi.nota; } },
+    { key: 'piani', nome: 'Piani e ascensore', valuta: function (p, e) { return valutaPiani(p.misure.piani, e); }, nota: function (p) { return p.misure.piani.nota; } },
+    { key: 'bagno', nome: 'Bagno', valuta: function (p, e) { return valutaBagno(p.misure.bagno, e); }, nota: function (p) { return p.misure.bagno.nota; } }
+  ];
+
+  function voce(key) {
+    return VOCI.filter(function (v) { return v.key === key; })[0];
+  }
+
+  /* Giudizio per esigenza: ✓ se tutte le voci sono ✓ (le "non previste" non contano);
+     ✕ se ingresso o spazi sono ✕; ? se manca l'ingresso; – negli altri casi */
+  var cacheGiudizi = {};
+  function giudizio(p, e) {
+    var k = p.id + '|' + e;
+    if (cacheGiudizi[k]) return cacheGiudizi[k];
+    var stati = {};
+    VOCI.forEach(function (v) { stati[v.key] = v.valuta(p, e)[0]; });
+    var g;
+    if (stati.ingresso === 'nv') g = 'nv';
+    else if (stati.ingresso === 'no' || stati.spazi === 'no') g = 'no';
+    else if (Object.keys(stati).every(function (k2) { return stati[k2] === 'si' || stati[k2] === 'np'; })) g = 'si';
+    else g = 'parziale';
+    cacheGiudizi[k] = g;
+    return g;
   }
 
   var GIUDIZIO = { si: 'Accessibile', parziale: 'Accessibile in parte', no: 'Non accessibile', nv: 'Da verificare' };
+  var ICONA_STATO = { si: '#icon-yes', parziale: '#icon-partial', no: '#icon-no', nv: '#icon-unknown', np: '#icon-na' };
+  var PREFISSO_STATO = { si: 'Sì: ', parziale: 'In parte: ', no: 'No: ', nv: 'Non verificato: ', np: 'Non previsto: ' };
 
-  var ICONA_STATO = { si: '#icon-yes', parziale: '#icon-partial', no: '#icon-no', nv: '#icon-unknown' };
-  var PREFISSO_STATO = { si: 'Sì: ', parziale: 'In parte: ', no: 'No: ', nv: 'Non verificato: ' };
+  /* Filtri della pagina mappa, calcolati per l'esigenza scelta */
+  var FILTRI = {
+    accessibile: function (p, e) { return giudizio(p, e) === 'si'; },
+    ingresso: function (p, e) { return valutaIngresso(p.misure.ingresso, e)[0] === 'si'; },
+    bagno: function (p, e) { return valutaBagno(p.misure.bagno, e)[0] === 'si'; },
+    parcheggio: function (p) { return !!(p.facoltativi && p.facoltativi.parcheggio && p.facoltativi.parcheggio.posti); }
+  };
 
-  /* ---------- Utilità DOM ---------- */
+  /* Verifica: livello e scadenza */
+  function verifica(p) {
+    var v = p.verifica || {};
+    var scaduta = false;
+    if (v.data) {
+      var d = new Date(v.data + 'T12:00:00');
+      var limite = new Date();
+      limite.setMonth(limite.getMonth() - SCADENZA_MESI);
+      scaduta = d < limite;
+    }
+    return { livello: v.livello, data: v.data, scaduta: scaduta };
+  }
+
+  /* ---------- 3. Scelta "Come ti muovi?" ----------
+     Salvata nel browser (localStorage: preferenza chiesta dall'utente, nessun cookie) e nell'indirizzo (?per=). */
+  var ascoltatori = [];
+
+  function esigenzaSalvata() {
+    var fromUrl = new URLSearchParams(location.search).get('per');
+    if (ESIGENZE[fromUrl]) return fromUrl;
+    try {
+      var v = localStorage.getItem(STORAGE_KEY);
+      return ESIGENZE[v] ? v : null;
+    } catch (err) {
+      return null;
+    }
+  }
+
+  var esigenzaCorrente = esigenzaSalvata();
+
+  function esigenza() {
+    return esigenzaCorrente || 'manuale';   /* finché non si sceglie: carrozzina manuale, con l'invito a scegliere */
+  }
+
+  function setEsigenza(e) {
+    if (!ESIGENZE[e]) return;
+    esigenzaCorrente = e;
+    try { localStorage.setItem(STORAGE_KEY, e); } catch (err) { /* navigazione privata: resta solo per questa pagina */ }
+    var params = new URLSearchParams(location.search);
+    params.set('per', e);
+    history.replaceState(null, '', '?' + params.toString());
+    ascoltatori.forEach(function (fn) { fn(e); });
+  }
+
+  function onEsigenza(fn) {
+    ascoltatori.push(fn);
+  }
+
+  /* Gruppo di scelta nelle pagine (fieldset con radio, già nell'HTML: .needs) */
+  function initNeedsPicker() {
+    [].forEach.call(document.querySelectorAll('.needs'), function (box) {
+      var help = box.querySelector('.needs__help');
+      var live = box.querySelector('.needs__live');
+      function sync(announce) {
+        [].forEach.call(box.querySelectorAll('input[name="esigenza"]'), function (r) {
+          r.checked = r.value === esigenza() && !!esigenzaCorrente;
+        });
+        box.classList.toggle('needs--ask', !esigenzaCorrente);
+        if (help) {
+          help.textContent = esigenzaCorrente
+            ? 'Giudizi calcolati per: ' + ESIGENZE[esigenza()].nome.toLowerCase() + '.'
+            : 'Scegli come ti muovi: i giudizi cambiano in base alla tua esigenza. Per ora vedi quelli per la carrozzina manuale.';
+        }
+        if (announce && live) live.textContent = 'Giudizi aggiornati per ' + ESIGENZE[esigenza()].nome.toLowerCase() + '.';
+      }
+      box.addEventListener('change', function (ev) {
+        if (ev.target.name === 'esigenza') setEsigenza(ev.target.value);
+      });
+      onEsigenza(function () { sync(true); });
+      sync(false);
+    });
+  }
+
+  /* ---------- 4. Utilità DOM ---------- */
   function el(tag, attrs, children) {
     var node = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
@@ -107,26 +291,14 @@
     return svg;
   }
 
-  /* Stato con icona + prefisso nascosto per screen reader: il significato non dipende dal colore */
-  function statusNode(p, key) {
-    var s = stato(p, key);
-    return el('span', { className: 'status status--' + s[0] }, [
-      icon(ICONA_STATO[s[0]]),
-      el('span', {}, [
-        el('span', { className: 'visually-hidden', text: PREFISSO_STATO[s[0]] }),
-        document.createTextNode(s[1])
-      ])
-    ]);
-  }
-
   function placeUrl(p) {
-    return 'luogo.html?id=' + encodeURIComponent(p.id);
+    return 'luogo.html?id=' + encodeURIComponent(p.id) + (esigenzaCorrente ? '&per=' + esigenzaCorrente : '');
   }
 
-  function formatDate(iso) {
+  function formatDate(iso, short) {
     var d = new Date(iso + 'T12:00:00');
     if (isNaN(d)) return '';
-    return d.toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' });
+    return d.toLocaleDateString('it-IT', short ? { month: 'long', year: 'numeric' } : { day: 'numeric', month: 'long', year: 'numeric' });
   }
 
   function normalize(s) {
@@ -139,27 +311,48 @@
       .then(function (data) { return data.luoghi || []; });
   }
 
-  function labelled(name, node) {
-    node.insertBefore(el('span', { className: 'visually-hidden', text: name + ': ' }), node.firstChild);
-    return node;
+  /* ---------- 5. Componenti ---------- */
+
+  /* Stato con icona + prefisso nascosto per screen reader: il significato non dipende dal colore */
+  function statusNode(st, label) {
+    return el('span', { className: 'status status--' + st[0] }, [
+      icon(ICONA_STATO[st[0]]),
+      el('span', {}, [
+        el('span', { className: 'visually-hidden', text: (label ? label + ': ' : '') + PREFISSO_STATO[st[0]] }),
+        document.createTextNode(st[1])
+      ])
+    ]);
   }
 
-  function verdictNode(p) {
-    var g = giudizio(p);
-    return el('span', { className: 'verdict verdict--' + g }, [icon(ICONA_STATO[g]), el('span', { text: GIUDIZIO[g] })]);
+  function verdictNode(p, e) {
+    var g = giudizio(p, e);
+    return el('span', { className: 'verdict verdict--' + g }, [
+      icon(ICONA_STATO[g]),
+      el('span', {}, [
+        document.createTextNode(GIUDIZIO[g]),
+        el('span', { className: 'visually-hidden', text: ' per ' + ESIGENZE[e].nome.toLowerCase() })
+      ])
+    ]);
+  }
+
+  function verificaNode(p) {
+    var v = verifica(p);
+    if (v.scaduta) return el('span', { className: 'trust trust--old' }, [icon('#icon-clock'), el('span', { text: 'Da ricontrollare' })]);
+    if (v.livello === 'sul-posto') return el('span', { className: 'trust trust--onsite' }, [icon('#icon-shield'), el('span', { text: 'Verificato sul posto' })]);
+    return el('span', { className: 'trust' }, [icon('#icon-people'), el('span', { text: 'Segnalato dalla community' })]);
   }
 
   /* Card di un luogo (elenco della mappa e home). onShow: pulsante "Mostra sulla mappa" */
   function placeCard(p, headingTag, onShow) {
+    var e = esigenza();
     return el('li', { className: 'place', 'data-id': p.id }, [
-      verdictNode(p),
+      el('div', { className: 'place__top' }, [verdictNode(p, e), verificaNode(p)]),
       el(headingTag || 'h3', { className: 'place__title' }, [el('a', { className: 'place__link', href: placeUrl(p), text: p.nome })]),
       el('p', { className: 'place__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
-      el('div', { className: 'place__features' }, [
-        labelled('Ingresso', statusNode(p, 'ingresso')),
-        labelled('Bagno', statusNode(p, 'bagno')),
-        labelled('Parcheggio', statusNode(p, 'parcheggio'))
-      ]),
+      el('div', { className: 'place__features' }, ['ingresso', 'piani', 'bagno'].map(function (k) {
+        var v = voce(k);
+        return statusNode(v.valuta(p, e), v.nome);
+      })),
       onShow ? showButton(p, onShow) : null
     ]);
   }
@@ -176,7 +369,7 @@
     return btn;
   }
 
-  /* ---------- Mappa (Leaflet + OpenStreetMap) ---------- */
+  /* ---------- 6. Mappa (Leaflet + OpenStreetMap) ---------- */
   function createMap(container, options) {
     if (!window.L) return null;
     var map = L.map(container, Object.assign({
@@ -187,8 +380,8 @@
     L.control.zoom({ zoomInTitle: 'Avvicina', zoomOutTitle: 'Allontana' }).addTo(map);
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
     map.attributionControl.setPrefix(false);
-    map.on('popupopen', function (e) {
-      var close = e.popup.getElement().querySelector('.leaflet-popup-close-button');
+    map.on('popupopen', function (ev) {
+      var close = ev.popup.getElement().querySelector('.leaflet-popup-close-button');
       if (close) {
         close.setAttribute('aria-label', 'Chiudi');
         close.setAttribute('title', 'Chiudi');
@@ -196,8 +389,6 @@
     });
     return map;
   }
-
-
 
   /* Segnaposto: colore + simbolo del giudizio (il significato non dipende solo dal colore) */
   function pinIcon(g) {
@@ -230,15 +421,15 @@
   }
 
   function popupContent(p) {
+    var e = esigenza();
     return el('div', { className: 'popup' }, [
-      verdictNode(p),
+      verdictNode(p, e),
       el('strong', { className: 'popup__title', text: p.nome }),
       el('span', { className: 'popup__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.citta }),
-      el('span', { className: 'popup__features' }, [
-        labelled('Ingresso', statusNode(p, 'ingresso')),
-        labelled('Bagno', statusNode(p, 'bagno')),
-        labelled('Parcheggio', statusNode(p, 'parcheggio'))
-      ]),
+      el('span', { className: 'popup__features' }, ['ingresso', 'piani', 'bagno'].map(function (k) {
+        var v = voce(k);
+        return statusNode(v.valuta(p, e), v.nome);
+      })),
       el('a', { className: 'btn btn--primary btn--small popup__link', href: placeUrl(p) }, [
         document.createTextNode('Apri la scheda'),
         el('span', { className: 'visually-hidden', text: ': ' + p.nome })
@@ -247,13 +438,14 @@
   }
 
   function addMarker(layer, p, onSelect, focusable) {
+    var g = giudizio(p, esigenza());
     var marker = L.marker([p.lat, p.lng], {
-      icon: pinIcon(giudizio(p)),
-      title: p.nome + ', ' + p.citta + ': ' + GIUDIZIO[giudizio(p)].toLowerCase(),
+      icon: pinIcon(g),
+      title: p.nome + ', ' + p.citta + ': ' + GIUDIZIO[g].toLowerCase(),
       keyboard: !!focusable,
       riseOnHover: true
     }).addTo(layer);
-    marker.bindPopup(popupContent(p), { maxWidth: 280, minWidth: 220 });
+    marker.bindPopup(function () { return popupContent(p); }, { maxWidth: 280, minWidth: 220 });
     if (onSelect) marker.on('click', function () { onSelect(p.id); });
     return marker;
   }
@@ -298,29 +490,38 @@
     map.addControl(new Ctl());
   }
 
-  /* ---------- Home: mappa d'anteprima ---------- */
+  /* ---------- 7. Home: mappa d'anteprima e ultimi luoghi ---------- */
   function initHome() {
     var box = document.getElementById('home-map');
     var latest = document.getElementById('latest-list');
     if (!box && !latest) return;
     loadPlaces().then(function (places) {
-      if (latest) {
-        latest.textContent = '';
-        places
-          .filter(function (p) { return p.verificato_il; })
-          .sort(function (a, b) { return a.verificato_il < b.verificato_il ? 1 : -1; })
-          .slice(0, 3)
-          .forEach(function (p) { latest.appendChild(placeCard(p)); });
-      }
       var map = box && createMap(box, { zoomControl: true });
-      if (!map) return;
-      map.setView(ITALY.center, ITALY.zoom);
-      var group = clusterLayer().addTo(map);
-      places.forEach(function (p) { addMarker(group, p); });
+      var group = null;
+      if (map) {
+        map.setView(ITALY.center, ITALY.zoom);
+        group = clusterLayer().addTo(map);
+      }
+      function render() {
+        if (latest) {
+          latest.textContent = '';
+          places
+            .filter(function (p) { return p.verifica && p.verifica.data; })
+            .sort(function (a, b) { return a.verifica.data < b.verifica.data ? 1 : -1; })
+            .slice(0, 3)
+            .forEach(function (p) { latest.appendChild(placeCard(p)); });
+        }
+        if (group) {
+          group.clearLayers();
+          places.forEach(function (p) { addMarker(group, p); });
+        }
+      }
+      render();
+      onEsigenza(render);
     }).catch(function () {});
   }
 
-  /* ---------- Pagina mappa: ricerca, filtri, elenco e mappa ---------- */
+  /* ---------- 8. Pagina mappa: ricerca, filtri, elenco e mappa ---------- */
   function initExplore() {
     var form = document.getElementById('filters');
     var list = document.getElementById('results-list');
@@ -345,13 +546,13 @@
       return [].slice.call(form.querySelectorAll('input[name="f"]:checked')).map(function (i) { return i.value; });
     }
 
-    function matches(p, q, cat, filters) {
+    function matches(p, q, cat, filters, e) {
       if (cat && p.categoria !== cat) return false;
       for (var i = 0; i < filters.length; i++) {
-        if (FILTRI[filters[i]] && !FILTRI[filters[i]](p)) return false;
+        if (FILTRI[filters[i]] && !FILTRI[filters[i]](p, e)) return false;
       }
       if (!q) return true;
-      var hay = normalize([p.nome, p.citta, p.provincia, p.indirizzo, CATEGORIE[p.categoria]].join(' '));
+      var hay = normalize([p.nome, p.citta, p.provincia, p.regione, p.indirizzo, CATEGORIE[p.categoria]].join(' '));
       return normalize(q).split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
     }
 
@@ -378,11 +579,12 @@
       else { map.setView(m.getLatLng(), 15); open(); }
     }
 
-    function render(updateUrl) {
+    function render(updateUrl, keepView) {
+      var e = esigenza();
       var q = form.elements.q.value.trim();
       var cat = form.elements.cat.value;
       var filters = selected();
-      var found = places.filter(function (p) { return matches(p, q, cat, filters); });
+      var found = places.filter(function (p) { return matches(p, q, cat, filters, e); });
 
       list.textContent = '';
       if (!found.length) {
@@ -393,7 +595,8 @@
       } else {
         found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null)); });
       }
-      count.textContent = found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati';
+      count.textContent = (found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati') +
+        ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase();
 
       if (map) {
         layer.clearLayers();
@@ -401,15 +604,18 @@
         found.forEach(function (p) {
           markers[p.id] = addMarker(layer, p, highlight);
         });
-        if (found.length) {
-          map.fitBounds(L.latLngBounds(found.map(function (p) { return [p.lat, p.lng]; })), { padding: [40, 40], maxZoom: 14 });
-        } else {
-          map.setView(ITALY.center, ITALY.zoom);
+        if (!keepView) {
+          if (found.length) {
+            map.fitBounds(L.latLngBounds(found.map(function (p) { return [p.lat, p.lng]; })), { padding: [40, 40], maxZoom: 14 });
+          } else {
+            map.setView(ITALY.center, ITALY.zoom);
+          }
         }
       }
 
       if (updateUrl) {
         var next = new URLSearchParams();
+        if (esigenzaCorrente) next.set('per', esigenzaCorrente);
         if (q) next.set('q', q);
         if (cat) next.set('cat', cat);
         filters.forEach(function (f) { next.append('f', f); });
@@ -419,12 +625,13 @@
     }
 
     var timer = null;
-    form.addEventListener('input', function (e) {
+    form.addEventListener('input', function (ev) {
+      if (ev.target.name === 'esigenza') return;      /* gestito da onEsigenza */
       clearTimeout(timer);
-      timer = setTimeout(function () { render(true); }, e.target.name === 'q' ? 250 : 0);
+      timer = setTimeout(function () { render(true); }, ev.target.name === 'q' ? 250 : 0);
     });
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
       render(true);
       count.focus();
     });
@@ -443,12 +650,13 @@
         }
       }
       render(false);
+      onEsigenza(function () { render(true, true); });
     }).catch(function () {
       count.textContent = 'Non siamo riusciti a caricare i luoghi. Ricarica la pagina tra poco.';
     });
   }
 
-  /* Indicazioni stradali: si sceglie l'app (Google Maps, Apple Mappe, Waze, OpenStreetMap, altra app su Android) */
+  /* ---------- 9. Indicazioni stradali: si sceglie l'app ---------- */
   function directionsLinks(p) {
     var ll = p.lat + ',' + p.lng;
     var enc = encodeURIComponent(ll);
@@ -492,21 +700,135 @@
       setOpen(open);
       if (open) list.querySelector('a').focus();
     });
-    panel.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') setOpen(false, true);
+    panel.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') setOpen(false, true);
     });
-    toggle.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') setOpen(false);
+    toggle.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape') setOpen(false);
     });
-    document.addEventListener('click', function (e) {
-      if (!panel.hidden && !panel.contains(e.target) && !toggle.contains(e.target)) setOpen(false);
+    document.addEventListener('click', function (ev) {
+      if (!panel.hidden && !panel.contains(ev.target) && !toggle.contains(ev.target)) setOpen(false);
     });
-    panel.addEventListener('focusout', function (e) {
-      if (e.relatedTarget && !panel.contains(e.relatedTarget) && e.relatedTarget !== toggle) setOpen(false);
+    panel.addEventListener('focusout', function (ev) {
+      if (ev.relatedTarget && !panel.contains(ev.relatedTarget) && ev.relatedTarget !== toggle) setOpen(false);
     });
   }
 
-  /* ---------- Scheda luogo ---------- */
+  /* ---------- 10. Scheda luogo ---------- */
+  var DETTAGLI = {
+    tavoli_cm: ['Altezza dei tavoli', 'cm'],
+    spazio_gambe: ['Spazio per le gambe sotto il tavolo'],
+    camere_accessibili: ['Camere accessibili', 'num'],
+    doccia_filo: ['Doccia a filo pavimento'],
+    passerella: ['Passerella fino all\'acqua'],
+    sedia_mare: ['Sedia da mare disponibile'],
+    posti_carrozzina: ['Posti per carrozzina in sala', 'num'],
+    accompagnatore_gratis: ['Biglietto gratuito per l\'accompagnatore'],
+    assistenza_prenotabile: ['Assistenza da prenotare'],
+    preavviso_ore: ['Preavviso per l\'assistenza', 'ore'],
+    percorso_tattile: ['Percorso tattile'],
+    ausili_prestito: ['Ausili in prestito (es. sedia a rotelle)']
+  };
+
+  var TITOLO_DETTAGLI = {
+    ristorante: 'Al tavolo', hotel: 'Camere', spiaggia: 'In spiaggia', cultura: 'In sala',
+    trasporti: 'Il viaggio', museo: 'La visita', parco: 'Nel parco', negozio: 'Nel negozio'
+  };
+
+  function siNo(v) {
+    return v === true ? ['si', 'Sì'] : v === false ? ['no', 'No'] : ['nv', 'Da verificare'];
+  }
+
+  function valoreDettaglio(key, v) {
+    var tipo = DETTAGLI[key][1];
+    if (!tipo) return siNo(v);
+    if (v == null) return ['nv', 'Da verificare'];
+    if (tipo === 'cm') return ['info', v + ' cm'];
+    if (tipo === 'ore') return ['info', 'Almeno ' + v + ' ore prima'];
+    return ['info', String(v)];
+  }
+
+  function infoRow(label, st, note) {
+    var value = st[0] === 'info'
+      ? el('span', { className: 'status status--info', text: st[1] })
+      : statusNode(st);
+    return el('div', { className: 'facts__row' }, [
+      el('dt', { text: label }),
+      el('dd', {}, [value, note ? el('p', { className: 'facts__note', text: note }) : null])
+    ]);
+  }
+
+  function renderDetail(p) {
+    var e = esigenza();
+
+    /* Tre giudizi affiancati: quello dell'esigenza scelta è evidenziato */
+    var trio = document.getElementById('detail-verdicts');
+    trio.textContent = '';
+    ORDINE_ESIGENZE.forEach(function (k) {
+      var g = giudizio(p, k);
+      var mine = k === e && !!esigenzaCorrente;
+      trio.appendChild(el('li', { className: 'needs-verdict needs-verdict--' + g + (mine ? ' is-current' : '') }, [
+        icon(ESIGENZE[k].icona, 'needs-verdict__who'),
+        el('span', { className: 'needs-verdict__name', text: ESIGENZE[k].nome }),
+        el('span', { className: 'needs-verdict__value' }, [icon(ICONA_STATO[g]), el('span', { text: GIUDIZIO[g] })]),
+        mine ? el('span', { className: 'needs-verdict__mine', text: 'La tua scelta' }) : null
+      ]));
+    });
+
+    /* Misure base: descrizione + stato per ognuna delle tre esigenze */
+    var facts = document.getElementById('detail-facts');
+    facts.textContent = '';
+    VOCI.forEach(function (v) {
+      var states = ORDINE_ESIGENZE.map(function (k) { return [k, v.valuta(p, k)]; });
+      var nonPrevista = states.every(function (s) { return s[1][0] === 'np'; });
+      var nota = v.nota(p);
+      facts.appendChild(el('div', { className: 'facts__row facts__row--needs' }, [
+        el('dt', { text: v.nome }),
+        el('dd', {}, [
+          el('p', { className: 'facts__desc', text: states[0][1][1] }),
+          nota ? el('p', { className: 'facts__note', text: nota }) : null,
+          nonPrevista ? null : el('ul', { className: 'needs-states', role: 'list' }, states.map(function (s) {
+            var st = s[1];
+            return el('li', { className: 'needs-state needs-state--' + st[0] + (s[0] === e && esigenzaCorrente ? ' is-current' : '') }, [
+              icon(ICONA_STATO[st[0]]),
+              el('span', {}, [
+                el('span', { className: 'visually-hidden', text: ESIGENZE[s[0]].nome + ', ' + PREFISSO_STATO[st[0]].replace(': ', '') }),
+                el('span', { 'aria-hidden': 'true', text: ESIGENZE[s[0]].breve })
+              ])
+            ]);
+          }))
+        ])
+      ]));
+    });
+
+    /* Voci facoltative */
+    var f = p.facoltativi || {};
+    var extra = document.getElementById('detail-extra');
+    extra.textContent = '';
+    var porta = { automatica: 'Automatica', manuale: 'Da aprire a mano', pesante: 'Pesante da aprire' }[f.porta_tipo];
+    var pav = { liscio: 'Liscio', irregolare: 'Irregolare (sampietrini, legno, sabbia)', ghiaia: 'Ghiaia' }[f.pavimento];
+    if (p.misure.ingresso.porta_cm !== 0) extra.appendChild(infoRow('Tipo di porta', porta ? ['info', porta] : ['nv', 'Da verificare']));
+    extra.appendChild(infoRow('Pavimento', pav ? ['info', pav] : ['nv', 'Da verificare']));
+    extra.appendChild(infoRow('Sedute lungo il percorso', siNo(f.sedute)));
+    var park = f.parcheggio || {};
+    var parkSt = park.posti === true
+      ? ['si', 'Posti riservati' + (park.distanza_m != null ? (park.distanza_m === 0 ? ' all\'ingresso' : ' a ' + park.distanza_m + ' m') : '')]
+      : park.posti === false ? ['no', 'Nessun posto riservato vicino'] : ['nv', 'Da verificare'];
+    extra.appendChild(infoRow('Parcheggio', parkSt, park.nota));
+    var ass = f.assistenza || {};
+    extra.appendChild(infoRow('Assistenza del personale', ass.valore === true ? ['si', 'Disponibile'] : ass.valore === false ? ['no', 'Non disponibile'] : ['nv', 'Da verificare'], ass.nota));
+
+    /* Dettagli per tipo di luogo */
+    var det = p.dettagli || {};
+    var keys = Object.keys(det).filter(function (k) { return DETTAGLI[k]; });
+    var detBox = document.getElementById('detail-specific');
+    var detList = document.getElementById('detail-specific-list');
+    detList.textContent = '';
+    detBox.hidden = !keys.length;
+    document.getElementById('detail-specific-title').textContent = TITOLO_DETTAGLI[p.categoria] || 'Dettagli';
+    keys.forEach(function (k) { detList.appendChild(infoRow(DETTAGLI[k][0], valoreDettaglio(k, det[k]))); });
+  }
+
   function initDetail() {
     var root = document.getElementById('detail');
     if (!root) return;
@@ -528,9 +850,16 @@
       document.getElementById('detail-title').textContent = p.nome;
       document.getElementById('detail-address').textContent = p.indirizzo + ', ' + p.cap + ' ' + p.citta + ' (' + p.provincia + ')';
       document.getElementById('detail-intro').textContent = p.descrizione || '';
-      document.getElementById('detail-date').textContent = p.verificato_il
-        ? 'Ultima verifica sul posto: ' + formatDate(p.verificato_il)
-        : 'Non ancora verificato sul posto: le informazioni arrivano da una segnalazione.';
+
+      var v = verifica(p);
+      var trust = document.getElementById('detail-trust');
+      trust.textContent = '';
+      trust.appendChild(verificaNode(p));
+      document.getElementById('detail-date').textContent = v.data
+        ? (v.scaduta
+          ? 'Ultima verifica: ' + formatDate(v.data) + '. Sono passati più di ' + SCADENZA_MESI + ' mesi: le informazioni potrebbero essere cambiate.'
+          : 'Ultima verifica: ' + formatDate(v.data) + '.')
+        : 'Non ancora verificato: le informazioni arrivano da una segnalazione.';
 
       initDirections(p);
 
@@ -538,39 +867,27 @@
       report.href = 'mailto:ovunqueaccessibile@gmail.com?subject=' +
         encodeURIComponent('Correzione scheda: ' + p.nome + ', ' + p.citta + ' (' + p.id + ')');
 
-      var facts = document.getElementById('detail-facts');
-      [
-        ['ingresso', 'Ingresso'],
-        ['porta_cm', 'Porta d\'ingresso'],
-        ['interni', 'Spazi e percorsi'],
-        ['ascensore', 'Piani e ascensore'],
-        ['bagno', 'Bagno'],
-        ['parcheggio', 'Parcheggio'],
-        ['assistenza', 'Assistenza']
-      ].forEach(function (row) {
-        var note = p.note && p.note[row[0]];
-        facts.appendChild(el('div', { className: 'facts__row' }, [
-          el('dt', { text: row[1] }),
-          el('dd', {}, [
-            statusNode(p, row[0]),
-            note ? el('p', { className: 'facts__note', text: note }) : null
-          ])
-        ]));
-      });
-
+      renderDetail(p);
+      onEsigenza(function () { renderDetail(p); });
       document.getElementById('detail-body').hidden = false;
 
       var box = document.getElementById('detail-map');
       var map = createMap(box, { zoomControl: true });
       if (map) {
         map.setView([p.lat, p.lng], 16);
-        addMarker(map, p, null, true).openPopup();
+        var marker = addMarker(map, p, null, true);
+        marker.openPopup();
+        onEsigenza(function () {
+          marker.setIcon(pinIcon(giudizio(p, esigenza())));
+          marker.setPopupContent(popupContent(p));
+        });
       }
     }).catch(function () {
       document.getElementById('detail-intro').textContent = 'Non siamo riusciti a caricare la scheda. Ricarica la pagina tra poco.';
     });
   }
 
+  initNeedsPicker();
   initHome();
   initExplore();
   initDetail();

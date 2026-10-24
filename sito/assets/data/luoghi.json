@@ -1,5 +1,6 @@
 {
-  "_nota": "DATI DI ESEMPIO per il prototipo: luoghi inventati, non reali. Stessa forma della futura tabella Supabase 'places'. Valori a tre stati: \"si\", \"no\", null = non ancora verificato. 'note' contiene un dettaglio per ogni voce.",
+  "_nota": "DATI DI ESEMPIO per il prototipo: luoghi inventati, non reali. Stessa forma della futura tabella Supabase 'places'. Le misure sono numeri (cm, gradini, %); null = non ancora misurato. I giudizi per esigenza li calcola sito.js (sezione Regole). porta_cm = 0 significa che non c'è una porta (spiagge, parchi, pontili).",
+  "versione": 2,
   "luoghi": [
     {
       "id": "esempio-museo-roma",
@@ -12,24 +13,59 @@
       "regione": "Lazio",
       "lat": 41.8955,
       "lng": 12.4823,
-      "ingresso": "rampa",
-      "porta_cm": 90,
-      "interni": "tutto",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": "si",
       "descrizione": "Tre piani di esposizione, tutti raggiungibili. Il percorso accessibile parte dall'ingresso laterale.",
-      "note": {
-        "ingresso": "Rampa a sinistra della scalinata, pendenza dichiarata 6%, con corrimano.",
-        "porta_cm": "Porta automatica.",
-        "interni": "Pavimenti lisci, sale ampie, panche con spazio accanto.",
-        "ascensore": "Cabina 110 × 140 cm, pulsanti in braille.",
-        "bagno": "Al piano terra: maniglioni su entrambi i lati, lavabo sospeso.",
-        "parcheggio": "Due posti riservati a 30 metri, in Via di Prova.",
-        "assistenza": "Sedia a rotelle in prestito alla biglietteria."
+      "misure": {
+        "ingresso": {
+          "gradini": 12,
+          "gradino_cm": 16,
+          "rampa": true,
+          "rampa_pct": 6,
+          "corrimano": true,
+          "porta_cm": 90,
+          "nota": "Rampa a sinistra della scalinata, pendenza dichiarata 6%, con corrimano.",
+          "nota_porta": "Porta automatica."
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Pavimenti lisci, sale ampie, panche con spazio accanto."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            110,
+            140
+          ],
+          "nota": "Cabina 110 × 140 cm, pulsanti in braille."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 150,
+          "maniglioni": true,
+          "nota": "Al piano terra: maniglioni su entrambi i lati, lavabo sospeso."
+        }
       },
-      "verificato_il": "2026-10-18"
+      "facoltativi": {
+        "porta_tipo": "automatica",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 30,
+          "nota": "Due posti riservati a 30 metri, in Via di Prova."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Sedia a rotelle in prestito alla biglietteria."
+        }
+      },
+      "dettagli": {
+        "percorso_tattile": false,
+        "ausili_prestito": true
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-10-18"
+      }
     },
     {
       "id": "esempio-trattoria-roma",
@@ -40,25 +76,57 @@
       "citta": "Roma",
       "provincia": "RM",
       "regione": "Lazio",
-      "lat": 41.8890,
-      "lng": 12.4700,
-      "ingresso": "gradino-basso",
-      "porta_cm": 78,
-      "interni": "parziale",
-      "ascensore": "non-serve",
-      "bagno": "no",
-      "parcheggio": "no",
-      "assistenza": "si",
+      "lat": 41.889,
+      "lng": 12.47,
       "descrizione": "Sala piccola: meglio prenotare e chiedere il tavolo vicino all'ingresso.",
-      "note": {
-        "ingresso": "Un gradino di 5 cm; il personale ha una pedana mobile.",
-        "porta_cm": "Porta stretta: passa una carrozzina standard, a fatica una elettronica.",
-        "interni": "Sala al piano terra accessibile, dehors su sampietrini.",
-        "bagno": "Bagno al piano di sotto, con scale.",
-        "parcheggio": "Zona a traffico limitato.",
-        "assistenza": "Molto disponibili, chiamare prima."
+      "misure": {
+        "ingresso": {
+          "gradini": 1,
+          "gradino_cm": 5,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": false,
+          "porta_cm": 78,
+          "nota": "Un gradino di 5 cm; il personale ha una pedana mobile.",
+          "nota_porta": "Porta stretta: passa una carrozzina standard, a fatica una elettronica."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Sala al piano terra accessibile, dehors su sampietrini."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "assente",
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": "Bagno al piano di sotto, con scale."
+        }
       },
-      "verificato_il": "2026-10-12"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": "irregolare",
+        "sedute": true,
+        "parcheggio": {
+          "posti": false,
+          "distanza_m": null,
+          "nota": "Zona a traffico limitato."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Molto disponibili, chiamare prima."
+        }
+      },
+      "dettagli": {
+        "tavoli_cm": 76,
+        "spazio_gambe": true
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2026-10-12"
+      }
     },
     {
       "id": "esempio-ristorante-milano",
@@ -71,20 +139,54 @@
       "regione": "Lombardia",
       "lat": 45.4685,
       "lng": 9.1824,
-      "ingresso": "senza-gradini",
-      "porta_cm": 85,
-      "interni": "tutto",
-      "ascensore": "non-serve",
-      "bagno": "si",
-      "parcheggio": "no",
-      "assistenza": null,
       "descrizione": "Ingresso a raso e tavoli alti 75 cm con spazio per le gambe.",
-      "note": {
-        "ingresso": "A filo del marciapiede.",
-        "bagno": "Spazio di rotazione di 150 cm, maniglione a destra.",
-        "parcheggio": "Posti riservati più vicini a 200 metri."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 85,
+          "nota": "A filo del marciapiede."
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": null
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 150,
+          "maniglioni": true,
+          "nota": "Spazio di rotazione di 150 cm, maniglione a destra."
+        }
       },
-      "verificato_il": "2026-09-20"
+      "facoltativi": {
+        "porta_tipo": null,
+        "pavimento": "liscio",
+        "sedute": null,
+        "parcheggio": {
+          "posti": false,
+          "distanza_m": 200,
+          "nota": "Posti riservati più vicini a 200 metri."
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "tavoli_cm": 75,
+        "spazio_gambe": true
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-09-20"
+      }
     },
     {
       "id": "esempio-hotel-milano",
@@ -95,24 +197,60 @@
       "citta": "Milano",
       "provincia": "MI",
       "regione": "Lombardia",
-      "lat": 45.4840,
-      "lng": 9.2040,
-      "ingresso": "senza-gradini",
-      "porta_cm": 100,
-      "interni": "tutto",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": "si",
+      "lat": 45.484,
+      "lng": 9.204,
       "descrizione": "Quattro camere accessibili con doccia a filo pavimento.",
-      "note": {
-        "ingresso": "Porta scorrevole automatica.",
-        "interni": "Reception con bancone ribassato.",
-        "ascensore": "Due ascensori, cabina 120 × 150 cm.",
-        "bagno": "Doccia a filo con seggiolino ribaltabile, maniglioni, campanello d'emergenza.",
-        "parcheggio": "Garage interno con due posti riservati, da prenotare."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 100,
+          "nota": "Porta scorrevole automatica."
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Reception con bancone ribassato."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            120,
+            150
+          ],
+          "nota": "Due ascensori, cabina 120 × 150 cm."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 150,
+          "maniglioni": true,
+          "nota": "Doccia a filo con seggiolino ribaltabile, maniglioni, campanello d'emergenza."
+        }
       },
-      "verificato_il": "2026-10-05"
+      "facoltativi": {
+        "porta_tipo": "automatica",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 0,
+          "nota": "Garage interno con due posti riservati, da prenotare."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "camere_accessibili": 4,
+        "doccia_filo": true
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-10-05"
+      }
     },
     {
       "id": "esempio-spiaggia-rimini",
@@ -125,22 +263,54 @@
       "regione": "Emilia-Romagna",
       "lat": 44.0678,
       "lng": 12.5795,
-      "ingresso": "senza-gradini",
-      "porta_cm": null,
-      "interni": "parziale",
-      "ascensore": "non-serve",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": "si",
       "descrizione": "Passerella fino alla battigia e sedia da mare disponibile.",
-      "note": {
-        "ingresso": "Accesso dal lungomare senza dislivelli.",
-        "interni": "Passerella fino a 5 metri dall'acqua; ombrelloni delle prime file raggiungibili.",
-        "bagno": "Bagno e doccia accessibili nello stabilimento.",
-        "parcheggio": "Parcheggio pubblico con posti riservati di fronte.",
-        "assistenza": "Sedia da mare (tipo Job) da prenotare il giorno prima."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 0,
+          "nota": "Accesso dal lungomare senza dislivelli."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Passerella fino a 5 metri dall'acqua; ombrelloni delle prime file raggiungibili."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": null,
+          "maniglioni": true,
+          "nota": "Bagno e doccia accessibili nello stabilimento."
+        }
       },
-      "verificato_il": "2026-08-15"
+      "facoltativi": {
+        "porta_tipo": null,
+        "pavimento": "irregolare",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 40,
+          "nota": "Parcheggio pubblico con posti riservati di fronte."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Sedia da mare (tipo Job) da prenotare il giorno prima."
+        }
+      },
+      "dettagli": {
+        "passerella": true,
+        "sedia_mare": true
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2026-08-15"
+      }
     },
     {
       "id": "esempio-hotel-napoli",
@@ -153,21 +323,58 @@
       "regione": "Campania",
       "lat": 40.8399,
       "lng": 14.2523,
-      "ingresso": "gradino-basso",
-      "porta_cm": 80,
-      "interni": "parziale",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": null,
-      "assistenza": null,
       "descrizione": "Una sola camera con bagno attrezzato: chiedere quella al momento della prenotazione.",
-      "note": {
-        "ingresso": "Un gradino di 4 cm.",
-        "interni": "Sala colazioni al primo piano, raggiungibile in ascensore.",
-        "ascensore": "Cabina stretta: 80 × 120 cm.",
-        "bagno": "Camera 101: doccia con piatto basso, maniglione."
+      "misure": {
+        "ingresso": {
+          "gradini": 1,
+          "gradino_cm": 4,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": false,
+          "porta_cm": 80,
+          "nota": "Nessuna rampa; il personale non ha una pedana mobile."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Sala colazioni al primo piano, raggiungibile in ascensore."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            80,
+            120
+          ],
+          "nota": "Cabina stretta: 80 × 120 cm."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 130,
+          "maniglioni": true,
+          "nota": "Camera 101: doccia con piatto basso, maniglione."
+        }
       },
-      "verificato_il": "2026-07-30"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": "liscio",
+        "sedute": null,
+        "parcheggio": {
+          "posti": null,
+          "distanza_m": null,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "camere_accessibili": 1,
+        "doccia_filo": false
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2026-07-30"
+      }
     },
     {
       "id": "esempio-pizzeria-napoli",
@@ -178,22 +385,57 @@
       "citta": "Napoli",
       "provincia": "NA",
       "regione": "Campania",
-      "lat": 40.8510,
-      "lng": 14.2610,
-      "ingresso": "gradini",
-      "porta_cm": 90,
-      "interni": "non-accessibile",
-      "ascensore": "no",
-      "bagno": "no",
-      "parcheggio": "no",
-      "assistenza": null,
+      "lat": 40.851,
+      "lng": 14.261,
       "descrizione": "Locale su due livelli raggiungibili solo con scale.",
-      "note": {
-        "ingresso": "Tre gradini da 15 cm, nessuna rampa.",
-        "interni": "Sala al piano rialzato.",
-        "bagno": "Al piano di sotto."
+      "misure": {
+        "ingresso": {
+          "gradini": 3,
+          "gradino_cm": 15,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": true,
+          "porta_cm": 90,
+          "nota": "Tre gradini da 15 cm, nessuna rampa."
+        },
+        "spazi": {
+          "valore": "no",
+          "nota": "Sala al piano rialzato."
+        },
+        "piani": {
+          "valore": "scale",
+          "corrimano_scale": true,
+          "nota": null
+        },
+        "bagno": {
+          "valore": "assente",
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": "Al piano di sotto."
+        }
       },
-      "verificato_il": "2026-09-02"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": null,
+        "sedute": null,
+        "parcheggio": {
+          "posti": false,
+          "distanza_m": null,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "tavoli_cm": null,
+        "spazio_gambe": null
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2026-09-02"
+      }
     },
     {
       "id": "esempio-parco-torino",
@@ -206,21 +448,51 @@
       "regione": "Piemonte",
       "lat": 45.0547,
       "lng": 7.6852,
-      "ingresso": "senza-gradini",
-      "porta_cm": null,
-      "interni": "tutto",
-      "ascensore": "non-serve",
-      "bagno": "no",
-      "parcheggio": "si",
-      "assistenza": null,
       "descrizione": "Vialetti asfaltati e pianeggianti, panchine con braccioli ogni 100 metri.",
-      "note": {
-        "ingresso": "Cancello largo 3 metri.",
-        "interni": "Anello principale di 2 km tutto in piano.",
-        "bagno": "Nessun bagno pubblico nel parco.",
-        "parcheggio": "Quattro posti riservati all'ingresso nord."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 0,
+          "nota": "Cancello largo 3 metri."
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Anello principale di 2 km tutto in piano."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "non-previsto",
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": "Nessun bagno pubblico nel parco."
+        }
       },
-      "verificato_il": "2026-09-05"
+      "facoltativi": {
+        "porta_tipo": null,
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 20,
+          "nota": "Quattro posti riservati all'ingresso nord."
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {},
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-09-05"
+      }
     },
     {
       "id": "esempio-museo-torino",
@@ -231,23 +503,60 @@
       "citta": "Torino",
       "provincia": "TO",
       "regione": "Piemonte",
-      "lat": 45.0680,
-      "lng": 7.6830,
-      "ingresso": "senza-gradini",
-      "porta_cm": 120,
-      "interni": "tutto",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": null,
-      "assistenza": "si",
+      "lat": 45.068,
+      "lng": 7.683,
       "descrizione": "Percorsi tattili e postazioni interattive ad altezza ridotta.",
-      "note": {
-        "interni": "Tavoli interattivi alti 80 cm, percorso tattile per persone cieche.",
-        "ascensore": "Due ascensori, cabina ampia.",
-        "bagno": "Uno per piano.",
-        "assistenza": "Visite guidate in LIS su prenotazione."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 120,
+          "nota": null
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Tavoli interattivi alti 80 cm, percorso tattile per persone cieche."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            140,
+            160
+          ],
+          "nota": "Due ascensori, cabina ampia."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 160,
+          "maniglioni": true,
+          "nota": "Uno per piano."
+        }
       },
-      "verificato_il": "2026-10-20"
+      "facoltativi": {
+        "porta_tipo": "automatica",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": null,
+          "distanza_m": null,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Visite guidate in LIS su prenotazione."
+        }
+      },
+      "dettagli": {
+        "percorso_tattile": true,
+        "ausili_prestito": false
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-10-20"
+      }
     },
     {
       "id": "esempio-cinema-bologna",
@@ -260,21 +569,55 @@
       "regione": "Emilia-Romagna",
       "lat": 44.4949,
       "lng": 11.3426,
-      "ingresso": "gradini",
-      "porta_cm": 120,
-      "interni": "parziale",
-      "ascensore": "no",
-      "bagno": null,
-      "parcheggio": "no",
-      "assistenza": "si",
       "descrizione": "Ingresso principale con gradini; ingresso laterale ancora da verificare.",
-      "note": {
-        "ingresso": "Tre gradini all'ingresso principale.",
-        "interni": "Due posti per carrozzina nella sala 1, in ultima fila.",
-        "ascensore": "Sale 2 e 3 al primo piano, solo scale.",
-        "assistenza": "Il personale apre l'ingresso laterale su richiesta."
+      "misure": {
+        "ingresso": {
+          "gradini": 3,
+          "gradino_cm": 14,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": true,
+          "porta_cm": 120,
+          "nota": "Tre gradini all'ingresso principale."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Due posti per carrozzina nella sala 1, in ultima fila."
+        },
+        "piani": {
+          "valore": "scale",
+          "corrimano_scale": true,
+          "nota": "Sale 2 e 3 al primo piano, solo scale."
+        },
+        "bagno": {
+          "valore": null,
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": null
+        }
       },
-      "verificato_il": "2026-06-12"
+      "facoltativi": {
+        "porta_tipo": "pesante",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": false,
+          "distanza_m": null,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Il personale apre l'ingresso laterale su richiesta."
+        }
+      },
+      "dettagli": {
+        "posti_carrozzina": 2,
+        "accompagnatore_gratis": null
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2024-06-12"
+      }
     },
     {
       "id": "esempio-teatro-bologna",
@@ -285,25 +628,60 @@
       "citta": "Bologna",
       "provincia": "BO",
       "regione": "Emilia-Romagna",
-      "lat": 44.4920,
-      "lng": 11.3520,
-      "ingresso": "rampa",
-      "porta_cm": 100,
-      "interni": "parziale",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": "si",
+      "lat": 44.492,
+      "lng": 11.352,
       "descrizione": "Platea accessibile; palchi raggiungibili solo con scale.",
-      "note": {
-        "ingresso": "Rampa fissa, pendenza dichiarata 7%.",
-        "interni": "Sei posti per carrozzina in platea, con posto accanto per l'accompagnatore.",
-        "ascensore": "Dal foyer al guardaroba.",
-        "bagno": "Al piano della platea.",
-        "parcheggio": "Due posti riservati in piazza.",
-        "assistenza": "Biglietto gratuito per l'accompagnatore."
+      "misure": {
+        "ingresso": {
+          "gradini": 4,
+          "gradino_cm": 15,
+          "rampa": true,
+          "rampa_pct": 7,
+          "corrimano": true,
+          "porta_cm": 100,
+          "nota": "Rampa fissa, pendenza dichiarata 7%."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Sei posti per carrozzina in platea, con posto accanto per l'accompagnatore."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            100,
+            130
+          ],
+          "nota": "Dal foyer al guardaroba."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 150,
+          "maniglioni": true,
+          "nota": "Al piano della platea."
+        }
       },
-      "verificato_il": "2026-10-01"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 50,
+          "nota": "Due posti riservati in piazza."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Biglietto gratuito per l'accompagnatore."
+        }
+      },
+      "dettagli": {
+        "posti_carrozzina": 6,
+        "accompagnatore_gratis": true
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-10-01"
+      }
     },
     {
       "id": "esempio-negozio-firenze",
@@ -316,20 +694,51 @@
       "regione": "Toscana",
       "lat": 43.7696,
       "lng": 11.2558,
-      "ingresso": "rampa",
-      "porta_cm": 95,
-      "interni": "tutto",
-      "ascensore": "non-serve",
-      "bagno": null,
-      "parcheggio": null,
-      "assistenza": "si",
       "descrizione": "Corsie larghe e scaffali bassi nella sezione ragazzi.",
-      "note": {
-        "ingresso": "Rampa mobile: suonare il campanello all'altezza di 90 cm.",
-        "interni": "Corsie larghe almeno 110 cm.",
-        "assistenza": "Il personale prende i libri dagli scaffali alti."
+      "misure": {
+        "ingresso": {
+          "gradini": 1,
+          "gradino_cm": 12,
+          "rampa": true,
+          "rampa_pct": null,
+          "corrimano": false,
+          "porta_cm": 95,
+          "nota": "Rampa mobile: suonare il campanello all'altezza di 90 cm."
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Corsie larghe almeno 110 cm."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "non-previsto",
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": null
+        }
       },
-      "verificato_il": "2026-10-10"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": "liscio",
+        "sedute": false,
+        "parcheggio": {
+          "posti": null,
+          "distanza_m": null,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Il personale prende i libri dagli scaffali alti."
+        }
+      },
+      "dettagli": {},
+      "verifica": {
+        "livello": "community",
+        "data": "2026-10-10"
+      }
     },
     {
       "id": "esempio-agriturismo-siena",
@@ -340,22 +749,56 @@
       "citta": "Siena",
       "provincia": "SI",
       "regione": "Toscana",
-      "lat": 43.3300,
-      "lng": 11.3200,
-      "ingresso": "senza-gradini",
-      "porta_cm": 90,
-      "interni": "parziale",
-      "ascensore": "non-serve",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": null,
+      "lat": 43.33,
+      "lng": 11.32,
       "descrizione": "Due camere al piano terra; giardino con ghiaia.",
-      "note": {
-        "interni": "Ristorante e camere al piano terra accessibili; giardino in ghiaia difficile in carrozzina.",
-        "bagno": "Doccia a filo pavimento nelle camere 1 e 2.",
-        "parcheggio": "Parcheggio interno davanti alle camere."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 90,
+          "nota": null
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Ristorante e camere al piano terra accessibili; giardino in ghiaia difficile in carrozzina."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 150,
+          "maniglioni": true,
+          "nota": "Doccia a filo pavimento nelle camere 1 e 2."
+        }
       },
-      "verificato_il": "2026-09-14"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": "ghiaia",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 10,
+          "nota": "Parcheggio interno davanti alle camere."
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "camere_accessibili": 2,
+        "doccia_filo": true
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-09-14"
+      }
     },
     {
       "id": "esempio-stazione-venezia",
@@ -366,23 +809,56 @@
       "citta": "Venezia",
       "provincia": "VE",
       "regione": "Veneto",
-      "lat": 45.4410,
-      "lng": 12.3210,
-      "ingresso": "rampa",
-      "porta_cm": null,
-      "interni": "parziale",
-      "ascensore": "non-serve",
-      "bagno": null,
-      "parcheggio": "no",
-      "assistenza": "si",
+      "lat": 45.441,
+      "lng": 12.321,
       "descrizione": "Fermata del vaporetto con pontile a raso, salvo alta marea.",
-      "note": {
-        "ingresso": "Passerella con pendenza variabile secondo la marea.",
-        "interni": "Posti per carrozzina sul ponte esterno del battello.",
-        "parcheggio": "Città senza auto.",
-        "assistenza": "Il marinaio aiuta a salire."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": true,
+          "rampa_pct": 10,
+          "corrimano": true,
+          "porta_cm": 0,
+          "nota": "Passerella con pendenza variabile secondo la marea."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Posti per carrozzina sul ponte esterno del battello."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": null,
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": null
+        }
       },
-      "verificato_il": "2026-08-28"
+      "facoltativi": {
+        "porta_tipo": null,
+        "pavimento": "irregolare",
+        "sedute": true,
+        "parcheggio": {
+          "posti": false,
+          "distanza_m": null,
+          "nota": "Città senza auto."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Il marinaio aiuta a salire."
+        }
+      },
+      "dettagli": {
+        "assistenza_prenotabile": false,
+        "preavviso_ore": null
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2026-08-28"
+      }
     },
     {
       "id": "esempio-museo-trento",
@@ -393,24 +869,60 @@
       "citta": "Trento",
       "provincia": "TN",
       "regione": "Trentino-Alto Adige",
-      "lat": 46.0700,
-      "lng": 11.1250,
-      "ingresso": "gradini",
-      "porta_cm": 110,
-      "interni": "parziale",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": null,
+      "lat": 46.07,
+      "lng": 11.125,
       "descrizione": "Edificio storico: accessibile solo il piano nobile, con ascensore dal cortile.",
-      "note": {
-        "ingresso": "Ingresso principale con scalone; ingresso dal cortile da chiedere in biglietteria.",
-        "interni": "Torre e camminamenti non accessibili.",
-        "ascensore": "Dal cortile al piano nobile.",
-        "bagno": "Nel cortile.",
-        "parcheggio": "Due posti riservati nel cortile, con permesso."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 110,
+          "nota": "Ingresso dal cortile, da chiedere in biglietteria: lo scalone principale non è accessibile."
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Torre e camminamenti non accessibili."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            90,
+            130
+          ],
+          "nota": "Dal cortile al piano nobile."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 140,
+          "maniglioni": true,
+          "nota": "Nel cortile."
+        }
       },
-      "verificato_il": "2026-07-18"
+      "facoltativi": {
+        "porta_tipo": "pesante",
+        "pavimento": "irregolare",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 0,
+          "nota": "Due posti riservati nel cortile, con permesso."
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "percorso_tattile": false,
+        "ausili_prestito": false
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-07-18"
+      }
     },
     {
       "id": "esempio-bar-genova",
@@ -421,21 +933,56 @@
       "citta": "Genova",
       "provincia": "GE",
       "regione": "Liguria",
-      "lat": 44.4070,
-      "lng": 8.9330,
-      "ingresso": "senza-gradini",
-      "porta_cm": 82,
-      "interni": "tutto",
-      "ascensore": "non-serve",
-      "bagno": "si",
-      "parcheggio": null,
-      "assistenza": null,
+      "lat": 44.407,
+      "lng": 8.933,
       "descrizione": "Bancone con una parte ribassata.",
-      "note": {
-        "interni": "Bancone ribassato a 80 cm su un lato.",
-        "bagno": "Piccolo ma con maniglione e porta che apre verso l'esterno."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 82,
+          "nota": null
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Bancone ribassato a 80 cm su un lato."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": null,
+          "maniglioni": true,
+          "nota": "Piccolo ma con maniglione e porta che apre verso l'esterno."
+        }
       },
-      "verificato_il": "2026-10-15"
+      "facoltativi": {
+        "porta_tipo": "manuale",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": null,
+          "distanza_m": null,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {
+        "tavoli_cm": 74,
+        "spazio_gambe": true
+      },
+      "verifica": {
+        "livello": "community",
+        "data": "2026-10-15"
+      }
     },
     {
       "id": "esempio-spiaggia-cagliari",
@@ -446,24 +993,56 @@
       "citta": "Cagliari",
       "provincia": "CA",
       "regione": "Sardegna",
-      "lat": 39.2080,
-      "lng": 9.1450,
-      "ingresso": "rampa",
-      "porta_cm": null,
-      "interni": "tutto",
-      "ascensore": "non-serve",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": "si",
+      "lat": 39.208,
+      "lng": 9.145,
       "descrizione": "Passerella fino all'acqua e area ombreggiata riservata.",
-      "note": {
-        "ingresso": "Rampa dal parcheggio alla spiaggia.",
-        "interni": "Passerella fino all'acqua, sedia anfibia gratuita.",
-        "bagno": "Bagno e doccia accessibili.",
-        "parcheggio": "Sei posti riservati.",
-        "assistenza": "Bagnino formato per l'accompagnamento in acqua."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": true,
+          "rampa_pct": 5,
+          "corrimano": true,
+          "porta_cm": 0,
+          "nota": "Rampa dal parcheggio alla spiaggia."
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Passerella fino all'acqua, sedia anfibia gratuita."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 160,
+          "maniglioni": true,
+          "nota": "Bagno e doccia accessibili."
+        }
       },
-      "verificato_il": "2026-08-02"
+      "facoltativi": {
+        "porta_tipo": null,
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 30,
+          "nota": "Sei posti riservati."
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Bagnino formato per l'accompagnamento in acqua."
+        }
+      },
+      "dettagli": {
+        "passerella": true,
+        "sedia_mare": true
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-08-02"
+      }
     },
     {
       "id": "esempio-stazione-palermo",
@@ -474,23 +1053,60 @@
       "citta": "Palermo",
       "provincia": "PA",
       "regione": "Sicilia",
-      "lat": 38.1100,
-      "lng": 13.3640,
-      "ingresso": "senza-gradini",
-      "porta_cm": null,
-      "interni": "parziale",
-      "ascensore": "si",
-      "bagno": "si",
-      "parcheggio": "si",
-      "assistenza": "si",
+      "lat": 38.11,
+      "lng": 13.364,
       "descrizione": "Ascensori per i binari e servizio di assistenza da prenotare.",
-      "note": {
-        "interni": "Binari 1–5 con ascensore; binari 6–8 solo con sottopasso a scale.",
-        "ascensore": "A volte fuori servizio: controllare prima.",
-        "bagno": "Nell'atrio, aperto 6–22.",
-        "assistenza": "Assistenza al treno da prenotare almeno 24 ore prima."
+      "misure": {
+        "ingresso": {
+          "gradini": 0,
+          "gradino_cm": null,
+          "rampa": false,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 150,
+          "nota": null
+        },
+        "spazi": {
+          "valore": "parziale",
+          "nota": "Binari 1–5 con ascensore; binari 6–8 solo con sottopasso a scale."
+        },
+        "piani": {
+          "valore": "ascensore",
+          "ascensore_cm": [
+            110,
+            140
+          ],
+          "nota": "A volte fuori servizio: controllare prima."
+        },
+        "bagno": {
+          "valore": "attrezzato",
+          "rotazione_cm": 150,
+          "maniglioni": true,
+          "nota": "Nell'atrio, aperto 6–22."
+        }
       },
-      "verificato_il": "2026-09-28"
+      "facoltativi": {
+        "porta_tipo": "automatica",
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": 60,
+          "nota": null
+        },
+        "assistenza": {
+          "valore": true,
+          "nota": "Assistenza al treno da prenotare almeno 24 ore prima."
+        }
+      },
+      "dettagli": {
+        "assistenza_prenotabile": true,
+        "preavviso_ore": 24
+      },
+      "verifica": {
+        "livello": "sul-posto",
+        "data": "2026-09-28"
+      }
     },
     {
       "id": "esempio-piazza-bari",
@@ -501,21 +1117,53 @@
       "citta": "Bari",
       "provincia": "BA",
       "regione": "Puglia",
-      "lat": 41.1250,
-      "lng": 16.8750,
-      "ingresso": "senza-gradini",
-      "porta_cm": null,
-      "interni": "tutto",
-      "ascensore": "non-serve",
-      "bagno": null,
-      "parcheggio": "si",
-      "assistenza": null,
+      "lat": 41.125,
+      "lng": 16.875,
       "descrizione": "Passeggiata larga e in piano, scivoli ai passaggi pedonali.",
-      "note": {
-        "interni": "Pavimentazione liscia per 3 km, scivoli a ogni attraversamento.",
-        "parcheggio": "Posti riservati lungo la strada parallela."
+      "misure": {
+        "ingresso": {
+          "gradini": null,
+          "gradino_cm": null,
+          "rampa": null,
+          "rampa_pct": null,
+          "corrimano": null,
+          "porta_cm": 0,
+          "nota": null
+        },
+        "spazi": {
+          "valore": "tutti",
+          "nota": "Pavimentazione liscia per 3 km, scivoli a ogni attraversamento."
+        },
+        "piani": {
+          "valore": "uno",
+          "nota": null
+        },
+        "bagno": {
+          "valore": "non-previsto",
+          "rotazione_cm": null,
+          "maniglioni": null,
+          "nota": null
+        }
       },
-      "verificato_il": null
+      "facoltativi": {
+        "porta_tipo": null,
+        "pavimento": "liscio",
+        "sedute": true,
+        "parcheggio": {
+          "posti": true,
+          "distanza_m": null,
+          "nota": "Posti riservati lungo la strada parallela."
+        },
+        "assistenza": {
+          "valore": null,
+          "nota": null
+        }
+      },
+      "dettagli": {},
+      "verifica": {
+        "livello": "community",
+        "data": null
+      }
     }
   ]
 }
