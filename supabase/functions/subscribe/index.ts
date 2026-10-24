@@ -1,5 +1,5 @@
 /*
- * Ovunque Accessibile – Edge Function "subscribe" (sostituisce subscribe.php).
+ * Ovunque Accessibile – Edge Function "subscribe".
  *
  * GET  ?action=token → { token } firmato con HMAC (orario + nonce): serve al controllo
  *                      del tempo minimo di compilazione, senza cookie né sessioni.

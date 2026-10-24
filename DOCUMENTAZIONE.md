@@ -1,6 +1,6 @@
 # Ovunque Accessibile – pagina "in arrivo"
 
-Pagina unica che annuncia l'arrivo del **sito definitivo e della web-app**, con una carrozzina animata che percorre una stradina e un modulo per lasciare **solo l'email** ed essere avvisati.
+Pagina unica che annuncia l'arrivo del **sito definitivo e della web-app**, con una mappa dell'Italia a puntini che si accende pian piano e un modulo per lasciare **solo l'email** ed essere avvisati.
 Realizzata da Mockly.
 
 - **Front-end**: HTML5, CSS3, JavaScript vanilla (solo progressive enhancement). Sito statico, nessun framework, nessun CDN, nessun tracker, **nessun cookie** (quindi niente banner cookie).
@@ -19,7 +19,7 @@ Realizzata da Mockly.
 ├── .htaccess                header di sicurezza per hosting Apache
 ├── assets/
 │   ├── css/style.css
-│   ├── js/main.js           animazione della carrozzina + modulo
+│   ├── js/main.js           animazione della mappa + modulo
 │   ├── fonts/               Fredoka 600 (titoli), Atkinson Hyperlegible 400/700 (testi); woff2, licenza OFL inclusa
 │   └── img/                 logo, favicon, apple-touch-icon, og-image
 ├── supabase/                NON va pubblicato con il sito
@@ -31,14 +31,18 @@ Realizzata da Mockly.
 
 ## La pagina
 
-- **Annuncio**: logo, "In arrivo", nome, slogan e una frase: "Siamo Angelo e Lorenzo. Stiamo preparando il sito e la web-app…".
-- **Stradina animata** (SVG): una carrozzina percorre un sentiero (ripreso dal logo) passando accanto a due segnaposto; la ruota gira mentre avanza.
-  - Animazione SMIL avviata da `main.js`, in loop. Un pulsante **"Ferma / Avvia l'animazione"** la controlla (WCAG 2.2.2).
-  - Se il sistema chiede di ridurre il movimento (`prefers-reduced-motion`), la carrozzina resta ferma e il pulsante permette di avviarla.
-  - Senza JavaScript la carrozzina resta ferma a metà strada.
-  - La scena è decorativa (`aria-hidden`): il contenuto è tutto nel testo.
-- **Modulo "Ti avvisiamo noi"**: email + consenso, pulsante "Avvisami".
-- **Footer**: Instagram, email di contatto, privacy, © 2026, "Sito realizzato da Mockly".
+Fondo chiaro e caldo. Su computer due colonne (testo e modulo a sinistra, mappa a destra); su telefono e tablet una colonna centrata, con il modulo nella prima schermata e la mappa sotto.
+
+- **Testo**: badge "In arrivo · sito e web-app", titolo "La mappa dei luoghi davvero accessibili", una frase, firma "Un progetto di Angelo e Lorenzo".
+- **Modulo**: email + consenso, pulsante "Avvisami". Finché `[PROJECT-REF]` non è sostituito, l'invio mostra "Le iscrizioni aprono a breve" invece di un errore.
+- **Mappa a puntini** (SVG statico in `index.html`): 987 punti generati dal contorno dell'Italia di [Natural Earth](https://www.naturalearthdata.com) (pubblico dominio), Sicilia e Sardegna comprese.
+  - `main.js` accende un punto ogni 0,7 s con un'onda; ogni quattro punti compare un segnaposto. Restano accesi al massimo 90 punti.
+  - **I punti accesi sono un'illustrazione, non luoghi reali**: lo dice la nota visibile sotto la mappa. Quando ci saranno luoghi veri, la stessa mappa potrà mostrarli.
+  - Tre etichette d'esempio (Ingresso senza gradini, Bagno attrezzato, Parcheggio riservato) mostrano che tipo di informazioni ci saranno.
+  - Pulsante **"Ferma / Avvia l'animazione"** (WCAG 2.2.2). Con "riduci movimento" la mappa resta ferma; senza JavaScript restano accesi 16 punti fissi.
+  - La mappa è decorativa (`aria-hidden`): il contenuto è tutto nel testo.
+- **Footer** (uguale su tutte le pagine): Privacy, `ovunqueaccessibile@gmail.com`, © 2026, "Sito realizzato da Mockly". Instagram è in alto a destra.
+- **Pagine interne** (`privacy.html`, `grazie.html`, `iscrizione-errore.html`): stesso header, fondo e footer della home, contenuto in una scheda bianca.
 
 ## Come sono protetti i dati
 
@@ -92,12 +96,16 @@ Notifica email facoltativa: account Brevo con dominio verificato, poi `BREVO_API
 
 Si pubblicano **solo**: `*.html`, `assets/`, `_headers` (Netlify/Cloudflare Pages) oppure `.htaccess` (Apache). **Non** pubblicare `supabase/`, i file `.md` e `.claude/`.
 
+**GitHub Pages** (dove si trova ora l'anteprima, https://mockly-website.github.io/ovunque_accessibile/) va bene per far vedere il sito, ma **ignora `_headers` e `.htaccess`**: niente CSP né gli altri header di sicurezza, e pubblica anche `supabase/` e i `.md` (che non contengono segreti). Per il lancio con il modulo attivo meglio Netlify, Cloudflare Pages o un hosting Apache.
+
+Dopo ogni modifica a CSS o JS aggiorna la versione `?v=` nei link di tutte e quattro le pagine HTML, così i browser non usano i file vecchi.
+
 ## Vedere la demo in locale
 
 ```bash
-cd "/Users/noahmelis/Desktop/PROGECT/OVUNQUE ACCESSIBILE" && /Applications/MAMP/bin/php/php8.4.17/bin/php -S 127.0.0.1:8080
+cd "/Users/noahmelis/Desktop/PROGECT/OVUNQUE ACCESSIBILE" && /Applications/MAMP/bin/php/php8.4.17/bin/php -S 127.0.0.1:8090
 ```
-Poi apri http://localhost:8080. La pagina e l'animazione funzionano; il modulo risponde solo dopo aver configurato Supabase.
+Poi apri http://localhost:8090. Per vederla dal telefono sulla stessa Wi-Fi usa `-S 0.0.0.0:8091` e apri l'indirizzo IP del Mac sulla porta 8091. Il server PHP serve solo i file statici; il modulo risponde solo dopo aver configurato Supabase.
 
 ## Consultare ed esportare gli iscritti
 
@@ -107,9 +115,10 @@ Dashboard Supabase → **Table Editor** → schema `private` → `subscribers` �
 
 | Cosa | Dove |
 |---|---|
-| Testi dell'annuncio | `index.html`, blocco "Annuncio" |
-| Stradina, carrozzina, segnaposto | `index.html` (SVG `.trail__svg`), colori in `style.css` sezione 7, velocità in `dur="14s"` (`animateMotion`) |
-| Email di contatto | footer di `index.html`, `privacy.html` (sezioni 1 e 10) |
+| Testi della pagina | `index.html`, blocco `.home__copy` |
+| Mappa: punti, colori, etichette, nota | `index.html` (SVG `#italy-map`, `.italy__tags`, `.italy__note`), colori in `style.css` sezione 7 |
+| Velocità e numero di punti accesi | `main.js` → `EVERY` (ms) e `MAX_LIT` in `initMap` |
+| Email di contatto | footer di tutte le pagine, `privacy.html` (sezioni 1 e 10), `iscrizione-errore.html` |
 | Blu del logo | `style.css` → `--color-brand` |
 | Messaggi del modulo | `main.js` (client) e `supabase/functions/subscribe/index.ts` (server) |
 | Informativa privacy | `privacy.html`; se la cambi, aggiorna il secret `PRIVACY_VERSION` (ora `2026-10-v2`) |
@@ -122,17 +131,17 @@ Dashboard Supabase → **Table Editor** → schema `private` → `subscribers` �
 
 ---
 
-## Report di accessibilità (22 ottobre 2026)
+## Report di accessibilità (24 ottobre 2026)
 
 Obiettivo WCAG 2.2 AA. Verifiche fatte nel browser integrato (Chromium) e con un backend locale (Postgres 17 + Deno).
 
 | Verifica | Esito |
 |---|---|
-| axe-core 4.10.2 (WCAG 2.0/2.1/2.2 A+AA + best practice) | **0 violazioni** su `index.html`, `grazie.html`, `privacy.html`, `iscrizione-errore.html`. In home axe segnala "da rivedere" i testi sopra gli sfondi a gradiente: i colori sono tutti chiari (beige, azzurrino, bianco caldo), il caso peggiore è il link blu in grassetto su beige, 4,75:1 |
-| Tastiera | skip link; invio vuoto → focus sul riepilogo errori; correggendo l'errore sparisce; invio riuscito → focus sul messaggio; pulsante "Ferma/Avvia l'animazione" raggiungibile e attivabile |
+| axe-core 4.10.2 (WCAG 2.0/2.1/2.2 A+AA + best practice) | **0 violazioni** su `index.html`, `grazie.html`, `privacy.html`, `iscrizione-errore.html`. axe segnala "da rivedere" i testi sopra gli sfondi a gradiente: i colori sono tutti chiari (bianco caldo, azzurrino, beige), controllati a mano, tutti ≥ 4,5:1 |
+| Tastiera | skip link; invio vuoto → focus sul riepilogo errori; correggendo l'errore sparisce; invio → focus sul messaggio; pulsante "Ferma/Avvia l'animazione" raggiungibile e attivabile |
 | Errori | `aria-invalid`, messaggio collegato con `aria-describedby`, prefisso nascosto "Errore:", icona + testo + bordo spesso |
-| Animazione | in loop ma con pulsante di pausa (2.2.2); non parte da sola con "riduci movimento"; nessun lampeggiamento |
-| Telefono | 375px: annuncio, carrozzina e inizio del modulo nella prima schermata; nessuno scroll orizzontale |
+| Animazione | mappa in loop ma con pulsante di pausa (2.2.2); non parte con "riduci movimento"; nessun lampeggiamento |
+| Telefono e tablet | 320, 375 e 768 px: colonna centrata, titolo e modulo completo nella prima schermata; nessuno scroll orizzontale. Computer 1280×800: tutto in una schermata |
 | Aree cliccabili | ≥ 44×44 px, tranne i link dentro le frasi (eccezione WCAG 2.5.8) e la checkbox (28 px, ma l'intera etichetta è cliccabile) |
 
 **Non ancora verificato**: VoiceOver/NVDA reali, Lighthouse sul sito online, dispositivi reali, notifica Brevo.

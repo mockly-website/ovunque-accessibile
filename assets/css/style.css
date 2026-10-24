@@ -678,6 +678,14 @@ section:focus {
   filter: drop-shadow(0 4px 6px rgba(22, 40, 65, 0.3));
 }
 
+/* Nota visibile: i punti accesi sono un'illustrazione, non luoghi reali */
+.italy__note {
+  max-width: 34ch;
+  margin: 0;
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
 /* Etichette d'esempio sulle informazioni che troverai (decorative) */
 .italy__tags {
   position: absolute;
@@ -1108,11 +1116,14 @@ section:focus {
 }
 
 .page {
-  padding-block: var(--space-2xl);
+  flex: 1 0 auto;
+  padding-block: var(--space-md) var(--space-2xl);
 }
 
 .page__title {
-  font-size: var(--text-2xl);
+  font-size: clamp(1.9rem, 1.4rem + 2vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .page h2 {
@@ -1131,9 +1142,10 @@ section:focus {
 
 .page-card {
   padding: var(--space-lg);
+  border: 1px solid rgba(22, 40, 65, 0.08);
   border-radius: var(--radius-xl);
-  background: var(--color-card);
-  box-shadow: var(--shadow-sm);
+  background: var(--color-white);
+  box-shadow: 0 2px 6px rgba(22, 40, 65, 0.05), 0 22px 50px rgba(22, 40, 65, 0.12);
 }
 
 @media (min-width: 40em) {
@@ -1150,8 +1162,8 @@ section:focus {
 }
 
 svg.card__icon {
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3rem;
+  height: 3rem;
   margin-bottom: var(--space-sm);
   color: var(--color-brand);
 }
@@ -1168,8 +1180,8 @@ svg.card__icon.icon--error {
 }
 
 /* 11. Animazioni: solo se l'utente non ha chiesto di ridurle.
-   La carrozzina (SMIL) è avviata da main.js, che rispetta la stessa preferenza
-   e mostra un pulsante per fermarla (WCAG 2.2.2). */
+   I punti della mappa sono accesi da main.js, che rispetta la stessa preferenza
+   e mostra un pulsante per fermarli (WCAG 2.2.2). */
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;

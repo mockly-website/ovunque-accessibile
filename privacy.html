@@ -5,36 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Privacy policy – Ovunque Accessibile</title>
   <meta name="description" content="Informativa sul trattamento dei dati personali raccolti con il modulo di iscrizione di Ovunque Accessibile.">
-  <meta name="theme-color" content="#162841">
+  <meta name="theme-color" content="#fbf6ec">
   <meta name="color-scheme" content="light">
   <link rel="icon" href="assets/img/favicon.ico" sizes="any">
   <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-22i">
+  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-24a">
 </head>
-<body>
+<body class="home">
   <!--
     MODELLO DA VERIFICARE: questo testo è una bozza preparata da Mockly e non costituisce consulenza legale.
     Il cliente (titolare del trattamento) deve completare i campi [DA COMPLETARE] e farla verificare
-    prima della pubblicazione. Se modifichi il testo, aggiorna anche 'privacy_version' in config.php.
+    prima della pubblicazione. Se modifichi il testo, aggiorna anche il secret PRIVACY_VERSION della Edge Function "subscribe" su Supabase.
   -->
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M7.5 2h9A5.5 5.5 0 0 1 22 7.5v9a5.5 5.5 0 0 1-5.5 5.5h-9A5.5 5.5 0 0 1 2 16.5v-9A5.5 5.5 0 0 1 7.5 2zm0 2A3.5 3.5 0 0 0 4 7.5v9A3.5 3.5 0 0 0 7.5 20h9a3.5 3.5 0 0 0 3.5-3.5v-9A3.5 3.5 0 0 0 16.5 4h-9zM12 7a5 5 0 1 1 0 10 5 5 0 0 1 0-10zm0 2a3 3 0 1 0 0 6 3 3 0 0 0 0-6zm5.25-3.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5z"/></symbol>
+  </svg>
+
   <ul class="skip-links">
     <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
   </ul>
 
-  <header class="site-header">
-    <div class="container site-header__inner">
-      <a class="brand" href="./">
-        <img class="brand__logo" src="assets/img/logo.png" alt="" width="36" height="45">
-        <span class="brand__name">Ovunque Accessibile</span>
-      </a>
-      <nav class="site-header__nav" aria-label="Principale">
-        <a class="btn btn--primary btn--small" href="./#avvisami">Rimani aggiornato</a>
-      </nav>
-    </div>
+  <header class="home__top container">
+    <a class="brand" href="./">
+      <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
+      <span class="brand__name">Ovunque Accessibile</span>
+    </a>
+    <a class="home__social" href="https://www.instagram.com/ovunque_accessibile">
+      <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>
+      <span class="home__social-label">Instagram</span><span class="visually-hidden"> (sito esterno)</span>
+    </a>
   </header>
 
-  <main id="main" class="section section--light page" tabindex="-1">
+  <main id="main" class="page" tabindex="-1">
     <div class="container container--narrow">
       <article class="page-card prose">
         <h1 class="page__title">Privacy policy</h1>
@@ -54,7 +57,7 @@
         <p>Per qualsiasi domanda sui tuoi dati puoi scrivere a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p>
 
         <h2>2. Quali dati raccogliamo</h2>
-        <p>Con il modulo “Ti avvisiamo noi” raccogliamo:</p>
+        <p>Con il modulo di iscrizione della pagina principale raccogliamo:</p>
         <ul>
           <li>il tuo <strong>indirizzo email</strong>;</li>
           <li><strong>registrati automaticamente:</strong> data e ora del consenso e versione di questa informativa che hai accettato.</li>
@@ -121,12 +124,12 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <p class="site-footer__meta">
-        <span>© 2026 Ovunque Accessibile</span>
-        <span>Sito realizzato da <a class="site-footer__credit" href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
-      </p>
+  <footer class="home__footer">
+    <div class="container home__footer-inner">
+      <a href="privacy.html" aria-current="page">Privacy</a>
+      <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
+      <span>© 2026 Ovunque Accessibile</span>
+      <span>Sito realizzato da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
     </div>
   </footer>
 </body>

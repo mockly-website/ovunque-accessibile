@@ -1,5 +1,5 @@
 /* Ovunque Accessibile – progressive enhancement.
-   Senza JS: la carrozzina resta ferma sulla stradina e il form fa un POST classico
+   Senza JS: la mappa resta ferma (con alcuni punti già accesi) e il form fa un POST classico
    alla Edge Function "subscribe" (Supabase). */
 (function () {
   'use strict';
