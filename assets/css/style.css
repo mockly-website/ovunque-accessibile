@@ -649,6 +649,52 @@ section:focus {
   .home .italy__tag--2 { left: 0; }
 }
 
+/* Tablet grandi in verticale (iPad Pro, o iPad con lo zoom di Safari ridotto): una colonna centrata e più grande,
+   invece delle due colonne da computer che lascerebbero metà schermo vuoto sopra e sotto */
+@media (min-width: 60em) and (max-width: 89.99em) and (orientation: portrait) {
+  .home .home__main {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    gap: var(--space-xl);
+  }
+
+  .home .home__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 44rem;
+    text-align: center;
+  }
+
+  .home .home__title {
+    max-width: 18ch;
+    font-size: clamp(3.4rem, 1rem + 4vw, 4.5rem);
+  }
+
+  .home .home__lead {
+    max-width: 46ch;
+  }
+
+  .home .home__form {
+    width: 100%;
+    max-width: 38rem;
+    text-align: left;
+  }
+
+  .home .italy {
+    width: 100%;
+  }
+
+  .home .italy__stage {
+    width: min(100%, 32rem);
+  }
+
+  .home .italy__tag {
+    font-size: 0.95rem;
+  }
+}
+
 @media (max-width: 29.99em) {
   .home__title {
     font-size: clamp(2.1rem, 1.2rem + 5.5vw, 2.6rem);
