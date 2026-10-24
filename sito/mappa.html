@@ -14,9 +14,11 @@
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
-  <link rel="stylesheet" href="assets/css/sito.css?v=p4">
+  <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p8">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
-  <script src="assets/js/sito.js?v=p4" defer></script>
+  <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
+  <script src="assets/js/sito.js?v=p8" defer></script>
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -26,6 +28,9 @@
     <symbol id="icon-partial" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></symbol>
     <symbol id="icon-no" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
     <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 0 1 0-5 2.5 2.5 0 0 1 0 5z"/></symbol>
+    <symbol id="icon-locate" viewBox="0 0 24 24"><path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm8.94 3A8.99 8.99 0 0 0 13 3.06V1h-2v2.06A8.99 8.99 0 0 0 3.06 11H1v2h2.06A8.99 8.99 0 0 0 11 20.94V23h2v-2.06A8.99 8.99 0 0 0 20.94 13H23v-2h-2.06zM12 19c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></symbol>
+    <symbol id="icon-italy" viewBox="0 0 24 24"><path d="M15 21h2v-2h-2v2zm4-12h2V7h-2v2zM3 5v14c0 1.1.9 2 2 2h4v-2H5V5h4V3H5c-1.1 0-2 .9-2 2zm16-2v2h2c0-1.1-.9-2-2-2zm-8 20h2V1h-2v22zm8-6h2v-2h-2v2zM15 5h2V3h-2v2zm4 8h2v-2h-2v2zm0 8c1.1 0 2-.9 2-2h-2v2z"/></symbol>
   </svg>
 
   <ul class="skip-links">
@@ -80,6 +85,7 @@
               </div>
             </fieldset>
 
+            <div class="filters__row">
             <div class="field">
               <label class="field__label" for="cat">Tipo di luogo</label>
               <select class="select" id="cat" name="cat">
@@ -95,13 +101,19 @@
               </select>
             </div>
 
-            <div>
-              <button class="btn btn--secondary btn--small" type="reset">Azzera i filtri</button>
+            <button class="btn btn--secondary btn--small filters__reset" type="reset">Azzera</button>
             </div>
           </form>
 
         <div class="explore__map-wrap">
           <div id="explore-map" class="map" role="region" aria-label="Mappa dei luoghi trovati"></div>
+          <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
+            <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
+            <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
+            <li><span class="map-legend__dot pin--no"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-no"/></svg></span>Non accessibile</li>
+            <li><span class="map-legend__dot pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Da verificare</li>
+          </ul>
+          <p id="map-status" class="visually-hidden" role="status"></p>
           <p class="map__note">La mappa mostra gli stessi luoghi dell'elenco. Con la tastiera: frecce per spostarti, + e − per lo zoom, Tab per passare da un segnaposto all'altro.</p>
         </div>
 

@@ -65,6 +65,18 @@
     return ['nv', 'Da verificare'];
   }
 
+  /* Giudizio complessivo per segnaposto e card: dipende da ingresso e spazi interni */
+  function giudizio(p) {
+    var ingresso = stato(p, 'ingresso')[0];
+    var interni = stato(p, 'interni')[0];
+    if (ingresso === 'nv') return 'nv';
+    if (ingresso === 'no' || interni === 'no') return 'no';
+    if (ingresso === 'si' && interni === 'si') return 'si';
+    return 'parziale';
+  }
+
+  var GIUDIZIO = { si: 'Accessibile', parziale: 'Accessibile in parte', no: 'Non accessibile', nv: 'Da verificare' };
+
   var ICONA_STATO = { si: '#icon-yes', parziale: '#icon-partial', no: '#icon-no', nv: '#icon-unknown' };
   var PREFISSO_STATO = { si: 'Sì: ', parziale: 'In parte: ', no: 'No: ', nv: 'Non verificato: ' };
 
@@ -129,17 +141,36 @@
     return node;
   }
 
-  /* Card di un luogo (elenco della mappa e home) */
-  function placeCard(p, headingTag) {
+  function verdictNode(p) {
+    var g = giudizio(p);
+    return el('span', { className: 'verdict verdict--' + g }, [icon(ICONA_STATO[g]), el('span', { text: GIUDIZIO[g] })]);
+  }
+
+  /* Card di un luogo (elenco della mappa e home). onShow: pulsante "Mostra sulla mappa" */
+  function placeCard(p, headingTag, onShow) {
     return el('li', { className: 'place', 'data-id': p.id }, [
+      verdictNode(p),
       el(headingTag || 'h3', { className: 'place__title' }, [el('a', { className: 'place__link', href: placeUrl(p), text: p.nome })]),
       el('p', { className: 'place__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
       el('div', { className: 'place__features' }, [
         labelled('Ingresso', statusNode(p, 'ingresso')),
         labelled('Bagno', statusNode(p, 'bagno')),
         labelled('Parcheggio', statusNode(p, 'parcheggio'))
+      ]),
+      onShow ? showButton(p, onShow) : null
+    ]);
+  }
+
+  function showButton(p, onShow) {
+    var btn = el('button', { type: 'button', className: 'place__show' }, [
+      icon('#icon-pin'),
+      el('span', {}, [
+        document.createTextNode('Mostra sulla mappa'),
+        el('span', { className: 'visually-hidden', text: ': ' + p.nome })
       ])
     ]);
+    btn.addEventListener('click', function () { onShow(p.id); });
+    return btn;
   }
 
   /* ---------- Mappa (Leaflet + OpenStreetMap) ---------- */
@@ -154,30 +185,100 @@
     return map;
   }
 
-  function pinIcon() {
-    return L.divIcon({ className: 'pin', iconSize: null, html: '' });
+  /* Segnaposto: colore + simbolo del giudizio (il significato non dipende solo dal colore) */
+  function pinIcon(g) {
+    return L.divIcon({
+      className: 'pin pin--' + g,
+      iconSize: null,
+      html: '<span class="pin__drop"><svg class="pin__glyph" aria-hidden="true" focusable="false"><use href="' + ICONA_STATO[g] + '"/></svg></span>'
+    });
+  }
+
+  /* Gruppi di luoghi vicini: cerchio con il numero, si apre zoomando */
+  function clusterLayer() {
+    if (!L.markerClusterGroup) return L.layerGroup();
+    return L.markerClusterGroup({
+      showCoverageOnHover: false,
+      maxClusterRadius: 48,
+      spiderfyDistanceMultiplier: 1.6,
+      iconCreateFunction: function (cluster) {
+        var n = cluster.getChildCount();
+        return L.divIcon({
+          className: 'cluster',
+          iconSize: L.point(48, 48),
+          html: '<span aria-hidden="true">' + n + '</span><span class="visually-hidden">' + n + ' luoghi in questa zona: premi per avvicinarti</span>'
+        });
+      }
+    });
   }
 
   function popupContent(p) {
-    return el('div', {}, [
-      el('strong', { text: p.nome }),
-      el('span', { text: (CATEGORIE[p.categoria] || '') + ' · ' + p.citta }),
-      el('br'),
-      el('a', { href: placeUrl(p), text: 'Apri la scheda' })
+    return el('div', { className: 'popup' }, [
+      verdictNode(p),
+      el('strong', { className: 'popup__title', text: p.nome }),
+      el('span', { className: 'popup__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.citta }),
+      el('span', { className: 'popup__features' }, [
+        labelled('Ingresso', statusNode(p, 'ingresso')),
+        labelled('Bagno', statusNode(p, 'bagno')),
+        labelled('Parcheggio', statusNode(p, 'parcheggio'))
+      ]),
+      el('a', { className: 'btn btn--primary btn--small popup__link', href: placeUrl(p) }, [
+        document.createTextNode('Apri la scheda'),
+        el('span', { className: 'visually-hidden', text: ': ' + p.nome })
+      ])
     ]);
   }
 
-  function addMarker(map, p, onSelect) {
+  function addMarker(layer, p, onSelect) {
     var marker = L.marker([p.lat, p.lng], {
-      icon: pinIcon(),
-      title: p.nome + ', ' + p.citta,
-      alt: p.nome,
+      icon: pinIcon(giudizio(p)),
+      title: p.nome + ', ' + p.citta + ': ' + GIUDIZIO[giudizio(p)].toLowerCase(),
       keyboard: true,
       riseOnHover: true
-    }).addTo(map);
-    marker.bindPopup(popupContent(p));
+    }).addTo(layer);
+    marker.bindPopup(popupContent(p), { maxWidth: 280, minWidth: 220 });
     if (onSelect) marker.on('click', function () { onSelect(p.id); });
     return marker;
+  }
+
+  /* Pulsanti sulla mappa: "Vicino a me" (posizione solo nel browser, mai inviata) e "Tutta Italia" */
+  function addMapButtons(map, status) {
+    var Ctl = L.Control.extend({
+      options: { position: 'topright' },
+      onAdd: function () {
+        var box = L.DomUtil.create('div', 'map-tools');
+        var near = el('button', { type: 'button', className: 'map-tools__btn' }, [icon('#icon-locate'), el('span', { text: 'Vicino a me' })]);
+        var all = el('button', { type: 'button', className: 'map-tools__btn' }, [icon('#icon-italy'), el('span', { text: 'Tutta Italia' })]);
+        box.appendChild(near);
+        box.appendChild(all);
+        L.DomEvent.disableClickPropagation(box);
+        L.DomEvent.disableScrollPropagation(box);
+
+        var me = null;
+        near.addEventListener('click', function () {
+          if (!navigator.geolocation) {
+            if (status) status.textContent = 'Il tuo browser non permette di trovare la posizione.';
+            return;
+          }
+          if (status) status.textContent = 'Cerco la tua posizione…';
+          navigator.geolocation.getCurrentPosition(function (pos) {
+            var ll = [pos.coords.latitude, pos.coords.longitude];
+            if (me) me.remove();
+            me = L.circleMarker(ll, { radius: 9, color: '#ffffff', weight: 3, fillColor: '#162841', fillOpacity: 1, interactive: false }).addTo(map);
+            map.setView(ll, 13);
+            if (status) status.textContent = 'Mappa centrata sulla tua posizione.';
+          }, function () {
+            if (status) status.textContent = 'Non è stato possibile trovare la tua posizione. Controlla i permessi del browser.';
+          }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
+        });
+        all.addEventListener('click', function () {
+          map.setView(ITALY.center, ITALY.zoom);
+          if (status) status.textContent = 'Mappa di tutta Italia.';
+        });
+        return box;
+      }
+    });
+    map.addControl(new Ctl());
   }
 
   /* ---------- Home: mappa d'anteprima ---------- */
@@ -197,7 +298,8 @@
       var map = box && createMap(box, { zoomControl: true });
       if (!map) return;
       map.setView(ITALY.center, ITALY.zoom);
-      places.forEach(function (p) { addMarker(map, p); });
+      var group = clusterLayer().addTo(map);
+      places.forEach(function (p) { addMarker(group, p); });
     }).catch(function () {});
   }
 
@@ -246,6 +348,19 @@
       });
     }
 
+    /* "Mostra sulla mappa": porta la mappa sul luogo e apre il riquadro */
+    function showOnMap(id) {
+      var m = markers[id];
+      if (!m || !map) return;
+      highlight(id);
+      if (window.matchMedia('(max-width: 63.99em)').matches) {
+        mapBox.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }
+      var open = function () { m.openPopup(); };
+      if (layer.zoomToShowLayer) layer.zoomToShowLayer(m, open);
+      else { map.setView(m.getLatLng(), 15); open(); }
+    }
+
     function render(updateUrl) {
       var q = form.elements.q.value.trim();
       var cat = form.elements.cat.value;
@@ -259,7 +374,7 @@
           el('p', { text: 'Prova a togliere qualche filtro o a cercare un\'altra città.' })
         ]));
       } else {
-        found.forEach(function (p) { list.appendChild(placeCard(p)); });
+        found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null)); });
       }
       count.textContent = found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati';
 
@@ -305,8 +420,9 @@
       if (mapBox) {
         map = createMap(mapBox);
         if (map) {
-          layer = L.layerGroup().addTo(map);
+          layer = clusterLayer().addTo(map);
           map.setView(ITALY.center, ITALY.zoom);
+          addMapButtons(map, document.getElementById('map-status'));
         }
       }
       render(false);
