@@ -216,11 +216,11 @@ Migrazioni applicate da utente non superuser con i ruoli di Supabase simulati; f
 
 Prima versione funzionante del sito definitivo, separata dalla pagina "in arrivo" (che resta nella cartella principale ed è quella online). In locale: http://localhost:8091/sito/ con il server `lan-preview`.
 
-**Ruolo del sito**: parte informativa. Mappa, ricerca e schede dei luoghi. Il login, i preferiti e le segnalazioni stanno nell'app (web-app + APK Android), raggiungibile dal pulsante "Scarica l'app".
+**Ruolo del sito**: parte informativa. Mappa, ricerca e schede dei luoghi. Il login, i preferiti e le segnalazioni stanno nell'app (web-app + APK Android), raggiungibile dal pulsante "Apri la web-app" (link relativo `../app/`).
 
 | Pagina | Cosa fa |
 |---|---|
-| `index.html` | Ricerca, ricerche rapide (ingresso, bagno, parcheggio), anteprima della mappa, come funziona, cosa c'è in ogni scheda, blocco app (web-app e APK, ora "In arrivo"), chi siamo |
+| `index.html` | Ricerca, ricerche rapide (ingresso, bagno, parcheggio), anteprima della mappa, come funziona, cosa c'è in ogni scheda, blocco app (web-app con il pulsante "Apri la web-app", APK ancora "In arrivo"), chi siamo |
 | `mappa.html` | Ricerca per città/nome/tipo, filtri, elenco e mappa sincronizzati. I filtri finiscono nell'indirizzo (`?q=roma&f=bagno`), quindi una ricerca si può condividere |
 | `luogo.html?id=…` | Scheda: indirizzo, "Indicazioni stradali" con scelta dell'app (Google Maps, Apple Mappe, Waze, OpenStreetMap; su Android anche "Altra app del telefono" con il link `geo:`), stato di ingresso, porta, interni, piani, bagno e parcheggio, data dell'ultima verifica, "Segnala una correzione" (email) |
 
@@ -299,7 +299,7 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 
 ### Stato attuale (24 ottobre 2026)
 
-Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACCESSIBILE» dell'account Mockly, regione Central EU (Frankfurt), piano Free, URL `https://fzqibkvdpywgvlejzeks.supabase.co`. Fatti i passi 2–4 e 6–7 qui sotto: migrazioni `app.sql` e `foto.sql`, 19 luoghi di esempio, Site URL e Redirect URLs, password minima 10 con lettere e numeri, conferma email attiva, TOTP attivo, chiave publishable in `app/assets/js/config.js`. Verificato dall'esterno con la chiave pubblica: si leggono solo le schede; profili, proposte, storico, scritture e funzioni di moderazione sono rifiutati.
+Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACCESSIBILE» dell'account Mockly, regione Central EU (Frankfurt), piano Free, URL `https://fzqibkvdpywgvlejzeks.supabase.co`. Fatti i passi 2–4 e 6–7 qui sotto: migrazioni `app.sql` e `foto.sql`, 19 luoghi di esempio, Site URL e Redirect URLs, password minima 10 con lettere e numeri, conferma email attiva, TOTP attivo, chiave publishable in `app/assets/js/config.js`. Demo su GitHub Pages (dal ramo `main`): sito https://mockly-website.github.io/ovunque_accessibile/sito/ e web-app https://mockly-website.github.io/ovunque_accessibile/app/. Verificato dall'esterno con la chiave pubblica: si leggono solo le schede; profili, proposte, storico, scritture e funzioni di moderazione sono rifiutati.
 
 **Ancora da fare**: SMTP proprio (passo 5: con il servizio email di Supabase le email di conferma arrivano solo agli indirizzi dei membri dell'organizzazione, quindi gli utenti esterni non riescono a registrarsi), nomina degli admin (passo 8), pubblicazione della cartella `app/` su Altervista.
 
@@ -308,7 +308,7 @@ Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACC
 1. Su supabase.com crea il progetto **Ovunque Accessibile**, regione **Central EU (Frankfurt)**, piano Free per ora. La password del database va nel gestore di password dei titolari, **mai** nel repository o in chat.
 2. **SQL Editor** → incolla ed esegui, nell'ordine: `supabase/migrations/20261024000000_app.sql`, `supabase/migrations/20261024010000_foto.sql` (crea anche il bucket delle foto), poi (facoltativo, per avere luoghi da guardare) `supabase/seed.sql`. Le due migrazioni vecchie (`subscribers`) servono solo alla lista d'attesa, non attiva.
 3. **Authentication → Sign In / Providers → Email**: attivo, «Confirm email» attivo, lunghezza minima password **10**, requisiti «lettere e numeri». Sul piano Pro attivare anche «Leaked password protection».
-4. **Authentication → URL Configuration**: Site URL `https://ovunqueaccessibile.altervista.org/app/`; Redirect URLs `https://ovunqueaccessibile.altervista.org/app/**` (e `http://localhost:8091/app/**` per le prove).
+4. **Authentication → URL Configuration**: Site URL `https://ovunqueaccessibile.altervista.org/app/`; Redirect URLs `https://ovunqueaccessibile.altervista.org/app/**` (e `http://localhost:8091/app/**` e `https://mockly-website.github.io/ovunque_accessibile/app/**` per le prove).
 5. **Authentication → Emails**: testi in italiano; **SMTP proprio** (es. Brevo) prima del lancio, perché quello di Supabase manda pochissime email all'ora.
 6. **Authentication → Multi-Factor**: TOTP attivo (lo è di default).
 7. **Project Settings → API**: copia *Project URL* e la chiave **publishable** (o *anon*) in `app/assets/js/config.js`. È pubblica per natura; la chiave *secret / service_role* non va mai nell'app.

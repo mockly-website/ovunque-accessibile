@@ -2,7 +2,7 @@
 
 ## Fatto
 - **Web-app** in `app/`, installabile sul telefono (PWA). Pagine: mappa, scheda luogo, accedi, registrati, password dimenticata, segnala un luogo, profilo, moderazione, privacy.
-- **Modalità prova**: finché `app/assets/js/config.js` è vuoto, l'app usa i luoghi di esempio e account finti salvati nel browser. Si entra con «Entra come utente di prova» o «Entra come moderatore di prova»; come codice 2FA va bene qualsiasi numero di 6 cifre.
+- **Collegata a Supabase** (progetto «ovunque accessibile» di Mockly). La **modalità prova** resta per chi sviluppa: finché `app/assets/js/config.js` è vuoto, l'app usa i luoghi di esempio e account finti salvati nel browser. Si entra con «Entra come utente di prova» o «Entra come moderatore di prova»; come codice 2FA va bene qualsiasi numero di 6 cifre.
 - **Stesse regole del sito**: soglie e giudizi stanno in `sito/assets/js/oa-core.js`, usato da sito e app.
 - **Database Supabase** pronto in `supabase/migrations/20261024000000_app.sql`:
   - tabelle: profili, schede, proposte, recensioni, preferiti, storico delle modifiche;
@@ -40,5 +40,6 @@
 Pulizia dei file delle foto respinte · pagine statiche per Google · MapTiler · APK Android (TWA) · Termini d'uso e Dichiarazione di accessibilità.
 
 ## Provarla ora
+- Su GitHub Pages, dopo il push: sito demo https://mockly-website.github.io/ovunque_accessibile/sito/ e web-app https://mockly-website.github.io/ovunque_accessibile/app/
 - Dal computer: http://localhost:8091/app/
 - Dal telefono, sulla stessa rete Wi-Fi: http://192.168.1.12:8091/app/
