@@ -68,6 +68,10 @@
     }
   };
 
+  /* Pendenza della rampa descritta a parole da chi segnala (rampa_pendenza), quando manca la misura in %.
+     Lieve ≈ fino all'8%, media ≈ 8–12%, ripida = oltre: stessi gradini delle soglie qui sopra. */
+  var PENDENZE = { lieve: 'lieve', media: 'media', ripida: 'ripida' };
+
   /* Ogni regola restituisce [stato, testo]: stato è si, parziale, no, nv (non verificato) o np (non previsto) */
   function valutaIngresso(m, e) {
     var s = SOGLIE[e];
@@ -79,7 +83,8 @@
     var senzaGradini = g === 0 || (g === 1 && h != null && h <= s.gradinoSenza);
     var testo;
     if (m.rampa) {
-      testo = 'Rampa' + (m.rampa_pct != null ? ' ' + m.rampa_pct + '%' : ' (pendenza non misurata)') + (g ? ', in alternativa a ' + gradiniTxt : '');
+      testo = 'Rampa' + (m.rampa_pct != null ? ' ' + m.rampa_pct + '%'
+        : (PENDENZE[m.rampa_pendenza] ? ' ' + PENDENZE[m.rampa_pendenza] : ' (pendenza non indicata)')) + (g ? ', in alternativa a ' + gradiniTxt : '');
     } else {
       testo = senzaGradini ? 'Senza gradini' : gradiniTxt.charAt(0).toUpperCase() + gradiniTxt.slice(1);
       if (g && m.corrimano) testo += ', con corrimano';
@@ -94,7 +99,7 @@
 
     if (senzaGradini) return ['si', testo];
     if (m.rampa) {
-      if (m.rampa_pct == null) return ['parziale', testo];
+      if (m.rampa_pct == null) return [{ lieve: 'si', media: 'parziale', ripida: 'no' }[m.rampa_pendenza] || 'parziale', testo];
       if (m.rampa_pct <= s.rampaOk) return ['si', testo];
       if (m.rampa_pct <= s.rampaInParte) return ['parziale', testo];
       return ['no', testo];

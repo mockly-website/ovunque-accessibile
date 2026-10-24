@@ -17,7 +17,7 @@
 - Con l'account:
   - salvare i preferiti;
   - scrivere recensioni (escono dopo la moderazione);
-  - segnalare luoghi nuovi o correzioni, con misure, posizione sulla mappa e **fino a 5 foto** (GPS tolto, descrizione obbligatoria per chi non vede, pubbliche solo dopo l'approvazione);
+  - segnalare luoghi nuovi o correzioni, con misure (rampa descritta a parole), posizione trovata dall'indirizzo e **fino a 5 foto** (GPS tolto, descrizione obbligatoria per chi non vede, pubbliche solo dopo l'approvazione);
   - seguire lo stato delle proprie segnalazioni nel profilo;
   - scaricare i propri dati ed eliminare l'account.
 - Moderatori, dopo la verifica in due passaggi:
@@ -28,7 +28,7 @@
 
 ## Da fare (servono i titolari)
 1. **Creare il progetto Supabase**, regione Francoforte (lo fanno loro, con la loro password).
-2. **Eseguire le due migrazioni** (`app.sql`, poi `foto.sql`) e il seed nel SQL Editor.
+2. **Eseguire le tre migrazioni** (`app.sql`, `foto.sql`, `segnalazioni.sql`) e il seed nel SQL Editor.
 3. **Impostare l'accesso**: conferma email, password minima di 10 caratteri, URL di redirect.
 4. **Collegare l'app**: copiare URL e chiave *publishable* in `config.js`.
 5. **Nominare gli admin**: Angelo e Lorenzo si registrano, poi diventano admin con una riga SQL e attivano la 2FA.

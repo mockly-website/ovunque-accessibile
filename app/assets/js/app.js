@@ -92,6 +92,7 @@
     var id = (input.id || input.name) + '-errore';
     var p = el('p', { className: 'field__error', id: id }, [icon('#icon-no'), el('span', { text: text })]);
     var anchor = input.closest('fieldset.group') || input.closest('.field') || input;
+    for (var d = input.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
     if (input.closest('fieldset.group')) {
       anchor.querySelector('legend').after(p);
       anchor.setAttribute('aria-describedby', ((anchor.getAttribute('aria-describedby') || '') + ' ' + id).trim());
@@ -103,7 +104,7 @@
   }
 
   /* errors: [{ input, text }] → messaggi accanto ai campi e riepilogo in cima, che prende il focus */
-  function showErrors(form, errors) {
+  function showErrors(form, errors, title) {
     clearErrors(form);
     if (!errors.length) return false;
     var list = el('ul', {}, errors.map(function (e) {
@@ -116,7 +117,7 @@
       return el('li', {}, [a]);
     }));
     var box = el('div', { className: 'error-summary', role: 'alert', tabindex: '-1' }, [
-      el('h2', { className: 'error-summary__title', text: errors.length === 1 ? 'C\'è un problema da correggere' : 'Ci sono ' + errors.length + ' problemi da correggere' }),
+      el('h2', { className: 'error-summary__title', text: title || (errors.length === 1 ? 'C\'è un problema da correggere' : 'Ci sono ' + errors.length + ' problemi da correggere') }),
       list
     ]);
     form.insertBefore(box, form.firstChild);
@@ -418,68 +419,74 @@
     'Lombardia', 'Marche', 'Molise', 'Piemonte', 'Puglia', 'Sardegna', 'Sicilia', 'Toscana', 'Trentino-Alto Adige', 'Umbria',
     'Valle d\'Aosta', 'Veneto'];
 
+  /* Altezza del gradino e corrimano servono solo se ci sono gradini */
+  function gradiniPresenti(get) {
+    var g = get('misure.ingresso.gradini');
+    return g == null || g > 0;
+  }
+
   var SCHEMA = [
     { id: 'luogo', title: 'Il luogo', fields: [
       { path: 'nome', label: 'Nome del luogo', type: 'text', required: true, max: 120, autocomplete: 'organization' },
       { path: 'categoria', label: 'Tipo di luogo', type: 'select', required: true, options: Object.keys(OA.CATEGORIE).map(function (k) { return [k, OA.CATEGORIE[k]]; }) },
       { path: 'indirizzo', label: 'Indirizzo', help: 'Via e numero civico.', type: 'text', required: true, max: 200, autocomplete: 'street-address' },
-      { path: 'cap', label: 'CAP', type: 'text', pattern: '^[0-9]{5}$', patternMsg: 'Il CAP è fatto di 5 cifre.', inputmode: 'numeric', autocomplete: 'postal-code', short: true },
       { path: 'citta', label: 'Città', type: 'text', required: true, max: 80, autocomplete: 'address-level2' },
-      { path: 'provincia', label: 'Sigla della provincia', help: 'Due lettere, per esempio RM.', type: 'text', pattern: '^[A-Za-z]{2}$', patternMsg: 'La provincia è una sigla di 2 lettere, per esempio RM.', upper: true, short: true },
-      { path: 'regione', label: 'Regione', type: 'select', options: REGIONI.map(function (r) { return [r, r]; }) },
-      { path: 'descrizione', label: 'Descrizione breve', help: 'Facoltativa: cosa c\'è e come si entra.', type: 'textarea', max: 1000 },
+      { path: 'cap', label: 'CAP', type: 'text', pattern: '^[0-9]{5}$', patternMsg: 'Il CAP è fatto di 5 cifre.', inputmode: 'numeric', autocomplete: 'postal-code', short: true, more: true },
+      { path: 'provincia', label: 'Sigla della provincia', help: 'Due lettere, per esempio RM.', type: 'text', pattern: '^[A-Za-z]{2}$', patternMsg: 'La provincia è una sigla di 2 lettere, per esempio RM.', upper: true, short: true, more: true },
+      { path: 'regione', label: 'Regione', type: 'select', options: REGIONI.map(function (r) { return [r, r]; }), more: true },
+      { path: 'descrizione', label: 'Descrizione breve', help: 'Cosa c\'è e come si entra.', type: 'textarea', max: 1000, more: true },
       { path: 'lat', label: 'Latitudine', type: 'number', required: true, min: 35, max: 48, step: 'any', short: true, coord: true },
       { path: 'lng', label: 'Longitudine', type: 'number', required: true, min: 6, max: 19, step: 'any', short: true, coord: true }
     ] },
-    { id: 'ingresso', title: 'Ingresso', intro: 'Lascia vuoto quello che non sai: lo segneremo come «da verificare».', fields: [
-      { path: 'misure.ingresso.gradini', label: 'Quanti gradini per entrare?', help: 'Scrivi 0 se non ce ne sono.', type: 'number', min: 0, max: 200, short: true },
-      { path: 'misure.ingresso.gradino_cm', label: 'Altezza del gradino più alto', unit: 'cm', type: 'number', min: 0, max: 100, short: true },
+    { id: 'ingresso', title: 'Ingresso', intro: 'Serve almeno il numero di gradini. Per il resto lascia «Non so» se non lo sai: lo segneremo come «da verificare».', fields: [
+      { path: 'misure.ingresso.gradini', label: 'Quanti gradini per entrare?', help: 'Scrivi 0 se non ce ne sono.', type: 'number', required: true, min: 0, max: 100, short: true, warnAbove: [30, 'più di 30 gradini all\'ingresso sono tanti'] },
+      { path: 'misure.ingresso.gradino_cm', label: 'Altezza del gradino più alto', unit: 'cm', type: 'number', min: 1, max: 50, short: true, when: gradiniPresenti, warnAbove: [25, 'un gradino più alto di 25 cm è raro'] },
+      { path: 'misure.ingresso.corrimano', label: 'Ci sono corrimano?', type: 'tri', when: gradiniPresenti },
       { path: 'misure.ingresso.rampa', label: 'C\'è una rampa?', type: 'tri' },
-      { path: 'misure.ingresso.rampa_pct', label: 'Pendenza della rampa', unit: '%', type: 'number', min: 0, max: 50, short: true, showIf: ['misure.ingresso.rampa', true] },
-      { path: 'misure.ingresso.corrimano', label: 'Ci sono corrimano?', type: 'tri' },
+      { path: 'misure.ingresso.rampa_pendenza', label: 'Com\'è la rampa?', type: 'choice', options: [['lieve', 'Lieve: in carrozzina si sale da soli'], ['media', 'Media: serve un po\' di forza o una spinta'], ['ripida', 'Ripida: difficile anche con aiuto']], showIf: ['misure.ingresso.rampa', true] },
       { path: 'x.nessuna_porta', label: 'Non c\'è una porta (spiaggia, parco, pontile…)', type: 'checkbox' },
-      { path: 'misure.ingresso.porta_cm', label: 'Larghezza della porta', help: 'Lo spazio libero quando è aperta.', unit: 'cm', type: 'number', min: 1, max: 500, short: true, showIf: ['x.nessuna_porta', false] },
-      { path: 'misure.ingresso.nota', label: 'Note sull\'ingresso', type: 'textarea', max: 500 },
-      { path: 'misure.ingresso.nota_porta', label: 'Note sulla porta', type: 'textarea', max: 500, showIf: ['x.nessuna_porta', false] }
+      { path: 'misure.ingresso.porta_cm', label: 'Larghezza della porta', help: 'Lo spazio libero quando è aperta.', unit: 'cm', type: 'number', min: 40, max: 300, short: true, showIf: ['x.nessuna_porta', false], warnBelow: [60, 'una porta più stretta di 60 cm è molto stretta'] },
+      { path: 'misure.ingresso.nota', label: 'Note sull\'ingresso', type: 'textarea', max: 500, more: true },
+      { path: 'misure.ingresso.nota_porta', label: 'Note sulla porta', type: 'textarea', max: 500, showIf: ['x.nessuna_porta', false], more: true }
     ] },
     { id: 'spazi', title: 'Spazi e percorsi', fields: [
       { path: 'misure.spazi.valore', label: 'Gli spazi interni sono accessibili?', type: 'choice', options: [['tutti', 'Sì, tutti'], ['parziale', 'Solo in parte'], ['no', 'No']] },
-      { path: 'misure.spazi.nota', label: 'Note su spazi e percorsi', type: 'textarea', max: 500 }
+      { path: 'misure.spazi.nota', label: 'Note su spazi e percorsi', type: 'textarea', max: 500, more: true }
     ] },
     { id: 'piani', title: 'Piani e ascensore', fields: [
       { path: 'misure.piani.valore', label: 'Come si raggiungono i piani?', type: 'choice', options: [['uno', 'È tutto su un piano'], ['ascensore', 'C\'è un ascensore'], ['scale', 'Solo con le scale']] },
-      { path: 'x.ascensore_l', label: 'Larghezza della cabina', unit: 'cm', type: 'number', min: 30, max: 500, short: true, showIf: ['misure.piani.valore', 'ascensore'] },
-      { path: 'x.ascensore_p', label: 'Profondità della cabina', unit: 'cm', type: 'number', min: 30, max: 500, short: true, showIf: ['misure.piani.valore', 'ascensore'] },
+      { path: 'x.ascensore_l', label: 'Larghezza della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina larga meno di 70 cm è molto piccola'] },
+      { path: 'x.ascensore_p', label: 'Profondità della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina profonda meno di 70 cm è molto piccola'] },
       { path: 'misure.piani.corrimano_scale', label: 'Le scale hanno il corrimano?', type: 'tri', showIf: ['misure.piani.valore', 'scale'] },
-      { path: 'misure.piani.nota', label: 'Note su piani e ascensore', type: 'textarea', max: 500 }
+      { path: 'misure.piani.nota', label: 'Note su piani e ascensore', type: 'textarea', max: 500, more: true }
     ] },
     { id: 'bagno', title: 'Bagno', fields: [
       { path: 'misure.bagno.valore', label: 'C\'è un bagno accessibile?', type: 'choice', options: [['attrezzato', 'Sì, attrezzato per persone con disabilità'], ['non-attrezzato', 'C\'è, ma non è attrezzato'], ['assente', 'No, nessun bagno accessibile'], ['non-previsto', 'In questo luogo non è previsto un bagno']] },
-      { path: 'misure.bagno.rotazione_cm', label: 'Spazio per girarsi con la carrozzina', help: 'Il diametro del cerchio libero davanti al WC.', unit: 'cm', type: 'number', min: 0, max: 500, short: true, showIf: ['misure.bagno.valore', 'attrezzato'] },
+      { path: 'misure.bagno.rotazione_cm', label: 'Spazio per girarsi con la carrozzina', help: 'Il diametro del cerchio libero davanti al WC.', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.bagno.valore', 'attrezzato'] },
       { path: 'misure.bagno.maniglioni', label: 'Ci sono i maniglioni?', type: 'tri', showIf: ['misure.bagno.valore', 'attrezzato'] },
-      { path: 'misure.bagno.nota', label: 'Note sul bagno', type: 'textarea', max: 500 }
+      { path: 'misure.bagno.nota', label: 'Note sul bagno', type: 'textarea', max: 500, more: true }
     ] },
     { id: 'altre', title: 'Altre informazioni', optional: true, fields: [
       { path: 'facoltativi.porta_tipo', label: 'Com\'è la porta?', type: 'choice', options: [['automatica', 'Automatica'], ['manuale', 'Da aprire a mano'], ['pesante', 'Pesante da aprire']], showIf: ['x.nessuna_porta', false] },
       { path: 'facoltativi.pavimento', label: 'Com\'è il pavimento?', type: 'choice', options: [['liscio', 'Liscio'], ['irregolare', 'Irregolare (sampietrini, legno, sabbia)'], ['ghiaia', 'Ghiaia']] },
       { path: 'facoltativi.sedute', label: 'Ci sono sedute lungo il percorso?', type: 'tri' },
       { path: 'facoltativi.parcheggio.posti', label: 'Ci sono posti auto riservati vicino?', type: 'tri' },
-      { path: 'facoltativi.parcheggio.distanza_m', label: 'Distanza del parcheggio dall\'ingresso', unit: 'metri', type: 'number', min: 0, max: 5000, short: true, showIf: ['facoltativi.parcheggio.posti', true] },
+      { path: 'facoltativi.parcheggio.distanza_m', label: 'Distanza del parcheggio dall\'ingresso', unit: 'metri', type: 'number', min: 0, max: 2000, short: true, showIf: ['facoltativi.parcheggio.posti', true] },
       { path: 'facoltativi.parcheggio.nota', label: 'Note sul parcheggio', type: 'textarea', max: 500 },
       { path: 'facoltativi.assistenza.valore', label: 'Il personale offre assistenza?', type: 'tri' },
       { path: 'facoltativi.assistenza.nota', label: 'Note sull\'assistenza', type: 'textarea', max: 500 }
     ] },
     { id: 'dettagli', title: 'Dettagli per tipo di luogo', optional: true, fields: [
-      { path: 'dettagli.tavoli_cm', label: 'Altezza dei tavoli', unit: 'cm', type: 'number', min: 30, max: 150, short: true, cat: ['ristorante'] },
+      { path: 'dettagli.tavoli_cm', label: 'Altezza dei tavoli', unit: 'cm', type: 'number', min: 40, max: 130, short: true, cat: ['ristorante'] },
       { path: 'dettagli.spazio_gambe', label: 'C\'è spazio per le gambe sotto il tavolo?', type: 'tri', cat: ['ristorante'] },
-      { path: 'dettagli.camere_accessibili', label: 'Quante camere accessibili?', type: 'number', min: 0, max: 2000, short: true, cat: ['hotel'] },
+      { path: 'dettagli.camere_accessibili', label: 'Quante camere accessibili?', type: 'number', min: 0, max: 500, short: true, cat: ['hotel'] },
       { path: 'dettagli.doccia_filo', label: 'Doccia a filo pavimento?', type: 'tri', cat: ['hotel'] },
       { path: 'dettagli.passerella', label: 'Passerella fino all\'acqua?', type: 'tri', cat: ['spiaggia'] },
       { path: 'dettagli.sedia_mare', label: 'Sedia da mare disponibile?', type: 'tri', cat: ['spiaggia'] },
-      { path: 'dettagli.posti_carrozzina', label: 'Posti per carrozzina in sala', type: 'number', min: 0, max: 2000, short: true, cat: ['cultura'] },
+      { path: 'dettagli.posti_carrozzina', label: 'Posti per carrozzina in sala', type: 'number', min: 0, max: 500, short: true, cat: ['cultura'] },
       { path: 'dettagli.accompagnatore_gratis', label: 'Biglietto gratuito per l\'accompagnatore?', type: 'tri', cat: ['cultura', 'museo'] },
       { path: 'dettagli.assistenza_prenotabile', label: 'Assistenza da prenotare?', type: 'tri', cat: ['trasporti'] },
-      { path: 'dettagli.preavviso_ore', label: 'Preavviso per l\'assistenza', unit: 'ore', type: 'number', min: 0, max: 720, short: true, cat: ['trasporti'] },
+      { path: 'dettagli.preavviso_ore', label: 'Preavviso per l\'assistenza', unit: 'ore', type: 'number', min: 0, max: 168, short: true, cat: ['trasporti'] },
       { path: 'dettagli.percorso_tattile', label: 'Percorso tattile?', type: 'tri', cat: ['museo', 'parco'] },
       { path: 'dettagli.ausili_prestito', label: 'Ausili in prestito (es. sedia a rotelle)?', type: 'tri', cat: ['museo', 'parco', 'negozio'] }
     ] }
@@ -495,6 +502,14 @@
     });
   });
   LABELS['misure.piani.ascensore_cm'] = 'Piani e ascensore – Cabina (larghezza × profondità)';
+  LABELS['misure.ingresso.rampa_pct'] = 'Ingresso – Pendenza della rampa (%)';
+  /* Testo delle scelte (es. «lieve» → «Lieve: in carrozzina si sale da soli») per il confronto dei moderatori */
+  var OPTION_LABELS = {};
+  FIELDS.forEach(function (f) {
+    if (!f.options) return;
+    OPTION_LABELS[f.path] = {};
+    f.options.forEach(function (o) { OPTION_LABELS[f.path][o[0]] = o[1]; });
+  });
   LABELS['misure.ingresso.porta_cm'] = 'Ingresso – Larghezza della porta (0 = nessuna porta)';
 
   function fid(path) {
@@ -611,6 +626,7 @@
         var dep = FIELDS.filter(function (g) { return g.path === f.showIf[0]; })[0];
         visible = formValue(form, dep) === f.showIf[1];
       }
+      if (f.when) visible = visible && f.when(function (path) { return formValue(form, FIELDS.filter(function (g) { return g.path === path; })[0]); });
       if (f.cat) visible = f.cat.indexOf(cat) !== -1;
       node.hidden = !visible;
     });
@@ -635,7 +651,12 @@
       var v = getPath(src, f.path);
       if (f.path === 'misure.ingresso.porta_cm' && v === 0) v = null;
       setFormValue(form, f, v);
+      /* Le tendine con qualcosa di già compilato si aprono, così si vede cosa c'è */
+      var d = v != null && v !== '' && v !== false ? form.querySelector('[data-path="' + f.path + '"]').closest('details') : null;
+      if (d) d.open = true;
     });
+    /* La pendenza misurata in % (schede verificate) resta, finché non si cambia la rampa */
+    form.oaKeep = { rampa_pct: p.misure.ingresso.rampa_pct, rampa_pendenza: p.misure.ingresso.rampa_pendenza || null };
   }
 
   /* Legge il modulo → { dati, errors } nella stessa forma delle schede (proposta_valida nel database) */
@@ -686,7 +707,18 @@
     }
     out.misure.piani.ascensore_cm = asc;
     if (out.misure.piani.valore !== 'scale') out.misure.piani.corrimano_scale = null;
-    if (out.misure.ingresso.rampa !== true) out.misure.ingresso.rampa_pct = null;
+    var keep = form.oaKeep || {};
+    out.misure.ingresso.rampa_pct = out.misure.ingresso.rampa === true && keep.rampa_pct != null &&
+      (out.misure.ingresso.rampa_pendenza || null) === keep.rampa_pendenza ? keep.rampa_pct : null;
+    if (out.misure.ingresso.rampa !== true) out.misure.ingresso.rampa_pendenza = null;
+    if (out.misure.ingresso.gradini === 0) {
+      out.misure.ingresso.gradino_cm = null;
+      out.misure.ingresso.corrimano = null;
+    }
+    /* Scheda minima: senza almeno una risposta su spazi, piani o bagno la scheda resterebbe vuota */
+    if (out.misure.spazi.valore == null && out.misure.piani.valore == null && out.misure.bagno.valore == null) {
+      errors.push({ input: form.querySelector('[data-path="misure.spazi.valore"]'), text: 'Rispondi ad almeno una domanda tra «Spazi e percorsi», «Piani e ascensore» e «Bagno»: senza, la scheda resterebbe vuota.' });
+    }
     /* Le voci facoltative vuote non si salvano */
     ['parcheggio', 'assistenza'].forEach(function (k) {
       var o = out.facoltativi[k];
@@ -695,6 +727,21 @@
     Object.keys(out.facoltativi).forEach(function (k) { if (out.facoltativi[k] == null) delete out.facoltativi[k]; });
     Object.keys(out.dettagli).forEach(function (k) { if (out.dettagli[k] == null) delete out.dettagli[k]; });
     return { dati: out, errors: errors };
+  }
+
+  /* Valori nei limiti ma insoliti (es. porta di 45 cm): non bloccano, chiedono solo di ricontrollare */
+  function unusualValues(form) {
+    var out = [];
+    FIELDS.forEach(function (f) {
+      if (!f.warnAbove && !f.warnBelow) return;
+      var node = form.querySelector('[data-path="' + f.path + '"]');
+      if (node.hidden) return;
+      var v = formValue(form, f);
+      if (v == null) return;
+      var w = f.warnAbove && v > f.warnAbove[0] ? f.warnAbove : (f.warnBelow && v < f.warnBelow[0] ? f.warnBelow : null);
+      if (w) out.push({ input: $(fid(f.path)), text: '«' + f.label + '»: hai scritto ' + v + (f.unit ? ' ' + f.unit : '') + ', ma ' + w[1] + '. È giusto?' });
+    });
+    return out;
   }
 
   /* Foto: ricompresse nel browser in JPEG (lato lungo 1600 px). Ridisegnarle su un canvas toglie
@@ -821,17 +868,38 @@
 
     SCHEMA.forEach(function (sec) {
       var titleId = 'sec-' + sec.id + '-title';
-      box.appendChild(el('section', { className: 'card form-section', id: 'sec-' + sec.id, 'aria-labelledby': titleId }, [
-        el('h2', { id: titleId, text: sec.title + (sec.optional ? ' (facoltative)' : '') }),
+      var main = sec.fields.filter(function (f) { return !f.more && !f.coord; });
+      var more = sec.fields.filter(function (f) { return f.more; });
+      var body = [
         sec.intro ? el('p', { className: 'field__help', text: sec.intro }) : null,
-        sec.id === 'luogo' ? el('div', { className: 'pick' }, [
-          el('p', { className: 'field__help', id: 'pick-help', text: 'Posizione: tocca la mappa nel punto dell\'ingresso, oppure usa «La mia posizione» se sei lì. Puoi anche scrivere le coordinate qui sotto (in Google Maps tieni premuto sul luogo e copiale).' }),
+        el('div', { className: 'form-grid' }, main.map(fieldNode)),
+        more.length ? el('details', { className: 'more' }, [
+          el('summary', { className: 'more__toggle', text: sec.id === 'luogo' ? 'Altri dati del luogo (facoltativi): CAP, provincia, regione, descrizione' : (more.length === 1 ? 'Aggiungi una nota' : 'Aggiungi delle note') }),
+          el('div', { className: 'form-grid more__body' }, more.map(fieldNode))
+        ]) : null
+      ];
+      if (sec.id === 'luogo') {
+        body.push(el('div', { className: 'pick' }, [
+          el('h3', { className: 'pick__title', text: 'Dov\'è l\'ingresso?' }),
+          el('p', { className: 'field__help', id: 'pick-help', text: 'Premi «Trova l\'indirizzo sulla mappa», poi sposta il segnaposto sull\'ingresso se serve. Puoi anche toccare la mappa, usare «La mia posizione» se sei lì o scrivere le coordinate qui sotto.' }),
+          el('div', { className: 'pick__actions' }, [
+            el('button', { type: 'button', id: 'pick-find', className: 'btn btn--primary btn--small' }, [icon('#icon-search'), el('span', { text: 'Trova l\'indirizzo sulla mappa' })]),
+            el('button', { type: 'button', id: 'pick-locate', className: 'btn btn--secondary btn--small' }, [icon('#icon-locate'), el('span', { text: 'La mia posizione' })])
+          ]),
+          el('p', { id: 'pick-status', className: 'pick__status', role: 'status' }),
           el('div', { id: 'pick-map', className: 'pick__map', role: 'region', 'aria-label': 'Mappa per indicare la posizione del luogo' }),
-          el('button', { type: 'button', id: 'pick-locate', className: 'btn btn--secondary btn--small' }, [icon('#icon-locate'), el('span', { text: 'La mia posizione' })]),
-          el('p', { id: 'pick-status', className: 'visually-hidden', role: 'status' })
-        ]) : null,
-        el('div', { className: 'form-grid' }, sec.fields.map(fieldNode))
-      ]));
+          el('div', { className: 'form-grid' }, sec.fields.filter(function (f) { return f.coord; }).map(fieldNode))
+        ]));
+      }
+      /* Le sezioni tutte facoltative sono chiuse in una tendina */
+      box.appendChild(sec.optional
+        ? el('section', { className: 'card form-section form-section--optional', id: 'sec-' + sec.id, 'aria-labelledby': titleId }, [
+            el('details', { className: 'more more--section' }, [
+              el('summary', { className: 'more__toggle more__toggle--section' }, [el('span', { id: titleId, text: sec.title }), el('span', { className: 'more__hint', text: ' (facoltative)' })]),
+              el('div', { className: 'more__body stack' }, body)
+            ])
+          ])
+        : el('section', { className: 'card form-section', id: 'sec-' + sec.id, 'aria-labelledby': titleId }, [el('h2', { id: titleId, text: sec.title })].concat(body)));
     });
     var photosUi = photoSection(box);
     show(form, true);
@@ -871,13 +939,36 @@
         res.errors.push({ input: $(fid('nome')), text: 'Non hai cambiato niente: modifica le voci che non corrispondono più al luogo.' });
       }
       if (showErrors(form, res.errors)) return;
+      /* Valori possibili ma strani: si chiede di controllarli, al secondo invio passano */
+      var warns = unusualValues(form);
+      var sigW = JSON.stringify(warns.map(function (w) { return w.text; }));
+      if (warns.length && form.dataset.warned !== sigW) {
+        form.dataset.warned = sigW;
+        showErrors(form, warns, warns.length === 1 ? 'Controlla questo valore' : 'Controlla questi valori');
+        form.querySelector('.error-summary').appendChild(el('p', { text: 'Se è tutto giusto, premi di nuovo «Invia la segnalazione».' }));
+        return;
+      }
       var nota = form.elements.nota_moderatori.value.trim() || null;
-      busy(form, true, 'Invio…');
+      busy(form, true, 'Controllo la posizione…');
       var items = photosUi.items();
       var failed = 0;
-      ready.then(function () {
-        return api.propose({ tipo: place ? 'correzione' : 'nuovo', place_id: place ? place.id : null, dati: res.dati, nota: nota });
+      var stop = false;
+      farFromCity(res.dati).then(function (km) {
+        var sigG = [res.dati.lat, res.dati.lng, res.dati.citta, res.dati.cap].join('|');
+        if (km && form.dataset.farOk !== sigG) {
+          stop = true;
+          form.dataset.farOk = sigG;
+          busy(form, false);
+          showErrors(form, [{ input: $(fid('lat')), text: 'Il punto sulla mappa è a circa ' + km + ' km da ' + res.dati.citta + ': controlla la posizione o il nome della città.' }], 'Controlla la posizione');
+          form.querySelector('.error-summary').appendChild(el('p', { text: 'Se il punto è giusto, premi di nuovo «Invia la segnalazione».' }));
+          return;
+        }
+        form.querySelector('[type="submit"]').textContent = 'Invio…';
+        return ready.then(function () {
+          return api.propose({ tipo: place ? 'correzione' : 'nuovo', place_id: place ? place.id : null, dati: res.dati, nota: nota });
+        });
       }).then(function (propostaId) {
+        if (stop) return;
         /* Le foto una alla volta, dopo la proposta: se una non passa, la segnalazione resta comunque inviata */
         return items.reduce(function (prev, item, i) {
           return prev.then(function () {
@@ -886,6 +977,7 @@
           });
         }, Promise.resolve());
       }).then(function () {
+        if (stop) return;
         show(form, false);
         if (failed) message($('proposal-photo-note'), failed === 1 ? 'Una foto non è stata caricata. La segnalazione è arrivata: se vuoi, rimandaci la foto con una correzione.' : failed + ' foto non sono state caricate. La segnalazione è arrivata: se vuoi, rimandaci le foto con una correzione.', 'error');
         show($('proposal-done'), true);
@@ -897,7 +989,51 @@
     });
   }
 
-  /* Mappa per indicare la posizione: tocco, segnaposto trascinabile o campi delle coordinate */
+  /* Ricerca degli indirizzi con Nominatim (OpenStreetMap): parte solo da un pulsante o dal controllo all'invio,
+     invia solo l'indirizzo del luogo, una richiesta al secondo come chiedono le regole d'uso del servizio. */
+  var GEO_URL = 'https://nominatim.openstreetmap.org/search';
+  var GEO_MAX_KM = 25;
+  var geoCache = {};
+  var geoQueue = Promise.resolve();
+
+  function geocode(q) {
+    var key = JSON.stringify(q);
+    if (geoCache[key]) return geoCache[key];
+    var params = new URLSearchParams({ format: 'jsonv2', limit: '1', countrycodes: 'it', 'accept-language': 'it' });
+    Object.keys(q).forEach(function (k) { if (q[k]) params.set(k, q[k]); });
+    var run = geoQueue.then(function () {
+      return fetch(GEO_URL + '?' + params.toString(), { credentials: 'omit' });
+    }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
+      return a && a[0] ? { lat: Number(a[0].lat), lng: Number(a[0].lon), nome: a[0].display_name } : null;
+    }).catch(function () { return undefined; });
+    geoQueue = run.then(function () { return new Promise(function (res) { setTimeout(res, 1100); }); });
+    geoCache[key] = run;
+    run.then(function (v) { if (v === undefined) delete geoCache[key]; });
+    return run;
+  }
+
+  function distanceKm(a, b) {
+    var r = Math.PI / 180;
+    var x = Math.sin((b.lat - a.lat) * r / 2);
+    var y = Math.sin((b.lng - a.lng) * r / 2);
+    var h = x * x + Math.cos(a.lat * r) * Math.cos(b.lat * r) * y * y;
+    return 2 * 6371 * Math.asin(Math.sqrt(h));
+  }
+
+  /* → null se il punto è vicino alla città (o non si può controllare), altrimenti i km di distanza */
+  function farFromCity(dati) {
+    if (dati.lat == null || dati.lng == null || !dati.citta) return Promise.resolve(null);
+    return geocode({ city: dati.citta, postalcode: dati.cap }).then(function (c) {
+      if (!c && dati.cap) return geocode({ city: dati.citta });
+      return c;
+    }).then(function (c) {
+      if (!c) return null;
+      var km = distanceKm(c, { lat: dati.lat, lng: dati.lng });
+      return km > GEO_MAX_KM ? Math.round(km) : null;
+    });
+  }
+
+  /* Mappa per indicare la posizione: indirizzo, tocco, segnaposto trascinabile o campi delle coordinate */
   function initPicker(form) {
     var latIn = $(fid('lat'));
     var lngIn = $(fid('lng'));
@@ -937,6 +1073,35 @@
     }
     latIn.addEventListener('change', fromInputs);
     lngIn.addEventListener('change', fromInputs);
+    $('pick-find').addEventListener('click', function () {
+      var via = $(fid('indirizzo')).value.trim();
+      var citta = $(fid('citta')).value.trim();
+      var cap = $(fid('cap')).value.trim();
+      if (!citta) {
+        status.textContent = 'Scrivi prima l\'indirizzo e la città.';
+        $(fid(via ? 'citta' : 'indirizzo')).focus();
+        return;
+      }
+      status.textContent = 'Cerco l\'indirizzo…';
+      geocode({ street: via, city: citta, postalcode: cap }).then(function (r) {
+        if (r) return { r: r, esatto: true };
+        return geocode({ city: citta }).then(function (c) { return c ? { r: c, esatto: false } : c; });
+      }).then(function (res) {
+        if (res === undefined) {
+          status.textContent = 'La ricerca non risponde: tocca la mappa nel punto dell\'ingresso.';
+          return;
+        }
+        if (!res) {
+          status.textContent = 'Non trovo «' + citta + '»: controlla il nome della città o tocca la mappa.';
+          return;
+        }
+        set(res.r.lat, res.r.lng, false);
+        if (!res.esatto && map) map.setView([res.r.lat, res.r.lng], 14);
+        status.textContent = res.esatto
+          ? 'Trovato: ' + res.r.nome + '. Controlla e sposta il segnaposto sull\'ingresso se serve.'
+          : 'Non trovo la via: ho messo il segnaposto al centro di ' + citta + '. Spostalo sull\'ingresso.';
+      });
+    });
     $('pick-locate').addEventListener('click', function () {
       if (!navigator.geolocation) {
         status.textContent = 'Il tuo browser non permette di trovare la posizione.';
@@ -1162,8 +1327,10 @@
           var label = LABELS[k] || k;
           if (k === 'categoria') return el('tr', {}, [el('th', { scope: 'row', text: label })].concat(
             (current ? [OA.CATEGORIE[b[k]] || fmt(b[k])] : []).concat([OA.CATEGORIE[a[k]] || fmt(a[k])]).map(function (t) { return el('td', { text: t }); })));
+          var names = OPTION_LABELS[k] || {};
+          var show2 = function (v) { return names[v] || fmt(v); };
           return el('tr', {}, [el('th', { scope: 'row', text: label })].concat(
-            (current ? [fmt(b[k])] : []).concat([fmt(a[k])]).map(function (t) { return el('td', { text: t }); })));
+            (current ? [show2(b[k])] : []).concat([show2(a[k])]).map(function (t) { return el('td', { text: t }); })));
         }))
       ])
     ]);
@@ -1327,6 +1494,13 @@
         var diffBox = el('div', {}, [el('p', { className: 'place__meta', text: 'Caricamento del confronto…' })]);
         article.appendChild(el('h4', { text: x.tipo === 'nuovo' ? 'Dati proposti' : 'Cosa cambia' }));
         article.appendChild(diffBox);
+        var geoNote = el('p', { className: 'notice notice--error', hidden: '' });
+        article.appendChild(geoNote);
+        farFromCity(x.dati).then(function (km) {
+          if (!km) return;
+          geoNote.textContent = 'Attenzione: il punto sulla mappa è a circa ' + km + ' km da ' + x.dati.citta + '. Controlla la posizione prima di approvare.';
+          geoNote.hidden = false;
+        });
         if (x.tipo === 'correzione') {
           api.getPlace(x.place_id).then(function (p) {
             diffBox.textContent = '';

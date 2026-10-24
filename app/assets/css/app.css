@@ -301,7 +301,127 @@ textarea.input {
 .pick {
   display: grid;
   gap: var(--space-sm);
-  margin-bottom: var(--space-lg);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-line);
+}
+
+.pick__title {
+  font-size: var(--text-base);
+}
+
+.pick__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.pick__status:empty {
+  display: none;
+}
+
+.pick__status {
+  margin: 0;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  background: var(--color-sky);
+}
+
+.pick > .form-grid {
+  margin-top: var(--space-xs);
+}
+
+/* Tendine per le domande facoltative: si aprono con un clic, dentro hanno i campi normali */
+.more {
+  margin-top: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.more__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  padding: var(--space-sm) var(--space-md);
+  font-weight: 700;
+  color: var(--color-brand);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-md);
+}
+
+.more__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.more__toggle::before {
+  content: "";
+  flex: none;
+  width: 0.55em;
+  height: 0.55em;
+  border-right: 2.5px solid currentColor;
+  border-bottom: 2.5px solid currentColor;
+  transform: rotate(-45deg);
+  transition: transform 0.15s var(--ease-out);
+}
+
+.more[open] > .more__toggle::before {
+  transform: rotate(45deg);
+}
+
+.more__toggle:hover {
+  text-decoration: underline;
+}
+
+.more__toggle:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.more__body {
+  padding: var(--space-xs) var(--space-md) var(--space-lg);
+}
+
+/* Sezione intera facoltativa: la tendina prende il posto del titolo */
+.form-section--optional {
+  padding: 0;
+}
+
+.more--section {
+  margin: 0;
+  border: 0;
+  background: transparent;
+}
+
+.more__toggle--section {
+  padding: var(--space-lg);
+  font-family: var(--font-heading);
+  font-weight: var(--font-heading-weight);
+  font-size: var(--text-lg);
+  color: var(--color-text);
+}
+
+.more__hint {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 400;
+  color: var(--color-muted);
+}
+
+.more--section > .more__body {
+  padding: 0 var(--space-lg) var(--space-lg);
+}
+
+.more--section .more {
+  background: var(--color-card);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .more__toggle::before {
+    transition: none;
+  }
 }
 
 .pick__map {

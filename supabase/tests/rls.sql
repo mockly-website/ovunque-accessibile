@@ -102,6 +102,10 @@ begin
     raise exception 'DOVEVA FALLIRE: coordinate fuori Italia';
   exception when check_violation then null; end;
   begin
+    insert into public.proposte (tipo, dati) values ('nuovo', jsonb_set(base, '{misure,ingresso,gradini}', 'null'));
+    raise exception 'DOVEVA FALLIRE: segnalazione senza gradini';
+  exception when check_violation then null; end;
+  begin
     perform public.approva_proposta((select id from public.proposte limit 1));
     raise exception 'DOVEVA FALLIRE: A approva';
   exception when insufficient_privilege then null; end;
@@ -171,6 +175,12 @@ begin
   assert (select count(*) from public.proposte where stato = 'in-attesa') = 1, 'la moderatrice non vede le proposte';
   assert (select count(*) from public.places) = 19, 'la moderatrice deve vedere anche le archiviate';
   select id into prop from public.proposte limit 1;
+  begin
+    perform public.approva_proposta(prop, 'community',
+      jsonb_set((select dati from public.proposte where id = prop), '{misure,ingresso,porta_cm}', '15'));
+    raise exception 'DOVEVA FALLIRE: approvata con una porta di 15 cm';
+  exception when check_violation then null; end;
+  assert (select count(*) from public.places) = 19, 'approvazione fallita ma scheda creata';
   nuovo := public.approva_proposta(prop, 'sul-posto');
   assert (select slug from public.places where id = nuovo) = 'bar-di-prova-roma', 'slug della nuova scheda';
   assert (select verifica_livello from public.places where id = nuovo) = 'sul-posto', 'livello di verifica';
@@ -267,6 +277,27 @@ do $$ begin
       "piani": {"ascensore_cm": [100, 130], "corrimano_scale": null, "nota": null, "valore": "ascensore"},
       "spazi": {"nota": null, "valore": "tutti"}},
     "nome": "Gelateria di prova", "provincia": "TO", "regione": "Piemonte"}'::jsonb), 'dati del modulo dell''app rifiutati';
+end $$;
+
+-- 10b. Segnalazioni affidabili: rampa a parole, scheda minima, valori realistici (20261024020000_segnalazioni.sql)
+do $$
+declare
+  ok jsonb := '{"categoria": "museo", "citta": "Cagliari", "indirizzo": "Via Roma 1", "lat": 39.2238, "lng": 9.1217,
+    "misure": {"bagno": {"valore": null}, "piani": {"valore": null}, "spazi": {"valore": "tutti"},
+      "ingresso": {"gradini": 2, "rampa": true, "rampa_pendenza": "lieve", "porta_cm": 90}},
+    "nome": "Museo di prova"}';
+  m jsonb := ok -> 'misure';
+begin
+  assert public.proposta_valida(ok), 'rampa descritta a parole rifiutata';
+  assert not public.proposta_valida(jsonb_set(ok, '{misure,ingresso,rampa_pendenza}', '"verticale"')), 'pendenza sconosciuta accettata';
+  assert public.scheda_plausibile(m, '{}', '{}'), 'scheda plausibile rifiutata';
+  assert not public.scheda_plausibile(jsonb_set(m, '{ingresso,gradini}', 'null'), '{}', '{}'), 'scheda senza gradini accettata';
+  assert not public.scheda_plausibile(jsonb_set(m, '{spazi,valore}', 'null'), '{}', '{}'), 'scheda senza spazi, piani e bagno accettata';
+  assert not public.scheda_plausibile(jsonb_set(m, '{ingresso,porta_cm}', '20'), '{}', '{}'), 'porta di 20 cm accettata';
+  assert public.scheda_plausibile(jsonb_set(m, '{ingresso,porta_cm}', '0'), '{}', '{}'), 'nessuna porta (0) rifiutata';
+  assert not public.scheda_plausibile(jsonb_set(m, '{ingresso,rampa_pct}', '50'), '{}', '{}'), 'rampa del 50% accettata';
+  assert not public.scheda_plausibile(jsonb_set(m, '{ingresso,gradini}', '150'), '{}', '{}'), '150 gradini accettati';
+  assert not public.scheda_plausibile(m, '{}', '{"tavoli_cm": 200}'), 'tavolo di 2 metri accettato';
 end $$;
 
 -- 11. Foto: B segnala un luogo con una foto; resta privata finché M non approva
