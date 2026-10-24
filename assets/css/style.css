@@ -399,6 +399,7 @@ section:focus {
 .home {
   display: flex;
   flex-direction: column;
+  min-height: 100vh;      /* Safari vecchi: niente svh */
   min-height: 100svh;
   background:
     radial-gradient(42rem 32rem at 85% 30%, rgba(230, 244, 253, 0.95), transparent 70%),
@@ -782,7 +783,10 @@ section:focus {
 /* Etichette d'esempio sulle informazioni che troverai (decorative) */
 .italy__tags {
   position: absolute;
-  inset: 0;
+  top: 0;                 /* invece di inset: 0, che Safari prima della 14.1 non conosce */
+  right: 0;
+  bottom: 0;
+  left: 0;
   pointer-events: none;
 }
 
@@ -1420,3 +1424,78 @@ svg.card__icon.icon--error {
   }
 }
 
+
+/* 12. Compatibilità con Safari vecchi (iPad non aggiornati)
+   - flex con gap: Safari lo supporta dalla 14.1. main.js lo controlla e, se manca, aggiunge
+     .no-flexgap a <html>: qui gli stessi spazi fatti con i margini.
+   - transform-box: senza, l'ingrandimento dei punti accesi parte dall'angolo della mappa e li sposta
+     fuori dall'Italia. Lì il punto acceso si ingrandisce con il bordo e l'onda non si mostra.
+   - :focus-visible: una regola che lo contiene viene ignorata per intero, quindi il focus dei campi
+     ha anche una regola con il solo :focus. */
+.field__input:focus,
+.error-summary:focus {
+  outline: var(--focus-width) solid var(--color-focus);
+}
+
+@supports not (transform-box: fill-box) {
+  .italy__dots circle.is-lit {
+    transform: none;
+    stroke: var(--color-brand);
+    stroke-width: 2.5;
+  }
+
+  .italy__ripple {
+    display: none;
+  }
+}
+
+.no-flexgap .btn .icon,
+.no-flexgap .home__social .icon,
+.no-flexgap .trail__toggle .icon,
+.no-flexgap .footer-links__link .icon,
+.no-flexgap .home__footer-inner .icon,
+.no-flexgap .field__error .icon,
+.no-flexgap .error-summary__title .icon {
+  margin-left: 0.25em;
+  margin-right: 0.25em;
+}
+
+.no-flexgap .brand > * + *,
+.no-flexgap .home__badge > * + *,
+.no-flexgap .italy__tag > * + *,
+.no-flexgap .field--checkbox > * + *,
+.no-flexgap .form-status > * + *,
+.no-flexgap .form-card__head > * + * {
+  margin-left: var(--space-sm);
+}
+
+.no-flexgap .home__dot {
+  margin-right: var(--space-xs);
+}
+
+.no-flexgap .italy__tag .icon {
+  margin-right: 0.4rem;
+}
+
+.no-flexgap .field--checkbox .field__error {
+  margin-left: 0;
+}
+
+.no-flexgap .form__inline > * {
+  margin: 0 var(--space-sm) var(--space-sm) 0;
+}
+
+.no-flexgap .form__inline > :last-child {
+  margin-right: 0;
+}
+
+.no-flexgap .italy > * + * {
+  margin-top: var(--space-md);
+}
+
+.no-flexgap .home__footer-inner > *,
+.no-flexgap .footer-links > *,
+.no-flexgap .site-footer__meta > *,
+.no-flexgap .hero__actions > * {
+  margin: 0.25rem 0.75rem;
+}

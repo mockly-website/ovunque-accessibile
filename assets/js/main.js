@@ -4,6 +4,17 @@
 (function () {
   'use strict';
 
+  /* Safari prima della 14.1 non conosce il gap nei flex: lo segnalo al CSS (sezione 12 di style.css) */
+  (function flexGapCheck() {
+    var box = document.createElement('div');
+    box.style.cssText = 'display:flex;flex-direction:column;row-gap:1px;position:absolute;visibility:hidden';
+    box.appendChild(document.createElement('div'));
+    box.appendChild(document.createElement('div'));
+    document.body.appendChild(box);
+    if (box.scrollHeight !== 1) document.documentElement.classList.add('no-flexgap');
+    box.parentNode.removeChild(box);
+  })();
+
   /* Mappa dell'Italia a puntini: i punti si accendono uno alla volta (con un'onda e, ogni tanto,
      un segnaposto), come una community che aggiunge luoghi. È un'illustrazione: nessun luogo reale.
      Parte da sola solo se l'utente non ha chiesto di ridurre il movimento; il pulsante la ferma (WCAG 2.2.2). */
