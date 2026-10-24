@@ -15,10 +15,10 @@
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
-  <link rel="stylesheet" href="assets/css/sito.css?v=p9">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p11">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="assets/js/sito.js?v=p9" defer></script>
+  <script src="assets/js/sito.js?v=p11" defer></script>
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -106,7 +106,9 @@
           </form>
 
         <div class="explore__map-wrap">
-          <div id="explore-map" class="map" role="region" aria-label="Mappa dei luoghi trovati"></div>
+          <div id="explore-map" class="map" role="region" aria-label="Mappa dei luoghi trovati">
+            <noscript><p class="map__fallback">La mappa ha bisogno di JavaScript.</p></noscript>
+          </div>
           <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
             <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
             <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
@@ -114,14 +116,14 @@
             <li><span class="map-legend__dot pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Da verificare</li>
           </ul>
           <p id="map-status" class="visually-hidden" role="status"></p>
-          <p class="map__note">La mappa mostra gli stessi luoghi dell'elenco. Con la tastiera: frecce per spostarti, + e − per lo zoom, Tab per passare da un segnaposto all'altro.</p>
+          <p class="map__note">La mappa mostra gli stessi luoghi dell'elenco. Con la tastiera usa l'elenco: ogni luogo ha il pulsante «Mostra sulla mappa». Sulla mappa le frecce la spostano e + e − cambiano lo zoom.</p>
         </div>
 
         <section id="results" aria-labelledby="results-title" tabindex="-1">
             <h2 id="results-title" class="visually-hidden">Elenco dei luoghi</h2>
-            <p id="results-count" class="results__count" role="status" tabindex="-1">Caricamento dei luoghi…</p>
+            <p id="results-count" class="results__count" role="status" tabindex="-1"><span class="js-only">Caricamento dei luoghi…</span></p>
             <ul id="results-list" class="results__list" role="list"></ul>
-            <noscript><p class="empty">Per vedere i luoghi serve JavaScript attivo.</p></noscript>
+            <noscript><p class="empty">Per vedere i luoghi e la mappa serve JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>: ti mandiamo noi le informazioni sul luogo che ti interessa.</p></noscript>
         </section>
       </div>
     </div>
@@ -129,7 +131,7 @@
 
   <footer class="site-footer">
     <div class="container site-footer__inner">
-      <a href="../privacy.html">Privacy</a>
+      <a href="privacy.html">Privacy</a>
       <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
       <a href="tel:+393518332819">Angelo: 351 833 2819</a>
       <span>© 2026 Ovunque Accessibile</span>

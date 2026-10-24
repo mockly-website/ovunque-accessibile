@@ -4,6 +4,9 @@
 (function () {
   'use strict';
 
+  /* Con JavaScript attivo si mostrano i messaggi "Caricamento…" (classe js-only) */
+  document.documentElement.classList.add('js');
+
   var DATA_URL = 'assets/data/luoghi.json';
   var TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
   var ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
@@ -179,11 +182,22 @@
     var map = L.map(container, Object.assign({
       scrollWheelZoom: false,     /* la rotella scorre la pagina, non la mappa */
       keyboard: true
-    }, options || {}));
+    }, options || {}, { zoomControl: false }));
+    /* Testi dei controlli di Leaflet in italiano (WCAG 3.1.2) */
+    L.control.zoom({ zoomInTitle: 'Avvicina', zoomOutTitle: 'Allontana' }).addTo(map);
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
     map.attributionControl.setPrefix(false);
+    map.on('popupopen', function (e) {
+      var close = e.popup.getElement().querySelector('.leaflet-popup-close-button');
+      if (close) {
+        close.setAttribute('aria-label', 'Chiudi');
+        close.setAttribute('title', 'Chiudi');
+      }
+    });
     return map;
   }
+
+
 
   /* Segnaposto: colore + simbolo del giudizio (il significato non dipende solo dal colore) */
   function pinIcon(g) {
@@ -197,6 +211,9 @@
   /* Gruppi di luoghi vicini: cerchio con il numero, si apre zoomando */
   function clusterLayer() {
     if (!L.markerClusterGroup) return L.layerGroup();
+    /* Mappe con elenco accanto: gruppi e segnaposto fuori dall'ordine di tabulazione.
+       Con la tastiera si usa l'elenco ("Mostra sulla mappa"), che ha le stesse informazioni. */
+    L.MarkerCluster.mergeOptions({ keyboard: false });
     return L.markerClusterGroup({
       showCoverageOnHover: false,
       maxClusterRadius: 48,
@@ -229,11 +246,11 @@
     ]);
   }
 
-  function addMarker(layer, p, onSelect) {
+  function addMarker(layer, p, onSelect, focusable) {
     var marker = L.marker([p.lat, p.lng], {
       icon: pinIcon(giudizio(p)),
       title: p.nome + ', ' + p.citta + ': ' + GIUDIZIO[giudizio(p)].toLowerCase(),
-      keyboard: true,
+      keyboard: !!focusable,
       riseOnHover: true
     }).addTo(layer);
     marker.bindPopup(popupContent(p), { maxWidth: 280, minWidth: 220 });
@@ -547,7 +564,7 @@
       var map = createMap(box, { zoomControl: true });
       if (map) {
         map.setView([p.lat, p.lng], 16);
-        addMarker(map, p).openPopup();
+        addMarker(map, p, null, true).openPopup();
       }
     }).catch(function () {
       document.getElementById('detail-intro').textContent = 'Non siamo riusciti a caricare la scheda. Ricarica la pagina tra poco.';

@@ -200,6 +200,10 @@ main:focus {
   border: 0 !important;
 }
 
+html:not(.js) .js-only {
+  display: none !important;
+}
+
 .sprite {
   position: absolute;
   width: 0;
@@ -1033,6 +1037,16 @@ main:focus {
   }
 }
 
+.map__fallback {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  margin: 0;
+  padding: var(--space-lg);
+  text-align: center;
+  font-weight: 700;
+}
+
 .map__note {
   margin: var(--space-xs) 0 0;
   color: var(--color-muted);
@@ -1270,6 +1284,28 @@ main:focus {
 
 .leaflet-popup-content-wrapper {
   border-radius: var(--radius-md);
+}
+
+/* Pulsante "Chiudi" del riquadro: 44 × 44 px */
+.leaflet-container a.leaflet-popup-close-button {
+  top: 2px;
+  right: 2px;
+  width: var(--target-min);
+  height: var(--target-min);
+  border-radius: var(--radius-sm);
+  color: var(--color-navy);
+  font: 700 1.6rem/var(--target-min) var(--font-body);
+  text-align: center;
+}
+
+.leaflet-container a.leaflet-popup-close-button:hover,
+.leaflet-container a.leaflet-popup-close-button:focus-visible {
+  background: var(--color-sky);
+  color: var(--color-navy);
+}
+
+.leaflet-popup-content {
+  padding-right: var(--space-xl);
 }
 
 .leaflet-popup-content {
@@ -1528,6 +1564,26 @@ main:focus {
   display: grid;
   gap: var(--space-2xs);
   font-size: var(--text-sm);
+}
+
+/* Pagina privacy */
+.legal {
+  max-width: 50rem;
+  margin-top: var(--space-xl);
+}
+
+.legal h2 {
+  margin-top: var(--space-xl);
+  font-size: var(--text-lg);
+}
+
+.legal ul {
+  margin: 0 0 var(--space-md);
+  padding-left: var(--space-lg);
+}
+
+.legal li + li {
+  margin-top: var(--space-xs);
 }
 
 /* 10. Animazioni: solo se l'utente non ha chiesto di ridurle */
