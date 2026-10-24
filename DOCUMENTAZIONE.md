@@ -4,8 +4,8 @@ Pagina unica che annuncia l'arrivo del **sito definitivo e della web-app**, con 
 Realizzata da Mockly.
 
 - **Front-end**: HTML5, CSS3, JavaScript vanilla (solo progressive enhancement). Sito statico, nessun framework, nessun CDN, nessun tracker, **nessun cookie** (quindi niente banner cookie).
-- **Backend**: [Supabase](https://supabase.com) (Postgres, regione UE) + Edge Function `subscribe` che riceve il modulo.
-- **Email** (facoltativa): notifica a ogni nuova iscrizione tramite Brevo (azienda UE).
+- **Modulo**: [Formspree](https://formspree.io), endpoint `https://formspree.io/f/mljjddjo`. Ogni iscrizione resta nell'account Formspree e arriva come email al proprietario del form.
+- **Alternativa non attiva**: nella cartella `supabase/` c'è un backend completo (Postgres UE + Edge Function) già testato, da usare se in futuro si vuole tenere i dati in Europa. Vedi "Alternativa: Supabase".
 
 ## Struttura
 
@@ -22,7 +22,7 @@ Realizzata da Mockly.
 │   ├── js/main.js           animazione della mappa + modulo
 │   ├── fonts/               Fredoka 600 (titoli), Atkinson Hyperlegible 400/700 (testi); woff2, licenza OFL inclusa
 │   └── img/                 logo, favicon, apple-touch-icon, og-image
-├── supabase/                NON va pubblicato con il sito
+├── supabase/                alternativa non attiva; NON va pubblicata con il sito
 │   ├── config.toml
 │   ├── migrations/          20261018000000_subscribers.sql, 20261022000000_email_only.sql
 │   └── functions/subscribe/ index.ts (Edge Function), .env.example (secrets)
@@ -34,7 +34,7 @@ Realizzata da Mockly.
 Fondo chiaro e caldo. Su computer due colonne (testo e modulo a sinistra, mappa a destra); su telefono e tablet una colonna centrata, con il modulo nella prima schermata e la mappa sotto.
 
 - **Testo**: badge "In arrivo · sito e web-app", titolo "La mappa dei luoghi davvero accessibili", una frase, firma "Un progetto di Angelo e Lorenzo".
-- **Modulo**: email + consenso, pulsante "Avvisami". Finché `[PROJECT-REF]` non è sostituito, l'invio mostra "Le iscrizioni aprono a breve" invece di un errore.
+- **Modulo**: email + consenso, pulsante "Avvisami". Invia a Formspree via JavaScript e mostra la conferma nella pagina; senza JavaScript Formspree mostra la sua pagina di conferma.
 - **Mappa a puntini** (SVG statico in `index.html`): 987 punti generati dal contorno dell'Italia di [Natural Earth](https://www.naturalearthdata.com) (pubblico dominio), Sicilia e Sardegna comprese.
   - `main.js` accende un punto ogni 0,7 s con un'onda; ogni quattro punti compare un segnaposto. Restano accesi al massimo 90 punti.
   - **I punti accesi sono un'illustrazione, non luoghi reali**: lo dice la nota visibile sotto la mappa. Quando ci saranno luoghi veri, la stessa mappa potrà mostrarli.
@@ -44,7 +44,25 @@ Fondo chiaro e caldo. Su computer due colonne (testo e modulo a sinistra, mappa 
 - **Footer** (uguale su tutte le pagine): Privacy, `ovunqueaccessibile@gmail.com`, © 2026, "Sito realizzato da Mockly". Instagram è in alto a destra.
 - **Pagine interne** (`privacy.html`, `grazie.html`, `iscrizione-errore.html`): stesso header, fondo e footer della home, contenuto in una scheda bianca.
 
-## Come sono protetti i dati
+## Il modulo con Formspree
+
+Campi inviati: `email`, `consent` ("sì"), `_subject` (oggetto dell'email di avviso) e il campo anti-spam nascosto `_gotcha` (se è compilato, Formspree scarta l'invio).
+
+1. **Prima iscrizione**: Formspree chiede di confermare il form via email al proprietario dell'account. Finché non è confermato, le iscrizioni non arrivano.
+2. **Dove leggere le iscrizioni**: dashboard Formspree → form → Submissions (esportabili in CSV), oltre alle email di avviso.
+3. **Account**: attiva la verifica in due passaggi; accesso solo alle persone autorizzate.
+4. **Piano gratuito**: ha un limite mensile di invii e non permette di reindirizzare a `grazie.html` senza JavaScript. Controlla i limiti attuali su formspree.io.
+5. **Impostazioni consigliate** nella dashboard: protezione spam attiva; se disponibile, limita il form al dominio del sito.
+
+`grazie.html` e `iscrizione-errore.html` restano per l'alternativa Supabase (e per un eventuale piano Formspree con reindirizzamento).
+
+**Rispetto a Supabase**: i dati stanno negli Stati Uniti (serve il DPA di Formspree, vedi privacy) e Formspree può registrare IP e browser per l'antispam. Il sito resta senza cookie e senza tracker.
+
+## Alternativa: Supabase (non attiva)
+
+Questa sezione, le sue sottosezioni e "Consultare ed esportare gli iscritti" descrivono il backend Supabase, pronto ma non collegato. Per attivarlo: segui "Configurare Supabase", poi rimetti nel form `action="https://<ref>.supabase.co/functions/v1/subscribe"`, il campo nascosto `form_token` e il honeypot `website`, e ripristina in `main.js` la logica del token (vedi la cronologia git prima del passaggio a Formspree).
+
+### Come sono protetti i dati (Supabase)
 
 | Livello | Protezione |
 |---|---|
@@ -62,7 +80,7 @@ Fondo chiaro e caldo. Su computer due colonne (testo e modulo a sinistra, mappa 
 
 **Limite noto**: chi ha JavaScript disattivato invia un POST classico senza token (la pagina è statica). Quel percorso è protetto da Origin, honeypot, validazione e limite globale, ma non dal tempo minimo: un bot potrebbe inserire email false, **non** leggere i dati. La difesa completa è il double opt-in (vedi "Prossimi passi").
 
-## Configurare Supabase (una volta)
+### Configurare Supabase (una volta)
 
 Servono un account Supabase con **2FA attiva** e la [Supabase CLI](https://supabase.com/docs/guides/cli) (`brew install supabase/tap/supabase`).
 
@@ -107,7 +125,7 @@ cd "/Users/noahmelis/Desktop/PROGECT/OVUNQUE ACCESSIBILE" && /Applications/MAMP/
 ```
 Poi apri http://localhost:8090. Per vederla dal telefono sulla stessa Wi-Fi usa `-S 0.0.0.0:8091` e apri l'indirizzo IP del Mac sulla porta 8091. Il server PHP serve solo i file statici; il modulo risponde solo dopo aver configurato Supabase.
 
-## Consultare ed esportare gli iscritti
+### Consultare ed esportare gli iscritti (Supabase)
 
 Dashboard Supabase → **Table Editor** → schema `private` → `subscribers` → esporta CSV. Accesso solo a persone autorizzate, ognuna con il proprio account e la 2FA. Il piano gratuito non ha backup scaricabili e va in pausa dopo circa una settimana senza attività.
 
@@ -120,12 +138,13 @@ Dashboard Supabase → **Table Editor** → schema `private` → `subscribers` �
 | Velocità e numero di punti accesi | `main.js` → `EVERY` (ms) e `MAX_LIT` in `initMap` |
 | Email di contatto | footer di tutte le pagine, `privacy.html` (sezioni 1 e 10), `iscrizione-errore.html` |
 | Blu del logo | `style.css` → `--color-brand` |
-| Messaggi del modulo | `main.js` (client) e `supabase/functions/subscribe/index.ts` (server) |
-| Informativa privacy | `privacy.html`; se la cambi, aggiorna il secret `PRIVACY_VERSION` (ora `2026-10-v2`) |
+| Messaggi del modulo | `main.js` (validazione ed esito dell'invio) |
+| Indirizzo Formspree | `index.html` (attributo `action` del form), `_headers` e `.htaccess` (CSP) |
+| Informativa privacy | `privacy.html` (ora versione `2026-10-v3`) |
 
 ## Prossimi passi consigliati
 
-1. **Double opt-in** con Brevo: email "conferma la tua iscrizione".
+1. **Double opt-in**: email "conferma la tua iscrizione" (Formspree a pagamento, oppure Supabase + Brevo).
 2. **Link di disiscrizione** in ogni email.
 3. **Pulizia automatica** (pg_cron) oltre il periodo di conservazione.
 
@@ -144,9 +163,9 @@ Obiettivo WCAG 2.2 AA. Verifiche fatte nel browser integrato (Chromium) e con un
 | Telefono e tablet | 320, 375 e 768 px: colonna centrata, titolo e modulo completo nella prima schermata; nessuno scroll orizzontale. Computer 1280×800: tutto in una schermata |
 | Aree cliccabili | ≥ 44×44 px, tranne i link dentro le frasi (eccezione WCAG 2.5.8) e la checkbox (28 px, ma l'intera etichetta è cliccabile) |
 
-**Non ancora verificato**: VoiceOver/NVDA reali, Lighthouse sul sito online, dispositivi reali, notifica Brevo.
+**Non ancora verificato**: VoiceOver/NVDA reali, Lighthouse sul sito online, dispositivi reali, un invio reale a Formspree.
 
-## Test del backend (in locale)
+## Test del backend Supabase (in locale, alternativa non attiva)
 
 Migrazioni applicate da utente non superuser con i ruoli di Supabase simulati; funzione eseguita con Deno 2.9 (`deno check` ok).
 
@@ -176,7 +195,7 @@ Migrazioni applicate da utente non superuser con i ruoli di Supabase simulati; f
 | 3 | **Blu del logo**: brief `#2F5B9C` (in uso), PNG `#215A9F` | `--color-brand` |
 | 4 | **Logo vettoriale** (SVG o PNG ≥ 1000 px) | `assets/img/` |
 | 5 | **Dominio**: canonical, og:url, og:image assoluto, `SITE_URL`, `ALLOWED_ORIGINS`, `NOTIFY_FROM` | `index.html`, secrets |
-| 6 | **`[PROJECT-REF]`** di Supabase | `index.html`, `_headers`, `.htaccess` |
-| 7 | Privacy: hosting, ruolo di Mockly, conservazione, età minima, log dei fornitori, DPA Supabase, data | `privacy.html` |
+| 6 | **Conferma del form Formspree** (prima iscrizione) e verifica in due passaggi sull'account | dashboard Formspree |
+| 7 | Privacy: hosting, ruolo di Mockly, conservazione, età minima, log dei fornitori, dati tecnici e DPA di Formspree e Google, data | `privacy.html` |
 
 > ⚠️ `privacy.html` è un **modello**: non è consulenza legale e va verificato dal titolare del trattamento prima della pubblicazione.

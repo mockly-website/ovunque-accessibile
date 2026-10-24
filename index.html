@@ -29,8 +29,8 @@
 
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-24a">
-  <script src="assets/js/main.js?v=2026-10-24a" defer></script>
+  <link rel="stylesheet" href="assets/css/style.css?v=2026-10-24b">
+  <script src="assets/js/main.js?v=2026-10-24b" defer></script>
 
   <script type="application/ld+json">
   {
@@ -93,8 +93,8 @@
         <!-- Regione di esito: riceve il focus dopo l'invio via fetch -->
         <div id="form-status" class="form-status" role="status" aria-live="polite" tabindex="-1"></div>
 
-        <!-- SEGNAPOSTO: sostituire [PROJECT-REF] con il riferimento del progetto Supabase (Settings → General) -->
-        <form id="subscribe-form" class="form home__card" action="https://[PROJECT-REF].supabase.co/functions/v1/subscribe" method="post">
+        <!-- Invio a Formspree. Senza JavaScript Formspree mostra la sua pagina di conferma. -->
+        <form id="subscribe-form" class="form home__card" action="https://formspree.io/f/mljjddjo" method="post">
           <div id="error-summary" class="error-summary" tabindex="-1" hidden>
             <h3 class="error-summary__title">
               <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-error"/></svg>
@@ -103,7 +103,7 @@
             <ul class="error-summary__list" id="error-summary-list"></ul>
           </div>
 
-          <input type="hidden" name="form_token" value="">
+          <input type="hidden" name="_subject" value="Nuova iscrizione – Ovunque Accessibile">
 
           <div class="field">
             <label class="field__label" for="email">La tua email</label>
@@ -118,12 +118,12 @@
 
           <!-- Honeypot: nascosto a tutti, solo i bot lo compilano -->
           <div class="hp" aria-hidden="true">
-            <label for="website">Non compilare questo campo</label>
-            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            <label for="gotcha">Non compilare questo campo</label>
+            <input type="text" id="gotcha" name="_gotcha" tabindex="-1" autocomplete="off">
           </div>
 
           <div class="field field--checkbox">
-            <input class="field__checkbox" type="checkbox" id="consent" name="consent" value="1" required>
+            <input class="field__checkbox" type="checkbox" id="consent" name="consent" value="sì" required>
             <label class="field__label field__label--checkbox" for="consent">
               Voglio ricevere email su Ovunque Accessibile. Ho letto la
               <a href="privacy.html" target="_blank" rel="noopener">privacy<span class="visually-hidden"> policy (si apre in una nuova scheda)</span><svg class="icon icon--inline" aria-hidden="true" focusable="false"><use href="#icon-external"/></svg></a>.

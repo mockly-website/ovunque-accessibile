@@ -1,6 +1,6 @@
 /* Ovunque Accessibile – progressive enhancement.
    Senza JS: la mappa resta ferma (con alcuni punti già accesi) e il form fa un POST classico
-   alla Edge Function "subscribe" (Supabase). */
+   a Formspree. */
 (function () {
   'use strict';
 
@@ -86,18 +86,13 @@
   var form = document.getElementById('subscribe-form');
   if (!form || !window.fetch || !window.FormData) return;
 
-  var MIN_SECONDS = 3;          /* deve coincidere con MIN_FILL_SECONDS nei secrets della funzione */
-
   var statusBox = document.getElementById('form-status');
   var summary = document.getElementById('error-summary');
   var summaryTitle = document.getElementById('error-summary-title');
   var summaryList = document.getElementById('error-summary-list');
   var submitBtn = form.querySelector('[type="submit"]');
   var submitLabel = submitBtn.textContent;
-  var tokenInput = form.elements.form_token;
 
-  var tokenPromise = null;
-  var tokenIssuedAt = 0;
   var attempted = false;
   var sending = false;
 
@@ -245,32 +240,6 @@
   form.addEventListener('change', revalidate);
   form.addEventListener('focusout', revalidate);
 
-  /* Token firmato (anti-bot, tempo minimo): richiesto al primo contatto col form. Nessun cookie. */
-  function ensureToken(force) {
-    if (tokenPromise && !force) return tokenPromise;
-    tokenPromise = fetch(form.action + '?action=token', {
-      headers: { Accept: 'application/json' },
-      credentials: 'omit',
-      cache: 'no-store'
-    })
-      .then(function (r) { if (!r.ok) throw new Error('token'); return r.json(); })
-      .then(function (data) {
-        tokenInput.value = data.token;
-        tokenIssuedAt = Date.now();
-        return data.token;
-      })
-      .catch(function (err) { tokenPromise = null; throw err; });
-    return tokenPromise;
-  }
-  form.addEventListener('focusin', function () {
-    if ((form.getAttribute('action') || '').indexOf('[PROJECT-REF]') !== -1) return;
-    ensureToken().catch(function () {});
-  }, { once: true });
-
-  function wait(ms) {
-    return new Promise(function (resolve) { setTimeout(resolve, ms); });
-  }
-
   function setSending(on) {
     sending = on;
     submitBtn.setAttribute('aria-disabled', on ? 'true' : 'false');
@@ -299,6 +268,7 @@
     statusBox.textContent = '';
   }
 
+  /* Formspree risponde in JSON: { ok: true } oppure { errors: [{ field, message }] } */
   function post() {
     return fetch(form.action, {
       method: 'POST',
@@ -306,7 +276,10 @@
       headers: { Accept: 'application/json' },
       credentials: 'omit'
     }).then(function (r) {
-      return r.json().catch(function () { throw new Error('json'); });
+      return r.json().catch(function () { return {}; }).then(function (data) {
+        data.httpOk = r.ok;
+        return data;
+      });
     });
   }
 
@@ -321,49 +294,30 @@
     showErrors(errors);
     if (Object.keys(errors).length) return;
 
-    /* Backend non ancora configurato (segnaposto [PROJECT-REF]): niente errore del browser */
-    if ((form.getAttribute('action') || '').indexOf('[PROJECT-REF]') !== -1) {
-      showStatus('info', 'Le iscrizioni aprono a breve',
-        'Il modulo non è ancora attivo. Nel frattempo puoi seguirci su Instagram: @ovunque_accessibile.');
-      return;
-    }
-
     setSending(true);
-    var retried = false;
-
-    ensureToken()
-      .then(function () {
-        var elapsed = Date.now() - tokenIssuedAt;
-        var minMs = MIN_SECONDS * 1000 + 200;
-        return elapsed < minMs ? wait(minMs - elapsed) : null;
-      })
-      .then(function send() {
-        return post().then(function (data) {
-          if (data.status === 'expired' && !retried) {
-            retried = true;
-            return ensureToken(true).then(function () { return wait(MIN_SECONDS * 1000 + 200); }).then(send);
-          }
-          return data;
-        });
-      })
+    post()
       .then(function (data) {
         setSending(false);
-        if (data.status === 'ok') {
+        if (data.httpOk && data.ok !== false && !data.errors) {
           form.hidden = true;
-          showStatus('success', data.title, data.message);
-        } else if (data.status === 'invalid' && data.errors) {
-          showErrors(data.errors);
+          showStatus('success', 'Grazie, sei nella lista!',
+            'Ti avviseremo appena il sito e la web-app saranno online.');
+          return;
+        }
+        /* Errori sui campi segnalati da Formspree (es. email non valida) */
+        var fieldErrors = {};
+        (data.errors || []).forEach(function (err) {
+          if (err.field === 'email') fieldErrors.email = 'Controlla l\'indirizzo email: deve essere nel formato nome@esempio.it.';
+        });
+        if (Object.keys(fieldErrors).length) {
+          showErrors(fieldErrors);
         } else {
-          showStatus('error', data.title || 'Non siamo riusciti a iscriverti', data.message || 'Riprova tra qualche minuto.');
+          showStatus('error', 'Non siamo riusciti a iscriverti',
+            'Riprova tra qualche minuto. Se il problema continua, scrivici a ovunqueaccessibile@gmail.com.');
         }
       })
       .catch(function () {
         setSending(false);
-        if (!tokenInput.value) {
-          /* Endpoint non raggiungibile via fetch: ripiego sull'invio classico */
-          form.submit();
-          return;
-        }
         showStatus('error', 'Non siamo riusciti a inviare il modulo',
           'Controlla la connessione e riprova. La tua email è ancora nel modulo.');
       });
