@@ -297,6 +297,12 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 - `supabase/seed.sql`: i 19 luoghi di esempio (`esempio = true`), rigenerabili con `python3 supabase/strumenti/seed_da_json.py`. Prima del lancio: `delete from public.places where esempio;`
 - **Prove**: `sh supabase/tests/esegui.sh` avvia un Postgres locale usa e getta e verifica le regole (`supabase/tests/rls.sql`: anonimi, utenti, moderatori con e senza 2FA, limiti, eliminazione account).
 
+### Stato attuale (24 ottobre 2026)
+
+Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACCESSIBILE» dell'account Mockly, regione Central EU (Frankfurt), piano Free, URL `https://fzqibkvdpywgvlejzeks.supabase.co`. Fatti i passi 2–4 e 6–7 qui sotto: migrazioni `app.sql` e `foto.sql`, 19 luoghi di esempio, Site URL e Redirect URLs, password minima 10 con lettere e numeri, conferma email attiva, TOTP attivo, chiave publishable in `app/assets/js/config.js`. Verificato dall'esterno con la chiave pubblica: si leggono solo le schede; profili, proposte, storico, scritture e funzioni di moderazione sono rifiutati.
+
+**Ancora da fare**: SMTP proprio (passo 5: con il servizio email di Supabase le email di conferma arrivano solo agli indirizzi dei membri dell'organizzazione, quindi gli utenti esterni non riescono a registrarsi), nomina degli admin (passo 8), pubblicazione della cartella `app/` su Altervista.
+
 ### Configurare Supabase (da fare con i titolari: account e password li inseriscono loro)
 
 1. Su supabase.com crea il progetto **Ovunque Accessibile**, regione **Central EU (Frankfurt)**, piano Free per ora. La password del database va nel gestore di password dei titolari, **mai** nel repository o in chat.
