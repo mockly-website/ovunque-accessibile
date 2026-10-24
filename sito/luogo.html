@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Scheda luogo – Ovunque Accessibile</title>
+  <meta name="description" content="Informazioni sull'accessibilità del luogo: ingresso, porte, bagno, parcheggio e spazi interni.">
+  <meta name="theme-color" content="#fbf6ec">
+  <meta name="color-scheme" content="light">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="assets/img/favicon.ico" sizes="any">
+  <link rel="icon" href="assets/img/favicon-32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p3">
+  <script src="assets/vendor/leaflet/leaflet.js" defer></script>
+  <script src="assets/js/sito.js?v=p3" defer></script>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></symbol>
+    <symbol id="icon-partial" viewBox="0 0 24 24"><path d="M5 11h14v2H5z"/></symbol>
+    <symbol id="icon-no" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></symbol>
+    <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></symbol>
+    <symbol id="icon-route" viewBox="0 0 24 24"><path d="M21.71 11.29l-9-9a1 1 0 0 0-1.41 0l-9 9a1 1 0 0 0 0 1.41l9 9a1 1 0 0 0 1.41 0l9-9a1 1 0 0 0 0-1.41zM14 14.5V12h-4v3H8v-4c0-.55.45-1 1-1h5V7.5l3.5 3.5-3.5 3.5z"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></symbol>
+  </svg>
+
+  <ul class="skip-links">
+    <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
+  </ul>
+
+  <header class="site-header">
+    <p class="proto-banner">Prototipo: i luoghi mostrati sono esempi, non dati reali.</p>
+    <div class="container site-header__inner">
+      <a class="brand" href="./">
+        <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
+        <span class="brand__name">Ovunque Accessibile</span>
+      </a>
+      <nav class="nav" aria-label="Principale">
+        <ul class="nav__list" role="list">
+          <li><a class="nav__link" href="mappa.html">Mappa dei luoghi</a></li>
+          <li><a class="nav__link" href="./#come-funziona">Come funziona</a></li>
+          <li><a class="nav__link" href="./#chi-siamo">Chi siamo</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn--primary btn--small site-header__app" href="./#app">Scarica l'app</a>
+    </div>
+  </header>
+
+  <main id="main" tabindex="-1">
+    <div class="container">
+      <nav class="crumbs" aria-label="Percorso">
+        <ol>
+          <li><a href="./">Home</a></li>
+          <li><a href="mappa.html">Mappa dei luoghi</a></li>
+          <li><span id="crumb-current" aria-current="page">Scheda luogo</span></li>
+        </ol>
+      </nav>
+
+      <article id="detail" class="detail" aria-labelledby="detail-title">
+        <div>
+          <p id="detail-cat" class="pill"></p>
+          <h1 id="detail-title" class="detail__title">Caricamento…</h1>
+          <address id="detail-address" class="detail__address"></address>
+          <p id="detail-intro"></p>
+
+          <div id="detail-body" hidden>
+            <div class="detail__actions">
+              <a id="detail-directions" class="btn btn--primary" href="#">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-route"/></svg>
+                Indicazioni stradali<span class="visually-hidden"> (OpenStreetMap, sito esterno)</span>
+              </a>
+              <a id="detail-report" class="btn btn--secondary" href="#">
+                <svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-edit"/></svg>
+                Segnala una correzione
+              </a>
+            </div>
+
+            <section class="card" aria-labelledby="facts-title">
+              <h2 id="facts-title">Accessibilità</h2>
+              <dl id="detail-facts" class="facts"></dl>
+              <p id="detail-date" class="place__meta"></p>
+            </section>
+          </div>
+        </div>
+
+        <aside class="detail__side" aria-label="Posizione e legenda">
+          <div id="detail-map" class="detail__map" role="region" aria-label="Posizione del luogo sulla mappa"></div>
+          <div class="card">
+            <h2 class="h3">Come leggere la scheda</h2>
+            <ul class="legend" role="list">
+              <li><span class="status status--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg>Accessibile</span></li>
+              <li><span class="status status--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg>Accessibile in parte</span></li>
+              <li><span class="status status--no"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-no"/></svg>Non accessibile</span></li>
+              <li><span class="status status--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg>Non ancora verificato</span></li>
+            </ul>
+          </div>
+          <div class="card">
+            <h2 class="h3">Recensioni</h2>
+            <p>Le esperienze di chi ci è stato si leggono e si scrivono nell'app.</p>
+            <a class="btn btn--secondary btn--small" href="./#app">Scopri l'app</a>
+          </div>
+        </aside>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <a href="../privacy.html">Privacy</a>
+      <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
+      <a href="tel:+393518332819">Angelo: 351 833 2819</a>
+      <span>© 2026 Ovunque Accessibile</span>
+      <span>Sito realizzato da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
+    </div>
+  </footer>
+</body>
+</html>

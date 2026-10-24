@@ -209,3 +209,24 @@ Migrazioni applicate da utente non superuser con i ruoli di Supabase simulati; f
 | 8 | Da verificare: DPA (accordo sul trattamento) di Formspree, Google e Altervista; dati tecnici che Formspree registra | contratti dei fornitori |
 
 > ⚠️ `privacy.html` è stata compilata con i dati forniti dai titolari, ma non è consulenza legale: conviene farla rileggere da un esperto privacy.
+
+---
+
+## Sito effettivo – prototipo (cartella `sito/`)
+
+Prima versione funzionante del sito definitivo, separata dalla pagina "in arrivo" (che resta nella cartella principale ed è quella online). In locale: http://localhost:8091/sito/ con il server `lan-preview`.
+
+**Ruolo del sito**: parte informativa. Mappa, ricerca e schede dei luoghi. Il login, i preferiti e le segnalazioni stanno nell'app (web-app + APK Android), raggiungibile dal pulsante "Scarica l'app".
+
+| Pagina | Cosa fa |
+|---|---|
+| `index.html` | Ricerca, ricerche rapide (ingresso, bagno, parcheggio), anteprima della mappa, come funziona, cosa c'è in ogni scheda, blocco app (web-app e APK, ora "In arrivo"), chi siamo |
+| `mappa.html` | Ricerca per città/nome/tipo, filtri, elenco e mappa sincronizzati. I filtri finiscono nell'indirizzo (`?q=roma&f=bagno`), quindi una ricerca si può condividere |
+| `luogo.html?id=…` | Scheda: indirizzo, indicazioni (OpenStreetMap), stato di ingresso, porta, interni, piani, bagno e parcheggio, data dell'ultima verifica, "Segnala una correzione" (email) |
+
+- **Dati**: `sito/assets/data/luoghi.json`, **solo esempi inventati** (nomi "… di esempio", indirizzi "di Prova"). Ogni pagina mostra la striscia "Prototipo". Ogni caratteristica ha tre stati: `"si"`, `"no"`, `null` = non verificato (più `"parziale"`/`"rampa"`/… dove serve). È la stessa forma della futura tabella Supabase `places`.
+- **Mappa**: Leaflet 1.9.4 ospitato in `sito/assets/vendor/leaflet/` (integrità del pacchetto npm verificata, licenza BSD inclusa). Sfondo da `tile.openstreetmap.org`: è l'unica risorsa esterna e va citata nella privacy (il browser contatta i server di OpenStreetMap). Per il lancio, con molto traffico, conviene un fornitore di mappe dedicato in UE (le regole d'uso dei server OSM vietano l'uso intensivo).
+- **Accessibilità**: l'elenco è l'equivalente testuale della mappa; stato sempre con icona + testo (+ prefisso per screen reader), mai solo colore; segnaposto raggiungibili con Tab; rotella del mouse che non "cattura" la pagina; axe 0 violazioni su tutte le pagine a 375 e 1280 px; nessuno scroll orizzontale anche a 320 px.
+- **Sicurezza**: i testi dei luoghi entrano nella pagina solo con `textContent` (mai `innerHTML`), così i contenuti degli utenti non possono iniettare codice.
+
+**Prossimi passi**: tabella `places` su Supabase con lettura pubblica solo dei luoghi approvati; pagina privacy del sito (tile OSM); link veri a web-app e APK; dati reali raccolti da Angelo e Lorenzo.
