@@ -268,3 +268,66 @@ do $$ begin
       "spazi": {"nota": null, "valore": "tutti"}},
     "nome": "Gelateria di prova", "provincia": "TO", "regione": "Piemonte"}'::jsonb), 'dati del modulo dell''app rifiutati';
 end $$;
+
+-- 11. Foto: B segnala un luogo con una foto; resta privata finché M non approva
+\set PB '''aaaaaaaa-0000-0000-0000-000000000002/bbbbbbbb-0000-0000-0000-000000000001.jpg'''
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  base jsonb := (select dati from public.proposte where tipo = 'correzione' limit 1);
+  prop uuid;
+begin
+  insert into public.proposte (tipo, dati) values ('nuovo', jsonb_set(base, '{nome}', '"Bar con foto"')) returning id into prop;
+  insert into storage.objects (bucket_id, name) values ('foto', 'aaaaaaaa-0000-0000-0000-000000000002/bbbbbbbb-0000-0000-0000-000000000001.jpg');
+  insert into public.foto (proposta_id, path, alt) values (prop, 'aaaaaaaa-0000-0000-0000-000000000002/bbbbbbbb-0000-0000-0000-000000000001.jpg', 'Rampa davanti all''ingresso');
+  begin
+    insert into storage.objects (bucket_id, name) values ('foto', 'aaaaaaaa-0000-0000-0000-000000000003/bbbbbbbb-0000-0000-0000-000000000002.jpg');
+    raise exception 'DOVEVA FALLIRE: carico nella cartella di un altro';
+  exception when insufficient_privilege then null; end;
+  begin
+    insert into public.foto (proposta_id, path, alt) values (prop, 'aaaaaaaa-0000-0000-0000-000000000002/bbbbbbbb-0000-0000-0000-000000000003.jpg', 'no');
+    raise exception 'DOVEVA FALLIRE: descrizione troppo corta';
+  exception when check_violation then null; end;
+  begin
+    insert into public.foto (proposta_id, path, alt) values ((select id from public.proposte where tipo = 'correzione' limit 1),
+      'aaaaaaaa-0000-0000-0000-000000000002/bbbbbbbb-0000-0000-0000-000000000004.jpg', 'Foto su proposta già decisa');
+    raise exception 'DOVEVA FALLIRE: foto su una proposta già approvata';
+  exception when check_violation then null; end;
+  assert (select count(*) from public.foto) = 1, 'B non vede la propria foto';
+  assert (select count(*) from storage.objects) = 1, 'B non vede il proprio file';
+  assert jsonb_array_length(public.i_miei_dati() -> 'foto') = 1, 'export: foto';
+end $$;
+reset role;
+
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  assert (select count(*) from public.foto) = 0, 'anon vede una foto in attesa';
+  assert (select count(*) from storage.objects) = 0, 'anon vede un file in attesa';
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal2"}', false);
+set role authenticated;
+do $$
+declare
+  nuovo uuid;
+begin
+  assert (select count(*) from storage.objects) = 1, 'la moderatrice non vede il file da controllare';
+  nuovo := public.approva_proposta((select id from public.proposte where dati ->> 'nome' = 'Bar con foto'));
+  assert (select place_id from public.foto limit 1) = nuovo, 'foto non collegata alla nuova scheda';
+end $$;
+reset role;
+
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  assert (select alt from public.foto where stato = 'pubblicata') = 'Rampa davanti all''ingresso', 'anon non vede la foto approvata';
+  assert (select count(*) from storage.objects) = 1, 'anon non vede il file approvato';
+  begin
+    perform autore from public.foto;
+    raise exception 'DOVEVA FALLIRE: anon legge l''autore della foto';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;

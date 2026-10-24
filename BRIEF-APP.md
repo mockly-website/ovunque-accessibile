@@ -17,18 +17,18 @@
 - Con l'account:
   - salvare i preferiti;
   - scrivere recensioni (escono dopo la moderazione);
-  - segnalare luoghi nuovi o correzioni, con misure e posizione sulla mappa;
+  - segnalare luoghi nuovi o correzioni, con misure, posizione sulla mappa e **fino a 5 foto** (GPS tolto, descrizione obbligatoria per chi non vede, pubbliche solo dopo l'approvazione);
   - seguire lo stato delle proprie segnalazioni nel profilo;
   - scaricare i propri dati ed eliminare l'account.
 - Moderatori, dopo la verifica in due passaggi:
-  - confronto «Ora / Proposto» e anteprima dei giudizi;
+  - confronto «Ora / Proposto», anteprima dei giudizi e foto da controllare (si può escluderne una);
   - approvare («community» o «verificato sul posto») o respingere con motivo;
   - moderare le recensioni;
   - mettere una scheda in revisione o archiviarla.
 
 ## Da fare (servono i titolari)
 1. **Creare il progetto Supabase**, regione Francoforte (lo fanno loro, con la loro password).
-2. **Eseguire la migrazione** e il seed nel SQL Editor.
+2. **Eseguire le due migrazioni** (`app.sql`, poi `foto.sql`) e il seed nel SQL Editor.
 3. **Impostare l'accesso**: conferma email, password minima di 10 caratteri, URL di redirect.
 4. **Collegare l'app**: copiare URL e chiave *publishable* in `config.js`.
 5. **Nominare gli admin**: Angelo e Lorenzo si registrano, poi diventano admin con una riga SQL e attivano la 2FA.
@@ -37,7 +37,7 @@
 8. **Rileggere la privacy** dell'app (bozza) con il consulente.
 
 ## Dopo
-Foto nelle segnalazioni · pagine statiche per Google · MapTiler · APK Android (TWA) · Termini d'uso e Dichiarazione di accessibilità.
+Pulizia dei file delle foto respinte · pagine statiche per Google · MapTiler · APK Android (TWA) · Termini d'uso e Dichiarazione di accessibilità.
 
 ## Provarla ora
 - Dal computer: http://localhost:8091/app/

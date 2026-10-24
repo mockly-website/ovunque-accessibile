@@ -277,7 +277,7 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 | `index.html` | Mappa ed elenco con «Come ti muovi?» e filtri (come il sito) |
 | `luogo.html` | Scheda + **Salva nei preferiti**, **Proponi una correzione**, recensioni approvate e modulo «Racconta la tua visita» |
 | `accedi.html`, `registrati.html`, `password.html` | Accesso con email e password; registrazione con nome pubblico, conferma 14 anni e privacy; password dimenticata |
-| `segnala.html` | Nuovo luogo o correzione (`?id=`): misure base, voci facoltative, dettagli per tipo, posizione sulla mappa o con le coordinate |
+| `segnala.html` | Nuovo luogo o correzione (`?id=`): misure base, voci facoltative, dettagli per tipo, posizione sulla mappa o con le coordinate, **fino a 5 foto** con descrizione obbligatoria |
 | `profilo.html` | Esigenza salvata nell'account, preferiti, stato delle proprie segnalazioni e recensioni, nome pubblico, password, **scarica i miei dati**, esci, **elimina l'account** |
 | `moderazione.html` | Solo verificatori/admin **con verifica in due passaggi (TOTP)**: proposte con confronto «Ora / Proposto» e anteprima dei giudizi, approva (community o «verificato sul posto») o respingi con motivo; recensioni; stato delle schede (pubblicata / in revisione / archiviata) |
 | `privacy.html` | Bozza dell'informativa dell'app (versione `app-2026-10-v1`), da rileggere con il consulente |
@@ -292,6 +292,7 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 - `places`: schede; tutti leggono solo `pubblicato` e `in-revisione`; **nessuno scrive direttamente**, solo le funzioni di moderazione. `scheda_valida()` controlla ogni misura (tipi, intervalli, voci ammesse).
 - `proposte` (nuovo luogo / correzione), `recensioni`, `preferiti`: ognuno vede e cancella solo i propri; limite 10 proposte e 10 recensioni al giorno, 500 preferiti. L'id dell'autore non è mai pubblico.
 - `storico_luoghi`: ogni modifica alle schede, con la proposta che l'ha causata.
+- **Foto** (`supabase/migrations/20261024010000_foto.sql`): bucket privato `foto` (max 3 MB, solo JPEG/WebP), ogni utente scrive solo in `<suo id>/`. L'app ricomprime le foto nel browser (lato lungo 1600 px): così sparisce la posizione GPS. Tabella `foto` con descrizione obbligatoria (testo alternativo, 5–200 caratteri), massimo 5 per segnalazione e 20 al giorno. Restano private finché la proposta non è approvata (allora diventano pubbliche con la scheda; se respinta, restano escluse); il moderatore può escluderne una singola (`modera_foto`). Si mostrano con URL firmati validi un'ora. Eliminando l'account l'app cancella anche i file.
 - Funzioni: `approva_proposta`, `respingi_proposta`, `modera_recensione`, `stato_luogo`, `imposta_ruolo` (solo admin), `i_miei_dati` (export), `elimina_account`. Moderatore = ruolo giusto **e** token `aal2` (2FA).
 - `supabase/seed.sql`: i 19 luoghi di esempio (`esempio = true`), rigenerabili con `python3 supabase/strumenti/seed_da_json.py`. Prima del lancio: `delete from public.places where esempio;`
 - **Prove**: `sh supabase/tests/esegui.sh` avvia un Postgres locale usa e getta e verifica le regole (`supabase/tests/rls.sql`: anonimi, utenti, moderatori con e senza 2FA, limiti, eliminazione account).
@@ -299,7 +300,7 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 ### Configurare Supabase (da fare con i titolari: account e password li inseriscono loro)
 
 1. Su supabase.com crea il progetto **Ovunque Accessibile**, regione **Central EU (Frankfurt)**, piano Free per ora. La password del database va nel gestore di password dei titolari, **mai** nel repository o in chat.
-2. **SQL Editor** → incolla ed esegui, nell'ordine: `supabase/migrations/20261024000000_app.sql`, poi (facoltativo, per avere luoghi da guardare) `supabase/seed.sql`. Le due migrazioni vecchie (`subscribers`) servono solo alla lista d'attesa, non attiva.
+2. **SQL Editor** → incolla ed esegui, nell'ordine: `supabase/migrations/20261024000000_app.sql`, `supabase/migrations/20261024010000_foto.sql` (crea anche il bucket delle foto), poi (facoltativo, per avere luoghi da guardare) `supabase/seed.sql`. Le due migrazioni vecchie (`subscribers`) servono solo alla lista d'attesa, non attiva.
 3. **Authentication → Sign In / Providers → Email**: attivo, «Confirm email» attivo, lunghezza minima password **10**, requisiti «lettere e numeri». Sul piano Pro attivare anche «Leaked password protection».
 4. **Authentication → URL Configuration**: Site URL `https://ovunqueaccessibile.altervista.org/app/`; Redirect URLs `https://ovunqueaccessibile.altervista.org/app/**` (e `http://localhost:8091/app/**` per le prove).
 5. **Authentication → Emails**: testi in italiano; **SMTP proprio** (es. Brevo) prima del lancio, perché quello di Supabase manda pochissime email all'ora.
@@ -307,4 +308,4 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 7. **Project Settings → API**: copia *Project URL* e la chiave **publishable** (o *anon*) in `app/assets/js/config.js`. È pubblica per natura; la chiave *secret / service_role* non va mai nell'app.
 8. Angelo e Lorenzo si registrano dall'app; poi nel SQL Editor: `update public.profiles set ruolo = 'admin' where id = (select id from auth.users where email = '…');`. Al primo ingresso in `moderazione.html` attivano la 2FA. Gli altri verificatori li nomina un admin con `select public.imposta_ruolo('email', 'verificatore');`.
 
-**Da fare dopo**: foto nelle segnalazioni (Storage, GPS tolto), pagine statiche generate a ogni approvazione, MapTiler, APK (TWA), Termini d'uso e Dichiarazione di accessibilità, paginazione oltre 1000 luoghi, diritto di replica dei gestori.
+**Da fare dopo**: pulizia periodica dei file delle foto respinte o ritirate, pagine statiche generate a ogni approvazione, MapTiler, APK (TWA), Termini d'uso e Dichiarazione di accessibilità, paginazione oltre 1000 luoghi, diritto di replica dei gestori.

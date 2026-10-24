@@ -337,6 +337,20 @@
       });
     }
 
+    var gallery = $('photos-list');
+    if (gallery) {
+      api.placePhotos(p.id).then(function (rows) {
+        gallery.textContent = '';
+        show($('photos-card'), rows.length > 0);
+        rows.forEach(function (f) {
+          gallery.appendChild(el('li', {}, [el('figure', { className: 'photo' }, [
+            el('img', { src: f.url, alt: f.alt, loading: 'lazy', decoding: 'async' }),
+            el('figcaption', { text: 'Foto di ' + (f.autore_nome || 'un utente') })
+          ])]));
+        });
+      }).catch(function () { show($('photos-card'), false); });
+    }
+
     var list = $('reviews-list');
     function loadReviews() {
       api.reviews(p.id).then(function (rows) {
@@ -683,6 +697,117 @@
     return { dati: out, errors: errors };
   }
 
+  /* Foto: ricompresse nel browser in JPEG (lato lungo 1600 px). Ridisegnarle su un canvas toglie
+     i dati EXIF, compresa la posizione GPS di chi ha scattato. */
+  var MAX_FOTO = 5;
+
+  function loadImage(file) {
+    return new Promise(function (res, rej) {
+      var url = URL.createObjectURL(file);
+      var img = new Image();
+      img.onload = function () { res(img); };
+      img.onerror = function () { URL.revokeObjectURL(url); rej(new Error('formato')); };
+      img.src = url;
+    });
+  }
+
+  function preparePhoto(file, max) {
+    var decode = window.createImageBitmap
+      ? createImageBitmap(file, { imageOrientation: 'from-image' }).catch(function () { return loadImage(file); })
+      : loadImage(file);
+    return decode.then(function (img) {
+      var k = Math.min(1, max / Math.max(img.width, img.height));
+      var c = document.createElement('canvas');
+      c.width = Math.round(img.width * k);
+      c.height = Math.round(img.height * k);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      return new Promise(function (res, rej) {
+        c.toBlob(function (b) { if (b) res(b); else rej(new Error('formato')); }, 'image/jpeg', 0.82);
+      });
+    });
+  }
+
+  /* Sezione "Foto" del modulo: anteprima, descrizione obbligatoria (testo alternativo), "Togli" */
+  function photoSection(box) {
+    var chosen = [];
+    var list = el('ul', { className: 'photo-picks', role: 'list' });
+    var status = el('p', { className: 'visually-hidden', role: 'status' });
+    var input = el('input', { type: 'file', id: 'photo-input', className: 'photo-input', accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif', multiple: '', 'aria-describedby': 'photo-help' });
+    var count = 0;
+
+    function renumber() {
+      [].forEach.call(list.children, function (li, i) {
+        li.querySelector('label').textContent = 'Cosa si vede nella foto ' + (i + 1) + '?';
+        li.querySelector('img').alt = 'Anteprima della foto ' + (i + 1);
+        li.querySelector('button .visually-hidden').textContent = ' la foto ' + (i + 1);
+      });
+      input.disabled = chosen.length >= MAX_FOTO;
+    }
+
+    input.addEventListener('change', function () {
+      var files = [].slice.call(input.files || []);
+      input.value = '';
+      var room = MAX_FOTO - chosen.length;
+      if (files.length > room) status.textContent = 'Puoi aggiungere al massimo ' + MAX_FOTO + ' foto: ne ho prese ' + room + '.';
+      files.slice(0, room).reduce(function (prev, file) {
+        return prev.then(function () {
+          return preparePhoto(file, api.mode === 'prova' ? 800 : 1600).then(function (blob) {
+            var id = 'photo-' + (++count);
+            var url = URL.createObjectURL(blob);
+            var alt = el('input', { type: 'text', className: 'input', id: id, maxlength: '200', 'aria-describedby': id + '-aiuto' });
+            var remove = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [
+              icon('#icon-trash'), document.createTextNode('Togli'), el('span', { className: 'visually-hidden' })
+            ]);
+            var li = el('li', { className: 'photo-pick' }, [
+              el('img', { src: url, alt: '', width: '160', height: '120' }),
+              el('div', { className: 'field' }, [
+                el('label', { className: 'field__label', 'for': id }),
+                el('p', { className: 'field__help', id: id + '-aiuto', text: 'Serve a chi non vede la foto. Per esempio: «Rampa a sinistra della porta d\'ingresso».' }),
+                alt
+              ]),
+              remove
+            ]);
+            var item = { blob: blob, input: alt, li: li };
+            chosen.push(item);
+            list.appendChild(li);
+            remove.addEventListener('click', function () {
+              chosen.splice(chosen.indexOf(item), 1);
+              URL.revokeObjectURL(url);
+              li.remove();
+              renumber();
+              status.textContent = 'Foto tolta. Foto scelte: ' + chosen.length + '.';
+              input.focus();
+            });
+            renumber();
+            status.textContent = 'Foto aggiunta. Foto scelte: ' + chosen.length + ' di ' + MAX_FOTO + '. Scrivi cosa si vede.';
+          }).catch(function () {
+            status.textContent = 'Non riesco ad aprire «' + file.name + '»: usa una foto JPG o PNG.';
+          });
+        });
+      }, Promise.resolve());
+    });
+
+    box.appendChild(el('section', { className: 'card form-section', id: 'sec-foto', 'aria-labelledby': 'sec-foto-title' }, [
+      el('h2', { id: 'sec-foto-title', text: 'Foto (facoltative)' }),
+      el('p', { className: 'field__help', id: 'photo-help', text: 'Fino a ' + MAX_FOTO + ' foto: ingresso, porta, rampa, bagno. Togliamo noi la posizione GPS dalle foto. Non fotografare persone riconoscibili né targhe. Le foto si vedono solo dopo il controllo dei moderatori.' }),
+      el('div', { className: 'field' }, [el('label', { className: 'field__label', 'for': 'photo-input', text: 'Aggiungi foto' }), input]),
+      list,
+      status
+    ]));
+
+    return {
+      errors: function () {
+        return chosen.filter(function (c) {
+          var v = c.input.value.trim();
+          return v.length < 5 || v.length > 200;
+        }).map(function (c) {
+          return { input: c.input, text: 'Descrivi la foto ' + (chosen.indexOf(c) + 1) + ' in almeno 5 caratteri: cosa si vede?' };
+        });
+      },
+      items: function () { return chosen; }
+    };
+  }
+
   function initSegnala() {
     var form = $('proposal-form');
     var box = $('proposal-fields');
@@ -708,9 +833,12 @@
         el('div', { className: 'form-grid' }, sec.fields.map(fieldNode))
       ]));
     });
+    var photosUi = photoSection(box);
     show(form, true);
 
-    form.addEventListener('change', function () { refreshConditional(form); });
+    form.addEventListener('change', function (ev) {
+      if (ev.target.type !== 'file') refreshConditional(form);
+    });
     refreshConditional(form);
     var picker = initPicker(form);
 
@@ -738,16 +866,28 @@
       ev.preventDefault();
       if (isBusy(form)) return;
       var res = collect(form);
-      if (!res.errors.length && initial && JSON.stringify(res.dati) === initial) {
+      res.errors = res.errors.concat(photosUi.errors());
+      if (!res.errors.length && initial && JSON.stringify(res.dati) === initial && !photosUi.items().length) {
         res.errors.push({ input: $(fid('nome')), text: 'Non hai cambiato niente: modifica le voci che non corrispondono più al luogo.' });
       }
       if (showErrors(form, res.errors)) return;
       var nota = form.elements.nota_moderatori.value.trim() || null;
       busy(form, true, 'Invio…');
+      var items = photosUi.items();
+      var failed = 0;
       ready.then(function () {
         return api.propose({ tipo: place ? 'correzione' : 'nuovo', place_id: place ? place.id : null, dati: res.dati, nota: nota });
+      }).then(function (propostaId) {
+        /* Le foto una alla volta, dopo la proposta: se una non passa, la segnalazione resta comunque inviata */
+        return items.reduce(function (prev, item, i) {
+          return prev.then(function () {
+            form.querySelector('[type="submit"]').textContent = 'Invio della foto ' + (i + 1) + ' di ' + items.length + '…';
+            return api.uploadPhoto(propostaId, item.blob, item.input.value.trim()).catch(function () { failed++; });
+          });
+        }, Promise.resolve());
       }).then(function () {
         show(form, false);
+        if (failed) message($('proposal-photo-note'), failed === 1 ? 'Una foto non è stata caricata. La segnalazione è arrivata: se vuoi, rimandaci la foto con una correzione.' : failed + ' foto non sono state caricate. La segnalazione è arrivata: se vuoi, rimandaci le foto con una correzione.', 'error');
         show($('proposal-done'), true);
         focusHeading($('proposal-done-title'));
       }).catch(function (err) {
@@ -1201,6 +1341,34 @@
             rel: 'noopener', target: '_blank'
           }, [document.createTextNode('Controlla la posizione su OpenStreetMap'), el('span', { className: 'visually-hidden', text: ' (si apre in una nuova scheda)' })])]));
         }
+        var photoTitle = el('h4', { text: 'Foto' });
+        var photoBox = el('ul', { className: 'photos', role: 'list' });
+        article.appendChild(photoTitle);
+        article.appendChild(photoBox);
+        api.proposalPhotos(x.id).then(function (rows) {
+          if (!rows.length) {
+            photoTitle.remove();
+            photoBox.remove();
+            return;
+          }
+          photoTitle.textContent = rows.length === 1 ? 'Foto (1): si pubblica con la scheda' : 'Foto (' + rows.length + '): si pubblicano con la scheda';
+          rows.forEach(function (f, i) {
+            var btn = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [
+              document.createTextNode('Non pubblicare'), el('span', { className: 'visually-hidden', text: ' la foto ' + (i + 1) })
+            ]);
+            var li = el('li', {}, [el('figure', { className: 'photo' }, [
+              el('img', { src: f.url, alt: f.alt, loading: 'lazy' }),
+              el('figcaption', { text: 'Descrizione: ' + f.alt })
+            ]), btn]);
+            btn.addEventListener('click', function () {
+              api.moderatePhoto(f.id, 'respinta').then(function () {
+                li.textContent = '';
+                li.appendChild(el('p', { className: 'notice', role: 'status', text: 'Foto ' + (i + 1) + ' esclusa: non verrà pubblicata.' }));
+              }).catch(function (err) { message($('mod-note'), err.message, 'error'); });
+            });
+            photoBox.appendChild(li);
+          });
+        }).catch(function () { photoTitle.textContent = 'Foto: non siamo riusciti a caricarle'; });
         article.appendChild(decisionForm('proposta', x, function () { counts.p--; update(); }));
         listP.appendChild(el('li', {}, [article]));
       });

@@ -83,6 +83,16 @@
       return current.id;
     }
 
+    /* URL firmati, validi un'ora: il bucket è privato e le policy decidono chi può leggere cosa */
+    function signPhotos(rows) {
+      if (!rows.length) return [];
+      return sb.storage.from('foto').createSignedUrls(rows.map(function (r) { return r.path; }), 3600).then(check).then(function (urls) {
+        return rows.map(function (r, i) {
+          return { id: r.id, alt: r.alt, autore_nome: r.autore_nome, stato: r.stato, url: urls[i] && urls[i].signedUrl };
+        }).filter(function (r) { return r.url; });
+      });
+    }
+
     function redirect(page) {
       return new URL(page, location.href).href;
     }
@@ -166,17 +176,52 @@
           return check(res);
         });
       },
+      /* Restituisce l'id della proposta, che serve per collegarle le foto */
       propose: function (p) {
-        return sb.from('proposte').insert(p).then(check);
+        return sb.from('proposte').insert(p).select('id').single().then(check).then(function (r) { return r.id; });
       },
       withdrawProposal: function (id) {
-        return sb.from('proposte').delete().eq('id', id).then(check);
+        return sb.from('foto').select('path').eq('proposta_id', id).then(check).then(function (rows) {
+          return rows.length ? sb.storage.from('foto').remove(rows.map(function (r) { return r.path; })) : null;
+        }).then(function () {
+          return sb.from('proposte').delete().eq('id', id).then(check);
+        });
+      },
+
+      /* Foto: il file va nella cartella dell'utente, poi la riga in public.foto (se fallisce, il file si cancella) */
+      uploadPhoto: function (propostaId, blob, alt) {
+        var path = uid() + '/' + crypto.randomUUID() + '.jpg';
+        var bucket = sb.storage.from('foto');
+        return bucket.upload(path, blob, { contentType: 'image/jpeg', upsert: false, cacheControl: '31536000' }).then(check).then(function () {
+          return sb.from('foto').insert({ proposta_id: propostaId, path: path, alt: alt }).then(function (res) {
+            if (res.error) return bucket.remove([path]).then(function () { throw friendly(res.error); });
+            return null;
+          });
+        });
+      },
+      placePhotos: function (placeId) {
+        return sb.from('foto').select('id,path,alt,autore_nome').eq('place_id', placeId).eq('stato', 'pubblicata')
+          .order('created_at').limit(30).then(check).then(signPhotos);
+      },
+      proposalPhotos: function (propostaId) {
+        return sb.from('foto').select('id,path,alt,autore_nome,stato').eq('proposta_id', propostaId).neq('stato', 'respinta')
+          .order('created_at').then(check).then(signPhotos);
+      },
+      moderatePhoto: function (id, stato) {
+        return sb.rpc('modera_foto', { p_id: id, p_stato: stato }).then(check);
       },
       myData: function () {
         return sb.rpc('i_miei_dati').then(check);
       },
       deleteAccount: function () {
-        return sb.rpc('elimina_account').then(check).then(function () {
+        /* Prima i file delle foto (il database non può cancellarli), poi l'account */
+        var bucket = sb.storage.from('foto');
+        return bucket.list(uid(), { limit: 1000 }).then(check).then(function (files) {
+          var paths = files.map(function (f) { return uid() + '/' + f.name; });
+          return paths.length ? bucket.remove(paths).then(check) : null;
+        }).then(function () {
+          return sb.rpc('elimina_account').then(check);
+        }).then(function () {
           return sb.auth.signOut({ scope: 'local' });
         }).then(function () { current = null; profileCache = null; notify(null); });
       },
@@ -235,7 +280,27 @@
      ====================================================================== */
   function provaApi() {
     var KEY = 'oa-prova-v1';
+    var PHOTO_KEY = 'oa-prova-foto-v1';
     var memory = null;
+    var photoMemory = null;
+
+    /* Le foto di prova (piccole, in data URL) stanno a parte: se il browser non ha spazio restano in memoria */
+    function photos() {
+      if (photoMemory) return photoMemory;
+      try { photoMemory = JSON.parse(localStorage.getItem(PHOTO_KEY) || '[]'); } catch (e) { photoMemory = []; }
+      return photoMemory;
+    }
+    function savePhotos() {
+      try { localStorage.setItem(PHOTO_KEY, JSON.stringify(photoMemory)); } catch (e) { /* spazio finito: solo in memoria */ }
+    }
+    function blobToDataUrl(blob) {
+      return new Promise(function (res, rej) {
+        var r = new FileReader();
+        r.onload = function () { res(r.result); };
+        r.onerror = rej;
+        r.readAsDataURL(blob);
+      });
+    }
 
     function load() {
       if (memory) return memory;
@@ -452,16 +517,41 @@
       propose: function (p) {
         var u = needUser();
         var db = load();
-        db.proposte.push(Object.assign({ id: rid(), autore: u.id, autore_nome: db.profiles[u.id].nome_pubblico, stato: 'in-attesa', created_at: now() }, p,
+        var id = rid();
+        db.proposte.push(Object.assign({ id: id, autore: u.id, autore_nome: db.profiles[u.id].nome_pubblico, stato: 'in-attesa', created_at: now() }, p,
           { place_id: p.tipo === 'nuovo' ? null : p.place_id }));
         save();
-        return wait();
+        return wait(id);
       },
       withdrawProposal: function (id) {
         var u = needUser();
         var db = load();
         db.proposte = db.proposte.filter(function (x) { return !(x.id === id && x.autore === u.id && x.stato === 'in-attesa'); });
+        photoMemory = photos().filter(function (f) { return f.proposta_id !== id; });
+        savePhotos();
         save();
+        return wait();
+      },
+      uploadPhoto: function (propostaId, blob, alt) {
+        var u = needUser();
+        if (photos().filter(function (f) { return f.proposta_id === propostaId; }).length >= 5) return fail('Al massimo 5 foto per segnalazione');
+        return blobToDataUrl(blob).then(function (url) {
+          photos().push({ id: rid(), proposta_id: propostaId, place_id: null, autore: u.id, autore_nome: load().profiles[u.id].nome_pubblico,
+            alt: alt, url: url, stato: 'in-attesa', created_at: now() });
+          savePhotos();
+          return wait();
+        });
+      },
+      placePhotos: function (placeId) {
+        return wait(photos().filter(function (f) { return f.place_id === placeId && f.stato === 'pubblicata'; }));
+      },
+      proposalPhotos: function (propostaId) {
+        return wait(photos().filter(function (f) { return f.proposta_id === propostaId && f.stato !== 'respinta'; }));
+      },
+      moderatePhoto: function (id, stato) {
+        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        photos().forEach(function (f) { if (f.id === id) f.stato = stato; });
+        savePhotos();
         return wait();
       },
       myData: function () {
@@ -475,6 +565,7 @@
           profilo: db.profiles[u.id],
           proposte: db.proposte.filter(mine).map(strip).reverse(),
           recensioni: db.recensioni.filter(mine).map(strip).reverse(),
+          foto: photos().filter(mine).map(function (f) { var c = strip(f); delete c.url; return c; }),
           preferiti: (db.preferiti[u.id] || []).map(function (id) { return { place_id: id }; })
         });
       },
@@ -487,6 +578,8 @@
         delete db.preferiti[u.id];
         delete db.profiles[u.id];
         delete db.users[u.id];
+        photoMemory = photos().filter(function (f) { return f.autore !== u.id; });
+        savePhotos();
         db.session = null;
         save();
         notify(null);
@@ -536,6 +629,10 @@
         x.stato = 'approvata';
         x.place_id = placeId;
         x.deciso_at = now();
+        photos().forEach(function (f) {
+          if (f.proposta_id === id && f.stato === 'in-attesa') { f.stato = 'pubblicata'; f.place_id = placeId; }
+        });
+        savePhotos();
         save();
         return wait(placeId);
       },
@@ -547,6 +644,8 @@
         x.stato = 'respinta';
         x.motivo = motivo || null;
         x.deciso_at = now();
+        photos().forEach(function (f) { if (f.proposta_id === id && f.stato === 'in-attesa') f.stato = 'respinta'; });
+        savePhotos();
         save();
         return wait();
       },
@@ -569,8 +668,9 @@
         return wait();
       },
       resetProva: function () {
-        try { localStorage.removeItem(KEY); } catch (e) { /* niente da cancellare */ }
+        try { localStorage.removeItem(KEY); localStorage.removeItem(PHOTO_KEY); } catch (e) { /* niente da cancellare */ }
         memory = null;
+        photoMemory = null;
       }
     };
   }
