@@ -46,7 +46,7 @@ Fondo chiaro e caldo. Su computer due colonne (testo e modulo a sinistra, mappa 
 
 ## Il modulo con Formspree
 
-Campi inviati: `email`, `consent` ("sì"), `_subject` (oggetto dell'email di avviso) e il campo anti-spam nascosto `_gotcha` (se è compilato, Formspree scarta l'invio).
+Campi inviati: `email`, `consent` ("sì"), `privacy_version` (versione della privacy accettata: aggiornala in `index.html` quando cambi `privacy.html`), `_subject` (oggetto dell'email di avviso) e il campo anti-spam nascosto `_gotcha` (se è compilato, Formspree scarta l'invio).
 
 1. **Prima iscrizione**: Formspree chiede di confermare il form via email al proprietario dell'account. Finché non è confermato, le iscrizioni non arrivano.
 2. **Dove leggere le iscrizioni**: dashboard Formspree → form → Submissions (esportabili in CSV), oltre alle email di avviso.
