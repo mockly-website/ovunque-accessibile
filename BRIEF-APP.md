@@ -40,6 +40,6 @@
 Pulizia dei file delle foto respinte · pagine statiche per Google · MapTiler · APK Android (TWA) · Termini d'uso e Dichiarazione di accessibilità.
 
 ## Provarla ora
-- Su GitHub Pages, dopo il push: sito https://mockly-website.github.io/ovunque_accessibile/ e web-app https://mockly-website.github.io/ovunque_accessibile/app/
+- Su GitHub Pages, dopo il push: sito https://mockly-website.github.io/ovunque-accessibile/ e web-app https://mockly-website.github.io/ovunque-accessibile/app/
 - Dal computer: http://localhost:8091/app/
 - Dal telefono, sulla stessa rete Wi-Fi: http://192.168.1.12:8091/app/

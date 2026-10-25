@@ -693,7 +693,7 @@
     directionsLinks(p).forEach(function (l) {
       var external = l[1].indexOf('geo:') !== 0;
       list.appendChild(el('li', {}, [
-        el('a', { className: 'directions__link', href: l[1], rel: 'noopener' }, [
+        el('a', external ? { className: 'directions__link', href: l[1], rel: 'noopener', target: '_blank' } : { className: 'directions__link', href: l[1] }, [
           el('span', { text: l[0] }),
           external ? el('span', { className: 'visually-hidden', text: ' (app o sito esterno)' }) : null,
           external ? icon('#icon-external') : null
@@ -720,7 +720,17 @@
     document.addEventListener('click', function (ev) {
       if (!panel.hidden && !panel.contains(ev.target) && !toggle.contains(ev.target)) setOpen(false);
     });
+    /* Su iPhone, toccando un link il focus passa prima a <main> (tabindex -1): senza questo controllo
+       il pannello si chiuderebbe prima del clic e il link non si aprirebbe. Il focusout chiude solo con la tastiera. */
+    var pressing = false;
+    function press() {
+      pressing = true;
+      setTimeout(function () { pressing = false; }, 800);
+    }
+    panel.addEventListener('touchstart', press, { passive: true });
+    panel.addEventListener('mousedown', press);
     panel.addEventListener('focusout', function (ev) {
+      if (pressing) return;
       if (ev.relatedTarget && !panel.contains(ev.relatedTarget) && ev.relatedTarget !== toggle) setOpen(false);
     });
   }

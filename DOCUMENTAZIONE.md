@@ -4,7 +4,7 @@ Sito definitivo (prototipo con luoghi di esempio) e web-app con account, preferi
 
 - **Front-end**: HTML5, CSS3, JavaScript vanilla. Sito statico, nessun framework, nessun CDN, nessun tracker, nessun cookie. Font e librerie ospitati in `assets/`.
 - **Dati della web-app**: Supabase (progetto «ovunque accessibile», UE), vedi «Web-app e database Supabase».
-- **Demo online** (GitHub Pages, dal ramo `main`): sito https://mockly-website.github.io/ovunque_accessibile/ e web-app https://mockly-website.github.io/ovunque_accessibile/app/.
+- **Demo online** (GitHub Pages, dal ramo `main`): sito https://mockly-website.github.io/ovunque-accessibile/ e web-app https://mockly-website.github.io/ovunque-accessibile/app/.
 - **Pagina «in arrivo»**: resta online su https://ovunqueaccessibile.altervista.org/ ma non è più in questo repository. L'ultima versione è nel commit `8dfbc6c` e nella cartella `ovunque-altervista-upload/` sul Desktop.
 
 ## Struttura
@@ -122,7 +122,7 @@ Giudizio per esigenza: ✓ se tutte le voci sono ✓; ✕ se ingresso o spazi pr
 
 ### Stato attuale (24 ottobre 2026)
 
-Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACCESSIBILE» dell'account Mockly, regione Central EU (Frankfurt), piano Free, URL `https://fzqibkvdpywgvlejzeks.supabase.co`. Fatti i passi 2–4 e 6–7 qui sotto: migrazioni `app.sql`, `foto.sql` e `segnalazioni.sql`, 19 luoghi di esempio, Site URL e Redirect URLs, password minima 10 con lettere e numeri, conferma email attiva, TOTP attivo, chiave publishable in `app/assets/js/config.js`. Demo su GitHub Pages (dal ramo `main`): sito https://mockly-website.github.io/ovunque_accessibile/ e web-app https://mockly-website.github.io/ovunque_accessibile/app/. Verificato dall'esterno con la chiave pubblica: si leggono solo le schede; profili, proposte, storico, scritture e funzioni di moderazione sono rifiutati.
+Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACCESSIBILE» dell'account Mockly, regione Central EU (Frankfurt), piano Free, URL `https://fzqibkvdpywgvlejzeks.supabase.co`. Fatti i passi 2–4 e 6–7 qui sotto: migrazioni `app.sql`, `foto.sql` e `segnalazioni.sql`, 19 luoghi di esempio, Site URL e Redirect URLs, password minima 10 con lettere e numeri, conferma email attiva, TOTP attivo, chiave publishable in `app/assets/js/config.js`. Demo su GitHub Pages (dal ramo `main`): sito https://mockly-website.github.io/ovunque-accessibile/ e web-app https://mockly-website.github.io/ovunque-accessibile/app/. Verificato dall'esterno con la chiave pubblica: si leggono solo le schede; profili, proposte, storico, scritture e funzioni di moderazione sono rifiutati.
 
 **Ancora da fare**: SMTP proprio (passo 5: con il servizio email di Supabase le email di conferma arrivano solo agli indirizzi dei membri dell'organizzazione, quindi gli utenti esterni non riescono a registrarsi), nomina degli admin (passo 8), pubblicazione della cartella `app/` su Altervista.
 
@@ -131,7 +131,7 @@ Progetto **«ovunque accessibile»** nell'organizzazione Supabase «OVVUNQUE ACC
 1. Su supabase.com crea il progetto **Ovunque Accessibile**, regione **Central EU (Frankfurt)**, piano Free per ora. La password del database va nel gestore di password dei titolari, **mai** nel repository o in chat.
 2. **SQL Editor** → incolla ed esegui, nell'ordine: `supabase/migrations/20261024000000_app.sql`, `supabase/migrations/20261024010000_foto.sql` (crea anche il bucket delle foto), `supabase/migrations/20261024020000_segnalazioni.sql`, poi (facoltativo, per avere luoghi da guardare) `supabase/seed.sql`.
 3. **Authentication → Sign In / Providers → Email**: attivo, «Confirm email» attivo, lunghezza minima password **10**, requisiti «lettere e numeri». Sul piano Pro attivare anche «Leaked password protection».
-4. **Authentication → URL Configuration**: Site URL `https://ovunqueaccessibile.altervista.org/app/`; Redirect URLs `https://ovunqueaccessibile.altervista.org/app/**` (e `http://localhost:8091/app/**` e `https://mockly-website.github.io/ovunque_accessibile/app/**` per le prove).
+4. **Authentication → URL Configuration**: Site URL `https://ovunqueaccessibile.altervista.org/app/`; Redirect URLs `https://ovunqueaccessibile.altervista.org/app/**` (e `http://localhost:8091/app/**` e `https://mockly-website.github.io/ovunque-accessibile/app/**` per le prove).
 5. **Authentication → Emails**: testi in italiano; **SMTP proprio** (es. Brevo) prima del lancio, perché quello di Supabase manda pochissime email all'ora.
 6. **Authentication → Multi-Factor**: TOTP attivo (lo è di default).
 7. **Project Settings → API**: copia *Project URL* e la chiave **publishable** (o *anon*) in `app/assets/js/config.js`. È pubblica per natura; la chiave *secret / service_role* non va mai nell'app.
