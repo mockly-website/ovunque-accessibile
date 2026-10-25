@@ -563,7 +563,7 @@
         if (FILTRI[filters[i]] && !FILTRI[filters[i]](p, e)) return false;
       }
       if (!q) return true;
-      var hay = normalize([p.nome, p.citta, p.provincia, p.regione, p.indirizzo, CATEGORIE[p.categoria]].join(' '));
+      var hay = normalize([p.nome, p.citta, p.provincia, p.regione, p.indirizzo, CATEGORIE[p.categoria]].filter(Boolean).join(' '));
       return normalize(q).split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
     }
 
@@ -869,7 +869,8 @@
       document.getElementById('crumb-current').textContent = p.nome;
       document.getElementById('detail-cat').textContent = CATEGORIE[p.categoria] || '';
       document.getElementById('detail-title').textContent = p.nome;
-      document.getElementById('detail-address').textContent = p.indirizzo + ', ' + p.cap + ' ' + p.citta + ' (' + p.provincia + ')';
+      /* CAP e provincia sono facoltativi nelle segnalazioni: si mostrano solo se ci sono */
+      document.getElementById('detail-address').textContent = p.indirizzo + ', ' + (p.cap ? p.cap + ' ' : '') + p.citta + (p.provincia ? ' (' + p.provincia + ')' : '');
       document.getElementById('detail-intro').textContent = p.descrizione || '';
 
       var v = verifica(p);
