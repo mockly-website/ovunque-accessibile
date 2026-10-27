@@ -1282,7 +1282,7 @@
     });
   }
 
-  /* ---------- 8. Moderazione (verificatori e admin, con verifica in due passaggi) ---------- */
+  /* ---------- 8. Moderazione (verificatori e admin) ---------- */
   function flatten(obj, prefix, out) {
     out = out || {};
     Object.keys(obj || {}).forEach(function (k) {
@@ -1351,55 +1351,10 @@
         show($('mod-denied'), true);
         return;
       }
-      return api.mfa().then(function (st) {
-        if (st.level === 'aal2') return showPanel();
-        if (st.verified.length) return mfaChallenge(st.verified[0].id);
-        show($('mfa-enroll'), true);
-        if (api.mode === 'prova') show($('mfa-prova'), true);
-      });
+      showPanel();
     }).catch(function (err) {
       message($('mod-note'), err.message, 'error');
     });
-
-    $('mfa-start').addEventListener('click', function () {
-      api.mfaEnroll().then(function (d) {
-        show($('mfa-start'), false);
-        var img = $('mfa-qr');
-        if (d.qr && /^data:image\/svg\+xml/.test(d.qr)) {
-          img.src = d.qr;
-          show(img, true);
-        }
-        $('mfa-secret').textContent = d.secret;
-        show($('mfa-step2'), true);
-        $('mfa-enroll-form').dataset.factor = d.factorId;
-        $('mfa-enroll-form').elements.code.focus();
-      }).catch(function (err) { message($('mod-note'), err.message, 'error'); });
-    });
-    [$('mfa-enroll-form'), $('mfa-challenge-form')].forEach(function (form) {
-      form.addEventListener('submit', function (ev) {
-        ev.preventDefault();
-        if (isBusy(form)) return;
-        var code = form.elements.code;
-        var v = code.value.replace(/\s/g, '');
-        if (showErrors(form, /^[0-9]{6}$/.test(v) ? [] : [{ input: code, text: 'Il codice è fatto di 6 cifre.' }])) return;
-        busy(form, true, 'Verifica…');
-        api.mfaVerify(form.dataset.factor, v).then(function () {
-          busy(form, false);
-          show($('mfa-enroll'), false);
-          show($('mfa-challenge'), false);
-          showPanel();
-        }).catch(function (err) {
-          busy(form, false);
-          showErrors(form, [{ input: code, text: err.message }]);
-        });
-      });
-    });
-  }
-
-  function mfaChallenge(factorId) {
-    show($('mfa-challenge'), true);
-    $('mfa-challenge-form').dataset.factor = factorId;
-    if (api.mode === 'prova') show($('mfa-prova-2'), true);
   }
 
   function showPanel() {

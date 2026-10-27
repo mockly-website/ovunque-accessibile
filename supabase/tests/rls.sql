@@ -151,20 +151,20 @@ do $$ begin
   assert (select count(*) from public.preferiti) = 1, 'B ha cancellato un preferito di A';
 end $$;
 
--- 5. Verificatrice M senza 2FA: è come un utente normale
-select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+-- 5. Utente A non è moderatore: non vede le proposte degli altri e non approva
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
 set role authenticated;
 do $$ begin
-  assert (select count(*) from public.proposte) = 0, 'moderatrice senza 2FA vede le proposte';
+  assert (select count(*) from public.proposte) = 0, 'un utente normale vede le proposte degli altri';
   begin
     perform public.approva_proposta(gen_random_uuid());
-    raise exception 'DOVEVA FALLIRE: approvazione senza 2FA';
+    raise exception 'DOVEVA FALLIRE: approvazione da un utente normale';
   exception when insufficient_privilege then null; end;
 end $$;
 reset role;
 
--- 6. Verificatrice M con 2FA: approva, modera, mette in revisione
-select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal2"}', false);
+-- 6. Verificatrice M (senza 2FA, dal 27 ottobre): approva, modera, mette in revisione
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
 set role authenticated;
 do $$
 declare
@@ -232,7 +232,7 @@ begin
   exception when check_violation or foreign_key_violation then null; end;
 end $$;
 reset role;
-select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal2"}', false);
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
 set role authenticated;
 do $$ begin
   perform public.approva_proposta((select id from public.proposte where tipo = 'correzione'));
@@ -339,7 +339,7 @@ do $$ begin
 end $$;
 reset role;
 
-select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal2"}', false);
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
 set role authenticated;
 do $$
 declare

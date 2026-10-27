@@ -17,12 +17,12 @@
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p15">
-  <link rel="stylesheet" href="assets/css/app.css?v=a5">
-  <script src="assets/js/config.js?v=a5" defer></script>
+  <link rel="stylesheet" href="assets/css/app.css?v=a6">
+  <script src="assets/js/config.js?v=a6" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=p18" defer></script>
-  <script src="assets/js/api.js?v=a5" defer></script>
-  <script src="assets/js/app.js?v=a5" defer></script>
+  <script src="assets/js/api.js?v=a6" defer></script>
+  <script src="assets/js/app.js?v=a6" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -85,38 +85,6 @@
       <section id="mod-denied" class="card" aria-labelledby="mod-denied-title" hidden>
         <h2 id="mod-denied-title">Riservato ai moderatori</h2>
         <p>Questa pagina è per chi controlla le segnalazioni. Se pensi di doverla vedere, scrivi a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p>
-      </section>
-
-      <section id="mfa-enroll" class="card stack" aria-labelledby="mfa-enroll-title" hidden>
-        <h2 id="mfa-enroll-title">Attiva la verifica in due passaggi</h2>
-        <p>Per moderare serve un secondo controllo oltre alla password: un codice di 6 cifre che cambia ogni 30 secondi, generato da un'app sul telefono (per esempio Aegis, 2FAS, Google Authenticator o Microsoft Authenticator).</p>
-        <p id="mfa-prova" class="notice" hidden>Modalità prova: non c'è un vero codice QR, va bene qualsiasi numero di 6 cifre.</p>
-        <button id="mfa-start" class="btn btn--primary" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg>Inizia</button>
-        <div id="mfa-step2" class="stack" hidden>
-          <p>1. Nell'app di autenticazione aggiungi un account inquadrando questo codice QR.</p>
-          <img id="mfa-qr" class="mfa__qr" alt="Codice QR per aggiungere Ovunque Accessibile all'app di autenticazione" width="200" height="200" hidden>
-          <p>Se non puoi inquadrarlo, scrivi a mano questa chiave: <code id="mfa-secret" class="mfa__secret"></code></p>
-          <form id="mfa-enroll-form" class="stack" novalidate>
-            <div class="field field--short">
-              <label class="field__label" for="mfa-code">2. Scrivi il codice di 6 cifre che vedi nell'app</label>
-              <input class="input" type="text" id="mfa-code" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required>
-            </div>
-            <button class="btn btn--primary" type="submit">Attiva</button>
-          </form>
-        </div>
-      </section>
-
-      <section id="mfa-challenge" class="card stack" aria-labelledby="mfa-challenge-title" hidden>
-        <h2 id="mfa-challenge-title">Codice di verifica</h2>
-        <p>Apri l'app di autenticazione e scrivi il codice di 6 cifre di Ovunque Accessibile.</p>
-        <p id="mfa-prova-2" class="notice" hidden>Modalità prova: va bene qualsiasi numero di 6 cifre.</p>
-        <form id="mfa-challenge-form" class="stack" novalidate>
-          <div class="field field--short">
-            <label class="field__label" for="mfa-code-2">Codice</label>
-            <input class="input" type="text" id="mfa-code-2" name="code" inputmode="numeric" autocomplete="one-time-code" maxlength="7" required>
-          </div>
-          <button class="btn btn--primary" type="submit">Verifica</button>
-        </form>
       </section>
 
       <div id="mod-panel" class="stack" hidden>

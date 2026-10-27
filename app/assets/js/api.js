@@ -34,7 +34,6 @@
     same_password: 'La nuova password deve essere diversa da quella attuale.',
     over_email_send_rate_limit: 'Troppe email inviate: aspetta qualche minuto e riprova.',
     over_request_rate_limit: 'Troppi tentativi: aspetta qualche minuto e riprova.',
-    mfa_verification_failed: 'Codice non corretto o scaduto: riprova con quello nuovo.',
     session_not_found: 'La sessione è scaduta: accedi di nuovo.'
   };
 
@@ -226,32 +225,6 @@
         }).then(function () { current = null; profileCache = null; notify(null); });
       },
 
-      /* Moderazione: verifica in due passaggi (TOTP) */
-      mfa: function () {
-        return Promise.all([sb.auth.mfa.getAuthenticatorAssuranceLevel(), sb.auth.mfa.listFactors()]).then(function (r) {
-          var aal = check(r[0]);
-          var factors = check(r[1]);
-          return {
-            level: aal.currentLevel,
-            verified: (factors.totp || []).filter(function (f) { return f.status === 'verified'; }),
-            stale: (factors.all || []).filter(function (f) { return f.factor_type === 'totp' && f.status !== 'verified'; })
-          };
-        });
-      },
-      mfaEnroll: function () {
-        return this.mfa().then(function (st) {
-          return Promise.all(st.stale.map(function (f) { return sb.auth.mfa.unenroll({ factorId: f.id }); }));
-        }).then(function () {
-          return sb.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Ovunque Accessibile ' + new Date().toISOString().slice(0, 10) });
-        }).then(check).then(function (d) {
-          return { factorId: d.id, qr: d.totp.qr_code, secret: d.totp.secret };
-        });
-      },
-      mfaVerify: function (factorId, code) {
-        return sb.auth.mfa.challengeAndVerify({ factorId: factorId, code: code }).then(check).then(function () {
-          profileCache = null;
-        });
-      },
       pending: function () {
         return Promise.all([
           sb.from('proposte').select('id,tipo,place_id,autore_nome,dati,nota,created_at').eq('stato', 'in-attesa').order('created_at').limit(200),
@@ -330,7 +303,6 @@
         users: { 'prova-altro': { email: 'altro@prova.it' } },
         profiles: { 'prova-altro': { nome_pubblico: 'Giulia (prova)', esigenza: 'manuale', ruolo: 'utente' } },
         session: null,
-        aal2: false,
         proposte: [{
           id: 'prova-p1', tipo: 'correzione', place_id: 'esempio-trattoria-roma', autore: 'prova-altro', autore_nome: 'Giulia (prova)',
           dati: null, patch: { 'misure.ingresso.rampa': true, 'misure.ingresso.rampa_pct': 7 },
@@ -411,14 +383,13 @@
     function isMod() {
       var u = me();
       var db = load();
-      return !!(u && db.profiles[u.id] && db.profiles[u.id].ruolo !== 'utente' && db.aal2);
+      return !!(u && db.profiles[u.id] && db.profiles[u.id].ruolo !== 'utente');
     }
     function login(id, email, profile) {
       var db = load();
       db.users[id] = { email: email };
       if (!db.profiles[id]) db.profiles[id] = profile;
       db.session = id;
-      db.aal2 = false;
       save();
       notify(me());
     }
@@ -447,7 +418,6 @@
       signOut: function () {
         var db = load();
         db.session = null;
-        db.aal2 = false;
         save();
         notify(null);
         return wait();
@@ -549,7 +519,7 @@
         return wait(photos().filter(function (f) { return f.proposta_id === propostaId && f.stato !== 'respinta'; }));
       },
       moderatePhoto: function (id, stato) {
-        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        if (!isMod()) return fail('Riservato ai moderatori');
         photos().forEach(function (f) { if (f.id === id) f.stato = stato; });
         savePhotos();
         return wait();
@@ -586,23 +556,8 @@
         return wait();
       },
 
-      mfa: function () {
-        var db = load();
-        return wait({ level: db.aal2 ? 'aal2' : 'aal1', verified: db.mfaFactor ? [{ id: 'prova-factor' }] : [], stale: [] });
-      },
-      mfaEnroll: function () {
-        return wait({ factorId: 'prova-factor', qr: null, secret: 'PROVA-NESSUN-SEGRETO' });
-      },
-      mfaVerify: function (factorId, code) {
-        if (!/^[0-9]{6}$/.test(code)) return fail('Il codice è fatto di 6 cifre.');
-        var db = load();
-        db.aal2 = true;
-        db.mfaFactor = true;
-        save();
-        return wait();
-      },
       pending: function () {
-        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        if (!isMod()) return fail('Riservato ai moderatori');
         var db = load();
         return fillSeedProposal(db).then(function () {
           return allPlaces();
@@ -617,7 +572,7 @@
         });
       },
       approve: function (id, livello) {
-        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        if (!isMod()) return fail('Riservato ai moderatori');
         var db = load();
         var x = db.proposte.filter(function (q) { return q.id === id && q.stato === 'in-attesa'; })[0];
         if (!x) return fail('Proposta non trovata o già decisa');
@@ -637,7 +592,7 @@
         return wait(placeId);
       },
       reject: function (id, motivo) {
-        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        if (!isMod()) return fail('Riservato ai moderatori');
         var db = load();
         var x = db.proposte.filter(function (q) { return q.id === id && q.stato === 'in-attesa'; })[0];
         if (!x) return fail('Proposta non trovata o già decisa');
@@ -650,7 +605,7 @@
         return wait();
       },
       moderateReview: function (id, stato, motivo) {
-        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        if (!isMod()) return fail('Riservato ai moderatori');
         var db = load();
         var r = db.recensioni.filter(function (q) { return q.id === id; })[0];
         if (!r) return fail('Recensione non trovata');
@@ -661,7 +616,7 @@
         return wait();
       },
       setPlaceState: function (id, stato) {
-        if (!isMod()) return fail('Riservato ai moderatori con verifica in due passaggi');
+        if (!isMod()) return fail('Riservato ai moderatori');
         var db = load();
         db.stati[id] = stato;
         save();
