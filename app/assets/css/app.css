@@ -2,7 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono
+           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -1268,5 +1268,62 @@ textarea.input {
   /* Mentre si scrive, la barra in basso salirebbe sopra la tastiera e coprirebbe il campo: si nasconde */
   body.app:has(input:not([type="radio"]):not([type="checkbox"]):focus, textarea:focus, select:focus) .app-nav {
     display: none;
+  }
+}
+
+/* 12. Indirizzi suggeriti mentre si scrive (combobox) */
+.field--suggest {
+  position: relative;
+}
+
+.suggest {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  max-height: 18rem;
+  margin: 4px 0 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 2px solid var(--color-navy);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+.suggest[hidden] {
+  display: none;
+}
+
+.suggest__item {
+  display: grid;
+  gap: 2px;
+  min-height: var(--target-min);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.suggest__item:hover,
+.suggest__item[aria-selected="true"] {
+  background: var(--color-sky);
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
+.suggest__main {
+  font-weight: 700;
+}
+
+.suggest__sub {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+@media (forced-colors: active) {
+  .suggest__item[aria-selected="true"] {
+    outline: 3px solid Highlight;
   }
 }

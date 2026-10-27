@@ -9,7 +9,7 @@ Con --anteprima stampa solo quanti luoghi troverebbe, per tipo, senza scrivere n
 
 Regole:
 - solo wheelchair=yes (Ovunque Accessibile mostra luoghi davvero accessibili; «limited» e «no» restano fuori);
-- solo luoghi con nome e via (senza indirizzo una scheda non serve a nessuno);
+- solo luoghi con nome e via (senza indirizzo una scheda non serve a nessuno); i bagni pubblici senza nome si chiamano «Bagno pubblico»;
 - nessuna misura inventata: misure vuote, giudizio «da verificare», verifica_livello = 'osm';
 - i tag di origine restano nella colonna osm (ref, wheelchair, toilets_wheelchair, data dell'import);
 - un luogo già importato non si duplica (indice unico su osm->>'ref'), le schede già verificate non si toccano.
@@ -43,17 +43,31 @@ CATEGORIE = [
     ('amenity', {'cinema', 'theatre', 'arts_centre', 'library', 'concert_hall'}, 'cultura'),
     ('railway', {'station'}, 'trasporti'),
     ('amenity', {'bus_station', 'ferry_terminal'}, 'trasporti'),
+    ('amenity', {'pharmacy', 'hospital', 'clinic', 'doctors', 'dentist'}, 'sanita'),
+    ('healthcare', None, 'sanita'),
+    ('amenity', {'townhall', 'post_office', 'bank', 'courthouse', 'police'}, 'servizi'),
+    ('office', {'government'}, 'servizi'),
+    ('leisure', {'sports_centre', 'swimming_pool', 'stadium', 'fitness_centre', 'sports_hall'}, 'sport'),
+    ('amenity', {'place_of_worship'}, 'culto'),
+    ('amenity', {'school', 'university', 'college', 'kindergarten'}, 'istruzione'),
+    ('tourism', {'zoo', 'aquarium', 'theme_park'}, 'svago'),
+    ('shop', {'supermarket', 'convenience', 'greengrocer'}, 'supermercato'),
+    ('amenity', {'marketplace'}, 'supermercato'),
+    ('amenity', {'toilets'}, 'bagni'),
     ('shop', None, 'negozio'),
 ]
+
+# Tipi che su OpenStreetMap spesso non hanno nome: si usa questo
+NOME_PREDEFINITO = {'bagni': 'Bagno pubblico'}
 
 MISURE_VUOTE = {'ingresso': {}, 'spazi': {}, 'piani': {}, 'bagno': {}}
 
 
 def query(comune):
     filtri = ''.join(
-        '  nwr(area.a)["wheelchair"="yes"]["name"]["{}"{}];\n'.format(
-            k, '' if v is None else '~"^({})$"'.format('|'.join(sorted(v))))
-        for k, v, _ in CATEGORIE)
+        '  nwr(area.a)["wheelchair"="yes"]{}["{}"{}];\n'.format(
+            '' if cat in NOME_PREDEFINITO else '["name"]', k, '' if v is None else '~"^({})$"'.format('|'.join(sorted(v))))
+        for k, v, cat in CATEGORIE)
     nome = comune.replace('\\', '').replace('"', '')
     return ('[out:json][timeout:120];\n'
             'rel["boundary"="administrative"]["admin_level"="8"]["name"="{}"];\nmap_to_area->.a;\n'
@@ -88,7 +102,7 @@ def js(v):
 def scheda(el, comune, regione, provincia, oggi):
     tags = el.get('tags', {})
     cat = categoria(tags)
-    nome = pulito(tags.get('name'), 120)
+    nome = pulito(tags.get('name') or NOME_PREDEFINITO.get(cat, ''), 120)
     via = pulito(tags.get('addr:street'), 180)
     lat = el.get('lat', (el.get('center') or {}).get('lat'))
     lng = el.get('lon', (el.get('center') or {}).get('lon'))

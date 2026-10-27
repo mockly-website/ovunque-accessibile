@@ -753,11 +753,11 @@
   var SCHEMA = [
     { id: 'luogo', title: 'Il luogo', fields: [
       { path: 'nome', label: 'Nome del luogo', type: 'text', required: true, max: 120, autocomplete: 'organization' },
-      { path: 'categoria', label: 'Tipo di luogo', type: 'select', required: true, options: Object.keys(OA.CATEGORIE).map(function (k) { return [k, OA.CATEGORIE[k]]; }) },
-      { path: 'indirizzo', label: 'Indirizzo', help: 'Via e numero civico.', type: 'text', required: true, max: 200, autocomplete: 'street-address' },
-      { path: 'citta', label: 'Città', type: 'text', required: true, max: 80, autocomplete: 'address-level2' },
-      { path: 'cap', label: 'CAP', type: 'text', pattern: '^[0-9]{5}$', patternMsg: 'Il CAP è fatto di 5 cifre.', inputmode: 'numeric', autocomplete: 'postal-code', short: true, more: true },
-      { path: 'provincia', label: 'Sigla della provincia', help: 'Due lettere, per esempio RM.', type: 'text', pattern: '^[A-Za-z]{2}$', patternMsg: 'La provincia è una sigla di 2 lettere, per esempio RM.', upper: true, short: true, more: true },
+      { path: 'categoria', label: 'Tipo di luogo', type: 'select', required: true, options: Object.keys(OA.CATEGORIE).map(function (k) { return [k, OA.CATEGORIE[k] + ' (' + OA.ESEMPI_CATEGORIE[k] + ')']; }) },
+      { path: 'citta', label: 'Città', help: 'Scrivila prima della via: i suggerimenti degli indirizzi saranno di questa città.', type: 'text', required: true, max: 80, autocomplete: 'address-level2' },
+      { path: 'indirizzo', label: 'Indirizzo', help: 'Via e numero civico. Mentre scrivi compaiono gli indirizzi suggeriti: scegline uno e il segnaposto va sulla mappa.', type: 'text', required: true, max: 200, autocomplete: 'street-address' },
+      { path: 'cap', label: 'CAP', help: 'Si scrive da solo quando scegli l\'indirizzo o il punto sulla mappa.', type: 'text', pattern: '^[0-9]{5}$', patternMsg: 'Il CAP è fatto di 5 cifre.', inputmode: 'numeric', autocomplete: 'postal-code', short: true, more: true },
+      { path: 'provincia', label: 'Sigla della provincia', help: 'Due lettere, per esempio RM. Si scrive da sola dal punto sulla mappa.', type: 'text', pattern: '^[A-Za-z]{2}$', patternMsg: 'La provincia è una sigla di 2 lettere, per esempio RM.', upper: true, short: true, more: true },
       { path: 'regione', label: 'Regione', type: 'select', options: REGIONI.map(function (r) { return [r, r]; }), more: true },
       { path: 'descrizione', label: 'Descrizione breve', help: 'Cosa c\'è e come si entra.', type: 'textarea', max: 1000, more: true },
       { path: 'lat', label: 'Latitudine', type: 'number', required: true, min: 35, max: 48, step: 'any', short: true, coord: true },
@@ -1227,7 +1227,7 @@
         sec.intro ? el('p', { className: 'field__help', text: sec.intro }) : null,
         el('div', { className: 'form-grid' }, main.map(fieldNode)),
         more.length ? el('details', { className: 'more' }, [
-          el('summary', { className: 'more__toggle', text: sec.id === 'luogo' ? 'Altri dati del luogo (facoltativi): CAP, provincia, regione, descrizione' : (more.length === 1 ? 'Aggiungi una nota' : 'Aggiungi delle note') }),
+          el('summary', { className: 'more__toggle', text: sec.id === 'luogo' ? 'Altri dati del luogo: CAP, provincia e regione (si scrivono da soli dal punto sulla mappa), descrizione' : (more.length === 1 ? 'Aggiungi una nota' : 'Aggiungi delle note') }),
           el('div', { className: 'form-grid more__body' }, more.map(fieldNode))
         ]) : null
       ];
@@ -1387,10 +1387,19 @@
     });
   }
 
+  /* «Sardigna/Sardegna», «Trentino-Alto Adige/Südtirol» → la regione come la scriviamo noi (o null) */
+  function regionName(state) {
+    var parts = String(state || '').split('/').map(OA.normalize);
+    return REGIONI.filter(function (r) {
+      var k = OA.normalize(r).slice(0, 6);
+      return parts.some(function (x) { return x.indexOf(k) === 0; });
+    })[0] || null;
+  }
+
   /* Indirizzo di Nominatim → campi del modulo (via e civico, città, CAP, sigla della provincia, regione) */
   function addressParts(a) {
     var via = a.road || a.pedestrian || a.footway || a.square || a.path || a.cycleway || a.place || '';
-    var regione = REGIONI.filter(function (r) { return a.state && OA.normalize(a.state).indexOf(OA.normalize(r).slice(0, 6)) === 0; })[0] || null;
+    var regione = regionName(a.state);
     var prov = String(a['ISO3166-2-lvl6'] || '').replace(/^IT-/, '');
     return {
       indirizzo: via ? via + (a.house_number ? ' ' + a.house_number : '') : '',
@@ -1419,6 +1428,139 @@
     });
   }
 
+  /* Suggerimenti mentre si scrive la via: Photon (komoot, Germania), fatto per il completamento automatico con i dati di
+     OpenStreetMap (Nominatim per regolamento non lo permette). Parte da 3 lettere, dopo una pausa di 350 ms, invia solo il
+     testo scritto (più la città, se c'è). Elenco accessibile: combobox ARIA 1.2, frecce, Invio, Esc, tocco. */
+  var PHOTON_URL = 'https://photon.komoot.io/api/';
+  var ITALIA_BBOX = '6.6,35.4,18.6,47.1';
+
+  function addressSuggestions(input, cityInput, onPick, bias) {
+    var box = input.closest('.field');
+    var listId = 'addr-suggest';
+    var list = el('ul', { id: listId, className: 'suggest', role: 'listbox', 'aria-label': 'Indirizzi suggeriti', hidden: '' });
+    var live = el('p', { className: 'visually-hidden', role: 'status' });
+    var items = [];
+    var active = -1;
+    var timer = null;
+    var ctrl = null;
+    var lastQ = '';
+
+    input.setAttribute('role', 'combobox');
+    input.setAttribute('aria-autocomplete', 'list');
+    input.setAttribute('aria-expanded', 'false');
+    input.setAttribute('aria-controls', listId);
+    input.setAttribute('autocomplete', 'off');
+    box.classList.add('field--suggest');
+    box.appendChild(list);
+    box.appendChild(live);
+
+    function close() {
+      list.hidden = true;
+      input.setAttribute('aria-expanded', 'false');
+      input.removeAttribute('aria-activedescendant');
+      active = -1;
+    }
+
+    function highlight(i) {
+      active = i;
+      [].forEach.call(list.children, function (li, j) { li.setAttribute('aria-selected', j === i ? 'true' : 'false'); });
+      if (i >= 0) {
+        input.setAttribute('aria-activedescendant', listId + '-' + i);
+        list.children[i].scrollIntoView({ block: 'nearest' });
+      } else {
+        input.removeAttribute('aria-activedescendant');
+      }
+    }
+
+    function pick(i) {
+      var sug = items[i];
+      close();
+      if (!sug) return;
+      lastQ = sug.indirizzo;
+      onPick(sug);
+    }
+
+    function render(found) {
+      items = found;
+      list.textContent = '';
+      if (!found.length) {
+        close();
+        live.textContent = 'Nessun indirizzo suggerito: puoi scriverlo per intero e premere «Trova l\'indirizzo sulla mappa».';
+        return;
+      }
+      found.forEach(function (sug, i) {
+        var li = el('li', { id: listId + '-' + i, role: 'option', 'aria-selected': 'false', className: 'suggest__item' }, [
+          el('span', { className: 'suggest__main', text: sug.indirizzo }),
+          el('span', { className: 'suggest__sub', text: sug.luogo })
+        ]);
+        /* mousedown, non click: il campo non perde il focus prima della scelta */
+        li.addEventListener('mousedown', function (ev) { ev.preventDefault(); pick(i); });
+        list.appendChild(li);
+      });
+      list.hidden = false;
+      input.setAttribute('aria-expanded', 'true');
+      highlight(-1);
+      live.textContent = found.length === 1 ? '1 indirizzo suggerito: freccia giù per sceglierlo.' : found.length + ' indirizzi suggeriti: usa le frecce per sceglierne uno.';
+    }
+
+    function search() {
+      var q = input.value.trim();
+      if (q.length < 3 || q === lastQ) { if (q.length < 3) close(); return; }
+      lastQ = q;
+      var full = q + (cityInput.value.trim() ? ' ' + cityInput.value.trim() : '');
+      var params = new URLSearchParams({ q: full, limit: '5', bbox: ITALIA_BBOX });
+      params.append('layer', 'house');
+      params.append('layer', 'street');
+      var c = bias();
+      if (c) { params.set('lat', c.lat.toFixed(3)); params.set('lon', c.lng.toFixed(3)); }
+      if (ctrl) ctrl.abort();
+      ctrl = window.AbortController ? new AbortController() : null;
+      fetch(PHOTON_URL + '?' + params.toString(), { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
+        .then(function (r) { return r.ok ? r.json() : { features: [] }; })
+        .then(function (data) {
+          if (input.value.trim() !== q) return;          /* nel frattempo si è scritto altro */
+          var seen = {};
+          render((data.features || []).filter(function (f) {
+            return f.properties && f.properties.countrycode === 'IT' && (f.properties.street || f.properties.name);
+          }).map(function (f) {
+            var pr = f.properties;
+            var via = pr.street || pr.name;
+            var indirizzo = via + (pr.housenumber ? ' ' + pr.housenumber : '');
+            var citta = pr.city || pr.town || pr.village || pr.county || '';
+            return {
+              indirizzo: indirizzo, citta: citta, civico: !!pr.housenumber,
+              cap: /^[0-9]{5}$/.test(pr.postcode || '') ? pr.postcode : '',
+              luogo: [pr.postcode, citta].filter(Boolean).join(' ') + (regionName(pr.state) ? ' (' + regionName(pr.state) + ')' : ''),
+              testo: indirizzo + (citta ? ', ' + citta : ''),
+              lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0]
+            };
+          }).filter(function (sug) {
+            var k = sug.testo + sug.cap;
+            if (seen[k]) return false;
+            seen[k] = true;
+            return true;
+          }));
+        })
+        .catch(function () { /* senza suggerimenti resta «Trova l'indirizzo sulla mappa» */ });
+    }
+
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(search, 350);
+    });
+    input.addEventListener('keydown', function (ev) {
+      if (list.hidden) {
+        if (ev.key === 'ArrowDown' && items.length) { ev.preventDefault(); list.hidden = false; input.setAttribute('aria-expanded', 'true'); highlight(0); }
+        return;
+      }
+      if (ev.key === 'ArrowDown') { ev.preventDefault(); highlight(Math.min(active + 1, items.length - 1)); }
+      else if (ev.key === 'ArrowUp') { ev.preventDefault(); highlight(Math.max(active - 1, -1)); }
+      else if (ev.key === 'Enter' && active >= 0) { ev.preventDefault(); pick(active); }
+      else if (ev.key === 'Escape') { ev.preventDefault(); close(); }
+    });
+    input.addEventListener('blur', function () { setTimeout(close, 150); });
+  }
+
   /* Mappa per indicare la posizione. Si arriva al punto in quattro modi: «Trova l'indirizzo sulla mappa» (anche con Invio
      nei campi dell'indirizzo), tocco sulla mappa, segnaposto trascinato, «La mia posizione»; oppure con le coordinate.
      Quando il punto arriva dalla mappa, l'app propone l'indirizzo di quel punto (e lo scrive da sola se i campi sono vuoti). */
@@ -1443,6 +1585,17 @@
       });
     }
 
+    /* CAP, provincia e regione dipendono dal punto: si riscrivono ogni volta che il punto cambia */
+    function derived(parts) {
+      var done = [];
+      ['cap', 'provincia', 'regione'].forEach(function (k) {
+        if (!parts[k]) return;
+        field(k).value = parts[k];
+        done.push(parts[k]);
+      });
+      return done.length ? ' CAP, provincia e regione presi dal punto: ' + done.join(', ') + '.' : '';
+    }
+
     function placeMarker(lat, lng) {
       if (!map) return;
       if (!marker) {
@@ -1456,8 +1609,10 @@
       }
     }
 
-    /* origine: 'mappa' (tocco, trascinamento, mia posizione) → propone l'indirizzo; 'indirizzo' o 'campi' → no */
-    function set(lat, lng, origine, zoom) {
+    /* origine: 'mappa' (tocco, trascinamento, mia posizione, coordinate scritte) → propone anche via e città;
+       'indirizzo' (ricerca) e 'scelta' (suggerimento) → via e città le ha già date chi scrive; msg: testo da mostrare;
+       'iniziale' (scheda da correggere) → niente, i dati della scheda restano com'erano */
+    function set(lat, lng, origine, zoom, msg) {
       lat = Math.round(lat * 1e6) / 1e6;
       lng = Math.round(lng * 1e6) / 1e6;
       latIn.value = lat;
@@ -1465,25 +1620,30 @@
       placeMarker(lat, lng);
       if (map) map.setView([lat, lng], Math.max(map.getZoom(), zoom || 17));
       suggest.hidden = true;
-      if (origine !== 'mappa') return;
-      status.textContent = 'Punto messo sulla mappa. Cerco l\'indirizzo di quel punto…';
+      if (origine === 'iniziale') return;
+      status.textContent = msg || 'Punto messo sulla mappa. Cerco l\'indirizzo di quel punto…';
       var mine = ++asked;
       reverseGeocode(lat, lng).then(function (a) {
         if (mine !== asked) return;              /* nel frattempo il punto è cambiato */
         if (!a) {
-          status.textContent = 'Punto messo sulla mappa (' + lat + ', ' + lng + '). Non trovo un indirizzo qui: scrivilo tu nei campi qui sopra.';
+          if (origine === 'mappa') status.textContent = 'Punto messo sulla mappa (' + lat + ', ' + lng + '). Non trovo un indirizzo qui: scrivilo tu nei campi qui sopra.';
           return;
         }
         var parts = addressParts(a);
+        var extra = derived(parts);
+        if (origine !== 'mappa') {
+          status.textContent = (msg || '') + extra;
+          return;
+        }
         var testo = [parts.indirizzo, parts.citta].filter(Boolean).join(', ');
         if (!field('indirizzo').value.trim() && !field('citta').value.trim()) {
           fill(parts, false);
-          status.textContent = 'Punto messo sulla mappa. Ho scritto l\'indirizzo di quel punto: ' + testo + '. Controllalo qui sopra.';
+          status.textContent = 'Punto messo sulla mappa. Ho scritto l\'indirizzo di quel punto: ' + testo + '. Controllalo qui sopra.' + extra;
           return;
         }
         var same = !!parts.indirizzo && OA.normalize(field('indirizzo').value).indexOf(OA.normalize(parts.indirizzo)) === 0 &&
           OA.normalize(field('citta').value) === OA.normalize(parts.citta);
-        status.textContent = 'Punto messo sulla mappa' + (same ? ', all\'indirizzo che hai scritto.' : testo ? '. Qui l\'indirizzo è: ' + testo + '.' : '.');
+        status.textContent = 'Punto messo sulla mappa' + (same ? ', all\'indirizzo che hai scritto.' : testo ? '. Qui l\'indirizzo è: ' + testo + '.' : '.') + extra;
         if (!same && parts.indirizzo) {
           suggest.textContent = '';
           var btn = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [document.createTextNode('Usa questo indirizzo: ' + testo)]);
@@ -1517,7 +1677,7 @@
     function fromInputs() {
       var lat = Number(latIn.value.replace(',', '.'));
       var lng = Number(lngIn.value.replace(',', '.'));
-      if (latIn.value && lngIn.value && lat >= 35 && lat <= 48 && lng >= 6 && lng <= 19) set(lat, lng, 'campi');
+      if (latIn.value && lngIn.value && lat >= 35 && lat <= 48 && lng >= 6 && lng <= 19) set(lat, lng, 'mappa');
     }
     latIn.addEventListener('change', fromInputs);
     lngIn.addEventListener('change', fromInputs);
@@ -1564,21 +1724,31 @@
           status.textContent = down ? 'La ricerca non risponde: tocca la mappa nel punto dell\'ingresso.' : 'Non trovo «' + citta + '»: controlla il nome della città o tocca la mappa nel punto dell\'ingresso.';
           return;
         }
-        set(res.r.lat, res.r.lng, 'indirizzo', res.esatto ? 18 : 14);
-        if (!res.esatto && map) map.setView([res.r.lat, res.r.lng], 14);
-        fill(addressParts(res.r.address), false);    /* CAP, provincia e regione, se mancano */
-        status.textContent = res.esatto
+        var msg = res.esatto
           ? 'Trovato: ' + res.r.nome + '. Se l\'ingresso è da un\'altra parte, tocca la mappa lì o trascina il segnaposto.'
           : (via ? 'Non trovo la via: ho messo il segnaposto al centro di ' + citta + '. ' : 'Ho messo il segnaposto al centro di ' + citta + '. ') + 'Tocca la mappa nel punto dell\'ingresso.';
+        set(res.r.lat, res.r.lng, 'indirizzo', res.esatto ? 18 : 14, msg);
+        if (!res.esatto && map) map.setView([res.r.lat, res.r.lng], 14);
         reveal();
       });
     }
 
     $('pick-find').addEventListener('click', find);
+    /* Prima i suggerimenti (Invio sceglie quello evidenziato), poi Invio senza suggerimento cerca sulla mappa */
+    addressSuggestions(field('indirizzo'), field('citta'), function (sug) {
+      field('indirizzo').value = sug.indirizzo;
+      if (sug.citta) field('citta').value = sug.citta;
+      if (sug.cap) field('cap').value = sug.cap;
+      set(sug.lat, sug.lng, 'scelta', sug.civico ? 18 : 17,
+        'Indirizzo scelto: ' + sug.testo + '. Il segnaposto è sulla mappa qui sotto: se l\'ingresso è da un\'altra parte, tocca la mappa in quel punto.');
+    }, function () {
+      return map && map.getZoom() >= 10 ? map.getCenter() : null;
+    });
+
     /* Invio (o «Vai» sulla tastiera del telefono) nei campi dell'indirizzo cerca sulla mappa invece di inviare il modulo */
     ['indirizzo', 'citta', 'cap'].forEach(function (k) {
       field(k).addEventListener('keydown', function (ev) {
-        if (ev.key !== 'Enter' || ev.isComposing) return;
+        if (ev.key !== 'Enter' || ev.isComposing || ev.defaultPrevented) return;
         ev.preventDefault();
         find();
       });
@@ -1600,7 +1770,7 @@
 
     return {
       /* scheda da correggere: punto già noto, senza proporre indirizzi */
-      set: function (lat, lng) { set(lat, lng, 'campi'); }
+      set: function (lat, lng) { set(lat, lng, 'iniziale'); }
     };
   }
 

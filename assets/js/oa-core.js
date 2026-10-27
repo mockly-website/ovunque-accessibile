@@ -30,7 +30,35 @@
     parco: 'Parco e natura',
     cultura: 'Cinema, teatro e cultura',
     negozio: 'Negozio',
-    trasporti: 'Trasporti'
+    trasporti: 'Trasporti',
+    sanita: 'Salute',
+    servizi: 'Uffici e servizi',
+    sport: 'Sport',
+    culto: 'Luogo di culto',
+    istruzione: 'Scuola e università',
+    supermercato: 'Supermercato',
+    bagni: 'Bagno pubblico',
+    svago: 'Svago'
+  };
+
+  /* Esempi per ogni tipo: nel modulo «Segnala» e nella ricerca (chi cerca «farmacia» trova i luoghi «Salute») */
+  var ESEMPI_CATEGORIE = {
+    ristorante: 'pizzeria, trattoria, bar, gelateria, pub',
+    museo: 'museo, galleria, mostra',
+    hotel: 'hotel, B&B, ostello, agriturismo, casa vacanze',
+    spiaggia: 'spiaggia, lido, stabilimento balneare',
+    parco: 'parco, giardino, riserva naturale, sentiero',
+    cultura: 'cinema, teatro, biblioteca, sala concerti',
+    negozio: 'negozio, centro commerciale, libreria',
+    trasporti: 'stazione, aeroporto, porto, fermata',
+    sanita: 'farmacia, ospedale, ambulatorio, studio medico, dentista',
+    servizi: 'comune, ufficio postale, banca, anagrafe, INPS',
+    sport: 'palestra, piscina, stadio, palazzetto, campo sportivo',
+    culto: 'chiesa, moschea, sinagoga, tempio',
+    istruzione: 'scuola, università, asilo, biblioteca universitaria',
+    supermercato: 'supermercato, alimentari, mercato',
+    bagni: 'bagno pubblico, servizi igienici',
+    svago: 'zoo, acquario, parco divertimenti, sala giochi'
   };
 
   /* ---------- 2. Regole per esigenza ----------
@@ -740,7 +768,7 @@
         if (FILTRI[filters[i]] && !FILTRI[filters[i]](p, e)) return false;
       }
       if (!q) return true;
-      var hay = normalize([p.nome, p.citta, p.provincia, p.regione, p.indirizzo, CATEGORIE[p.categoria]].filter(Boolean).join(' '));
+      var hay = normalize([p.nome, p.citta, p.provincia, p.regione, p.indirizzo, CATEGORIE[p.categoria], ESEMPI_CATEGORIE[p.categoria]].filter(Boolean).join(' '));
       return normalize(q).split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
     }
 
@@ -1150,7 +1178,7 @@
       initExplore();
       initDetail();
     },
-    CATEGORIE: CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, SOGLIE: SOGLIE,
+    CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, SOGLIE: SOGLIE,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, DETTAGLI: DETTAGLI, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
     giudizio: giudizio, visibile: visibile, verifica: verifica, distanceKm: distanceKm,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,

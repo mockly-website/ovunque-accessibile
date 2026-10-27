@@ -494,3 +494,23 @@ begin
     raise exception 'DOVEVA FALLIRE: riferimento OSM non valido';
   exception when check_violation then null; end;
 end $$;
+
+-- 13. Più tipi di luogo (20261027020000)
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  ok jsonb := (select dati from public.proposte where tipo = 'correzione' limit 1);
+begin
+  assert public.proposta_valida(jsonb_set(ok, '{categoria}', '"bagni"')), 'tipo «bagni» rifiutato';
+  assert public.proposta_valida(jsonb_set(ok, '{categoria}', '"sanita"')), 'tipo «sanita» rifiutato';
+  assert not public.proposta_valida(jsonb_set(ok, '{categoria}', '"astronave"')), 'tipo sconosciuto accettato';
+  insert into public.proposte (tipo, dati) values ('nuovo', jsonb_set(jsonb_set(ok, '{categoria}', '"culto"'), '{nome}', '"Chiesa di prova"'));
+end $$;
+reset role;
+do $$ begin
+  begin
+    update public.places set categoria = 'astronave' where slug = 'esempio-trattoria-roma';
+    raise exception 'DOVEVA FALLIRE: scheda con tipo sconosciuto';
+  exception when check_violation then null; end;
+end $$;
