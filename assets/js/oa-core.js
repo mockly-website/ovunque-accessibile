@@ -486,13 +486,41 @@
     return btn;
   }
 
-  /* ---------- 6. Mappa (Leaflet + OpenStreetMap) ---------- */
+  /* ---------- 6. Mappa (Leaflet + OpenStreetMap) ----------
+     options.dueDita: mappa dentro una pagina che scorre (home, scheda, «Dov'è l'ingresso?»). Sul telefono un dito
+     fa scorrere la pagina e due dita spostano e ingrandiscono la mappa, così non si resta «bloccati» sulla mappa.
+     Il tocco singolo resta un clic (per mettere il punto) e i pulsanti + e − funzionano come sempre. */
+  var TOUCH = window.matchMedia && matchMedia('(pointer: coarse)').matches;
+
+  function dueDita(map) {
+    var box = map.getContainer();
+    var hint = el('p', { className: 'map-hint', 'aria-hidden': 'true', text: 'Usa due dita per spostare la mappa' });
+    var timer = null;
+    map.dragging.disable();
+    box.classList.add('map--due-dita');
+    box.appendChild(hint);
+    box.addEventListener('touchmove', function (ev) {
+      if (ev.touches.length !== 1 || ev.target.closest('.leaflet-marker-draggable')) return;
+      hint.classList.add('is-on');
+      clearTimeout(timer);
+      timer = setTimeout(function () { hint.classList.remove('is-on'); }, 1400);
+    }, { passive: true });
+    box.addEventListener('touchstart', function (ev) {
+      if (ev.touches.length > 1) hint.classList.remove('is-on');
+    }, { passive: true });
+  }
+
   function createMap(container, options) {
     if (!window.L) return null;
+    var opts = Object.assign({}, options || {});
+    var cooperative = opts.dueDita && TOUCH;
+    delete opts.dueDita;
     var map = L.map(container, Object.assign({
       scrollWheelZoom: false,     /* la rotella scorre la pagina, non la mappa */
-      keyboard: true
-    }, options || {}, { zoomControl: false }));
+      keyboard: true,
+      tapTolerance: 20            /* un tocco un po' mosso conta ancora come tocco (dita tremanti, carrozzina in movimento) */
+    }, opts, { zoomControl: false }));
+    if (cooperative) dueDita(map);
     /* Testi dei controlli di Leaflet in italiano (WCAG 3.1.2) */
     L.control.zoom({ zoomInTitle: 'Avvicina', zoomOutTitle: 'Allontana' }).addTo(map);
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
@@ -626,7 +654,7 @@
     var latest = document.getElementById('latest-list');
     if (!box && !latest) return;
     loadPlaces().then(function (places) {
-      var map = box && createMap(box, { zoomControl: true });
+      var map = box && createMap(box, { zoomControl: true, dueDita: true });
       var group = null;
       if (map) {
         map.setView(ITALY.center, ITALY.zoom);
@@ -1099,7 +1127,7 @@
       if (config.onDetail) config.onDetail(p);
 
       var box = document.getElementById('detail-map');
-      var map = createMap(box, { zoomControl: true });
+      var map = createMap(box, { zoomControl: true, dueDita: true });
       if (map) {
         map.setView([p.lat, p.lng], 16);
         var marker = addMarker(map, p, null, true);
@@ -1128,6 +1156,6 @@
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, verificaNode: verificaNode, placeCard: placeCard,
-    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY
+    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY, TOUCH: TOUCH
   };
 })();

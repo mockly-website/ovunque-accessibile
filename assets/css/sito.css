@@ -2279,3 +2279,37 @@ html:not(.js) .js-only {
 .filters__near {
   margin: 0;
 }
+
+/* 17. Mappe dentro pagine che scorrono, sul telefono: un dito scorre la pagina, due dita spostano la mappa (oa-core.js, dueDita) */
+.map-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--space-md);
+  background: rgba(22, 40, 65, 0.72);   /* testo bianco leggibile anche sulle zone chiare della mappa */
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: var(--text-base);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.map-hint.is-on {
+  opacity: 1;
+}
+
+/* Il segnaposto da trascinare segue il dito invece di far scorrere la pagina */
+.leaflet-marker-draggable {
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-hint {
+    transition: none;
+  }
+}

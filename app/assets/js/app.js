@@ -1234,12 +1234,13 @@
       if (sec.id === 'luogo') {
         body.push(el('div', { className: 'pick' }, [
           el('h3', { className: 'pick__title', text: 'Dov\'è l\'ingresso?' }),
-          el('p', { className: 'field__help', id: 'pick-help', text: 'Premi «Trova l\'indirizzo sulla mappa», poi sposta il segnaposto sull\'ingresso se serve. Puoi anche toccare la mappa, usare «La mia posizione» se sei lì o scrivere le coordinate qui sotto.' }),
+          el('p', { className: 'field__help', id: 'pick-help', text: 'Premi «Trova l\'indirizzo sulla mappa»: il segnaposto va sulla via. Se l\'ingresso è da un\'altra parte, tocca la mappa in quel punto (da lontano il primo tocco avvicina la mappa) o trascina il segnaposto. Sei lì? Usa «La mia posizione». Sul telefono la mappa si sposta con due dita.' }),
           el('div', { className: 'pick__actions' }, [
             el('button', { type: 'button', id: 'pick-find', className: 'btn btn--primary btn--small' }, [icon('#icon-search'), el('span', { text: 'Trova l\'indirizzo sulla mappa' })]),
             el('button', { type: 'button', id: 'pick-locate', className: 'btn btn--secondary btn--small' }, [icon('#icon-locate'), el('span', { text: 'La mia posizione' })])
           ]),
           el('p', { id: 'pick-status', className: 'pick__status', role: 'status' }),
+          el('div', { id: 'pick-suggest', className: 'pick__suggest', hidden: '' }),
           el('div', { id: 'pick-map', className: 'pick__map', role: 'region', 'aria-label': 'Mappa per indicare la posizione del luogo' }),
           el('div', { className: 'form-grid' }, sec.fields.filter(function (f) { return f.coord; }).map(fieldNode))
         ]));
@@ -1278,7 +1279,7 @@
         $('proposal-intro').textContent = 'Stai correggendo la scheda di «' + p.nome + '», ' + p.citta + '. Cambia solo quello che non va: i moderatori controllano ogni modifica prima di pubblicarla.';
         placeToForm(form, p);
         refreshConditional(form);
-        picker.set(p.lat, p.lng, false);
+        picker.set(p.lat, p.lng);
         initial = JSON.stringify(collect(form).dati);
       });
     }
@@ -1348,35 +1349,61 @@
     });
   }
 
-  /* Ricerca degli indirizzi con Nominatim (OpenStreetMap): parte solo da un pulsante o dal controllo all'invio,
-     invia solo l'indirizzo del luogo, una richiesta al secondo come chiedono le regole d'uso del servizio. */
+  /* Ricerca degli indirizzi con Nominatim (OpenStreetMap): parte solo da un pulsante, dal tocco sulla mappa o dal
+     controllo all'invio; invia solo l'indirizzo o il punto del luogo, una richiesta al secondo come chiedono le regole
+     d'uso del servizio. undefined = il servizio non risponde, null = non trovato. */
   var GEO_URL = 'https://nominatim.openstreetmap.org/search';
+  var GEO_REVERSE = 'https://nominatim.openstreetmap.org/reverse';
   var GEO_MAX_KM = 25;
+  var PICK_ZOOM = 15;            /* da questo ingrandimento in su un tocco mette il punto */
   var geoCache = {};
   var geoQueue = Promise.resolve();
 
-  function geocode(q) {
-    var key = JSON.stringify(q);
+  function nominatim(url, q) {
+    var key = url + JSON.stringify(q);
     if (geoCache[key]) return geoCache[key];
-    var params = new URLSearchParams({ format: 'jsonv2', limit: '1', countrycodes: 'it', 'accept-language': 'it' });
-    Object.keys(q).forEach(function (k) { if (q[k]) params.set(k, q[k]); });
+    var params = new URLSearchParams({ format: 'jsonv2', 'accept-language': 'it', addressdetails: '1' });
+    Object.keys(q).forEach(function (k) { if (q[k] != null && q[k] !== '') params.set(k, q[k]); });
     var run = geoQueue.then(function () {
-      return fetch(GEO_URL + '?' + params.toString(), { credentials: 'omit' });
-    }).then(function (r) { return r.ok ? r.json() : []; }).then(function (a) {
-      return a && a[0] ? { lat: Number(a[0].lat), lng: Number(a[0].lon), nome: a[0].display_name } : null;
-    }).catch(function () { return undefined; });
+      return fetch(url + '?' + params.toString(), { credentials: 'omit' });
+    }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return undefined; });
     geoQueue = run.then(function () { return new Promise(function (res) { setTimeout(res, 1100); }); });
     geoCache[key] = run;
     run.then(function (v) { if (v === undefined) delete geoCache[key]; });
     return run;
   }
 
-  function distanceKm(a, b) {
-    var r = Math.PI / 180;
-    var x = Math.sin((b.lat - a.lat) * r / 2);
-    var y = Math.sin((b.lng - a.lng) * r / 2);
-    var h = x * x + Math.cos(a.lat * r) * Math.cos(b.lat * r) * y * y;
-    return 2 * 6371 * Math.asin(Math.sqrt(h));
+  function geocode(q) {
+    return nominatim(GEO_URL, Object.assign({ limit: '1', countrycodes: 'it' }, q)).then(function (a) {
+      if (a === undefined) return undefined;
+      return a && a[0] ? { lat: Number(a[0].lat), lng: Number(a[0].lon), nome: a[0].display_name, address: a[0].address || {} } : null;
+    });
+  }
+
+  function reverseGeocode(lat, lng) {
+    return nominatim(GEO_REVERSE, { lat: lat.toFixed(6), lon: lng.toFixed(6), zoom: '18' }).then(function (r) {
+      if (r === undefined) return undefined;
+      return r && r.address && r.address.country_code === 'it' ? r.address : null;
+    });
+  }
+
+  /* Indirizzo di Nominatim → campi del modulo (via e civico, città, CAP, sigla della provincia, regione) */
+  function addressParts(a) {
+    var via = a.road || a.pedestrian || a.footway || a.square || a.path || a.cycleway || a.place || '';
+    var regione = REGIONI.filter(function (r) { return a.state && OA.normalize(a.state).indexOf(OA.normalize(r).slice(0, 6)) === 0; })[0] || null;
+    var prov = String(a['ISO3166-2-lvl6'] || '').replace(/^IT-/, '');
+    return {
+      indirizzo: via ? via + (a.house_number ? ' ' + a.house_number : '') : '',
+      citta: a.city || a.town || a.village || a.municipality || '',
+      cap: /^[0-9]{5}$/.test(a.postcode || '') ? a.postcode : '',
+      provincia: /^[A-Z]{2}$/.test(prov) ? prov : '',
+      regione: regione
+    };
+  }
+
+  /* «Via Roma, n. 5» → «Via Roma 5»: Nominatim capisce meglio */
+  function cleanStreet(v) {
+    return v.replace(/\b(n|nr|num|civico)\.?\s*(?=\d)/gi, '').replace(/[,;]/g, ' ').replace(/\s+/g, ' ').trim();
   }
 
   /* → null se il punto è vicino alla città (o non si può controllare), altrimenti i km di distanza */
@@ -1387,80 +1414,176 @@
       return c;
     }).then(function (c) {
       if (!c) return null;
-      var km = distanceKm(c, { lat: dati.lat, lng: dati.lng });
+      var km = OA.distanceKm(c, { lat: dati.lat, lng: dati.lng });
       return km > GEO_MAX_KM ? Math.round(km) : null;
     });
   }
 
-  /* Mappa per indicare la posizione: indirizzo, tocco, segnaposto trascinabile o campi delle coordinate */
+  /* Mappa per indicare la posizione. Si arriva al punto in quattro modi: «Trova l'indirizzo sulla mappa» (anche con Invio
+     nei campi dell'indirizzo), tocco sulla mappa, segnaposto trascinato, «La mia posizione»; oppure con le coordinate.
+     Quando il punto arriva dalla mappa, l'app propone l'indirizzo di quel punto (e lo scrive da sola se i campi sono vuoti). */
   function initPicker(form) {
     var latIn = $(fid('lat'));
     var lngIn = $(fid('lng'));
     var status = $('pick-status');
-    var map = OA.createMap($('pick-map'), { zoomControl: true });
+    var suggest = $('pick-suggest');
+    var mapBox = $('pick-map');
+    var map = OA.createMap(mapBox, { zoomControl: true, dueDita: true, doubleClickZoom: false });   /* qui ogni tocco serve a mettere il punto */
     var marker = null;
-    function set(lat, lng, announce) {
+    var asked = 0;
+
+    function field(path) {
+      return $(fid(path));
+    }
+
+    function fill(parts, all) {
+      ['indirizzo', 'citta', 'cap', 'provincia', 'regione'].forEach(function (k) {
+        var input = field(k);
+        if (parts[k] && (all || !input.value.trim())) input.value = parts[k];
+      });
+    }
+
+    function placeMarker(lat, lng) {
+      if (!map) return;
+      if (!marker) {
+        marker = L.marker([lat, lng], { draggable: true, keyboard: false, autoPan: true, icon: OA.pinIcon('nv'), title: 'Posizione del luogo: trascina per spostarla' }).addTo(map);
+        marker.on('dragend', function () {
+          var ll = marker.getLatLng();
+          set(ll.lat, ll.lng, 'mappa');
+        });
+      } else {
+        marker.setLatLng([lat, lng]);
+      }
+    }
+
+    /* origine: 'mappa' (tocco, trascinamento, mia posizione) → propone l'indirizzo; 'indirizzo' o 'campi' → no */
+    function set(lat, lng, origine, zoom) {
       lat = Math.round(lat * 1e6) / 1e6;
       lng = Math.round(lng * 1e6) / 1e6;
       latIn.value = lat;
       lngIn.value = lng;
-      if (map) {
-        if (!marker) {
-          marker = L.marker([lat, lng], { draggable: true, keyboard: false, icon: OA.pinIcon('nv'), title: 'Posizione del luogo' }).addTo(map);
-          marker.on('dragend', function () {
-            var ll = marker.getLatLng();
-            set(ll.lat, ll.lng, true);
-          });
-        } else {
-          marker.setLatLng([lat, lng]);
+      placeMarker(lat, lng);
+      if (map) map.setView([lat, lng], Math.max(map.getZoom(), zoom || 17));
+      suggest.hidden = true;
+      if (origine !== 'mappa') return;
+      status.textContent = 'Punto messo sulla mappa. Cerco l\'indirizzo di quel punto…';
+      var mine = ++asked;
+      reverseGeocode(lat, lng).then(function (a) {
+        if (mine !== asked) return;              /* nel frattempo il punto è cambiato */
+        if (!a) {
+          status.textContent = 'Punto messo sulla mappa (' + lat + ', ' + lng + '). Non trovo un indirizzo qui: scrivilo tu nei campi qui sopra.';
+          return;
         }
-        map.setView([lat, lng], Math.max(map.getZoom(), 16));
-      }
-      if (announce) status.textContent = 'Posizione impostata: ' + lat + ', ' + lng + '.';
+        var parts = addressParts(a);
+        var testo = [parts.indirizzo, parts.citta].filter(Boolean).join(', ');
+        if (!field('indirizzo').value.trim() && !field('citta').value.trim()) {
+          fill(parts, false);
+          status.textContent = 'Punto messo sulla mappa. Ho scritto l\'indirizzo di quel punto: ' + testo + '. Controllalo qui sopra.';
+          return;
+        }
+        var same = !!parts.indirizzo && OA.normalize(field('indirizzo').value).indexOf(OA.normalize(parts.indirizzo)) === 0 &&
+          OA.normalize(field('citta').value) === OA.normalize(parts.citta);
+        status.textContent = 'Punto messo sulla mappa' + (same ? ', all\'indirizzo che hai scritto.' : testo ? '. Qui l\'indirizzo è: ' + testo + '.' : '.');
+        if (!same && parts.indirizzo) {
+          suggest.textContent = '';
+          var btn = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [document.createTextNode('Usa questo indirizzo: ' + testo)]);
+          btn.addEventListener('click', function () {
+            fill(parts, true);
+            suggest.hidden = true;
+            status.textContent = 'Indirizzo aggiornato: ' + testo + '.';
+            field('indirizzo').focus();
+          });
+          suggest.appendChild(btn);
+          suggest.hidden = false;
+        }
+      });
     }
+
     if (map) {
       map.setView(OA.ITALY.center, OA.ITALY.zoom);
-      map.on('click', function (ev) { set(ev.latlng.lat, ev.latlng.lng, true); });
+      /* Da lontano un tocco sbaglia di chilometri: prima si avvicina (Italia → città → strada), poi mette il punto */
+      map.on('click', function (ev) {
+        var z = map.getZoom();
+        if (z < PICK_ZOOM) {
+          var next = Math.min(z + 5, PICK_ZOOM);
+          map.setView(ev.latlng, next);
+          status.textContent = next >= PICK_ZOOM ? 'Ora tocca il punto esatto dell\'ingresso.' : 'Mappa avvicinata: tocca di nuovo vicino al luogo.';
+          return;
+        }
+        set(ev.latlng.lat, ev.latlng.lng, 'mappa');
+      });
     }
+
     function fromInputs() {
       var lat = Number(latIn.value.replace(',', '.'));
       var lng = Number(lngIn.value.replace(',', '.'));
-      if (latIn.value && lngIn.value && lat >= 35 && lat <= 48 && lng >= 6 && lng <= 19 && map) {
-        if (!marker) set(lat, lng, false);
-        else { marker.setLatLng([lat, lng]); map.setView([lat, lng], Math.max(map.getZoom(), 16)); }
-      }
+      if (latIn.value && lngIn.value && lat >= 35 && lat <= 48 && lng >= 6 && lng <= 19) set(lat, lng, 'campi');
     }
     latIn.addEventListener('change', fromInputs);
     lngIn.addEventListener('change', fromInputs);
-    $('pick-find').addEventListener('click', function () {
-      var via = $(fid('indirizzo')).value.trim();
-      var citta = $(fid('citta')).value.trim();
-      var cap = $(fid('cap')).value.trim();
+
+    /* Sul telefono, dopo una ricerca, la mappa va portata in vista */
+    function reveal() {
+      var r = mapBox.getBoundingClientRect();
+      if (r.top < 0 || r.bottom > window.innerHeight) {
+        mapBox.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      }
+    }
+
+    function find() {
+      var via = cleanStreet(field('indirizzo').value);
+      var citta = field('citta').value.trim();
+      var cap = field('cap').value.trim();
       if (!citta) {
-        status.textContent = 'Scrivi prima l\'indirizzo e la città.';
-        $(fid(via ? 'citta' : 'indirizzo')).focus();
+        status.textContent = via ? 'Scrivi anche la città.' : 'Scrivi prima l\'indirizzo e la città.';
+        field(via ? 'citta' : 'indirizzo').focus();
         return;
       }
       status.textContent = 'Cerco l\'indirizzo…';
-      geocode({ street: via, city: citta, postalcode: cap }).then(function (r) {
+      suggest.hidden = true;
+      /* Prima la ricerca per campi, poi quella libera (capisce «Piazza…», «Lungomare…», frazioni), infine la sola città */
+      var tries = via ? [
+        { street: via, city: citta, postalcode: cap },
+        { q: via + ', ' + (cap ? cap + ' ' : '') + citta }
+      ] : [];
+      var down = false;
+      var chain = tries.reduce(function (prev, q) {
+        return prev.then(function (r) {
+          if (r) return r;
+          return geocode(q).then(function (x) { if (x === undefined) down = true; return x; });
+        });
+      }, Promise.resolve(null));
+      chain.then(function (r) {
         if (r) return { r: r, esatto: true };
-        return geocode({ city: citta }).then(function (c) { return c ? { r: c, esatto: false } : c; });
+        return geocode({ city: citta, postalcode: cap }).then(function (c) {
+          if (c === undefined) down = true;
+          return c ? { r: c, esatto: false } : null;
+        });
       }).then(function (res) {
-        if (res === undefined) {
-          status.textContent = 'La ricerca non risponde: tocca la mappa nel punto dell\'ingresso.';
-          return;
-        }
         if (!res) {
-          status.textContent = 'Non trovo «' + citta + '»: controlla il nome della città o tocca la mappa.';
+          status.textContent = down ? 'La ricerca non risponde: tocca la mappa nel punto dell\'ingresso.' : 'Non trovo «' + citta + '»: controlla il nome della città o tocca la mappa nel punto dell\'ingresso.';
           return;
         }
-        set(res.r.lat, res.r.lng, false);
+        set(res.r.lat, res.r.lng, 'indirizzo', res.esatto ? 18 : 14);
         if (!res.esatto && map) map.setView([res.r.lat, res.r.lng], 14);
+        fill(addressParts(res.r.address), false);    /* CAP, provincia e regione, se mancano */
         status.textContent = res.esatto
-          ? 'Trovato: ' + res.r.nome + '. Controlla e sposta il segnaposto sull\'ingresso se serve.'
-          : 'Non trovo la via: ho messo il segnaposto al centro di ' + citta + '. Spostalo sull\'ingresso.';
+          ? 'Trovato: ' + res.r.nome + '. Se l\'ingresso è da un\'altra parte, tocca la mappa lì o trascina il segnaposto.'
+          : (via ? 'Non trovo la via: ho messo il segnaposto al centro di ' + citta + '. ' : 'Ho messo il segnaposto al centro di ' + citta + '. ') + 'Tocca la mappa nel punto dell\'ingresso.';
+        reveal();
+      });
+    }
+
+    $('pick-find').addEventListener('click', find);
+    /* Invio (o «Vai» sulla tastiera del telefono) nei campi dell'indirizzo cerca sulla mappa invece di inviare il modulo */
+    ['indirizzo', 'citta', 'cap'].forEach(function (k) {
+      field(k).addEventListener('keydown', function (ev) {
+        if (ev.key !== 'Enter' || ev.isComposing) return;
+        ev.preventDefault();
+        find();
       });
     });
+
     $('pick-locate').addEventListener('click', function () {
       if (!navigator.geolocation) {
         status.textContent = 'Il tuo browser non permette di trovare la posizione.';
@@ -1468,12 +1591,17 @@
       }
       status.textContent = 'Cerco la tua posizione…';
       navigator.geolocation.getCurrentPosition(function (pos) {
-        set(pos.coords.latitude, pos.coords.longitude, true);
+        set(pos.coords.latitude, pos.coords.longitude, 'mappa', 18);
+        reveal();
       }, function () {
         status.textContent = 'Non è stato possibile trovare la tua posizione. Controlla i permessi del browser.';
       }, { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 });
     });
-    return { set: set };
+
+    return {
+      /* scheda da correggere: punto già noto, senza proporre indirizzi */
+      set: function (lat, lng) { set(lat, lng, 'campi'); }
+    };
   }
 
   /* ---------- 7. Profilo ---------- */

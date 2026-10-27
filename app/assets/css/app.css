@@ -2,7 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino
+           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -1236,5 +1236,37 @@ textarea.input {
   .badge {
     width: 13cm;
     break-inside: avoid;
+  }
+}
+
+/* 11. Mappa del punto e tastiera sul telefono (27 ottobre) */
+.pick__suggest {
+  display: flex;
+}
+
+.pick__suggest[hidden] {
+  display: none;
+}
+
+.pick__suggest .btn {
+  height: auto;
+  min-height: var(--target-min);
+  padding-block: var(--space-xs);
+  text-align: left;
+  white-space: normal;
+}
+
+@media (max-width: 47.99em) {
+  /* Mappa più alta: il punto si mette con il dito, senza dover ingrandire per forza */
+  .pick__map {
+    height: min(26rem, 60svh);
+    margin-inline: calc(var(--space-md) * -1);
+    border-radius: 0;
+    border-inline: 0;
+  }
+
+  /* Mentre si scrive, la barra in basso salirebbe sopra la tastiera e coprirebbe il campo: si nasconde */
+  body.app:has(input:not([type="radio"]):not([type="checkbox"]):focus, textarea:focus, select:focus) .app-nav {
+    display: none;
   }
 }
