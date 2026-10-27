@@ -377,67 +377,6 @@
       }
     },
     {
-      "id": "esempio-pizzeria-napoli",
-      "nome": "Pizzeria di esempio",
-      "categoria": "ristorante",
-      "indirizzo": "Via dei Prova 21",
-      "cap": "80138",
-      "citta": "Napoli",
-      "provincia": "NA",
-      "regione": "Campania",
-      "lat": 40.851,
-      "lng": 14.261,
-      "descrizione": "Locale su due livelli raggiungibili solo con scale.",
-      "misure": {
-        "ingresso": {
-          "gradini": 3,
-          "gradino_cm": 15,
-          "rampa": false,
-          "rampa_pct": null,
-          "corrimano": true,
-          "porta_cm": 90,
-          "nota": "Tre gradini da 15 cm, nessuna rampa."
-        },
-        "spazi": {
-          "valore": "no",
-          "nota": "Sala al piano rialzato."
-        },
-        "piani": {
-          "valore": "scale",
-          "corrimano_scale": true,
-          "nota": null
-        },
-        "bagno": {
-          "valore": "assente",
-          "rotazione_cm": null,
-          "maniglioni": null,
-          "nota": "Al piano di sotto."
-        }
-      },
-      "facoltativi": {
-        "porta_tipo": "manuale",
-        "pavimento": null,
-        "sedute": null,
-        "parcheggio": {
-          "posti": false,
-          "distanza_m": null,
-          "nota": null
-        },
-        "assistenza": {
-          "valore": null,
-          "nota": null
-        }
-      },
-      "dettagli": {
-        "tavoli_cm": null,
-        "spazio_gambe": null
-      },
-      "verifica": {
-        "livello": "community",
-        "data": "2026-09-02"
-      }
-    },
-    {
       "id": "esempio-parco-torino",
       "nome": "Parco di esempio",
       "categoria": "parco",

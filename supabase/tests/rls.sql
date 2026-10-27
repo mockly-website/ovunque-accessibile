@@ -34,7 +34,7 @@ end $$;
 set role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', false);
 do $$ begin
-  assert (select count(*) from public.places) = 18, 'anon deve vedere solo le 18 schede pubblicate';
+  assert (select count(*) from public.places) = 17, 'anon deve vedere solo le 17 schede pubblicate';
   assert not exists (select 1 from public.places where stato = 'archiviato'), 'anon vede una scheda archiviata';
   begin
     perform 1 from public.profiles;
@@ -173,14 +173,14 @@ declare
   rec uuid;
 begin
   assert (select count(*) from public.proposte where stato = 'in-attesa') = 1, 'la moderatrice non vede le proposte';
-  assert (select count(*) from public.places) = 19, 'la moderatrice deve vedere anche le archiviate';
+  assert (select count(*) from public.places) = 18, 'la moderatrice deve vedere anche le archiviate';
   select id into prop from public.proposte limit 1;
   begin
     perform public.approva_proposta(prop, 'community',
       jsonb_set((select dati from public.proposte where id = prop), '{misure,ingresso,porta_cm}', '15'));
     raise exception 'DOVEVA FALLIRE: approvata con una porta di 15 cm';
   exception when check_violation then null; end;
-  assert (select count(*) from public.places) = 19, 'approvazione fallita ma scheda creata';
+  assert (select count(*) from public.places) = 18, 'approvazione fallita ma scheda creata';
   nuovo := public.approva_proposta(prop, 'sul-posto');
   assert (select slug from public.places where id = nuovo) = 'bar-di-prova-roma', 'slug della nuova scheda';
   assert (select verifica_livello from public.places where id = nuovo) = 'sul-posto', 'livello di verifica';
@@ -205,7 +205,7 @@ reset role;
 set role anon;
 select set_config('request.jwt.claims', '{"role":"anon"}', false);
 do $$ begin
-  assert (select count(*) from public.places) = 19, 'anon: 18 + 1 nuova';
+  assert (select count(*) from public.places) = 18, 'anon: 17 + 1 nuova';
   assert exists (select 1 from public.places where slug = 'bar-di-prova-roma'), 'anon non vede la scheda approvata';
   assert (select stato from public.places where slug = 'esempio-hotel-napoli') = 'in-revisione', 'scheda in revisione visibile';
   assert (select autore_nome from public.recensioni) = 'Anna R.', 'anon non vede la recensione approvata';

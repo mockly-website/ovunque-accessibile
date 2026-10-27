@@ -729,6 +729,12 @@
     return { dati: out, errors: errors };
   }
 
+  var prove = 0;
+  function nessunoPuoEntrare(dati) {
+    var p = Object.assign({ id: 'segnalazione-' + (++prove) + '-' + Date.now() }, dati);
+    return OA.ORDINE_ESIGENZE.every(function (e) { return !OA.visibile(p, e); });
+  }
+
   /* Valori nei limiti ma insoliti (es. porta di 45 cm): non bloccano, chiedono solo di ricontrollare */
   function unusualValues(form) {
     var out = [];
@@ -935,6 +941,12 @@
       if (isBusy(form)) return;
       var res = collect(form);
       res.errors = res.errors.concat(photosUi.errors());
+      /* Solo luoghi accessibili, almeno in parte, per qualcuno: un luogo nuovo «non accessibile» per tutte e tre
+         le esigenze non si segnala (una correzione sì: il moderatore vede che il luogo sparirà dalla mappa) */
+      if (!res.errors.length && !place && nessunoPuoEntrare(res.dati)) {
+        res.errors.push({ input: form.querySelector('[data-path="misure.ingresso.gradini"]').querySelector('input') || $(fid('misure.ingresso.gradini')),
+          text: 'Con queste risposte il luogo non è accessibile per nessuna delle tre esigenze. Ovunque Accessibile raccoglie solo luoghi accessibili, almeno in parte: controlla ingresso e spazi interni.' });
+      }
       if (!res.errors.length && initial && JSON.stringify(res.dati) === initial && !photosUi.items().length) {
         res.errors.push({ input: $(fid('nome')), text: 'Non hai cambiato niente: modifica le voci che non corrispondono più al luogo.' });
       }
@@ -1446,6 +1458,9 @@
         if (x.nota) article.appendChild(el('blockquote', { className: 'mod-item__note' }, [el('p', { text: x.nota })]));
         article.appendChild(el('h4', { text: 'Giudizi con questi dati' }));
         article.appendChild(verdictPreview(x.dati, x.id));
+        if (nessunoPuoEntrare(x.dati)) {
+          article.appendChild(el('p', { className: 'notice notice--error', text: 'Con questi dati il luogo non è accessibile per nessuna esigenza: se approvi, sparisce da mappa ed elenchi.' }));
+        }
         var diffBox = el('div', {}, [el('p', { className: 'place__meta', text: 'Caricamento del confronto…' })]);
         article.appendChild(el('h4', { text: x.tipo === 'nuovo' ? 'Dati proposti' : 'Cosa cambia' }));
         article.appendChild(diffBox);

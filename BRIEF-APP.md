@@ -8,7 +8,7 @@
   - tabelle: profili, schede, proposte, recensioni, preferiti, storico delle modifiche;
   - regole di accesso (RLS) e moderazione riservata a verificatori e admin (senza 2FA dal 27 ottobre, su richiesta dei titolari);
   - limiti giornalieri, esportazione dei propri dati ed eliminazione dell'account.
-- **Esempi per il database**: `supabase/seed.sql` contiene i 19 luoghi di esempio.
+- **Esempi per il database**: `supabase/seed.sql` contiene i 18 luoghi di esempio (tutti accessibili almeno in parte per qualcuno).
 - **Prove automatiche**: `sh supabase/tests/esegui.sh` usa un Postgres locale e passano tutte. axe dà 0 violazioni su tutte le pagine dell'app, su telefono e computer, senza scorrimento orizzontale.
 - **Guida passo passo** in `DOCUMENTAZIONE.md`, sezione «Configurare Supabase».
 

@@ -195,6 +195,12 @@
   var ICONA_STATO = { si: '#icon-yes', parziale: '#icon-partial', no: '#icon-no', nv: '#icon-unknown', np: '#icon-na' };
   var PREFISSO_STATO = { si: 'Sì: ', parziale: 'In parte: ', no: 'No: ', nv: 'Non verificato: ', np: 'Non previsto: ' };
 
+  /* Ovunque Accessibile mostra solo luoghi accessibili, almeno in parte: chi ha un'esigenza per cui il luogo
+     è «non accessibile» non lo vede su mappa ed elenchi (la scheda resta raggiungibile con il suo link) */
+  function visibile(p, e) {
+    return giudizio(p, e) !== 'no';
+  }
+
   /* Filtri della pagina mappa, calcolati per l'esigenza scelta */
   var FILTRI = {
     accessibile: function (p, e) { return giudizio(p, e) === 'si'; },
@@ -517,14 +523,14 @@
         if (latest) {
           latest.textContent = '';
           places
-            .filter(function (p) { return p.verifica && p.verifica.data; })
+            .filter(function (p) { return p.verifica && p.verifica.data && visibile(p, esigenza()); })
             .sort(function (a, b) { return a.verifica.data < b.verifica.data ? 1 : -1; })
             .slice(0, 3)
             .forEach(function (p) { latest.appendChild(placeCard(p)); });
         }
         if (group) {
           group.clearLayers();
-          places.forEach(function (p) { addMarker(group, p); });
+          places.forEach(function (p) { if (visibile(p, esigenza())) addMarker(group, p); });
         }
       }
       render();
@@ -585,6 +591,7 @@
     }
 
     function matches(p, q, cat, filters, e) {
+      if (!visibile(p, e)) return false;
       if (cat && p.categoria !== cat) return false;
       for (var i = 0; i < filters.length; i++) {
         if (FILTRI[filters[i]] && !FILTRI[filters[i]](p, e)) return false;
@@ -949,7 +956,7 @@
     },
     CATEGORIE: CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, SOGLIE: SOGLIE,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, DETTAGLI: DETTAGLI, TITOLO_DETTAGLI: TITOLO_DETTAGLI,
-    giudizio: giudizio, verifica: verifica,
+    giudizio: giudizio, visibile: visibile, verifica: verifica,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, verificaNode: verificaNode, placeCard: placeCard,
