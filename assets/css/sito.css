@@ -1925,3 +1925,293 @@ html:not(.js) .js-only {
     display: none;
   }
 }
+
+/* 13. Schermata di caricamento (assets/js/intro.js): ragazzo in carrozzina che gira intorno al segnaposto.
+   Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori dall'albero di accessibilità. */
+.oa-intro,
+.oa-intro-out {
+  --intro-size: min(15rem, 62vw);
+}
+
+.oa-intro::before,
+.oa-intro::after,
+.oa-intro-out::before,
+.oa-intro-out::after {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+
+.oa-intro::before,
+.oa-intro-out::before {
+  content: "";
+  top: 0;
+  bottom: 0;
+  background: var(--color-card, #fbf6ec) url("../img/intro.svg") center / var(--intro-size) no-repeat;
+}
+
+.oa-intro::after,
+.oa-intro-out::after {
+  content: "Ovunque Accessibile";
+  top: calc(50% + var(--intro-size) / 2);
+  color: var(--color-navy, #162841);
+  font-family: var(--font-heading, sans-serif);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 1.1rem + 1.5vw, 2rem);
+  text-align: center;
+}
+
+.oa-intro-out::before,
+.oa-intro-out::after {
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oa-intro::before {
+    background-image: url("../img/intro-fermo.svg");
+  }
+
+  .oa-intro-out::before,
+  .oa-intro-out::after {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .oa-intro::before,
+  .oa-intro::after {
+    display: none;
+  }
+}
+
+/* 14. Telefono e tablet: pagina mappa con «Mappa / Elenco», percorso allineato, pulsanti della mappa compatti */
+.crumbs ol {
+  align-items: center;
+}
+
+.crumbs li {
+  display: inline-flex;
+  align-items: center;
+}
+
+.view-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.view-switch__btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: var(--target-min);
+  padding: 0 var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-navy);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.view-switch__btn:hover {
+  background: var(--color-sky);
+}
+
+.view-switch__btn[aria-pressed="true"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.view-switch__btn .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.view-switch__btn:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.view-switch__count {
+  font-weight: 400;
+}
+
+@media (min-width: 64em) {
+  .view-switch {
+    display: none;
+  }
+}
+
+@media (max-width: 63.99em) {
+  .explore__layout {
+    gap: var(--space-md);
+  }
+
+  .explore__layout[data-view="map"] #results,
+  .explore__layout[data-view="list"] .explore__map-wrap {
+    display: none;
+  }
+
+  /* La mappa riempie lo schermo che resta sotto i pulsanti */
+  .explore .map {
+    height: 62vh;
+    height: max(22rem, calc(100svh - 13rem));
+  }
+
+  .explore .needs {
+    margin-bottom: var(--space-md);
+  }
+
+  .filters {
+    gap: var(--space-sm);
+  }
+
+  /* Pulsanti sulla mappa: solo icona, il testo resta per gli screen reader */
+  .map-tools__btn {
+    justify-content: center;
+    width: var(--target-min);
+    padding: 0;
+  }
+
+  .map-tools__btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+/* Telefono: i tre giudizi della scheda diventano righe compatte (icona · esigenza · giudizio) */
+@media (max-width: 35.99em) {
+  .needs-verdict {
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      "who name"
+      "who value"
+      "who mine";
+    column-gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    border-top-width: 1px;
+    border-left: 6px solid var(--color-muted);
+  }
+
+  .needs-verdict.needs-verdict {
+    border-top-color: var(--color-line);
+  }
+
+  .needs-verdict--si { border-left-color: var(--color-success); }
+  .needs-verdict--parziale { border-left-color: var(--color-warning); }
+  .needs-verdict--no { border-left-color: var(--color-error); }
+
+  .needs-verdict.is-current {
+    border-top-width: var(--border-control);
+    border-left-width: 6px;
+  }
+
+  .needs-verdict__who { grid-area: who; align-self: center; }
+  .needs-verdict__name { grid-area: name; }
+  .needs-verdict__value { grid-area: value; }
+  .needs-verdict__mine { grid-area: mine; }
+}
+
+/* 15. Ricerca a forma di pillola (sito e app) */
+.search {
+  position: relative;
+  flex-wrap: nowrap;
+  padding: 5px;
+  border: 1.5px solid var(--color-navy);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  box-shadow: 0 6px 20px rgba(22, 40, 65, 0.06);
+}
+
+.search:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px rgba(47, 91, 156, 0.18);
+}
+
+.search .input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 3rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+}
+
+.search .input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.search .btn {
+  min-height: 3rem;
+}
+
+
+/* Telefono (sito e app): etichette ovvie nascoste a vista, «Come ti muovi?» su una riga, ricerca con la sola lente */
+@media (max-width: 47.99em) {
+  /* Etichette che sul telefono si capiscono già dal campo: restano per gli screen reader */
+  .explore .filters .field:first-child > .field__label,
+  .explore .filters legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* «Come ti muovi?» sempre su una riga di tre, anche alla prima visita */
+  .needs {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .needs .needs__options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .needs .needs__option label {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    padding: var(--space-xs) 0.3rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .needs__legend {
+    font-size: var(--text-base);
+  }
+
+  .needs__help {
+    margin-bottom: var(--space-xs);
+  }
+
+  /* Ricerca: il pulsante diventa solo lente, il nome resta per gli screen reader */
+  .search .btn {
+    width: 3rem;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .search .btn .icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+}

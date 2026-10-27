@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 0 260 260" width="260" height="260">
+  <!-- Ovunque Accessibile: schermata di caricamento. Un ragazzo in carrozzina gira su una pista intorno al segnaposto. -->
+  <circle cx="120" cy="130" r="46" fill="#e6f4fd"/>
+  <path d="M120 98c-15.5 0-28 12.3-28 27.5C92 146 120 168 120 168s28-22 28-42.5C148 110.3 135.5 98 120 98z" fill="#2f5b9c"/>
+  <circle cx="120" cy="125" r="11" fill="#fff"/>
+  <circle cx="120" cy="130" r="58" fill="none" stroke="#e7d6b9" stroke-width="10"/>
+  <circle cx="120" cy="130" r="58" fill="none" stroke="#fff" stroke-width="1.5" stroke-dasharray="5 7"/>
+  <g>
+    <g transform="translate(108 67)">
+      <!-- ruota grande con i raggi che girano -->
+      <circle cx="0" cy="-15" r="14" fill="#fff" stroke="#2f5b9c" stroke-width="4"/>
+      <g transform="translate(0 -15)" stroke="#2f5b9c" stroke-width="2" stroke-linecap="round">
+        <g>
+          <line x1="-12" y1="0" x2="12" y2="0"/><line x1="0" y1="-12" x2="0" y2="12"/>
+          <line x1="-8.5" y1="-8.5" x2="8.5" y2="8.5"/><line x1="-8.5" y1="8.5" x2="8.5" y2="-8.5"/>
+          <animateTransform attributeName="transform" type="rotate" from="0 0 0" to="360 0 0" dur="0.9s" repeatCount="indefinite"/>
+        </g>
+      </g>
+      <circle cx="0" cy="-15" r="3" fill="#162841"/>
+      <!-- telaio, schienale, pedana e ruotina -->
+      <path d="M-7 -23 H16 M-7 -23 L-10 -44 M16 -23 L22 -9 H30" fill="none" stroke="#162841" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="24" cy="-4.5" r="4.5" fill="#162841"/>
+      <!-- ragazzo: busto, gamba, braccio sulla ruota, testa -->
+      <path d="M-3 -28 L-5 -48 M-3 -28 H17 L23 -13 M-5 -45 L3 -34 L7 -24" fill="none" stroke="#162841" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="-4" cy="-57" r="7.5" fill="#162841"/>
+    </g>
+    <animateTransform attributeName="transform" type="rotate" from="0 120 130" to="360 120 130" dur="3s" repeatCount="indefinite"/>
+  </g>
+</svg>

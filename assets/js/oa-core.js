@@ -552,6 +552,33 @@
     var map = null;
     var markers = {};
     var layer = null;
+    var view = viewSwitch();
+
+    /* Telefono e tablet: «Mappa» o «Elenco», uno alla volta, così la mappa riempie lo schermo.
+       Sul computer si vedono insieme e i due pulsanti spariscono (CSS). */
+    function viewSwitch() {
+      var layout = mapBox && mapBox.closest('.explore__layout');
+      var wrap = mapBox && mapBox.closest('.explore__map-wrap');
+      if (!layout || !wrap) return null;
+      var num = el('span', { className: 'view-switch__count' });
+      var bMap = el('button', { type: 'button', className: 'view-switch__btn', 'aria-pressed': 'true' }, [icon('#icon-map'), el('span', { text: 'Mappa' })]);
+      var bList = el('button', { type: 'button', className: 'view-switch__btn', 'aria-pressed': 'false' }, [icon('#icon-list'), el('span', { text: 'Elenco' }), num]);
+      layout.insertBefore(el('div', { className: 'view-switch', role: 'group', 'aria-label': 'Come vuoi vedere i luoghi' }, [bMap, bList]), wrap);
+      function set(v) {
+        layout.setAttribute('data-view', v);
+        bMap.setAttribute('aria-pressed', v === 'map' ? 'true' : 'false');
+        bList.setAttribute('aria-pressed', v === 'list' ? 'true' : 'false');
+        if (v === 'map' && map) setTimeout(function () { map.invalidateSize(); }, 0);
+      }
+      bMap.addEventListener('click', function () { set('map'); });
+      bList.addEventListener('click', function () { set('list'); });
+      /* Il link «Vai all'elenco dei luoghi» mostra l'elenco */
+      [].forEach.call(document.querySelectorAll('a[href="#results"]'), function (a) {
+        a.addEventListener('click', function () { set('list'); });
+      });
+      if (location.hash === '#results') set('list'); else set('map');
+      return { set: set, count: function (n) { num.textContent = ' (' + n + ')'; } };
+    }
 
     function selected() {
       return [].slice.call(form.querySelectorAll('input[name="f"]:checked')).map(function (i) { return i.value; });
@@ -582,6 +609,7 @@
       var m = markers[id];
       if (!m || !map) return;
       highlight(id);
+      if (view) view.set('map');
       if (window.matchMedia('(max-width: 63.99em)').matches) {
         mapBox.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
       }
@@ -606,6 +634,7 @@
       } else {
         found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null)); });
       }
+      if (view) view.count(found.length);
       count.textContent = (found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati') +
         ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase();
 

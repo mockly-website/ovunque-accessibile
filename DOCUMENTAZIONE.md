@@ -34,6 +34,12 @@ Dopo ogni modifica a CSS o JS aggiorna la versione `?v=` nei link delle pagine (
 
 ---
 
+## Grafica e caricamento (27 ottobre 2026)
+
+- **Tecnologia**: restiamo su HTML, CSS e JavaScript senza framework. Il sito va su hosting statico (Altervista) senza passaggi di compilazione, sito e app condividono lo stesso codice (`assets/js/oa-core.js`, `assets/css/sito.css`), le pagine pesano poco e restano veloci anche con connessioni lente, e l'accessibilità si controlla riga per riga. Un framework (React, Vue, Flutter…) servirebbe solo con un'app molto più grande o un team dedicato.
+- **Schermata di caricamento**: `assets/js/intro.js` (nel `<head>`, senza `defer`) mette la classe `oa-intro` su `<html>` alla prima pagina della visita (una volta per il sito, una per l'app: `sessionStorage`); `sito.css` sezione 13 mostra `assets/img/intro.svg` (ragazzo in carrozzina che gira sulla pista intorno al segnaposto) e il nome. Dura almeno 1,4 s, al massimo 2,5 s. Con «riduci movimento» del sistema usa `intro-fermo.svg` e dura 0,5 s. È decorativa: per gli screen reader non esiste.
+- **Telefono e tablet** (`sito.css` sezioni 14–15, `app.css` sezione 9): nella pagina mappa i pulsanti «Mappa / Elenco (n)» mostrano una vista alla volta e la mappa riempie lo schermo; «Come ti muovi?» sempre su una riga di tre; ricerca a pillola con la lente; pulsanti della mappa solo icona (il testo resta per gli screen reader); giudizi della scheda in righe compatte. Nell'app: barra in basso che galleggia, schede più arrotondate, «Segnala» solo nella barra.
+
 ## Il sito – prototipo
 
 Prima versione funzionante del sito definitivo, nella cartella principale. In locale: http://localhost:8091/ con il server `lan-preview`.
