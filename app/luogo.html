@@ -19,15 +19,15 @@
   <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
   <script src="../assets/js/intro.js?v=i1"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p21">
-  <link rel="stylesheet" href="assets/css/app.css?v=a10">
-  <script src="assets/js/config.js?v=a10" defer></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=p22">
+  <link rel="stylesheet" href="assets/css/app.css?v=a11">
+  <script src="assets/js/config.js?v=a11" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="../assets/js/oa-core.js?v=p20" defer></script>
-  <script src="assets/js/api.js?v=a10" defer></script>
-  <script src="assets/js/app.js?v=a10" defer></script>
+  <script src="../assets/js/oa-core.js?v=p21" defer></script>
+  <script src="assets/js/api.js?v=a11" defer></script>
+  <script src="assets/js/app.js?v=a11" defer></script>
 </head>
 <body class="app" data-page="luogo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -45,6 +45,10 @@
     <symbol id="icon-wheelchair" viewBox="0 0 24 24"><circle cx="12" cy="4" r="2"/><path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/></symbol>
     <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><circle cx="11" cy="4" r="2"/><path d="M18 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H12c-.35-.2-.75-.3-1.19-.26C9.76 7.11 9 8.04 9 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/><path d="M21.5 1l-3 4.6h2L19 10l4-5.2h-2.1L22.5 1z"/></symbol>
     <symbol id="icon-walk" viewBox="0 0 24 24"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/><path d="M18.25 13h1.5v10h-1.5z"/></symbol>
+    <symbol id="icon-elder" viewBox="0 0 24 24"><path d="M13.5 5.5c1.09 0 2-.9 2-2s-.91-2-2-2-2 .9-2 2 .9 2 2 2zM20 12.5V23h-1V12.5c0-.28-.22-.5-.5-.5s-.5.22-.5.5v1h-1v-.69c-1.46-.38-2.7-1.29-3.51-2.52-.31.87-.49 1.78-.49 2.71 0 .23.02.46.03.69L15 16.5V23h-2v-5l-1.78-2.54L11 19l-3 4-1.6-1.2L9 18.33V13c0-1.15.18-2.29.5-3.39l-1.5.85V14H6V9.3l5.4-3.07v.01c.59-.31 1.32-.33 1.94.03.36.21.63.51.8.85l.79 1.67C15.58 10.1 16.94 11 18.5 11c.83 0 1.5.67 1.5 1.5z" fill="currentColor"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z" fill="currentColor"/></symbol>
+    <symbol id="icon-ear" viewBox="0 0 24 24"><path d="M17 20c-.29 0-.56-.06-.76-.15-.71-.37-1.21-.88-1.71-2.38-.51-1.56-1.47-2.29-2.39-3-.79-.61-1.61-1.24-2.32-2.53C9.29 10.98 9 9.93 9 9c0-2.8 2.2-5 5-5s5 2.2 5 5h2c0-3.93-3.07-7-7-7S7 5.07 7 9c0 1.26.38 2.65 1.07 3.9.91 1.65 1.98 2.48 2.85 3.15.81.62 1.39 1.07 1.71 2.05.6 1.82 1.37 2.84 2.73 3.55.51.23 1.07.35 1.64.35 2.21 0 4-1.79 4-4h-2c0 1.1-.9 2-2 2zM7.64 2.64L6.22 1.22C4.23 3.21 3 5.96 3 9s1.23 5.79 3.22 7.78l1.41-1.41C6.01 13.74 5 11.49 5 9s1.01-4.74 2.64-6.36zM11.5 9c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5-1.12-2.5-2.5-2.5-2.5 1.12-2.5 2.5z" fill="currentColor"/></symbol>
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"/></symbol>
     <symbol id="icon-na" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8z"/></symbol>
     <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
     <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
@@ -101,6 +105,46 @@
           <p id="detail-intro"></p>
 
           <div id="detail-body" hidden>
+            <section id="alerts" class="alerts" aria-labelledby="alerts-title">
+              <h2 id="alerts-title" class="visually-hidden">Avvisi temporanei</h2>
+              <ul id="alerts-list" class="alerts__list" role="list"></ul>
+              <p id="alerts-note" class="notice" role="status" tabindex="-1" hidden></p>
+              <details id="alert-new" class="more" hidden>
+                <summary class="more__toggle">Segnala un problema di oggi (ascensore guasto, rampa bloccata, lavori…)</summary>
+                <form id="alert-form" class="more__body stack" novalidate>
+                  <p class="field__help">L'avviso si vede subito, con il tuo nome pubblico, e sparisce da solo alla scadenza. Per le cose che restano (una rampa nuova, un ascensore tolto) proponi invece una correzione.</p>
+                  <div class="field">
+                    <label class="field__label" for="a-tipo">Cosa succede?</label>
+                    <select class="select" id="a-tipo" name="tipo">
+                      <option value="ascensore">Ascensore fuori servizio</option>
+                      <option value="rampa">Rampa non utilizzabile</option>
+                      <option value="bagno">Bagno accessibile fuori servizio</option>
+                      <option value="ingresso">Ingresso accessibile chiuso</option>
+                      <option value="lavori">Lavori in corso</option>
+                      <option value="altro">Altro</option>
+                    </select>
+                  </div>
+                  <div class="field">
+                    <label class="field__label" for="a-testo">Dettagli (facoltativi)</label>
+                    <p class="field__help" id="a-testo-aiuto">Fino a 300 caratteri. Per esempio: «Si entra dall'ingresso laterale, chiedere al personale».</p>
+                    <input class="input" type="text" id="a-testo" name="testo" maxlength="300" aria-describedby="a-testo-aiuto">
+                  </div>
+                  <div class="field field--short">
+                    <label class="field__label" for="a-durata">Per quanto tempo?</label>
+                    <select class="select" id="a-durata" name="durata">
+                      <option value="1">Solo oggi</option>
+                      <option value="3">3 giorni</option>
+                      <option value="7" selected>Una settimana</option>
+                      <option value="14">Due settimane</option>
+                      <option value="30">Un mese</option>
+                    </select>
+                  </div>
+                  <button class="btn btn--primary" type="submit">Pubblica l'avviso</button>
+                </form>
+              </details>
+              <p id="alert-login" class="place__meta" hidden><a id="alert-login-link" href="accedi.html">Accedi</a> per segnalare un problema di oggi, come un ascensore guasto.</p>
+            </section>
+
             <div class="detail__actions">
               <div class="directions">
                 <button id="directions-toggle" class="btn btn--primary" type="button" aria-expanded="false" aria-controls="directions-list">
@@ -127,12 +171,15 @@
             <section class="card detail__section" aria-labelledby="verdicts-title">
               <h2 id="verdicts-title">Accessibilità per esigenza</h2>
             <fieldset class="needs needs--compact" id="come-ti-muovi">
-              <legend class="needs__legend">Come ti muovi?</legend>
-              <p class="needs__help">Scegli come ti muovi: i giudizi cambiano in base alla tua esigenza.</p>
+              <legend class="needs__legend">La tua esigenza</legend>
+              <p class="needs__help">Scegli la tua esigenza: i giudizi cambiano in base a quella.</p>
               <div class="needs__options">
                 <div class="needs__option"><input type="radio" id="need-manuale" name="esigenza" value="manuale"><label for="need-manuale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</label></div>
                 <div class="needs__option"><input type="radio" id="need-elettrica" name="esigenza" value="elettrica"><label for="need-elettrica"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</label></div>
                 <div class="needs__option"><input type="radio" id="need-cammino" name="esigenza" value="cammino"><label for="need-cammino"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</label></div>
+                <div class="needs__option"><input type="radio" id="need-anziani" name="esigenza" value="anziani"><label for="need-anziani"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg>Persona anziana</label></div>
+                <div class="needs__option"><input type="radio" id="need-vista" name="esigenza" value="vista"><label for="need-vista"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>Disabilità visiva</label></div>
+                <div class="needs__option"><input type="radio" id="need-udito" name="esigenza" value="udito"><label for="need-udito"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-ear"/></svg>Disabilità uditiva</label></div>
               </div>
               <p class="needs__live visually-hidden" role="status"></p>
             </fieldset>
@@ -141,9 +188,15 @@
 
             <section class="card detail__section" aria-labelledby="facts-title">
               <h2 id="facts-title">Le misure</h2>
-              <p class="place__meta">Per ogni voce: cosa c'è e il giudizio per ognuna delle tre esigenze.</p>
+              <p class="place__meta">Per ogni voce: cosa c'è e il giudizio per le esigenze a cui serve.</p>
               <dl id="detail-facts" class="facts"></dl>
               <p id="detail-date" class="place__meta"></p>
+            </section>
+
+            <section class="card detail__section" aria-labelledby="senses-title">
+              <h2 id="senses-title">Vista e udito</h2>
+              <p id="detail-senses-empty" class="place__meta" hidden>Ancora nessuna informazione per chi non vede o non sente bene (cane guida, Braille, LIS, anello magnetico…). Se le conosci, proponi una correzione.</p>
+              <dl id="detail-senses" class="facts"></dl>
             </section>
 
             <section class="card detail__section" aria-labelledby="extra-title">
@@ -185,19 +238,23 @@
             <form id="review-form" class="review-form" novalidate hidden>
               <h3 class="h3">Racconta la tua visita</h3>
               <div class="field">
-                <label class="field__label" for="r-esigenza">Come ti muovi?</label>
+                <label class="field__label" for="r-esigenza">La tua esigenza</label>
                 <select class="select" id="r-esigenza" name="esigenza">
                   <option value="manuale">Carrozzina manuale</option>
                   <option value="elettrica">Carrozzina elettrica</option>
                   <option value="cammino">Difficoltà a camminare</option>
+                  <option value="anziani">Persona anziana</option>
+                  <option value="vista">Disabilità visiva</option>
+                  <option value="udito">Disabilità uditiva</option>
                 </select>
               </div>
+              <div id="review-questions" class="review-questions"></div>
               <div class="field">
                 <label class="field__label" for="r-data">Quando ci sei stato? (facoltativo)</label>
                 <input class="input" type="date" id="r-data" name="data_visita">
               </div>
               <div class="field">
-                <label class="field__label" for="r-testo">Com'è andata?</label>
+                <label class="field__label" for="r-testo">Vuoi raccontare di più? (facoltativo se hai risposto ad almeno una domanda)</label>
                 <p class="field__help" id="r-testo-aiuto">Da 20 a 2000 caratteri. Racconta ingresso, bagno, personale. Non scrivere dati personali di altre persone.</p>
                 <textarea class="input" id="r-testo" name="testo" rows="5" maxlength="2000" aria-describedby="r-testo-aiuto"></textarea>
                 <p class="field__counter" id="review-counter" aria-hidden="true">0 / 2000</p>
@@ -206,6 +263,36 @@
               <button class="btn btn--primary" type="submit">Invia la recensione</button>
             </form>
             <p id="review-login" hidden><a id="review-login-link" href="accedi.html">Accedi</a> per scrivere una recensione.</p>
+          </section>
+          <section id="owner-card" class="card" aria-labelledby="owner-title">
+            <h2 id="owner-title" class="h3">Gestisci questo luogo?</h2>
+            <p id="owner-intro" class="place__meta">Se sei il titolare o lavori qui, chiedi di essere riconosciuto: potrai rispondere alle recensioni e, per i luoghi verificati sul posto, stampare il bollino per la vetrina.</p>
+            <p id="owner-note" class="notice" role="status" tabindex="-1" hidden></p>
+            <details id="owner-new" class="more" hidden>
+              <summary class="more__toggle">Chiedi di gestire la scheda</summary>
+              <form id="owner-form" class="more__body stack" novalidate>
+                <div class="field">
+                  <label class="field__label" for="o-ruolo">Che ruolo hai?</label>
+                  <select class="select" id="o-ruolo" name="ruolo">
+                    <option value="titolare">Titolare</option>
+                    <option value="dipendente">Lavoro qui</option>
+                    <option value="altro">Altro (es. agenzia, ente)</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="o-contatto">Un contatto del luogo per verificare</label>
+                  <p class="field__help" id="o-contatto-aiuto">Il telefono o l'email del locale, come si trovano sul suo sito o sull'insegna: ti contattiamo lì per confermare. Lo vedono solo i moderatori.</p>
+                  <input class="input" type="text" id="o-contatto" name="contatto" maxlength="200" autocomplete="off" aria-describedby="o-contatto-aiuto">
+                </div>
+                <div class="field">
+                  <label class="field__label" for="o-nota">Note per i moderatori (facoltative)</label>
+                  <textarea class="input" id="o-nota" name="nota" rows="2" maxlength="500"></textarea>
+                </div>
+                <button class="btn btn--primary" type="submit">Invia la richiesta</button>
+              </form>
+            </details>
+            <p id="owner-login" hidden><a id="owner-login-link" href="accedi.html">Accedi</a> per chiedere di gestire la scheda.</p>
+            <p id="owner-badge" hidden><a id="badge-link" class="btn btn--secondary btn--small" href="#"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg>Bollino per la vetrina</a></p>
           </section>
         </aside>
       </article>

@@ -171,7 +171,7 @@
     return api.profile().catch(function () { return null; }).then(function (prof) {
       if (prof && prof.esigenza && !params.get('per') && prof.esigenza !== OA.scelta()) OA.setEsigenza(prof.esigenza);
       else if (prof && !prof.esigenza && OA.scelta()) api.updateProfile({ esigenza: OA.scelta() }).catch(function () {});
-      /* Da qui in poi la scelta "Come ti muovi?" viene salvata anche nel profilo */
+      /* Da qui in poi la scelta «La tua esigenza» viene salvata anche nel profilo */
       OA.onEsigenza(function (e) {
         if (api.user()) api.updateProfile({ esigenza: e }).catch(function () {});
       });
@@ -181,7 +181,7 @@
 
   var PAGES = {
     accedi: initAccedi, registrati: initRegistrati, password: initPassword,
-    segnala: initSegnala, profilo: initProfilo, moderazione: initModerazione
+    segnala: initSegnala, profilo: initProfilo, moderazione: initModerazione, bollino: initBollino
   };
 
   api.ready.then(syncNeeds).then(function () {
@@ -315,7 +315,22 @@
     });
   }
 
-  /* ---------- 5. Scheda luogo: preferiti e recensioni ---------- */
+  /* ---------- 5. Scheda luogo: preferiti, avvisi, recensioni, gestori ---------- */
+
+  /* Domande guidate delle recensioni: [chiave, domanda, etichetta breve, risposta «non l'ho usato»] */
+  var DOMANDE = [
+    ['scheda_giusta', 'Le informazioni della scheda erano giuste?', 'Scheda giusta'],
+    ['entrato', 'Sei riuscito a entrare senza chiedere aiuto?', 'Entrato senza aiuto'],
+    ['personale', 'Il personale è stato disponibile?', 'Personale disponibile'],
+    ['bagno', 'Hai potuto usare il bagno?', 'Bagno usabile', true],
+    ['tornerei', 'Ci torneresti?', 'Ci tornerebbe']
+  ];
+
+  function today() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
   function initDetailExtras(p) {
     var favBtn = $('fav-toggle');
     var favStatus = $('fav-status');
@@ -352,10 +367,180 @@
       }).catch(function () { show($('photos-card'), false); });
     }
 
+    /* Chi guarda: moderatore? gestore riconosciuto del luogo? */
+    Promise.all([
+      api.profile().catch(function () { return null; }),
+      api.ownerStatus ? api.ownerStatus(p.id).catch(function () { return null; }) : null
+    ]).then(function (r) {
+      var who = { mod: !!(r[0] && r[0].ruolo !== 'utente'), owner: r[1], gestore: !!(r[1] && r[1].stato === 'approvato') };
+      initAlerts(p, who);
+      initReviews(p, who);
+      initOwner(p, who);
+    });
+  }
+
+  /* Avvisi temporanei: elenco, «È risolto» per chi l'ha scritto, «Togli» per i moderatori, modulo per chi è registrato */
+  function initAlerts(p, who) {
+    var list = $('alerts-list');
+    var note = $('alerts-note');
+    var form = $('alert-form');
+    if (!list) return;
+
+    function load() {
+      api.alerts(p.id).then(function (res) {
+        list.textContent = '';
+        res.list.forEach(function (a) {
+          var mine = res.mine.indexOf(a.id) !== -1;
+          var titolo = OA.AVVISI[a.tipo] || OA.AVVISI.altro;
+          var btn = null;
+          if (mine || who.mod) {
+            btn = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [
+              document.createTextNode(mine ? 'È risolto' : 'Togli l\'avviso'),
+              el('span', { className: 'visually-hidden', text: ': ' + titolo })
+            ]);
+            btn.addEventListener('click', function () {
+              api.closeAlert(a.id, mine ? 'risolto' : 'rimosso').then(function () {
+                message(note, mine ? 'Grazie: avviso segnato come risolto.' : 'Avviso tolto.', 'ok');
+                note.focus();
+                load();
+              }).catch(function (err) { message(note, err.message, 'error'); note.focus(); });
+            });
+          }
+          list.appendChild(el('li', { className: 'alert-item' }, [
+            icon('#icon-alert', 'alert-item__icon'),
+            el('div', { className: 'alert-item__body' }, [
+              el('p', { className: 'alert-item__title', text: titolo }),
+              a.testo ? el('p', { className: 'alert-item__text', text: a.testo }) : null,
+              el('p', { className: 'alert-item__meta', text: 'Segnalato da ' + (a.autore_nome || 'un utente') + ' il ' + dateIt(a.created_at) +
+                ' · ' + (a.scade_il === today() ? 'vale solo oggi' : 'fino al ' + dateIt(a.scade_il)) })
+            ]),
+            btn
+          ]));
+        });
+      }).catch(function () { list.textContent = ''; });
+    }
+    load();
+
+    var logged = !!api.user();
+    show($('alert-new'), logged);
+    show($('alert-login'), !logged);
+    $('alert-login-link').href = 'accedi.html?torna=' + encodeURIComponent(here());
+    if (!logged || !form) return;
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (isBusy(form)) return;
+      var f = form.elements;
+      var testo = f.testo.value.trim();
+      if (showErrors(form, testo.length > 300 ? [{ input: f.testo, text: 'I dettagli possono avere al massimo 300 caratteri.' }] : [])) return;
+      busy(form, true, 'Pubblicazione…');
+      api.addAlert({ place_id: p.id, tipo: f.tipo.value, testo: testo, giorni: Number(f.durata.value) }).then(function () {
+        busy(form, false);
+        form.reset();
+        $('alert-new').open = false;
+        message(note, 'Avviso pubblicato. Grazie: chi arriva oggi lo sa prima di partire.', 'ok');
+        note.focus();
+        load();
+      }).catch(function (err) {
+        busy(form, false);
+        showErrors(form, [{ input: f.tipo, text: err.message }]);
+      });
+    });
+  }
+
+  function answersNode(risposte) {
+    var items = DOMANDE.filter(function (d) { return risposte && (risposte[d[0]] === 'si' || risposte[d[0]] === 'no'); });
+    if (!items.length) return null;
+    return el('ul', { className: 'review__answers', role: 'list' }, items.map(function (d) {
+      return el('li', {}, [OA.statusNode([risposte[d[0]] === 'si' ? 'si' : 'no', d[2]])]);
+    }));
+  }
+
+  /* «Cosa dicono i visitatori»: per ogni domanda, quanti hanno risposto sì */
+  function summaryNode(rows) {
+    var items = DOMANDE.map(function (d) {
+      var risp = rows.map(function (r) { return r.risposte && r.risposte[d[0]]; }).filter(function (v) { return v === 'si' || v === 'no'; });
+      if (!risp.length) return null;
+      var si = risp.filter(function (v) { return v === 'si'; }).length;
+      var st = si === risp.length ? 'si' : si === 0 ? 'no' : 'parziale';
+      /* Il numero dice già tutto: icona decorativa, niente «Sì:» o «No:» letto prima */
+      return el('li', {}, [el('span', { className: 'status status--' + st }, [icon(OA.ICONA_STATO[st]), el('span', { text: d[2] + ': sì per ' + si + ' su ' + risp.length })])]);
+    }).filter(Boolean);
+    if (!items.length) return null;
+    return el('div', { className: 'review-summary' }, [
+      el('h3', { className: 'review-summary__title', text: 'Cosa dicono i visitatori' }),
+      el('ul', { className: 'review-summary__list', role: 'list' }, items)
+    ]);
+  }
+
+  function initReviews(p, who) {
     var list = $('reviews-list');
+    var summaryBox = null;
+
+    function replyBox(r) {
+      var box = el('div', { className: 'review__reply-box' });
+      if (r.risposta) {
+        box.appendChild(el('div', { className: 'review__reply' }, [
+          el('p', { className: 'review__reply-title', text: 'Risposta del gestore' + (r.risposta_at ? ' · ' + dateIt(r.risposta_at) : '') }),
+          el('p', { text: r.risposta })
+        ]));
+      }
+      if (!who.gestore && !(who.mod && r.risposta)) return box;
+      var toggle = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [
+        document.createTextNode(who.gestore ? (r.risposta ? 'Modifica la risposta' : 'Rispondi') : 'Togli la risposta'),
+        el('span', { className: 'visually-hidden', text: ' alla recensione di ' + (r.autore_nome || 'un utente') })
+      ]);
+      box.appendChild(toggle);
+      var status = el('p', { className: 'notice', role: 'status', tabindex: '-1', hidden: '' });
+      box.appendChild(status);
+      if (!who.gestore) {
+        toggle.addEventListener('click', function () {
+          api.replyReview(r.id, '').then(loadReviews).catch(function (err) { message(status, err.message, 'error'); status.focus(); });
+        });
+        return box;
+      }
+      var id = 'reply-' + r.id;
+      var form = el('form', { className: 'stack review__reply-form', hidden: '', novalidate: '' }, [
+        el('div', { className: 'field' }, [
+          el('label', { className: 'field__label', 'for': id, text: 'La tua risposta, come gestore' }),
+          el('p', { className: 'field__help', id: id + '-aiuto', text: 'Si vede subito sotto la recensione. Da 2 a 1000 caratteri: ringrazia, spiega cosa è cambiato. Niente dati personali.' }),
+          el('textarea', { className: 'input', id: id, name: 'risposta', rows: '3', maxlength: '1000', 'aria-describedby': id + '-aiuto' })
+        ]),
+        el('div', { className: 'decision__actions' }, [
+          el('button', { type: 'submit', className: 'btn btn--primary btn--small', text: 'Pubblica la risposta' }),
+          r.risposta ? el('button', { type: 'button', className: 'btn btn--secondary btn--small', 'data-remove': '', text: 'Togli la risposta' }) : null
+        ])
+      ]);
+      form.elements.risposta.value = r.risposta || '';
+      box.appendChild(form);
+      toggle.addEventListener('click', function () {
+        form.hidden = !form.hidden;
+        if (!form.hidden) form.elements.risposta.focus();
+      });
+      function send(text) {
+        if (isBusy(form)) return;
+        busy(form, true, 'Invio…');
+        api.replyReview(r.id, text).then(loadReviews).catch(function (err) {
+          busy(form, false);
+          showErrors(form, [{ input: form.elements.risposta, text: err.message }]);
+        });
+      }
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        var v = form.elements.risposta.value.trim();
+        if (showErrors(form, v.length < 2 ? [{ input: form.elements.risposta, text: 'Scrivi almeno 2 caratteri.' }] : [])) return;
+        send(v);
+      });
+      var rm = form.querySelector('[data-remove]');
+      if (rm) rm.addEventListener('click', function () { send(''); });
+      return box;
+    }
+
     function loadReviews() {
       api.reviews(p.id).then(function (rows) {
         list.textContent = '';
+        if (summaryBox) summaryBox.remove();
+        summaryBox = summaryNode(rows);
+        if (summaryBox) list.parentNode.insertBefore(summaryBox, list);
         show($('reviews-empty'), !rows.length);
         rows.forEach(function (r) {
           list.appendChild(el('li', {}, [
@@ -366,7 +551,9 @@
                 el('span', { className: 'pill', text: OA.ESIGENZE[r.esigenza] ? OA.ESIGENZE[r.esigenza].nome : '' }),
                 el('span', { className: 'review__date', text: r.data_visita ? '· visita del ' + dateIt(r.data_visita) : '· ' + dateIt(r.created_at) })
               ]),
-              el('p', { className: 'review__text', text: r.testo })
+              answersNode(r.risposte),
+              r.testo ? el('p', { className: 'review__text', text: r.testo }) : null,
+              replyBox(r)
             ])
           ]));
         });
@@ -383,6 +570,24 @@
     show(form, logged);
     show($('review-login'), !logged);
     $('review-login-link').href = 'accedi.html?torna=' + encodeURIComponent(here());
+
+    /* Domande guidate: Sì / No / Non so (per il bagno anche «Non l'ho usato») */
+    var qBox = $('review-questions');
+    if (qBox && !qBox.childNodes.length) {
+      qBox.appendChild(el('p', { className: 'field__help', text: 'Rispondi solo a quello che sai: le risposte di tutti diventano il riepilogo «Cosa dicono i visitatori».' }));
+      DOMANDE.forEach(function (d) {
+        var gid = 'q-' + d[0];
+        var opts = [['si', 'Sì'], ['no', 'No']].concat(d[3] ? [['non-usato', 'Non l\'ho usato']] : []).concat([['', 'Non so']]);
+        qBox.appendChild(el('fieldset', { className: 'group group--inline', id: gid }, [
+          el('legend', { className: 'field__label', text: d[1] })
+        ].concat(opts.map(function (o, i) {
+          var attrs = { type: 'radio', id: gid + '-' + i, name: gid, value: o[0] };
+          if (o[0] === '') attrs.checked = '';
+          return el('div', { className: 'radio' }, [el('input', attrs), el('label', { 'for': gid + '-' + i, text: o[1] })]);
+        }))));
+      });
+    }
+
     form.elements.esigenza.value = OA.esigenza();
     form.elements.data_visita.max = new Date().toISOString().slice(0, 10);
     var counter = $('review-counter');
@@ -394,23 +599,143 @@
       if (isBusy(form)) return;
       var f = form.elements;
       var testo = f.testo.value.trim();
+      var risposte = {};
+      DOMANDE.forEach(function (d) {
+        var c = form.querySelector('input[name="q-' + d[0] + '"]:checked');
+        if (c && c.value) risposte[d[0]] = c.value;
+      });
+      var answered = Object.keys(risposte).length > 0;
       var errors = [];
-      if (testo.length < 20) errors.push({ input: f.testo, text: 'Racconta un po\' di più: servono almeno 20 caratteri.' });
+      if (!answered && !testo) errors.push({ input: f.testo, text: 'Rispondi ad almeno una domanda o racconta com\'è andata.' });
+      else if (testo && testo.length < 20) errors.push({ input: f.testo, text: 'Racconta un po\' di più: servono almeno 20 caratteri (oppure lascia vuoto e rispondi solo alle domande).' });
       if (f.data_visita.value && f.data_visita.value > f.data_visita.max) errors.push({ input: f.data_visita, text: 'La data della visita non può essere nel futuro.' });
       if (showErrors(form, errors)) return;
       busy(form, true, 'Invio…');
-      api.addReview({ place_id: p.id, esigenza: f.esigenza.value, data_visita: f.data_visita.value || null, testo: testo }).then(function () {
+      api.addReview({ place_id: p.id, esigenza: f.esigenza.value, data_visita: f.data_visita.value || null, testo: testo, risposte: risposte }).then(function () {
         busy(form, false);
         form.reset();
         f.esigenza.value = OA.esigenza();
         counter.textContent = '0 / 2000';
-        message($('reviews-note'), 'Grazie! La recensione sarà visibile dopo il controllo dei moderatori. La trovi nel tuo profilo.', 'ok');
-        $('reviews-note').focus();
+        var note = $('reviews-note');
+        message(note, 'Grazie! La recensione sarà visibile dopo il controllo dei moderatori. La trovi nel tuo profilo.', 'ok');
+        /* Scheda sbagliata: subito il link per correggerla */
+        if (risposte.scheda_giusta === 'no') {
+          note.appendChild(document.createTextNode(' Hai trovato informazioni diverse dalla scheda: '));
+          note.appendChild(el('a', { href: 'segnala.html?id=' + encodeURIComponent(p.id), text: 'proponi una correzione' }));
+          note.appendChild(document.createTextNode('.'));
+        }
+        note.focus();
       }).catch(function (err) {
         busy(form, false);
         showErrors(form, [{ input: f.testo, text: err.message }]);
       });
     });
+  }
+
+  /* Gestori: richiesta, stato della richiesta, bollino per la vetrina (solo luoghi verificati sul posto) */
+  function initOwner(p, who) {
+    var card = $('owner-card');
+    if (!card) return;
+    var note = $('owner-note');
+    var sulPosto = p.verifica && p.verifica.livello === 'sul-posto';
+    $('badge-link').href = 'bollino.html?id=' + encodeURIComponent(p.id);
+    show($('owner-badge'), sulPosto && (who.gestore || who.mod));
+
+    if (!api.user()) {
+      show($('owner-login'), true);
+      $('owner-login-link').href = 'accedi.html?torna=' + encodeURIComponent(here());
+      return;
+    }
+    var g = who.owner;
+    if (!g) {
+      show($('owner-new'), true);
+    } else if (g.stato === 'approvato') {
+      $('owner-title').textContent = 'Sei il gestore di questo luogo';
+      $('owner-intro').textContent = 'Puoi rispondere alle recensioni qui sopra. Se qualcosa cambia (una rampa nuova, un bagno rifatto), proponi una correzione: la controlliamo e aggiorniamo la scheda.' +
+        (sulPosto ? '' : ' Il bollino per la vetrina arriva quando verifichiamo il luogo sul posto.');
+    } else if (g.stato === 'in-attesa') {
+      message(note, 'La tua richiesta è in attesa: ti contatteremo al recapito che hai indicato per confermare.', '');
+    } else {
+      message(note, 'La richiesta non è stata approvata.' + (g.motivo ? ' Motivo: ' + g.motivo : '') + ' Per chiarimenti scrivi a ovunqueaccessibile@gmail.com.', 'error');
+    }
+
+    var form = $('owner-form');
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (isBusy(form)) return;
+      var f = form.elements;
+      var contatto = f.contatto.value.trim();
+      var errors = [];
+      if (contatto.length < 5) errors.push({ input: f.contatto, text: 'Scrivi il telefono o l\'email del locale, così possiamo verificare.' });
+      if (showErrors(form, errors)) return;
+      busy(form, true, 'Invio…');
+      api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, contatto: contatto, nota: f.nota.value.trim() || null }).then(function () {
+        show($('owner-new'), false);
+        message(note, 'Richiesta inviata. Ti contatteremo al recapito che hai indicato per confermare che gestisci il luogo.', 'ok');
+        note.focus();
+      }).catch(function (err) {
+        busy(form, false);
+        showErrors(form, [{ input: f.contatto, text: err.message }]);
+      });
+    });
+  }
+
+  /* Bollino per la vetrina: solo luoghi verificati sul posto. Il codice QR apre la scheda (sempre aggiornata). */
+  function qrSvg(text, label) {
+    var qr = window.qrcode(0, 'M');
+    qr.addData(text);
+    qr.make();
+    var n = qr.getModuleCount();
+    var q = 4;                      /* margine bianco richiesto dai lettori */
+    var d = '';
+    for (var r = 0; r < n; r++) {
+      for (var c = 0; c < n; c++) if (qr.isDark(r, c)) d += 'M' + (c + q) + ',' + (r + q) + 'h1v1h-1z';
+    }
+    var ns = 'http://www.w3.org/2000/svg';
+    var svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 ' + (n + 2 * q) + ' ' + (n + 2 * q));
+    svg.setAttribute('role', 'img');
+    svg.setAttribute('aria-label', label);
+    svg.setAttribute('shape-rendering', 'crispEdges');
+    var bg = document.createElementNS(ns, 'rect');
+    bg.setAttribute('width', '100%');
+    bg.setAttribute('height', '100%');
+    bg.setAttribute('fill', '#ffffff');
+    var path = document.createElementNS(ns, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', '#162841');
+    svg.appendChild(bg);
+    svg.appendChild(path);
+    return svg;
+  }
+
+  function initBollino() {
+    var id = params.get('id');
+    var note = $('badge-note');
+    if (id) $('badge-back').href = 'luogo.html?id=' + encodeURIComponent(id);
+    api.getPlace(id).then(function (p) {
+      if (!p) return message(note, 'Luogo non trovato.', 'error');
+      if (!p.verifica || p.verifica.livello !== 'sul-posto') {
+        return message(note, 'Il bollino è per i luoghi verificati sul posto da noi. «' + p.nome + '» non lo è ancora: scrivici a ovunqueaccessibile@gmail.com per organizzare una verifica.', 'error');
+      }
+      document.title = 'Bollino: ' + p.nome + ' – Ovunque Accessibile';
+      $('badge-place').textContent = p.nome + ', ' + p.citta;
+      var list = $('badge-verdicts');
+      OA.ORDINE_ESIGENZE.forEach(function (e) {
+        var g = OA.giudizio(p, e);
+        if (g !== 'si' && g !== 'parziale') return;
+        list.appendChild(el('li', { className: 'badge__verdict badge__verdict--' + g }, [
+          icon(OA.ESIGENZE[e].icona),
+          el('span', { text: OA.ESIGENZE[e].nome + ': ' + OA.GIUDIZIO[g].toLowerCase() })
+        ]));
+      });
+      var url = new URL('luogo.html?id=' + encodeURIComponent(p.id), location.href).href;
+      if (window.qrcode) $('badge-qr').appendChild(qrSvg(url, 'Codice QR che apre la scheda di ' + p.nome + ' su Ovunque Accessibile'));
+      $('badge-date').textContent = 'Verifica del ' + OA.formatDate(p.verifica.data) + ' · ' + url.replace(/^https?:\/\//, '');
+      show($('badge'), true);
+      show($('badge-actions'), true);
+      $('badge-print').addEventListener('click', function () { window.print(); });
+    }).catch(function (err) { message(note, err.message, 'error'); });
   }
 
   /* ---------- 6. Segnala un luogo / proponi una correzione ----------
@@ -476,6 +801,23 @@
       { path: 'facoltativi.assistenza.valore', label: 'Il personale offre assistenza?', type: 'tri' },
       { path: 'facoltativi.assistenza.nota', label: 'Note sull\'assistenza', type: 'textarea', max: 500 }
     ] },
+    { id: 'sensi', title: 'Vista e udito', optional: true, intro: 'Per chi non vede o non sente bene. Rispondi solo a quello che sai.', fields: [
+      { path: 'facoltativi.vista.cane_guida', label: 'I cani guida sono ammessi?', type: 'tri' },
+      { path: 'facoltativi.vista.percorso_tattile', label: 'C\'è un percorso tattile (strisce in rilievo sul pavimento)?', type: 'tri' },
+      { path: 'facoltativi.vista.mappa_tattile', label: 'C\'è una mappa tattile o un plastico?', type: 'tri' },
+      { path: 'facoltativi.vista.accompagnamento', label: 'Il personale accompagna chi non vede?', type: 'tri' },
+      { path: 'facoltativi.vista.braille', label: 'Ci sono menu, cartelli o didascalie in Braille?', type: 'tri' },
+      { path: 'facoltativi.vista.grandi_caratteri', label: 'Ci sono testi a grandi caratteri?', type: 'tri' },
+      { path: 'facoltativi.vista.audioguida', label: 'C\'è un\'audioguida o l\'audiodescrizione?', type: 'tri' },
+      { path: 'facoltativi.vista.contrasto', label: 'Gradini e ostacoli sono segnalati con colori a contrasto?', type: 'tri' },
+      { path: 'facoltativi.vista.nota', label: 'Note per chi non vede', type: 'textarea', max: 500 },
+      { path: 'facoltativi.udito.lis', label: 'Qualcuno del personale conosce la LIS (lingua dei segni italiana)?', type: 'tri' },
+      { path: 'facoltativi.udito.scritto', label: 'Si può prenotare o chiedere per scritto (chat, email, SMS)?', type: 'tri' },
+      { path: 'facoltativi.udito.anello', label: 'C\'è un anello magnetico per gli apparecchi acustici?', type: 'tri' },
+      { path: 'facoltativi.udito.sottotitoli', label: 'Video e spettacoli hanno i sottotitoli?', type: 'tri' },
+      { path: 'facoltativi.udito.avvisi_visivi', label: 'Avvisi e allarmi sono anche luminosi o scritti?', type: 'tri' },
+      { path: 'facoltativi.udito.nota', label: 'Note per chi non sente', type: 'textarea', max: 500 }
+    ] },
     { id: 'dettagli', title: 'Dettagli per tipo di luogo', optional: true, fields: [
       { path: 'dettagli.tavoli_cm', label: 'Altezza dei tavoli', unit: 'cm', type: 'number', min: 40, max: 130, short: true, cat: ['ristorante'] },
       { path: 'dettagli.spazio_gambe', label: 'C\'è spazio per le gambe sotto il tavolo?', type: 'tri', cat: ['ristorante'] },
@@ -487,7 +829,6 @@
       { path: 'dettagli.accompagnatore_gratis', label: 'Biglietto gratuito per l\'accompagnatore?', type: 'tri', cat: ['cultura', 'museo'] },
       { path: 'dettagli.assistenza_prenotabile', label: 'Assistenza da prenotare?', type: 'tri', cat: ['trasporti'] },
       { path: 'dettagli.preavviso_ore', label: 'Preavviso per l\'assistenza', unit: 'ore', type: 'number', min: 0, max: 168, short: true, cat: ['trasporti'] },
-      { path: 'dettagli.percorso_tattile', label: 'Percorso tattile?', type: 'tri', cat: ['museo', 'parco'] },
       { path: 'dettagli.ausili_prestito', label: 'Ausili in prestito (es. sedia a rotelle)?', type: 'tri', cat: ['museo', 'parco', 'negozio'] }
     ] }
   ];
@@ -637,10 +978,15 @@
   }
 
   function placeToForm(form, p) {
+    /* Il percorso tattile prima stava nei dettagli di musei e parchi: ora è una voce di «Vista e udito» */
+    var fac = JSON.parse(JSON.stringify(p.facoltativi || {}));
+    if (p.dettagli && p.dettagli.percorso_tattile != null && !(fac.vista && fac.vista.percorso_tattile != null)) {
+      fac.vista = Object.assign({}, fac.vista, { percorso_tattile: p.dettagli.percorso_tattile });
+    }
     var src = {
       nome: p.nome, categoria: p.categoria, indirizzo: p.indirizzo, cap: p.cap, citta: p.citta, provincia: p.provincia,
       regione: p.regione, descrizione: p.descrizione, lat: p.lat, lng: p.lng,
-      misure: p.misure, facoltativi: p.facoltativi || {}, dettagli: p.dettagli || {},
+      misure: p.misure, facoltativi: fac, dettagli: p.dettagli || {},
       x: {
         nessuna_porta: p.misure.ingresso.porta_cm === 0,
         ascensore_l: p.misure.piani.ascensore_cm ? p.misure.piani.ascensore_cm[0] : null,
@@ -720,7 +1066,7 @@
       errors.push({ input: form.querySelector('[data-path="misure.spazi.valore"]'), text: 'Rispondi ad almeno una domanda tra «Spazi e percorsi», «Piani e ascensore» e «Bagno»: senza, la scheda resterebbe vuota.' });
     }
     /* Le voci facoltative vuote non si salvano */
-    ['parcheggio', 'assistenza'].forEach(function (k) {
+    ['parcheggio', 'assistenza', 'vista', 'udito'].forEach(function (k) {
       var o = out.facoltativi[k];
       if (o && Object.keys(o).every(function (kk) { return o[kk] == null; })) delete out.facoltativi[k];
     });
@@ -729,10 +1075,11 @@
     return { dati: out, errors: errors };
   }
 
+  /* Nessuna esigenza con un giudizio almeno «in parte» (le esigenze di vista e udito senza informazioni non contano) */
   var prove = 0;
   function nessunoPuoEntrare(dati) {
     var p = Object.assign({ id: 'segnalazione-' + (++prove) + '-' + Date.now() }, dati);
-    return OA.ORDINE_ESIGENZE.every(function (e) { return !OA.visibile(p, e); });
+    return OA.ORDINE_ESIGENZE.every(function (e) { var g = OA.giudizio(p, e); return g === 'no' || g === 'nv'; });
   }
 
   /* Valori nei limiti ma insoliti (es. porta di 45 cm): non bloccano, chiedono solo di ricontrollare */
@@ -945,7 +1292,7 @@
          le esigenze non si segnala (una correzione sì: il moderatore vede che il luogo sparirà dalla mappa) */
       if (!res.errors.length && !place && nessunoPuoEntrare(res.dati)) {
         res.errors.push({ input: form.querySelector('[data-path="misure.ingresso.gradini"]').querySelector('input') || $(fid('misure.ingresso.gradini')),
-          text: 'Con queste risposte il luogo non è accessibile per nessuna delle tre esigenze. Ovunque Accessibile raccoglie solo luoghi accessibili, almeno in parte: controlla ingresso e spazi interni.' });
+          text: 'Con queste risposte il luogo non è accessibile per nessuna esigenza. Ovunque Accessibile raccoglie solo luoghi accessibili, almeno in parte: controlla ingresso e spazi interni.' });
       }
       if (!res.errors.length && initial && JSON.stringify(res.dati) === initial && !photosUi.items().length) {
         res.errors.push({ input: $(fid('nome')), text: 'Non hai cambiato niente: modifica le voci che non corrispondono più al luogo.' });
@@ -1284,7 +1631,7 @@
             el('h3', { className: 'activity__title' }, [p ? el('a', { href: 'luogo.html?id=' + encodeURIComponent(p.id), text: nome }) : document.createTextNode(nome)]),
             statePill(rv.stato, STATO_RECENSIONE)
           ]),
-          el('p', { className: 'activity__text', text: rv.testo }),
+          rv.testo ? el('p', { className: 'activity__text', text: rv.testo }) : answersNode(rv.risposte),
           rv.motivo ? el('p', { className: 'activity__reason', text: 'Motivo: ' + rv.motivo }) : null,
           del
         ]));
@@ -1390,8 +1737,8 @@
       el('label', { className: 'field__label', 'for': idp + '-m', text: 'Motivo, se non approvi (lo vede chi ha scritto)' }),
       el('textarea', { className: 'input', id: idp + '-m', name: 'motivo', rows: '2', maxlength: '500' })
     ]));
-    var ok = el('button', { type: 'submit', className: 'btn btn--primary btn--small', value: 'ok' }, [document.createTextNode(kind === 'proposta' ? 'Approva e pubblica' : 'Pubblica')]);
-    var no = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [document.createTextNode(kind === 'proposta' ? 'Non approvare' : 'Non pubblicare')]);
+    var ok = el('button', { type: 'submit', className: 'btn btn--primary btn--small', value: 'ok' }, [document.createTextNode(kind === 'proposta' ? 'Approva e pubblica' : kind === 'gestore' ? 'Approva: contatto verificato' : 'Pubblica')]);
+    var no = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [document.createTextNode(kind === 'recensione' ? 'Non pubblicare' : 'Non approvare')]);
     var status = el('p', { className: 'notice', hidden: '', tabindex: '-1', role: 'status' });
     form.appendChild(el('div', { className: 'decision__actions' }, [ok, no]));
     form.appendChild(status);
@@ -1419,6 +1766,8 @@
       if (kind === 'proposta') {
         var livello = form.querySelector('input[name="livello"]:checked').value;
         run(function () { return api.approve(item.id, livello); }, 'Approvata: la scheda è online.');
+      } else if (kind === 'gestore') {
+        run(function () { return api.decideOwner(item.id, 'approvato'); }, 'Gestore approvato: ora può rispondere alle recensioni.');
       } else {
         run(function () { return api.moderateReview(item.id, 'pubblicata'); }, 'Recensione pubblicata.');
       }
@@ -1426,6 +1775,7 @@
     no.addEventListener('click', function () {
       var motivo = form.elements.motivo.value.trim();
       if (kind === 'proposta') run(function () { return api.reject(item.id, motivo); }, 'Proposta non approvata.');
+      else if (kind === 'gestore') run(function () { return api.decideOwner(item.id, 'respinto', motivo); }, 'Richiesta non approvata.');
       else run(function () { return api.moderateReview(item.id, 'respinta', motivo); }, 'Recensione non pubblicata.');
     });
     return form;
@@ -1443,6 +1793,7 @@
       function update() {
         setCount('mod-proposals-count', counts.p, 'in attesa', 'in attesa');
         setCount('mod-reviews-count', counts.r, 'in attesa', 'in attesa');
+        if (counts.g != null) setCount('mod-owners-count', counts.g, 'in attesa', 'in attesa');
       }
       update();
       listP.textContent = '';
@@ -1523,10 +1874,30 @@
           el('h3', { id: 'mod-r-' + r.id, text: 'Recensione: ' + place }),
           el('p', { className: 'place__meta', text: 'Di ' + r.autore_nome + ' · ' + (OA.ESIGENZE[r.esigenza] ? OA.ESIGENZE[r.esigenza].nome : '') +
             (r.data_visita ? ' · visita del ' + dateIt(r.data_visita) : '') + ' · scritta il ' + dateIt(r.created_at) }),
-          el('blockquote', { className: 'mod-item__note' }, [el('p', { text: r.testo })]),
+          answersNode(r.risposte),
+          r.testo ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: r.testo })]) : el('p', { className: 'place__meta', text: 'Solo risposte alle domande, senza testo.' }),
           decisionForm('recensione', r, function () { counts.r--; update(); })
         ]);
         listR.appendChild(el('li', {}, [article]));
+      });
+
+      var listG = $('mod-owners');
+      var gs = res.gestori || [];
+      counts.g = gs.length;
+      update();
+      listG.textContent = '';
+      show($('mod-owners-empty'), !counts.g);
+      var RUOLI = { titolare: 'Titolare', dipendente: 'Lavora nel luogo', altro: 'Altro ruolo' };
+      gs.forEach(function (g) {
+        var place = g.places ? g.places.nome + ', ' + g.places.citta : 'Luogo';
+        listG.appendChild(el('li', {}, [el('article', { className: 'card mod-item', 'aria-labelledby': 'mod-g-' + g.id }, [
+          el('h3', { id: 'mod-g-' + g.id, text: 'Gestore: ' + place }),
+          el('p', { className: 'place__meta', text: 'Chiesto da ' + (g.nome || 'utente') + ' · ' + (RUOLI[g.ruolo] || g.ruolo) + ' · il ' + dateIt(g.created_at) }),
+          el('p', {}, [el('strong', { text: 'Contatto da verificare: ' }), document.createTextNode(g.contatto)]),
+          g.nota ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: g.nota })]) : null,
+          el('p', {}, [el('a', { href: 'luogo.html?id=' + encodeURIComponent(g.place_id), text: 'Apri la scheda' })]),
+          decisionForm('gestore', g, function () { counts.g--; update(); })
+        ])]));
       });
     }).catch(function (err) {
       message($('mod-note'), err.message, 'error');

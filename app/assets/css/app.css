@@ -2,6 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
+           10. Avvisi, recensioni guidate, gestori, bollino
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -989,5 +990,251 @@ textarea.input {
   .app .place:hover,
   .app .place.is-active {
     transform: none;
+  }
+}
+
+/* 10. Avvisi temporanei, recensioni guidate, gestori, bollino (27 ottobre) */
+.alerts {
+  display: grid;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.alerts__list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.alerts__list:empty {
+  display: none;
+}
+
+.alert-item {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-xs) var(--space-sm);
+  align-items: start;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-warning);
+  border-radius: var(--radius-md);
+  background: #fdf3e1;
+}
+
+.alert-item > .btn {
+  grid-column: 2;
+  justify-self: start;
+}
+
+.alert-item__icon {
+  width: 1.6rem;
+  height: 1.6rem;
+  color: var(--color-warning);
+}
+
+.alert-item__body p {
+  margin: 0;
+}
+
+.alert-item__title {
+  font-weight: 700;
+  color: var(--color-warning);
+}
+
+.alert-item__meta {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.review-questions {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.review__answers,
+.review-summary__list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-md);
+  margin: var(--space-xs) 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--text-sm);
+}
+
+.review-summary {
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
+}
+
+.review-summary__title {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+.review-summary__list {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.review__reply-box {
+  display: grid;
+  gap: var(--space-xs);
+  margin-top: var(--space-sm);
+}
+
+.review__reply-box:empty {
+  display: none;
+}
+
+.review__reply-box > .btn {
+  justify-self: start;
+}
+
+.review__reply {
+  padding: var(--space-xs) var(--space-md);
+  border-left: 4px solid var(--color-brand);
+  background: var(--color-sky);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.review__reply p {
+  margin: 0;
+}
+
+.review__reply-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* Bollino per la vetrina: a schermo un'anteprima, in stampa solo il bollino */
+.badge-page {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  padding-block: var(--space-lg);
+}
+
+.badge-page__back {
+  justify-self: start;
+  margin: 0;
+}
+
+.badge-page__actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  max-width: 34rem;
+  text-align: center;
+}
+
+.badge {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  width: min(100%, 26rem);
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  border: 6px solid var(--color-navy);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  text-align: center;
+}
+
+.badge__logo {
+  width: 4.5rem;
+  height: auto;
+}
+
+.badge__kicker {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge__brand {
+  margin: 0;
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+}
+
+.badge__place {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.badge__verdicts {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: var(--space-xs) 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.badge__verdict {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 700;
+}
+
+.badge__verdict .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-success);
+}
+
+.badge__verdict--parziale .icon {
+  color: var(--color-warning);
+}
+
+.badge__qr {
+  width: min(70%, 14rem);
+}
+
+.badge__qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.badge__cta,
+.badge__date {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.badge__date {
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  .site-header,
+  .site-footer,
+  .app-nav,
+  .no-print,
+  .notice {
+    display: none !important;
+  }
+
+  body.app {
+    background: #ffffff;
+  }
+
+  .badge-page {
+    padding: 0;
+  }
+
+  .badge {
+    width: 13cm;
+    break-inside: avoid;
   }
 }

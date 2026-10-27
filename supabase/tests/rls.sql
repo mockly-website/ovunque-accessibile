@@ -362,3 +362,135 @@ do $$ begin
   exception when insufficient_privilege then null; end;
 end $$;
 reset role;
+
+-- 12. Nuove esigenze, avvisi, recensioni guidate, gestori, luoghi da OpenStreetMap (20261027010000)
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  luogo uuid := (select id from public.places where slug = 'esempio-trattoria-roma');
+  ok jsonb := (select dati from public.proposte where tipo = 'correzione' limit 1);
+begin
+  update public.profiles set esigenza = 'vista' where id = auth.uid();
+  assert (select esigenza from public.profiles) = 'vista', 'esigenza «vista» rifiutata';
+  begin
+    update public.profiles set esigenza = 'volo' where id = auth.uid();
+    raise exception 'DOVEVA FALLIRE: esigenza sconosciuta';
+  exception when check_violation then null; end;
+  assert public.proposta_valida(jsonb_set(ok, '{facoltativi,vista}', '{"cane_guida": true, "braille": false, "nota": "Menu letto dal personale"}')), 'voci per la vista rifiutate';
+  assert public.proposta_valida(jsonb_set(ok, '{facoltativi,udito}', '{"lis": null, "anello": true}')), 'voci per l''udito rifiutate';
+  assert not public.proposta_valida(jsonb_set(ok, '{facoltativi,vista}', '{"cane_guida": "forse"}')), 'valore non sì/no accettato';
+  assert not public.proposta_valida(jsonb_set(ok, '{facoltativi,udito}', '{"telepatia": true}')), 'voce sconosciuta accettata';
+
+  -- Avvisi: si vedono subito, durano al massimo 30 giorni, non li chiude chiunque
+  insert into public.avvisi (place_id, tipo, testo) values (luogo, 'ascensore', '  Ascensore fermo per manutenzione ');
+  assert (select scade_il from public.avvisi) = current_date + 7, 'scadenza predefinita di 7 giorni';
+  assert (select testo from public.avvisi) = 'Ascensore fermo per manutenzione', 'testo non ripulito';
+  assert (select autore_nome from public.avvisi) <> '', 'nome pubblico non copiato nell''avviso';
+  assert (select count(*) from public.avvisi_miei(luogo)) = 1, 'avvisi_miei non trova l''avviso di B';
+  begin
+    insert into public.avvisi (place_id, tipo, scade_il) values (luogo, 'lavori', current_date + 60);
+    raise exception 'DOVEVA FALLIRE: avviso di 60 giorni';
+  exception when check_violation then null; end;
+  begin
+    insert into public.avvisi (place_id, tipo) values (luogo, 'meteo');
+    raise exception 'DOVEVA FALLIRE: tipo di avviso sconosciuto';
+  exception when check_violation then null; end;
+  begin
+    perform public.chiudi_avviso((select id from public.avvisi limit 1), 'rimosso');
+    raise exception 'DOVEVA FALLIRE: un utente toglie un avviso come un moderatore';
+  exception when insufficient_privilege then null; end;
+
+  -- Recensione con sole domande guidate (senza testo)
+  insert into public.recensioni (place_id, esigenza, risposte) values (luogo, 'udito', '{"personale": "si", "tornerei": "si", "bagno": "non-usato"}');
+  begin
+    insert into public.recensioni (place_id, esigenza) values (luogo, 'udito');
+    raise exception 'DOVEVA FALLIRE: recensione senza testo né risposte';
+  exception when check_violation then null; end;
+  begin
+    insert into public.recensioni (place_id, esigenza, risposte) values (luogo, 'udito', '{"personale": "forse"}');
+    raise exception 'DOVEVA FALLIRE: risposta non prevista';
+  exception when check_violation then null; end;
+
+  -- Richiesta da gestore: prima dell'approvazione non si risponde
+  insert into public.gestori (place_id, ruolo, contatto) values (luogo, 'titolare', ' info@trattoria.example ');
+  assert (select contatto from public.gestori) = 'info@trattoria.example', 'contatto non ripulito';
+  begin
+    perform public.rispondi_recensione((select id from public.recensioni where esigenza = 'udito'), 'Grazie!');
+    raise exception 'DOVEVA FALLIRE: risposta prima dell''approvazione';
+  exception when no_data_found or insufficient_privilege then null; end;
+end $$;
+reset role;
+
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  assert (select count(*) from public.avvisi) = 1, 'anon non vede l''avviso attivo';
+  begin
+    perform contatto from public.gestori;
+    raise exception 'DOVEVA FALLIRE: anon legge i contatti dei gestori';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform autore from public.avvisi;
+    raise exception 'DOVEVA FALLIRE: anon legge l''autore dell''avviso';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform public.avvisi_miei(gen_random_uuid());
+    raise exception 'DOVEVA FALLIRE: anon chiama avvisi_miei';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  rec uuid := (select id from public.recensioni where esigenza = 'udito');
+begin
+  assert (select count(*) from public.gestori) = 1, 'la moderatrice non vede la richiesta del gestore';
+  perform public.modera_recensione(rec, 'pubblicata');
+  perform public.decidi_gestore((select id from public.gestori limit 1), 'approvato');
+  begin
+    perform public.rispondi_recensione(rec, 'Risposta della moderatrice');
+    raise exception 'DOVEVA FALLIRE: la moderatrice risponde al posto del gestore';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$ begin
+  perform public.rispondi_recensione((select id from public.recensioni where esigenza = 'udito'), 'Grazie, vi aspettiamo!');
+  perform public.chiudi_avviso((select id from public.avvisi limit 1), 'risolto');
+  assert jsonb_array_length(public.i_miei_dati() -> 'avvisi') = 1, 'export: avvisi';
+  assert jsonb_array_length(public.i_miei_dati() -> 'gestore') = 1, 'export: richieste da gestore';
+end $$;
+reset role;
+
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  assert (select count(*) from public.avvisi) = 0, 'anon vede un avviso risolto';
+  assert (select risposta from public.recensioni where esigenza = 'udito') = 'Grazie, vi aspettiamo!', 'anon non vede la risposta del gestore';
+end $$;
+reset role;
+
+-- Luoghi da OpenStreetMap: si inseriscono solo dal SQL Editor, con riferimento valido e unico
+do $$
+declare
+  vuota jsonb := '{"ingresso": {}, "spazi": {}, "piani": {}, "bagno": {}}';
+begin
+  insert into public.places (slug, nome, categoria, indirizzo, citta, lat, lng, misure, verifica_livello, osm)
+  values ('osm-bar-prova', 'Bar da OSM', 'ristorante', 'Via OSM 1', 'Roma', 41.9, 12.5, vuota, 'osm',
+          '{"ref": "node/123", "wheelchair": "yes", "importato": "2026-10-27"}');
+  begin
+    insert into public.places (slug, nome, categoria, indirizzo, citta, lat, lng, misure, verifica_livello, osm)
+    values ('osm-bar-doppio', 'Bar doppio', 'ristorante', 'Via OSM 1', 'Roma', 41.9, 12.5, vuota, 'osm', '{"ref": "node/123"}');
+    raise exception 'DOVEVA FALLIRE: stesso luogo OSM importato due volte';
+  exception when unique_violation then null; end;
+  begin
+    insert into public.places (slug, nome, categoria, indirizzo, citta, lat, lng, misure, verifica_livello, osm)
+    values ('osm-bar-strano', 'Bar strano', 'ristorante', 'Via OSM 2', 'Roma', 41.9, 12.5, vuota, 'osm', '{"ref": "<script>"}');
+    raise exception 'DOVEVA FALLIRE: riferimento OSM non valido';
+  exception when check_violation then null; end;
+end $$;

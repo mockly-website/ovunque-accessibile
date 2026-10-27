@@ -8,7 +8,9 @@
 
   var CFG = window.OA_CONFIG || {};
   var PRIVACY = CFG.privacyVersion || 'app';
-  var COLONNE = 'id,slug,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,descrizione,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,esempio';
+  var COLONNE = 'id,slug,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,descrizione,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,esempio,osm';
+  var COLONNE_AVVISI = 'id,place_id,autore_nome,tipo,testo,scade_il,created_at';
+  var COLONNE_RECENSIONI = 'id,autore_nome,esigenza,data_visita,testo,risposte,risposta,risposta_at,created_at';
   var authListeners = [];
 
   function notify(user) {
@@ -21,8 +23,30 @@
       id: r.id, slug: r.slug, nome: r.nome, categoria: r.categoria, indirizzo: r.indirizzo, cap: r.cap,
       citta: r.citta, provincia: r.provincia, regione: r.regione, lat: r.lat, lng: r.lng, descrizione: r.descrizione,
       misure: r.misure, facoltativi: r.facoltativi || {}, dettagli: r.dettagli || {},
-      verifica: { livello: r.verifica_livello, data: r.verifica_data }, stato: r.stato, esempio: r.esempio
+      verifica: { livello: r.verifica_livello, data: r.verifica_data }, stato: r.stato, esempio: r.esempio,
+      osm: r.osm || null, avvisi: []
     };
+  }
+
+  function oggi() {
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  function traGiorni(n) {
+    var d = new Date();
+    d.setDate(d.getDate() + n);
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+
+  /* Avvisi attivi attaccati ai luoghi (p.avvisi), i più recenti prima */
+  function withAlerts(places, alerts) {
+    var by = {};
+    alerts.forEach(function (a) { (by[a.place_id] = by[a.place_id] || []).push(a); });
+    places.forEach(function (p) {
+      p.avvisi = (by[p.id] || []).sort(function (a, b) { return a.created_at < b.created_at ? 1 : -1; });
+    });
+    return places;
   }
 
   /* Messaggi d'errore comprensibili (i testi in italiano arrivano già dal database) */
@@ -96,6 +120,12 @@
       return new URL(page, location.href).href;
     }
 
+    function activeAlerts(placeId) {
+      var q = sb.from('avvisi').select(COLONNE_AVVISI).eq('stato', 'attivo').gte('scade_il', oggi());
+      if (placeId) q = q.eq('place_id', placeId);
+      return q.order('created_at', { ascending: false }).limit(placeId ? 5 : 1000).then(check);
+    }
+
     return {
       mode: 'supabase',
       ready: ready,
@@ -139,8 +169,10 @@
       },
 
       listPlaces: function () {
-        return sb.from('places').select(COLONNE).neq('stato', 'archiviato').order('nome').limit(1000)
-          .then(check).then(function (rows) { return rows.map(toPlace); });
+        return Promise.all([
+          sb.from('places').select(COLONNE).neq('stato', 'archiviato').order('nome').limit(5000).then(check),
+          activeAlerts().catch(function () { return []; })
+        ]).then(function (r) { return withAlerts(r[0].map(toPlace), r[1]); });
       },
       allPlacesForModeration: function () {
         return sb.from('places').select('id,nome,citta,stato').order('nome').limit(2000).then(check);
@@ -150,9 +182,40 @@
           .then(check).then(function (r) { return r ? toPlace(r) : null; });
       },
       reviews: function (placeId) {
-        return sb.from('recensioni').select('id,autore_nome,esigenza,data_visita,testo,created_at')
+        return sb.from('recensioni').select(COLONNE_RECENSIONI)
           .eq('place_id', placeId).eq('stato', 'pubblicata').order('created_at', { ascending: false }).limit(50)
           .then(check);
+      },
+
+      /* Avvisi temporanei: { list, mine: [id…] } */
+      alerts: function (placeId) {
+        return Promise.all([
+          activeAlerts(placeId),
+          current ? sb.rpc('avvisi_miei', { p_place: placeId }).then(check) : Promise.resolve([])
+        ]).then(function (r) {
+          return { list: r[0], mine: (r[1] || []).map(function (x) { return typeof x === 'string' ? x : x.avvisi_miei; }) };
+        });
+      },
+      addAlert: function (a) {
+        return sb.from('avvisi').insert({ place_id: a.place_id, tipo: a.tipo, testo: a.testo || null, scade_il: traGiorni(a.giorni - 1) }).then(check);
+      },
+      closeAlert: function (id, stato) {
+        return sb.rpc('chiudi_avviso', { p_id: id, p_stato: stato }).then(check);
+      },
+
+      /* Gestori: la mia richiesta per un luogo (o null), nuova richiesta, risposta a una recensione */
+      ownerStatus: function (placeId) {
+        if (!current) return Promise.resolve(null);
+        return sb.from('gestori').select('id,stato,motivo,created_at').eq('place_id', placeId).maybeSingle().then(check);
+      },
+      requestOwner: function (g) {
+        return sb.from('gestori').insert(g).then(check);
+      },
+      replyReview: function (id, testo) {
+        return sb.rpc('rispondi_recensione', { p_id: id, p_testo: testo }).then(check);
+      },
+      decideOwner: function (id, stato, motivo) {
+        return sb.rpc('decidi_gestore', { p_id: id, p_stato: stato, p_motivo: motivo || null }).then(check);
       },
       addReview: function (r) {
         return sb.from('recensioni').insert(r).then(check);
@@ -228,9 +291,10 @@
       pending: function () {
         return Promise.all([
           sb.from('proposte').select('id,tipo,place_id,autore_nome,dati,nota,created_at').eq('stato', 'in-attesa').order('created_at').limit(200),
-          sb.from('recensioni').select('id,place_id,autore_nome,esigenza,data_visita,testo,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200)
+          sb.from('recensioni').select('id,place_id,autore_nome,esigenza,data_visita,testo,risposte,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200),
+          sb.from('gestori').select('id,place_id,nome,ruolo,contatto,nota,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200)
         ]).then(function (r) {
-          return { proposte: check(r[0]), recensioni: check(r[1]) };
+          return { proposte: check(r[0]), recensioni: check(r[1]), gestori: check(r[2]) };
         });
       },
       approve: function (id, livello) {
@@ -279,7 +343,15 @@
       if (memory) return memory;
       try { memory = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { memory = null; }
       if (!memory) memory = seed();
+      memory.avvisi = memory.avvisi || [];      /* dati di prova salvati prima di avvisi e gestori */
+      memory.gestori = memory.gestori || [];
       return memory;
+    }
+    function attivi() {
+      return load().avvisi.filter(function (a) { return a.stato === 'attivo' && a.scade_il >= oggi(); });
+    }
+    function publicAlert(a) {
+      return { id: a.id, place_id: a.place_id, autore_nome: a.autore_nome, tipo: a.tipo, testo: a.testo, scade_il: a.scade_il, created_at: a.created_at };
     }
     function save() {
       try { localStorage.setItem(KEY, JSON.stringify(memory)); } catch (e) { /* navigazione privata: resta in memoria */ }
@@ -314,6 +386,8 @@
           stato: 'in-attesa', created_at: now()
         }],
         preferiti: {},
+        avvisi: [],
+        gestori: [],
         places: {},          /* schede create o modificate dalle approvazioni, per id */
         stati: {}            /* stato delle schede cambiato dai moderatori */
       };
@@ -439,7 +513,7 @@
 
       listPlaces: function () {
         return allPlaces().then(function (list) {
-          return list.filter(function (p) { return p.stato !== 'archiviato'; });
+          return withAlerts(list.filter(function (p) { return p.stato !== 'archiviato'; }), attivi().map(publicAlert));
         });
       },
       allPlacesForModeration: function () {
@@ -456,10 +530,76 @@
       reviews: function (placeId) {
         return wait(load().recensioni.filter(function (r) { return r.place_id === placeId && r.stato === 'pubblicata'; }).reverse());
       },
+      alerts: function (placeId) {
+        var u = me();
+        var mine = attivi().filter(function (a) { return a.place_id === placeId; });
+        return wait({
+          list: mine.map(publicAlert).reverse(),
+          mine: u ? mine.filter(function (a) { return a.autore === u.id; }).map(function (a) { return a.id; }) : []
+        });
+      },
+      addAlert: function (a) {
+        var u = needUser();
+        var db = load();
+        if (attivi().filter(function (x) { return x.place_id === a.place_id; }).length >= 5) return fail('Questo luogo ha già 5 avvisi attivi');
+        db.avvisi.push({ id: rid(), place_id: a.place_id, autore: u.id, autore_nome: db.profiles[u.id].nome_pubblico, tipo: a.tipo,
+          testo: a.testo || null, scade_il: traGiorni(a.giorni - 1), stato: 'attivo', created_at: now() });
+        save();
+        return wait();
+      },
+      closeAlert: function (id, stato) {
+        var u = needUser();
+        var db = load();
+        var a = db.avvisi.filter(function (x) { return x.id === id && x.stato === 'attivo'; })[0];
+        if (!a) return fail('Avviso non trovato o già chiuso');
+        if (!(isMod() || (a.autore === u.id && stato === 'risolto'))) return fail('Solo chi ha scritto l\'avviso o un moderatore può chiuderlo');
+        a.stato = stato;
+        a.chiuso_at = now();
+        save();
+        return wait();
+      },
+      ownerStatus: function (placeId) {
+        var u = me();
+        if (!u) return wait(null);
+        var g = load().gestori.filter(function (x) { return x.place_id === placeId && x.user_id === u.id; })[0];
+        return wait(g ? { id: g.id, stato: g.stato, motivo: g.motivo || null, created_at: g.created_at } : null);
+      },
+      requestOwner: function (g) {
+        var u = needUser();
+        var db = load();
+        if (db.gestori.some(function (x) { return x.place_id === g.place_id && x.user_id === u.id; })) return fail('Hai già chiesto di gestire questo luogo');
+        db.gestori.push(Object.assign({ id: rid(), user_id: u.id, nome: db.profiles[u.id].nome_pubblico, stato: 'in-attesa', created_at: now() }, g));
+        save();
+        return wait();
+      },
+      replyReview: function (id, testo) {
+        var u = needUser();
+        var db = load();
+        var r = db.recensioni.filter(function (x) { return x.id === id && x.stato === 'pubblicata'; })[0];
+        if (!r) return fail('Recensione non trovata');
+        var text = (testo || '').trim();
+        var gestore = db.gestori.some(function (x) { return x.place_id === r.place_id && x.user_id === u.id && x.stato === 'approvato'; });
+        if (!(gestore || (isMod() && !text))) return fail('Solo il gestore del luogo può rispondere');
+        r.risposta = text || null;
+        r.risposta_at = text ? now() : null;
+        save();
+        return wait();
+      },
+      decideOwner: function (id, stato, motivo) {
+        if (!isMod()) return fail('Riservato ai moderatori');
+        var db = load();
+        var g = db.gestori.filter(function (x) { return x.id === id && x.stato === 'in-attesa'; })[0];
+        if (!g) return fail('Richiesta non trovata o già decisa');
+        g.stato = stato;
+        g.motivo = motivo || null;
+        save();
+        return wait();
+      },
       addReview: function (r) {
         var u = needUser();
         var db = load();
-        if (!r.testo || r.testo.trim().length < 20) return fail('Racconta un po\' di più: almeno 20 caratteri.');
+        var answered = r.risposte && Object.keys(r.risposte).length;
+        if (!answered && (!r.testo || r.testo.trim().length < 20)) return fail('Racconta un po\' di più: almeno 20 caratteri.');
         db.recensioni.push(Object.assign({ id: rid(), autore: u.id, autore_nome: db.profiles[u.id].nome_pubblico, stato: 'in-attesa', created_at: now() }, r));
         save();
         return wait();
@@ -536,6 +676,8 @@
           proposte: db.proposte.filter(mine).map(strip).reverse(),
           recensioni: db.recensioni.filter(mine).map(strip).reverse(),
           foto: photos().filter(mine).map(function (f) { var c = strip(f); delete c.url; return c; }),
+          avvisi: db.avvisi.filter(mine).map(strip).reverse(),
+          gestore: db.gestori.filter(function (g) { return g.user_id === u.id; }).map(function (g) { var c = Object.assign({}, g); delete c.user_id; return c; }),
           preferiti: (db.preferiti[u.id] || []).map(function (id) { return { place_id: id }; })
         });
       },
@@ -545,6 +687,8 @@
         db.proposte = db.proposte.filter(function (x) { return !(x.autore === u.id && x.stato === 'in-attesa'); });
         db.proposte.forEach(function (x) { if (x.autore === u.id) { x.autore = null; x.autore_nome = 'Utente eliminato'; } });
         db.recensioni = db.recensioni.filter(function (r) { return r.autore !== u.id; });
+        db.avvisi = db.avvisi.filter(function (a) { return a.autore !== u.id; });
+        db.gestori = db.gestori.filter(function (g) { return g.user_id !== u.id; });
         delete db.preferiti[u.id];
         delete db.profiles[u.id];
         delete db.users[u.id];
@@ -567,7 +711,9 @@
           return {
             proposte: db.proposte.filter(function (x) { return x.stato === 'in-attesa'; }),
             recensioni: db.recensioni.filter(function (r) { return r.stato === 'in-attesa'; })
-              .map(function (r) { return Object.assign({ places: names[r.place_id] || null }, r); })
+              .map(function (r) { return Object.assign({ places: names[r.place_id] || null }, r); }),
+            gestori: db.gestori.filter(function (g) { return g.stato === 'in-attesa'; })
+              .map(function (g) { return Object.assign({ places: names[g.place_id] || null }, g); })
           };
         });
       },

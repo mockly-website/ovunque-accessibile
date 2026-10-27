@@ -2,7 +2,7 @@
    Il sito lo avvia con sito.js, l'app con app/assets/js/app.js: le regole e i giudizi sono gli stessi.
    Dati: assets/data/luoghi.json (esempi) se OA.config.loadPlaces non dice altro (l'app li prende da Supabase).
    Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni.
-   Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta "Come ti muovi?"
+   Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta «La tua esigenza»
            4. Utilità DOM · 5. Componenti · 6. Mappa · 7. Home · 8. Pagina mappa
            9. Indicazioni stradali · 10. Scheda luogo */
 (function () {
@@ -36,12 +36,23 @@
   /* ---------- 2. Regole per esigenza ----------
      Soglie iniziali (base DM 236/1989), DA CONFERMARE con Angelo e Lorenzo.
      Cambiare un numero qui aggiorna tutti i giudizi del sito. */
+  /* voci: cosa conta per il giudizio; card: le tre voci mostrate nelle schede brevi (elenco, mappa) */
+  var FISICHE = ['ingresso', 'porta', 'spazi', 'piani', 'bagno'];
+  var CARD_FISICHE = ['ingresso', 'piani', 'bagno'];
   var ESIGENZE = {
-    manuale: { nome: 'Carrozzina manuale', breve: 'Manuale', icona: '#icon-wheelchair' },
-    elettrica: { nome: 'Carrozzina elettrica', breve: 'Elettrica', icona: '#icon-wheelchair-e' },
-    cammino: { nome: 'Difficoltà a camminare', breve: 'Camminare', icona: '#icon-walk' }
+    manuale: { nome: 'Carrozzina manuale', breve: 'Manuale', icona: '#icon-wheelchair', voci: FISICHE, card: CARD_FISICHE },
+    elettrica: { nome: 'Carrozzina elettrica', breve: 'Elettrica', icona: '#icon-wheelchair-e', voci: FISICHE, card: CARD_FISICHE },
+    cammino: { nome: 'Difficoltà a camminare', breve: 'Camminare', icona: '#icon-walk', voci: FISICHE, card: CARD_FISICHE },
+    anziani: { nome: 'Persona anziana', breve: 'Anziani', icona: '#icon-elder', voci: FISICHE.concat(['sedute']), card: CARD_FISICHE },
+    vista: { nome: 'Disabilità visiva', breve: 'Vista', icona: '#icon-eye', voci: ['cane', 'orientamento', 'leggere', 'ostacoli'], card: ['cane', 'orientamento', 'leggere'], sensi: true },
+    udito: { nome: 'Disabilità uditiva', breve: 'Udito', icona: '#icon-ear', voci: ['comunicare', 'contatti', 'ascolto'], card: ['comunicare', 'contatti', 'ascolto'], sensi: true }
   };
-  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino'];
+  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino', 'anziani', 'vista', 'udito'];
+
+  /* Chi cammina con fatica (difficoltà a camminare, persone anziane): gradini con corrimano e scale si possono fare */
+  function aPiedi(e) {
+    return e === 'cammino' || e === 'anziani';
+  }
 
   var SOGLIE = {
     manuale: {
@@ -64,6 +75,11 @@
     cammino: {
       gradinoSenza: 2.5,
       gradiniConCorrimano: 3,      /* fino a 3 gradini con corrimano: accessibile */
+      portaOk: 75, portaInParte: 70
+    },
+    anziani: {                     /* come «difficoltà a camminare», più le sedute lungo il percorso */
+      gradinoSenza: 2.5,
+      gradiniConCorrimano: 3,
       portaOk: 75, portaInParte: 70
     }
   };
@@ -90,7 +106,7 @@
       if (g && m.corrimano) testo += ', con corrimano';
     }
 
-    if (e === 'cammino') {
+    if (aPiedi(e)) {
       if (senzaGradini || m.rampa) return ['si', testo];
       if (m.corrimano === true) return [g <= s.gradiniConCorrimano ? 'si' : 'parziale', testo];
       if (m.corrimano === false) return [g <= 1 ? 'parziale' : 'no', testo + ', senza corrimano'];
@@ -133,13 +149,13 @@
     if (m.valore === 'ascensore') {
       var d = m.ascensore_cm;
       var misure = d ? d[0] + ' × ' + d[1] + ' cm' : '';
-      if (e === 'cammino') return ['si', 'Ascensore' + (misure ? ' ' + misure : '')];
+      if (aPiedi(e)) return ['si', 'Ascensore' + (misure ? ' ' + misure : '')];
       if (!d) return ['parziale', 'Ascensore (cabina non misurata)'];
       if (d[0] >= s.ascensore[0] && d[1] >= s.ascensore[1]) return ['si', 'Ascensore ' + misure];
       return ['parziale', 'Ascensore piccolo: ' + misure];
     }
     if (m.valore === 'scale') {
-      if (e === 'cammino') return m.corrimano_scale ? ['si', 'Scale con corrimano'] : ['parziale', 'Scale senza corrimano'];
+      if (aPiedi(e)) return m.corrimano_scale ? ['si', 'Scale con corrimano'] : ['parziale', 'Scale senza corrimano'];
       return ['no', 'Solo scale'];
     }
     return ['nv', 'Da verificare'];
@@ -153,7 +169,7 @@
       case 'assente': return ['no', 'Nessun bagno accessibile'];
       case 'non-attrezzato': return [e === 'elettrica' ? 'no' : 'parziale', 'Bagno non attrezzato'];
       case 'attrezzato':
-        if (e === 'cammino') return m.maniglioni === false ? ['parziale', 'Bagno senza maniglioni'] : ['si', 'Bagno con maniglioni'];
+        if (aPiedi(e)) return m.maniglioni === false ? ['parziale', 'Bagno senza maniglioni'] : ['si', 'Bagno con maniglioni'];
         if (m.maniglioni === false) return ['parziale', 'Bagno senza maniglioni'];
         if (r == null) return s.rotazioneObbligatoria ? ['parziale', 'Spazio per girarsi non misurato'] : ['si', 'Bagno attrezzato'];
         if (r >= s.rotazioneBagno) return ['si', 'Bagno attrezzato, spazio per girarsi ' + r + ' cm'];
@@ -162,30 +178,80 @@
     return ['nv', 'Da verificare'];
   }
 
+  function valutaSedute(f) {
+    if (f.sedute === true) return ['si', 'Sedute lungo il percorso'];
+    if (f.sedute === false) return ['parziale', 'Nessuna seduta lungo il percorso'];
+    return ['nv', 'Da verificare'];
+  }
+
+  /* Vista e udito: voci sì/no in facoltativi.vista e facoltativi.udito.
+     Con almeno un aiuto presente la voce è ✓; se si sa solo che mancano è «in parte» (si entra, ma senza aiuti). */
+  function aiuti(o, defs, nessuno) {
+    var si = defs.filter(function (d) { return o[d[0]] === true; }).map(function (d) { return d[1]; });
+    var no = defs.filter(function (d) { return o[d[0]] === false; }).map(function (d) { return d[1]; });
+    if (si.length) return ['si', si.join(', ').replace(/^./, function (c) { return c.toUpperCase(); })];
+    if (no.length) return ['parziale', nessuno + ' ' + no.join(', ')];
+    return ['nv', 'Da verificare'];
+  }
+
+  function sensi(p, k) {
+    return (p.facoltativi && p.facoltativi[k]) || {};
+  }
+
   var VOCI = [
     { key: 'ingresso', nome: 'Ingresso', valuta: function (p, e) { return valutaIngresso(p.misure.ingresso, e); }, nota: function (p) { return p.misure.ingresso.nota; } },
     { key: 'porta', nome: 'Porta d\'ingresso', valuta: function (p, e) { return valutaPorta(p.misure.ingresso, e); }, nota: function (p) { return p.misure.ingresso.nota_porta; } },
     { key: 'spazi', nome: 'Spazi e percorsi', valuta: function (p) { return valutaSpazi(p.misure.spazi); }, nota: function (p) { return p.misure.spazi.nota; } },
     { key: 'piani', nome: 'Piani e ascensore', valuta: function (p, e) { return valutaPiani(p.misure.piani, e); }, nota: function (p) { return p.misure.piani.nota; } },
-    { key: 'bagno', nome: 'Bagno', valuta: function (p, e) { return valutaBagno(p.misure.bagno, e); }, nota: function (p) { return p.misure.bagno.nota; } }
+    { key: 'bagno', nome: 'Bagno', valuta: function (p, e) { return valutaBagno(p.misure.bagno, e); }, nota: function (p) { return p.misure.bagno.nota; } },
+    { key: 'sedute', nome: 'Sedute', valuta: function (p) { return valutaSedute(p.facoltativi || {}); }, nota: function () { return null; } },
+    { key: 'cane', nome: 'Cane guida', sensi: true, valuta: function (p) {
+      var v = sensi(p, 'vista').cane_guida;
+      return v === true ? ['si', 'Cani guida ammessi'] : v === false ? ['no', 'Cani guida non ammessi'] : ['nv', 'Da verificare'];
+    }, nota: function (p) { return sensi(p, 'vista').nota; } },
+    { key: 'orientamento', nome: 'Orientarsi', sensi: true, valuta: function (p) {
+      var v = Object.assign({}, sensi(p, 'vista'));
+      if (v.percorso_tattile == null && p.dettagli) v.percorso_tattile = p.dettagli.percorso_tattile;
+      return aiuti(v, [['percorso_tattile', 'percorso tattile'], ['mappa_tattile', 'mappa tattile'], ['accompagnamento', 'personale che accompagna']], 'Senza');
+    }, nota: function () { return null; } },
+    { key: 'leggere', nome: 'Informazioni da leggere', sensi: true, valuta: function (p) {
+      return aiuti(sensi(p, 'vista'), [['braille', 'testi in Braille'], ['grandi_caratteri', 'testi a grandi caratteri'], ['audioguida', 'audioguida o audiodescrizione']], 'Senza');
+    }, nota: function () { return null; } },
+    { key: 'ostacoli', nome: 'Gradini e ostacoli', sensi: true, valuta: function (p) {
+      var v = sensi(p, 'vista').contrasto;
+      return v === true ? ['si', 'Segnalati con colori a contrasto'] : v === false ? ['parziale', 'Non segnalati con colori a contrasto'] : ['nv', 'Da verificare'];
+    }, nota: function () { return null; } },
+    { key: 'comunicare', nome: 'Lingua dei segni', sensi: true, valuta: function (p) {
+      var v = sensi(p, 'udito').lis;
+      return v === true ? ['si', 'Personale che conosce la LIS'] : v === false ? ['parziale', 'Nessuno conosce la LIS'] : ['nv', 'Da verificare'];
+    }, nota: function (p) { return sensi(p, 'udito').nota; } },
+    { key: 'contatti', nome: 'Contatti senza telefono', sensi: true, valuta: function (p) {
+      var v = sensi(p, 'udito').scritto;
+      return v === true ? ['si', 'Si prenota e si chiede per scritto (chat, email, SMS)'] : v === false ? ['parziale', 'Solo per telefono'] : ['nv', 'Da verificare'];
+    }, nota: function () { return null; } },
+    { key: 'ascolto', nome: 'Ascolto e avvisi', sensi: true, valuta: function (p) {
+      return aiuti(sensi(p, 'udito'), [['anello', 'anello magnetico'], ['sottotitoli', 'sottotitoli'], ['avvisi_visivi', 'avvisi e allarmi luminosi']], 'Senza');
+    }, nota: function () { return null; } }
   ];
 
   function voce(key) {
     return VOCI.filter(function (v) { return v.key === key; })[0];
   }
 
-  /* Giudizio per esigenza: ✓ se tutte le voci sono ✓ (le "non previste" non contano);
-     ✕ se ingresso o spazi sono ✕; ? se manca l'ingresso; – negli altri casi */
+  /* Giudizio per esigenza: ✓ se tutte le voci sono ✓ (le "non previste" non contano); – negli altri casi.
+     Muoversi: ✕ se ingresso o spazi sono ✕; ? se manca l'ingresso.
+     Vista e udito: ? se non si sa ancora niente; ✕ (vista) se i cani guida non sono ammessi. */
   var cacheGiudizi = {};
   function giudizio(p, e) {
     var k = p.id + '|' + e;
     if (cacheGiudizi[k]) return cacheGiudizi[k];
     var stati = {};
-    VOCI.forEach(function (v) { stati[v.key] = v.valuta(p, e)[0]; });
+    ESIGENZE[e].voci.forEach(function (key) { stati[key] = voce(key).valuta(p, e)[0]; });
+    var tutte = Object.keys(stati);
     var g;
-    if (stati.ingresso === 'nv') g = 'nv';
-    else if (stati.ingresso === 'no' || stati.spazi === 'no') g = 'no';
-    else if (Object.keys(stati).every(function (k2) { return stati[k2] === 'si' || stati[k2] === 'np'; })) g = 'si';
+    if (ESIGENZE[e].sensi ? tutte.every(function (k2) { return stati[k2] === 'nv'; }) : stati.ingresso === 'nv') g = 'nv';
+    else if (stati.ingresso === 'no' || stati.spazi === 'no' || stati.cane === 'no') g = 'no';
+    else if (tutte.every(function (k2) { return stati[k2] === 'si' || stati[k2] === 'np'; })) g = 'si';
     else g = 'parziale';
     cacheGiudizi[k] = g;
     return g;
@@ -201,11 +267,15 @@
     return giudizio(p, e) !== 'no';
   }
 
-  /* Filtri della pagina mappa, calcolati per l'esigenza scelta */
+  /* Filtri della pagina mappa, calcolati per l'esigenza scelta (per vista e udito: ingresso e bagno
+     come per chi cammina con fatica, l'esigenza «fisica» più vicina) */
+  function fisica(e) {
+    return ESIGENZE[e].sensi ? 'cammino' : e;
+  }
   var FILTRI = {
     accessibile: function (p, e) { return giudizio(p, e) === 'si'; },
-    ingresso: function (p, e) { return valutaIngresso(p.misure.ingresso, e)[0] === 'si'; },
-    bagno: function (p, e) { return valutaBagno(p.misure.bagno, e)[0] === 'si'; },
+    ingresso: function (p, e) { return valutaIngresso(p.misure.ingresso, fisica(e))[0] === 'si'; },
+    bagno: function (p, e) { return valutaBagno(p.misure.bagno, fisica(e))[0] === 'si'; },
     parcheggio: function (p) { return !!(p.facoltativi && p.facoltativi.parcheggio && p.facoltativi.parcheggio.posti); }
   };
 
@@ -222,7 +292,7 @@
     return { livello: v.livello, data: v.data, scaduta: scaduta };
   }
 
-  /* ---------- 3. Scelta "Come ti muovi?" ----------
+  /* ---------- 3. Scelta «La tua esigenza» ----------
      Salvata nel browser (localStorage: preferenza chiesta dall'utente, nessun cookie) e nell'indirizzo (?per=). */
   var ascoltatori = [];
 
@@ -270,7 +340,7 @@
         if (help) {
           help.textContent = esigenzaCorrente
             ? 'Giudizi calcolati per: ' + ESIGENZE[esigenza()].nome.toLowerCase() + '.'
-            : 'Scegli come ti muovi: i giudizi cambiano in base alla tua esigenza. Per ora vedi quelli per la carrozzina manuale.';
+            : 'Scegli la tua esigenza: i giudizi cambiano in base a quella. Per ora vedi quelli per la carrozzina manuale.';
         }
         if (announce && live) live.textContent = 'Giudizi aggiornati per ' + ESIGENZE[esigenza()].nome.toLowerCase() + '.';
       }
@@ -354,22 +424,52 @@
   function verificaNode(p) {
     var v = verifica(p);
     if (p.stato === 'in-revisione') return el('span', { className: 'trust trust--old' }, [icon('#icon-clock'), el('span', { text: 'Scheda in revisione' })]);
+    if (v.livello === 'osm') return el('span', { className: 'trust trust--old' }, [icon('#icon-map'), el('span', { text: 'Da OpenStreetMap: da verificare' })]);
     if (v.scaduta) return el('span', { className: 'trust trust--old' }, [icon('#icon-clock'), el('span', { text: 'Da ricontrollare' })]);
     if (v.livello === 'sul-posto') return el('span', { className: 'trust trust--onsite' }, [icon('#icon-shield'), el('span', { text: 'Verificato sul posto' })]);
     return el('span', { className: 'trust' }, [icon('#icon-people'), el('span', { text: 'Segnalato dalla community' })]);
   }
 
-  /* Card di un luogo (elenco della mappa e home). onShow: pulsante "Mostra sulla mappa" */
-  function placeCard(p, headingTag, onShow) {
+  /* Avvisi temporanei (solo nell'app: p.avvisi arriva dal database) */
+  var AVVISI = {
+    ascensore: 'Ascensore fuori servizio',
+    rampa: 'Rampa non utilizzabile',
+    bagno: 'Bagno accessibile fuori servizio',
+    ingresso: 'Ingresso accessibile chiuso',
+    lavori: 'Lavori in corso',
+    altro: 'Avviso temporaneo'
+  };
+
+  function alertNode(p) {
+    var list = p.avvisi || [];
+    if (!list.length) return null;
+    var testo = AVVISI[list[0].tipo] || AVVISI.altro;
+    return el('p', { className: 'place__alert' }, [
+      icon('#icon-alert'),
+      el('span', { text: 'Avviso: ' + testo.charAt(0).toLowerCase() + testo.slice(1) + (list.length > 1 ? ' e altri ' + (list.length - 1) : '') })
+    ]);
+  }
+
+  function distanzaTxt(km) {
+    return km < 1 ? 'a ' + Math.max(10, Math.round(km * 100) * 10) + ' m' : 'a ' + (km < 10 ? km.toFixed(1).replace('.', ',') : Math.round(km)) + ' km';
+  }
+
+  function featuresNode(p, e, className) {
+    return el('span', { className: className }, ESIGENZE[e].card.map(function (k) {
+      var v = voce(k);
+      return statusNode(v.valuta(p, e), v.nome);
+    }));
+  }
+
+  /* Card di un luogo (elenco della mappa e home). onShow: pulsante "Mostra sulla mappa"; km: distanza da chi cerca */
+  function placeCard(p, headingTag, onShow, km) {
     var e = esigenza();
     return el('li', { className: 'place', 'data-id': p.id }, [
       el('div', { className: 'place__top' }, [verdictNode(p, e), verificaNode(p)]),
       el(headingTag || 'h3', { className: 'place__title' }, [el('a', { className: 'place__link', href: placeUrl(p), text: p.nome })]),
-      el('p', { className: 'place__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
-      el('div', { className: 'place__features' }, ['ingresso', 'piani', 'bagno'].map(function (k) {
-        var v = voce(k);
-        return statusNode(v.valuta(p, e), v.nome);
-      })),
+      el('p', { className: 'place__meta', text: (km != null ? distanzaTxt(km) + ' · ' : '') + (CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
+      alertNode(p),
+      featuresNode(p, e, 'place__features'),
       onShow ? showButton(p, onShow) : null
     ]);
   }
@@ -443,10 +543,8 @@
       verdictNode(p, e),
       el('strong', { className: 'popup__title', text: p.nome }),
       el('span', { className: 'popup__meta', text: (CATEGORIE[p.categoria] || '') + ' · ' + p.citta }),
-      el('span', { className: 'popup__features' }, ['ingresso', 'piani', 'bagno'].map(function (k) {
-        var v = voce(k);
-        return statusNode(v.valuta(p, e), v.nome);
-      })),
+      alertNode(p),
+      featuresNode(p, e, 'popup__features'),
       el('a', { className: 'btn btn--primary btn--small popup__link', href: placeUrl(p) }, [
         document.createTextNode('Apri la scheda'),
         el('span', { className: 'visually-hidden', text: ': ' + p.nome })
@@ -467,8 +565,11 @@
     return marker;
   }
 
-  /* Pulsanti sulla mappa: "Vicino a me" (posizione solo nel browser, mai inviata) e "Tutta Italia" */
-  function addMapButtons(map, status) {
+  /* Pulsanti sulla mappa: "Vicino a me" (posizione solo nel browser, mai inviata) e "Tutta Italia".
+     onLocate(lat, lng): chi usa la mappa riceve la posizione (es. per ordinare l'elenco per distanza).
+     Restituisce { locate }, per cercare la posizione anche senza il pulsante (link «vicino a me»). */
+  function addMapButtons(map, status, onLocate) {
+    var api = {};
     var Ctl = L.Control.extend({
       options: { position: 'topright' },
       onAdd: function () {
@@ -481,7 +582,9 @@
         L.DomEvent.disableScrollPropagation(box);
 
         var me = null;
-        near.addEventListener('click', function () {
+        api.locate = locate;
+        near.addEventListener('click', locate);
+        function locate() {
           if (!navigator.geolocation) {
             if (status) status.textContent = 'Il tuo browser non permette di trovare la posizione.';
             return;
@@ -491,12 +594,13 @@
             var ll = [pos.coords.latitude, pos.coords.longitude];
             if (me) me.remove();
             me = L.circleMarker(ll, { radius: 9, color: '#ffffff', weight: 3, fillColor: '#162841', fillOpacity: 1, interactive: false }).addTo(map);
-            map.setView(ll, 13);
-            if (status) status.textContent = 'Mappa centrata sulla tua posizione.';
+            map.setView(ll, 14);
+            if (status) status.textContent = onLocate ? 'Mappa centrata sulla tua posizione. L\'elenco è in ordine di distanza.' : 'Mappa centrata sulla tua posizione.';
+            if (onLocate) onLocate(ll[0], ll[1]);
           }, function () {
             if (status) status.textContent = 'Non è stato possibile trovare la tua posizione. Controlla i permessi del browser.';
           }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
-        });
+        }
         all.addEventListener('click', function () {
           map.setView(ITALY.center, ITALY.zoom);
           if (status) status.textContent = 'Mappa di tutta Italia.';
@@ -505,6 +609,15 @@
       }
     });
     map.addControl(new Ctl());
+    return api;
+  }
+
+  function distanceKm(a, b) {
+    var r = Math.PI / 180;
+    var x = Math.sin((b.lat - a.lat) * r / 2);
+    var y = Math.sin((b.lng - a.lng) * r / 2);
+    var h = x * x + Math.cos(a.lat * r) * Math.cos(b.lat * r) * y * y;
+    return 2 * 6371 * Math.asin(Math.sqrt(h));
   }
 
   /* ---------- 7. Home: mappa d'anteprima e ultimi luoghi ---------- */
@@ -558,6 +671,8 @@
     var map = null;
     var markers = {};
     var layer = null;
+    var origin = null;            /* posizione di chi cerca, dopo «Vicino a me»: elenco in ordine di distanza */
+    var tools = null;
     var view = viewSwitch();
 
     /* Telefono e tablet: «Mappa» o «Elenco», uno alla volta, così la mappa riempie lo schermo.
@@ -631,6 +746,11 @@
       var cat = form.elements.cat.value;
       var filters = selected();
       var found = places.filter(function (p) { return matches(p, q, cat, filters, e); });
+      var km = {};
+      if (origin) {
+        found.forEach(function (p) { km[p.id] = distanceKm(origin, p); });
+        found.sort(function (a, b) { return km[a.id] - km[b.id]; });
+      }
 
       list.textContent = '';
       if (!found.length) {
@@ -639,11 +759,11 @@
           el('p', { text: 'Prova a togliere qualche filtro o a cercare un\'altra città.' })
         ]));
       } else {
-        found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null)); });
+        found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null, origin ? km[p.id] : null)); });
       }
       if (view) view.count(found.length);
       count.textContent = (found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati') +
-        ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase();
+        (origin ? ', dal più vicino' : '') + ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase();
 
       if (map) {
         layer.clearLayers();
@@ -693,11 +813,28 @@
         if (map) {
           layer = clusterLayer().addTo(map);
           map.setView(ITALY.center, ITALY.zoom);
-          addMapButtons(map, document.getElementById('map-status'));
+          tools = addMapButtons(map, document.getElementById('map-status'), function (lat, lng) {
+            origin = { lat: lat, lng: lng };
+            render(false, true);
+          });
+          /* Link «… vicino a me» (es. bagni accessibili): la posizione si chiede perché l'ha scelto chi usa il sito */
+          if (params.get('vicino') === '1') tools.locate();
         }
       }
       render(false);
       onEsigenza(function () { render(true, true); });
+      /* «Bagni accessibili vicino a me» nella stessa pagina: filtro, posizione, elenco (senza ricaricare) */
+      [].forEach.call(document.querySelectorAll('a.quick__link--near'), function (a) {
+        a.addEventListener('click', function (ev) {
+          if (!tools || new URL(a.href).pathname !== location.pathname) return;
+          ev.preventDefault();
+          var box = form.querySelector('input[name="f"][value="bagno"]');
+          if (box) box.checked = true;
+          render(true);
+          if (view) view.set('list');
+          tools.locate();
+        });
+      });
     }).catch(function () {
       count.textContent = 'Non siamo riusciti a caricare i luoghi. Ricarica la pagina tra poco.';
     });
@@ -832,14 +969,26 @@
       ]));
     });
 
-    /* Misure base: descrizione + stato per ognuna delle tre esigenze */
+    /* Misure: descrizione + stato per ogni esigenza a cui la voce serve.
+       Muoversi in #detail-facts; vista e udito in #detail-senses (se la pagina lo prevede) */
     var facts = document.getElementById('detail-facts');
+    var senses = document.getElementById('detail-senses');
+    var sensesEmpty = document.getElementById('detail-senses-empty');
     facts.textContent = '';
+    if (senses) senses.textContent = '';
+    var sensiNoti = false;
     VOCI.forEach(function (v) {
-      var states = ORDINE_ESIGENZE.map(function (k) { return [k, v.valuta(p, k)]; });
+      var chi = ORDINE_ESIGENZE.filter(function (k) { return ESIGENZE[k].voci.indexOf(v.key) !== -1; });
+      var states = chi.map(function (k) { return [k, v.valuta(p, k)]; });
       var nonPrevista = states.every(function (s) { return s[1][0] === 'np'; });
       var nota = v.nota(p);
-      facts.appendChild(el('div', { className: 'facts__row facts__row--needs' }, [
+      var box = facts;
+      if (v.sensi) {
+        if (!senses) return;
+        if (states[0][1][0] !== 'nv') sensiNoti = true;
+        box = senses;
+      }
+      box.appendChild(el('div', { className: 'facts__row facts__row--needs' }, [
         el('dt', { text: v.nome }),
         el('dd', {}, [
           el('p', { className: 'facts__desc', text: states[0][1][1] }),
@@ -857,6 +1006,10 @@
         ])
       ]));
     });
+    if (senses) {
+      senses.hidden = !sensiNoti;
+      if (sensesEmpty) sensesEmpty.hidden = sensiNoti;
+    }
 
     /* Voci facoltative */
     var f = p.facoltativi || {};
@@ -866,7 +1019,6 @@
     var pav = { liscio: 'Liscio', irregolare: 'Irregolare (sampietrini, legno, sabbia)', ghiaia: 'Ghiaia' }[f.pavimento];
     if (p.misure.ingresso.porta_cm !== 0) extra.appendChild(infoRow('Tipo di porta', porta ? ['info', porta] : ['nv', 'Da verificare']));
     extra.appendChild(infoRow('Pavimento', pav ? ['info', pav] : ['nv', 'Da verificare']));
-    extra.appendChild(infoRow('Sedute lungo il percorso', siNo(f.sedute)));
     var park = f.parcheggio || {};
     var parkSt = park.posti === true
       ? ['si', 'Posti riservati' + (park.distanza_m != null ? (park.distanza_m === 0 ? ' all\'ingresso' : ' a ' + park.distanza_m + ' m') : '')]
@@ -874,6 +1026,13 @@
     extra.appendChild(infoRow('Parcheggio', parkSt, park.nota));
     var ass = f.assistenza || {};
     extra.appendChild(infoRow('Assistenza del personale', ass.valore === true ? ['si', 'Disponibile'] : ass.valore === false ? ['no', 'Non disponibile'] : ['nv', 'Da verificare'], ass.nota));
+    /* Luoghi importati da OpenStreetMap: cosa dice la mappa, finché qualcuno non verifica */
+    var osm = p.osm || null;
+    if (osm) {
+      var OSM_VAL = { yes: ['si', 'Sì'], limited: ['parziale', 'In parte'], no: ['no', 'No'] };
+      extra.appendChild(infoRow('OpenStreetMap: accesso in carrozzina', OSM_VAL[osm.wheelchair] || ['nv', 'Non indicato']));
+      extra.appendChild(infoRow('OpenStreetMap: bagno accessibile', OSM_VAL[osm.toilets_wheelchair] || ['nv', 'Non indicato']));
+    }
 
     /* Dettagli per tipo di luogo */
     var det = p.dettagli || {};
@@ -913,11 +1072,20 @@
       var trust = document.getElementById('detail-trust');
       trust.textContent = '';
       trust.appendChild(verificaNode(p));
-      document.getElementById('detail-date').textContent = v.data
+      var dateBox = document.getElementById('detail-date');
+      dateBox.textContent = v.livello === 'osm'
+        ? 'Dati di OpenStreetMap (© contributori di OpenStreetMap, licenza ODbL), importati il ' + formatDate(p.osm && p.osm.importato || v.data) +
+          '. Nessuno di noi li ha ancora controllati: se ci sei stato, proponi una correzione con le misure. '
+        : v.data
         ? (v.scaduta
           ? 'Ultima verifica: ' + formatDate(v.data) + '. Sono passati più di ' + SCADENZA_MESI + ' mesi: le informazioni potrebbero essere cambiate.'
           : 'Ultima verifica: ' + formatDate(v.data) + '.')
         : 'Non ancora verificato: le informazioni arrivano da una segnalazione.';
+      if (v.livello === 'osm' && p.osm && p.osm.ref) {
+        dateBox.appendChild(el('a', { href: 'https://www.openstreetmap.org/' + p.osm.ref, rel: 'noopener', target: '_blank' }, [
+          document.createTextNode('Vedi il luogo su OpenStreetMap'), el('span', { className: 'visually-hidden', text: ' (si apre in una nuova scheda)' })
+        ]));
+      }
 
       initDirections(p);
 
@@ -955,8 +1123,8 @@
       initDetail();
     },
     CATEGORIE: CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, SOGLIE: SOGLIE,
-    GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, DETTAGLI: DETTAGLI, TITOLO_DETTAGLI: TITOLO_DETTAGLI,
-    giudizio: giudizio, visibile: visibile, verifica: verifica,
+    GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, DETTAGLI: DETTAGLI, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
+    giudizio: giudizio, visibile: visibile, verifica: verifica, distanceKm: distanceKm,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, verificaNode: verificaNode, placeCard: placeCard,

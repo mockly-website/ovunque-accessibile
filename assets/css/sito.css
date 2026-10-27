@@ -2215,3 +2215,67 @@ html:not(.js) .js-only {
   }
 
 }
+
+/* 16. Sei esigenze (27 ottobre: anche persone anziane, vista e udito) e avvisi temporanei sulle schede */
+/* Computer, pagina mappa: due colonne nella colonna dei controlli */
+@media (min-width: 64em) {
+  .explore__controls .needs__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .explore__controls .needs__option label {
+    padding: var(--space-xs) var(--space-sm);
+  }
+}
+
+/* Telefono molto stretto: due colonne, così «Difficoltà a camminare» non si spezza a ogni sillaba */
+@media (max-width: 22em) {
+  .needs .needs__options,
+  .needs:not(.needs--ask) .needs__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.place__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: var(--space-2xs) 0 0;
+  padding: 0.35rem 0.6rem;
+  border-left: 4px solid var(--color-warning);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: #fdf3e1;
+  color: var(--color-warning);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.place__alert .icon {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.1rem;
+}
+
+.popup .place__alert {
+  margin: 0;
+}
+
+@media (forced-colors: active) {
+  .place__alert {
+    border: 2px solid CanvasText;
+  }
+}
+
+.quick__link--near {
+  border-color: var(--color-navy);
+  font-weight: 700;
+}
+
+.quick__link--near .icon {
+  color: var(--color-brand);
+}
+
+.filters__near {
+  margin: 0;
+}
