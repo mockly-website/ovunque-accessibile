@@ -302,9 +302,7 @@ textarea.input {
 .pick {
   display: grid;
   gap: var(--space-sm);
-  margin-top: var(--space-xl);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-line);
+  margin-top: var(--space-md);
 }
 
 .pick__title {
@@ -2146,16 +2144,16 @@ html:has(> body.app) {
   min-width: 0;
 }
 
-/* Linea che unisce i numeri */
+/* Linea che unisce i numeri: va da un cerchio all'altro, senza passarci sopra */
 .wizard__steps > li + li::before {
   content: "";
   position: absolute;
-  top: 1.35rem;
-  right: 50%;
-  left: -50%;
+  top: calc(0.2rem + 1.15rem - 1.5px);
+  right: calc(50% + 1.45rem);
+  left: calc(-50% + 1.45rem);
   height: 3px;
   border-radius: 2px;
-  background: rgba(22, 40, 65, 0.15);
+  background: rgba(22, 40, 65, 0.2);
 }
 
 .wizard__steps > li:has(.is-done, [aria-current="step"]) + li:has(.is-done, [aria-current="step"])::before {
@@ -2167,7 +2165,7 @@ html:has(> body.app) {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.25rem;
+  gap: 0.35rem;
   width: 100%;
   min-height: var(--target-min);
   padding: 0.2rem 0;
@@ -2175,16 +2173,19 @@ html:has(> body.app) {
   border-radius: var(--radius-md);
   background: none;
   color: var(--color-navy);
-  font: inherit;
-  font-size: 0.875rem;
-  font-weight: 700;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
   line-height: 1.2;
   cursor: pointer;
 }
 
+.wizard__dot[aria-current="step"],
+.wizard__dot.is-done {
+  font-weight: 700;
+}
+
 .wizard__dot:disabled {
-  color: var(--color-muted);
-  font-weight: 400;
   cursor: default;
 }
 
@@ -2198,11 +2199,12 @@ html:has(> body.app) {
   place-items: center;
   width: 2.3rem;
   height: 2.3rem;
-  border: 2px solid var(--color-muted);
+  border: 2px solid rgba(22, 40, 65, 0.6);
   border-radius: 50%;
   background: var(--color-white);
-  font-family: var(--font-heading);
+  font-family: var(--font-body);
   font-size: 1.05rem;
+  font-weight: 700;
   transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease-out);
 }
 
@@ -2216,29 +2218,12 @@ html:has(> body.app) {
   border-color: var(--color-navy);
   background: var(--color-navy);
   color: var(--color-white);
-  transform: scale(1.08);
 }
 
 .wizard__name {
   max-width: 100%;
   overflow-wrap: anywhere;
   text-align: center;
-}
-
-.wizard__count {
-  margin: var(--space-xs) 0 0;
-  color: var(--color-muted);
-  font-weight: 700;
-  text-align: center;
-}
-
-.wizard__count:focus {
-  outline: none;
-}
-
-.wizard__count:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: 2px;
 }
 
 .wizard__step:not([hidden]) {
@@ -2331,5 +2316,85 @@ html:has(> body.app) {
 
   .app .empty {
     text-align: center;
+  }
+}
+
+/* 21. Gerarchia e spazi (28 ottobre, notte): titolo della pagina > titolo di gruppo > titolo del riquadro.
+   Prima i titoli dei riquadri erano grandi quasi come quello della pagina. Ritmo verticale unico: 1 rem tra i
+   riquadri, 2 rem prima di un nuovo gruppo. */
+.app main h2 {
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+.app main h3 {
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.app main .card > h2:first-child,
+.app main .card > h3:first-child,
+.app main .form-section > h2:first-child {
+  margin-top: 0;
+}
+
+.app .card__title {
+  margin: 0 0 var(--space-xs);
+  font-size: 1.2rem;
+}
+
+.app .card__subtitle {
+  margin: var(--space-lg) 0 var(--space-xs);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.app .menu-list__heading {
+  margin: var(--space-xl) var(--space-2xs) var(--space-xs);
+  font-family: var(--font-heading);
+  font-size: 1.2rem;
+  font-weight: var(--font-heading-weight);
+  color: var(--color-navy);
+}
+
+#profile-main > nav:first-of-type .menu-list__heading {
+  margin-top: 0;
+}
+
+.app .menu-list__sub {
+  font-weight: 400;
+}
+
+.app .card > .needs + .field__help {
+  margin-top: var(--space-sm);
+}
+
+.app main .stack > .menu-list__heading {
+  margin-bottom: 0;
+}
+
+.app main {
+  padding-bottom: var(--space-2xl);
+}
+
+.app main h1 + p {
+  margin-top: 0;
+}
+
+/* Il primo passo della segnalazione: mappa subito sotto i campi, più alta sul telefono */
+.app .pick .pick__map {
+  margin-top: 0;
+}
+
+@media (max-width: 47.99em) {
+  .app .pick__actions {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .app .pick__actions .btn {
+    justify-content: center;
+    width: 100%;
   }
 }

@@ -1,6 +1,6 @@
 /* Ovunque Accessibile – schermata di caricamento (sito e web-app).
    Si carica nel <head> senza defer: mette la classe "oa-intro" su <html> prima che la pagina si disegni,
-   così il CSS copre la pagina con la carrozzina che gira (assets/img/intro.svg).
+   così il CSS copre la pagina con la mappa e il segnaposto che cade (assets/img/intro.svg).
    Solo alla prima pagina della visita (sessionStorage, chiave diversa per sito e app): almeno 0,6 s, mai oltre 1,5 s.
    È decorativa: per gli screen reader non esiste (pseudo-elementi di <html>). */
 (function () {

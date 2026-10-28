@@ -2027,7 +2027,8 @@ html:not(.js) .js-only {
   }
 }
 
-/* 13. Schermata di caricamento (assets/js/intro.js): ragazzo in carrozzina che gira intorno al segnaposto.
+/* 13. Schermata di caricamento (assets/js/intro.js): un pezzo di mappa come l'icona dell'app, il percorso si disegna
+   e il segnaposto con il simbolo dell'accessibilità cade sul punto (assets/img/intro.svg, dal 28 ottobre).
    Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori dall'albero di accessibilità. */
 .oa-intro,
 .oa-intro-out {
@@ -2050,7 +2051,7 @@ html:not(.js) .js-only {
   content: "";
   top: 0;
   bottom: 0;
-  background: var(--color-card, #fbf6ec) url("../img/intro.svg") center / var(--intro-size) no-repeat;
+  background: var(--color-card, #fbf6ec) url("../img/intro.svg?v=3") center / var(--intro-size) no-repeat;
 }
 
 .oa-intro::after,
@@ -2072,7 +2073,7 @@ html:not(.js) .js-only {
 
 @media (prefers-reduced-motion: reduce) {
   .oa-intro::before {
-    background-image: url("../img/intro-fermo.svg");
+    background-image: url("../img/intro-fermo.svg?v=2");
   }
 
   .oa-intro-out::before,

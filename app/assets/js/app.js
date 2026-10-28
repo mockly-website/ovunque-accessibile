@@ -962,12 +962,12 @@
     { id: 'luogo', title: 'Il luogo', fields: [
       { path: 'nome', label: 'Nome del luogo', type: 'text', required: true, max: 120, autocomplete: 'organization' },
       { path: 'categoria', label: 'Tipo di luogo', type: 'select', required: true, options: Object.keys(OA.CATEGORIE).map(function (k) { return [k, OA.CATEGORIE[k] + ' (' + OA.ESEMPI_CATEGORIE[k] + ')']; }) },
-      { path: 'citta', label: 'Città', help: 'Scrivila prima della via: i suggerimenti degli indirizzi saranno di questa città.', type: 'text', required: true, max: 80, autocomplete: 'address-level2' },
-      { path: 'indirizzo', label: 'Indirizzo', help: 'Via e numero civico. Mentre scrivi compaiono gli indirizzi suggeriti: scegline uno e il segnaposto va sulla mappa.', type: 'text', required: true, max: 200, autocomplete: 'street-address' },
-      { path: 'cap', label: 'CAP', help: 'Si scrive da solo quando scegli l\'indirizzo o il punto sulla mappa.', type: 'text', pattern: '^[0-9]{5}$', patternMsg: 'Il CAP è fatto di 5 cifre.', inputmode: 'numeric', autocomplete: 'postal-code', short: true, more: true },
-      { path: 'provincia', label: 'Sigla della provincia', help: 'Due lettere, per esempio RM. Si scrive da sola dal punto sulla mappa.', type: 'text', pattern: '^[A-Za-z]{2}$', patternMsg: 'La provincia è una sigla di 2 lettere, per esempio RM.', upper: true, short: true, more: true },
-      { path: 'regione', label: 'Regione', type: 'select', options: REGIONI.map(function (r) { return [r, r]; }), more: true },
-      { path: 'descrizione', label: 'Descrizione breve', help: 'Cosa c\'è e come si entra.', type: 'textarea', max: 1000, more: true },
+      { path: 'citta', label: 'Città', type: 'text', required: true, max: 80, autocomplete: 'address-level2' },
+      { path: 'indirizzo', label: 'Via e numero civico', type: 'text', required: true, max: 200, autocomplete: 'street-address' },
+      { path: 'cap', label: 'CAP', help: 'Si scrive da solo quando scegli l\'indirizzo o il punto sulla mappa.', type: 'text', pattern: '^[0-9]{5}$', patternMsg: 'Il CAP è fatto di 5 cifre.', inputmode: 'numeric', autocomplete: 'postal-code', short: true, auto: true },
+      { path: 'provincia', label: 'Sigla della provincia', help: 'Due lettere, per esempio RM. Si scrive da sola dal punto sulla mappa.', type: 'text', pattern: '^[A-Za-z]{2}$', patternMsg: 'La provincia è una sigla di 2 lettere, per esempio RM.', upper: true, short: true, auto: true },
+      { path: 'regione', label: 'Regione', type: 'select', options: REGIONI.map(function (r) { return [r, r]; }), auto: true },
+      { path: 'descrizione', label: 'Descrizione breve (facoltativa)', help: 'Cosa c\'è e come si entra.', type: 'textarea', max: 1000, own: true },
       { path: 'lat', label: 'Latitudine', type: 'number', required: true, min: 35, max: 48, step: 'any', short: true, coord: true },
       { path: 'lng', label: 'Longitudine', type: 'number', required: true, min: 6, max: 19, step: 'any', short: true, coord: true }
     ] },
@@ -1078,6 +1078,10 @@
 
   function fieldNode(f) {
     var id = fid(f.path);
+    /* Coordinate, CAP, provincia e regione non si scrivono: li ricava la mappa dal punto (initPicker) */
+    if (f.coord || f.auto) {
+      return el('div', { className: 'field--auto', 'data-path': f.path }, [el('input', { type: 'hidden', id: id, name: f.path })]);
+    }
     var helpId = f.help ? id + '-aiuto' : null;
     var label = f.label + (f.unit ? ' (' + f.unit + ')' : '');
     var wrap;
@@ -1225,9 +1229,14 @@
     FIELDS.forEach(function (f) {
       var node = form.querySelector('[data-path="' + f.path + '"]');
       var v = node.hidden ? null : formValue(form, f);
-      var input = f.type === 'tri' || f.type === 'choice' ? node : $(fid(f.path));
+      var input = f.type === 'tri' || f.type === 'choice' ? node : (f.coord && $('pick-map')) || $(fid(f.path));
+      if (f.coord && errors.some(function (e) { return e.input === input; })) return;   /* un solo errore per il punto */
       if (f.required && (v == null || v === '')) {
-        errors.push({ input: input, text: f.coord ? 'Indica la posizione: tocca la mappa o scrivi ' + f.label.toLowerCase() + '.' : 'Compila «' + f.label + '».' });
+        errors.push({ input: input, text: f.coord ? 'Indica dov\'è il luogo: tocca la mappa sull\'ingresso o premi «Trova sulla mappa».' : 'Compila «' + f.label + '».' });
+        return;
+      }
+      if (f.coord && v != null && (isNaN(v) || v < f.min || v > f.max)) {
+        errors.push({ input: input, text: 'Il punto è fuori dall\'Italia: tocca la mappa sull\'ingresso del luogo.' });
         return;
       }
       if (f.type === 'number' && v != null) {
@@ -1423,7 +1432,7 @@
     { titolo: 'Il luogo', sezioni: ['sec-luogo'] },
     { titolo: 'Ingresso', sezioni: ['sec-ingresso'] },
     { titolo: 'Dentro', sezioni: ['sec-spazi', 'sec-piani', 'sec-bagno'] },
-    { titolo: 'In più', sezioni: ['sec-altre', 'sec-sensi', 'sec-dettagli', 'sec-foto', 'sec-nota'] }
+    { titolo: 'In più', sezioni: ['sec-descrizione', 'sec-altre', 'sec-sensi', 'sec-dettagli', 'sec-foto', 'sec-nota'] }
   ];
 
   function initWizard(form, box, tutti) {
@@ -1445,7 +1454,7 @@
       return b;
     });
     var bar = el('ol', { className: 'wizard__steps', 'aria-label': 'Passi della segnalazione' }, dots.map(function (b) { return el('li', {}, [b]); }));
-    var count = el('p', { className: 'wizard__count', tabindex: '-1' });
+    var count = el('p', { className: 'visually-hidden', role: 'status' });
     var back = el('button', { type: 'button', className: 'btn btn--secondary wizard__back', text: 'Indietro' });
     var next = el('button', { type: 'button', className: 'btn btn--primary wizard__next', text: 'Avanti' });
     form.insertBefore(count, form.firstChild);
@@ -1468,7 +1477,11 @@
       window.dispatchEvent(new Event('resize'));   /* Leaflet ricalcola la mappa del punto, se torna visibile */
       if (focus) {
         form.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-        count.focus({ preventScroll: true });
+        var h = steps[i].querySelector('h2');
+        if (h) {
+          if (!h.hasAttribute('tabindex')) h.setAttribute('tabindex', '-1');
+          h.focus({ preventScroll: true });
+        }
       }
     }
 
@@ -1511,28 +1524,27 @@
 
     SCHEMA.forEach(function (sec) {
       var titleId = 'sec-' + sec.id + '-title';
-      var main = sec.fields.filter(function (f) { return !f.more && !f.coord; });
+      var main = sec.fields.filter(function (f) { return !f.more && !f.coord && !f.auto && !f.own; });
       var more = sec.fields.filter(function (f) { return f.more; });
       var body = [
         sec.intro ? el('p', { className: 'field__help', text: sec.intro }) : null,
         el('div', { className: 'form-grid' }, main.map(fieldNode)),
         more.length ? el('details', { className: 'more' }, [
-          el('summary', { className: 'more__toggle', text: sec.id === 'luogo' ? 'Altri dati del luogo: CAP, provincia e regione (si scrivono da soli dal punto sulla mappa), descrizione' : (more.length === 1 ? 'Aggiungi una nota' : 'Aggiungi delle note') }),
+          el('summary', { className: 'more__toggle', text: more.length === 1 ? 'Aggiungi una nota' : 'Aggiungi delle note' }),
           el('div', { className: 'form-grid more__body' }, more.map(fieldNode))
         ]) : null
       ];
       if (sec.id === 'luogo') {
-        body.push(el('div', { className: 'pick' }, [
-          el('h3', { className: 'pick__title', text: 'Dov\'è l\'ingresso?' }),
-          el('p', { className: 'field__help', id: 'pick-help', text: 'Premi «Trova l\'indirizzo sulla mappa»: il segnaposto va sulla via. Se l\'ingresso è da un\'altra parte, tocca la mappa in quel punto (da lontano il primo tocco avvicina la mappa) o trascina il segnaposto. Sei lì? Usa «La mia posizione». Sul telefono la mappa si sposta con due dita.' }),
+        body.push(el('div', { className: 'pick field' }, [
+          el('p', { className: 'field__help', id: 'pick-help', text: 'Tocca la mappa sull\'ingresso o trascina il segnaposto.' }),
           el('div', { className: 'pick__actions' }, [
-            el('button', { type: 'button', id: 'pick-find', className: 'btn btn--primary btn--small' }, [icon('#icon-search'), el('span', { text: 'Trova l\'indirizzo sulla mappa' })]),
+            el('button', { type: 'button', id: 'pick-find', className: 'btn btn--primary btn--small' }, [icon('#icon-search'), el('span', { text: 'Trova sulla mappa' })]),
             el('button', { type: 'button', id: 'pick-locate', className: 'btn btn--secondary btn--small' }, [icon('#icon-locate'), el('span', { text: 'La mia posizione' })])
           ]),
           el('p', { id: 'pick-status', className: 'pick__status', role: 'status' }),
           el('div', { id: 'pick-suggest', className: 'pick__suggest', hidden: '' }),
           el('div', { id: 'pick-map', className: 'pick__map', role: 'region', 'aria-label': 'Mappa per indicare la posizione del luogo' }),
-          el('div', { className: 'form-grid' }, sec.fields.filter(function (f) { return f.coord; }).map(fieldNode))
+          el('div', {}, sec.fields.filter(function (f) { return f.coord || f.auto; }).map(fieldNode))
         ]));
       }
       /* Le sezioni tutte facoltative sono chiuse in una tendina */
@@ -1545,6 +1557,11 @@
           ])
         : el('section', { className: 'card form-section', id: 'sec-' + sec.id, 'aria-labelledby': titleId }, [el('h2', { id: titleId, text: sec.title })].concat(body)));
     });
+    /* La descrizione è facoltativa: sta nel passo «In più», non nel primo */
+    box.appendChild(el('section', { className: 'card form-section', id: 'sec-descrizione', 'aria-labelledby': 'sec-descrizione-title' }, [
+      el('h2', { id: 'sec-descrizione-title', text: 'Descrizione del luogo' }),
+      el('div', { className: 'form-grid' }, SCHEMA[0].fields.filter(function (f) { return f.own; }).map(fieldNode))
+    ]));
     var photosUi = photoSection(box);
     var wizard = initWizard(form, box, !!id);
     function stepErrors(f, errors, title) {
@@ -1614,7 +1631,7 @@
           stop = true;
           form.dataset.farOk = sigG;
           busy(form, false);
-          stepErrors(form, [{ input: $(fid('lat')), text: 'Il punto sulla mappa è a circa ' + km + ' km da ' + res.dati.citta + ': controlla la posizione o il nome della città.' }], 'Controlla la posizione');
+          stepErrors(form, [{ input: $('pick-map'), text: 'Il punto sulla mappa è a circa ' + km + ' km da ' + res.dati.citta + ': controlla la posizione o il nome della città.' }], 'Controlla la posizione');
           form.querySelector('.error-summary').appendChild(el('p', { text: 'Se il punto è giusto, premi di nuovo «Invia la segnalazione».' }));
           return;
         }

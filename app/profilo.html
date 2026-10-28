@@ -16,14 +16,14 @@
   <link rel="apple-touch-icon" href="assets/img/icon-180.png">
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="../assets/js/intro.js?v=i2"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p34">
-  <link rel="stylesheet" href="assets/css/app.css?v=a28">
+  <script src="../assets/js/intro.js?v=i3"></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=p36">
+  <link rel="stylesheet" href="assets/css/app.css?v=a31">
   <script src="assets/js/config.js?v=a24" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=p30" defer></script>
   <script src="assets/js/api.js?v=a24" defer></script>
-  <script src="assets/js/app.js?v=a27" defer></script>
+  <script src="assets/js/app.js?v=a30" defer></script>
 </head>
 <body class="app" data-page="profilo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -102,7 +102,7 @@
         <p id="activity-note" class="notice" role="status" tabindex="-1" hidden></p>
 
         <nav aria-labelledby="shortcut-title">
-          <h2 id="shortcut-title" class="menu-list__heading">Collegamenti</h2>
+          <h2 id="shortcut-title" class="menu-list__heading">Per te</h2>
           <ul class="menu-list" role="list">
             <li id="mod-card" hidden><a class="menu-list__link" href="moderazione.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Moderazione</span><span class="menu-list__sub">Segnalazioni e recensioni in attesa</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
             <li><a class="menu-list__link" href="locali.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Hai un locale o un negozio?</span><span class="menu-list__sub">Gestisci la scheda, verifica sul posto, bollino</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
@@ -127,26 +127,28 @@
           <p class="field__help">La scelta resta salvata nel tuo account e vale su tutti i tuoi dispositivi.</p>
         </section>
 
+        <h2 class="menu-list__heading">Le tue attività</h2>
         <section class="card" aria-labelledby="fav-title">
-          <h2 id="fav-title">I tuoi preferiti</h2>
+          <h3 id="fav-title" class="card__title">I tuoi preferiti</h3>
           <p id="fav-empty" class="place__meta" hidden>Non hai ancora preferiti. Nella scheda di un luogo premi «Salva nei preferiti».</p>
           <ul id="fav-list" class="results__list" role="list"></ul>
         </section>
 
         <section class="card" aria-labelledby="proposals-title">
-          <h2 id="proposals-title">Le tue segnalazioni</h2>
+          <h3 id="proposals-title" class="card__title">Le tue segnalazioni</h3>
           <p id="proposals-empty" class="place__meta" hidden>Non hai ancora segnalato luoghi. <a href="segnala.html">Segnala un luogo</a></p>
           <ul id="my-proposals" class="activities" role="list"></ul>
         </section>
 
         <section class="card" aria-labelledby="my-reviews-title">
-          <h2 id="my-reviews-title">Le tue recensioni</h2>
+          <h3 id="my-reviews-title" class="card__title">Le tue recensioni</h3>
           <p id="reviews-mine-empty" class="place__meta" hidden>Non hai ancora scritto recensioni.</p>
           <ul id="my-reviews" class="activities" role="list"></ul>
         </section>
 
+        <h2 class="menu-list__heading">Account</h2>
         <section class="card" aria-labelledby="name-title">
-          <h2 id="name-title">Il tuo nome pubblico</h2>
+          <h3 id="name-title" class="card__title">Il tuo nome pubblico</h3>
           <p id="name-note" class="notice" role="status" hidden></p>
           <form id="name-form" class="stack" novalidate>
             <div class="field">
@@ -159,10 +161,10 @@
         </section>
 
         <section class="card" aria-labelledby="account-title">
-          <h2 id="account-title">Account</h2>
+          <h3 id="account-title" class="card__title">Email e password</h3>
           <p>Email: <strong id="account-email"></strong></p>
           <p id="account-note" class="notice" role="status" hidden></p>
-          <h3 class="h3">Cambia password</h3>
+          <h4 class="card__subtitle">Cambia password</h4>
           <p id="password-note" class="notice" role="status" hidden></p>
           <form id="password-form" class="stack" novalidate>
             <div class="field">
@@ -175,7 +177,7 @@
             </div>
             <button class="btn btn--secondary btn--small" type="submit">Salva la password</button>
           </form>
-          <h3 class="h3">I tuoi dati</h3>
+          <h4 class="card__subtitle">I tuoi dati</h4>
           <div class="demo__actions">
             <button id="export-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-download"/></svg>Scarica i miei dati</button>
             <button id="logout-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-logout"/></svg>Esci</button>
