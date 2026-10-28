@@ -1249,6 +1249,7 @@
         document.getElementById('detail-title').textContent = 'Luogo non trovato';
         document.getElementById('detail-intro').textContent = 'Il luogo che cerchi non esiste o è stato rimosso.';
         document.getElementById('detail-body').hidden = true;
+        root.classList.add('detail--missing');
         document.title = 'Luogo non trovato – Ovunque Accessibile';
         return;
       }

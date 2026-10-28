@@ -1474,7 +1474,7 @@ textarea.input {
 .osm-tools {
   display: grid;
   gap: var(--space-sm);
-  margin-bottom: var(--space-sm);
+  margin-block: var(--space-md) var(--space-sm);
 }
 
 .osm-tools__bulk {
@@ -1580,7 +1580,7 @@ html:has(> body.app) {
   top: 0;
   z-index: 1001;
   padding-top: env(safe-area-inset-top);
-  background: rgba(251, 246, 236, 0.97);   /* niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
+  background: rgb(251, 246, 236);   /* opaca: il testo che scorre sotto non deve vedersi. Niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
   box-shadow: 0 1px 0 var(--color-line);
 }
 
@@ -2351,7 +2351,7 @@ html:has(> body.app) {
 }
 
 .app .menu-list__heading {
-  margin: var(--space-xl) var(--space-2xs) var(--space-xs);
+  margin: var(--space-xl) 0 var(--space-xs);
   font-family: var(--font-heading);
   font-size: 1.2rem;
   font-weight: var(--font-heading-weight);
@@ -2570,4 +2570,9 @@ html:has(> body.app) {
 /* Indirizzi email e link lunghi negli avvisi vanno a capo invece di allargare la pagina (bollino a 320 px) */
 .app .notice {
   overflow-wrap: anywhere;
+}
+
+/* Moderazione: aria tra il titolo della pagina e la prima sezione */
+#mod-panel {
+  margin-top: var(--space-lg);
 }

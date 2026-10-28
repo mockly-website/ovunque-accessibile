@@ -2878,3 +2878,9 @@ html:not(.js) .js-only {
     border: 2px solid CanvasText;
   }
 }
+
+/* Luogo non trovato: restano solo titolo e spiegazione, niente mappa vuota né riquadri della scheda */
+.detail--missing .detail__side,
+.detail--missing #detail-cat {
+  display: none;
+}
