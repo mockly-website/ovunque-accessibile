@@ -20,14 +20,14 @@
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
   <script src="../assets/js/intro.js?v=i2"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p34">
-  <link rel="stylesheet" href="assets/css/app.css?v=a26">
+  <link rel="stylesheet" href="assets/css/app.css?v=a28">
   <script src="assets/js/config.js?v=a24" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="../assets/js/oa-core.js?v=p30" defer></script>
   <script src="assets/js/api.js?v=a24" defer></script>
-  <script src="assets/js/app.js?v=a26" defer></script>
+  <script src="assets/js/app.js?v=a27" defer></script>
 </head>
 <body class="app" data-page="luogo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -109,40 +109,6 @@
               <h2 id="alerts-title" class="visually-hidden">Avvisi temporanei</h2>
               <ul id="alerts-list" class="alerts__list" role="list"></ul>
               <p id="alerts-note" class="notice" role="status" tabindex="-1" hidden></p>
-              <details id="alert-new" class="more" hidden>
-                <summary class="more__toggle">Segnala un problema di oggi (ascensore guasto, rampa bloccata, lavori…)</summary>
-                <form id="alert-form" class="more__body stack" novalidate>
-                  <p class="field__help">L'avviso si vede subito, con il tuo nome pubblico, e sparisce da solo alla scadenza. Per le cose che restano (una rampa nuova, un ascensore tolto) proponi invece una correzione.</p>
-                  <div class="field">
-                    <label class="field__label" for="a-tipo">Cosa succede?</label>
-                    <select class="select" id="a-tipo" name="tipo">
-                      <option value="ascensore">Ascensore fuori servizio</option>
-                      <option value="rampa">Rampa non utilizzabile</option>
-                      <option value="bagno">Bagno accessibile fuori servizio</option>
-                      <option value="ingresso">Ingresso accessibile chiuso</option>
-                      <option value="lavori">Lavori in corso</option>
-                      <option value="altro">Altro</option>
-                    </select>
-                  </div>
-                  <div class="field">
-                    <label class="field__label" for="a-testo">Dettagli (facoltativi)</label>
-                    <p class="field__help" id="a-testo-aiuto">Fino a 300 caratteri. Per esempio: «Si entra dall'ingresso laterale, chiedere al personale».</p>
-                    <input class="input" type="text" id="a-testo" name="testo" maxlength="300" aria-describedby="a-testo-aiuto">
-                  </div>
-                  <div class="field field--short">
-                    <label class="field__label" for="a-durata">Per quanto tempo?</label>
-                    <select class="select" id="a-durata" name="durata">
-                      <option value="1">Solo oggi</option>
-                      <option value="3">3 giorni</option>
-                      <option value="7" selected>Una settimana</option>
-                      <option value="14">Due settimane</option>
-                      <option value="30">Un mese</option>
-                    </select>
-                  </div>
-                  <button class="btn btn--primary" type="submit">Pubblica l'avviso</button>
-                </form>
-              </details>
-              <p id="alert-login" class="place__meta" hidden><a id="alert-login-link" href="accedi.html">Accedi</a> per segnalare un problema di oggi, come un ascensore guasto.</p>
             </section>
 
             <div class="detail__actions">
@@ -171,6 +137,42 @@
               </a>
             </div>
             <p id="fav-status" class="visually-hidden" role="status"></p>
+            <div class="alert-new">
+            <details id="alert-new" class="more" hidden>
+              <summary class="more__toggle">Segnala un problema di oggi (ascensore guasto, rampa bloccata, lavori…)</summary>
+              <form id="alert-form" class="more__body stack" novalidate>
+                <p class="field__help">L'avviso si vede subito, con il tuo nome pubblico, e sparisce da solo alla scadenza. Per le cose che restano (una rampa nuova, un ascensore tolto) proponi invece una correzione.</p>
+                <div class="field">
+                  <label class="field__label" for="a-tipo">Cosa succede?</label>
+                  <select class="select" id="a-tipo" name="tipo">
+                    <option value="ascensore">Ascensore fuori servizio</option>
+                    <option value="rampa">Rampa non utilizzabile</option>
+                    <option value="bagno">Bagno accessibile fuori servizio</option>
+                    <option value="ingresso">Ingresso accessibile chiuso</option>
+                    <option value="lavori">Lavori in corso</option>
+                    <option value="altro">Altro</option>
+                  </select>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="a-testo">Dettagli (facoltativi)</label>
+                  <p class="field__help" id="a-testo-aiuto">Fino a 300 caratteri. Per esempio: «Si entra dall'ingresso laterale, chiedere al personale».</p>
+                  <input class="input" type="text" id="a-testo" name="testo" maxlength="300" aria-describedby="a-testo-aiuto">
+                </div>
+                <div class="field field--short">
+                  <label class="field__label" for="a-durata">Per quanto tempo?</label>
+                  <select class="select" id="a-durata" name="durata">
+                    <option value="1">Solo oggi</option>
+                    <option value="3">3 giorni</option>
+                    <option value="7" selected>Una settimana</option>
+                    <option value="14">Due settimane</option>
+                    <option value="30">Un mese</option>
+                  </select>
+                </div>
+                <button class="btn btn--primary" type="submit">Pubblica l'avviso</button>
+              </form>
+            </details>
+            <p id="alert-login" class="place__meta" hidden><a id="alert-login-link" href="accedi.html">Accedi</a> per segnalare un problema di oggi, come un ascensore guasto.</p>
+            </div>
 
             <section id="detail-summary" class="card detail__section summary" aria-labelledby="summary-title">
               <h2 id="summary-title">In breve</h2>

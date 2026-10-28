@@ -1416,6 +1416,88 @@
     };
   }
 
+  /* Segnala a passi: quattro schermate (Il luogo · Ingresso · Dentro · In più) invece di un modulo lunghissimo.
+     «Avanti» controlla solo i campi del passo; all'invio, se c'è un errore, si torna al passo che lo contiene.
+     Invio nei campi di un passo che non è l'ultimo vale «Avanti». I passi già visti si riaprono dall'indicatore. */
+  var PASSI = [
+    { titolo: 'Il luogo', sezioni: ['sec-luogo'] },
+    { titolo: 'Ingresso', sezioni: ['sec-ingresso'] },
+    { titolo: 'Dentro', sezioni: ['sec-spazi', 'sec-piani', 'sec-bagno'] },
+    { titolo: 'In più', sezioni: ['sec-altre', 'sec-sensi', 'sec-dettagli', 'sec-foto', 'sec-nota'] }
+  ];
+
+  function initWizard(form, box, tutti) {
+    var submit = form.querySelector('[type="submit"]');
+    var cur = 0;
+    var maxSeen = tutti ? PASSI.length - 1 : 0;
+    var steps = PASSI.map(function (p, i) {
+      var step = el('div', { className: 'wizard__step stack', 'data-step': String(i) });
+      p.sezioni.forEach(function (id) { if ($(id)) step.appendChild($(id)); });
+      box.appendChild(step);
+      return step;
+    });
+    var dots = PASSI.map(function (p, i) {
+      var b = el('button', { type: 'button', className: 'wizard__dot' }, [
+        el('span', { className: 'wizard__num', 'aria-hidden': 'true', text: String(i + 1) }),
+        el('span', { className: 'wizard__name', text: p.titolo })
+      ]);
+      b.addEventListener('click', function () { go(i, true); });
+      return b;
+    });
+    var bar = el('ol', { className: 'wizard__steps', 'aria-label': 'Passi della segnalazione' }, dots.map(function (b) { return el('li', {}, [b]); }));
+    var count = el('p', { className: 'wizard__count', tabindex: '-1' });
+    var back = el('button', { type: 'button', className: 'btn btn--secondary wizard__back', text: 'Indietro' });
+    var next = el('button', { type: 'button', className: 'btn btn--primary wizard__next', text: 'Avanti' });
+    form.insertBefore(count, form.firstChild);
+    form.insertBefore(bar, count);
+    form.appendChild(el('div', { className: 'wizard__nav' }, [back, next, submit]));
+
+    function go(i, focus) {
+      if (i < 0 || i >= PASSI.length || i > maxSeen) return;
+      cur = i;
+      steps.forEach(function (s, k) { s.hidden = k !== i; });
+      dots.forEach(function (b, k) {
+        if (k === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+        b.classList.toggle('is-done', k < i);
+        b.disabled = k > maxSeen;
+      });
+      count.textContent = 'Passo ' + (i + 1) + ' di ' + PASSI.length + ': ' + PASSI[i].titolo;
+      back.hidden = i === 0;
+      next.hidden = i === PASSI.length - 1;
+      submit.hidden = i !== PASSI.length - 1;
+      window.dispatchEvent(new Event('resize'));   /* Leaflet ricalcola la mappa del punto, se torna visibile */
+      if (focus) {
+        form.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+        count.focus({ preventScroll: true });
+      }
+    }
+
+    back.addEventListener('click', function () { clearErrors(form); go(cur - 1, true); });
+    next.addEventListener('click', function () {
+      var errs = collect(form).errors.filter(function (e) { return steps[cur].contains(e.input); });
+      if (showErrors(form, errs)) return;
+      maxSeen = Math.max(maxSeen, cur + 1);
+      go(cur + 1, true);
+    });
+    /* Invio in un campo prima dell'ultimo passo: «Avanti», non l'invio della segnalazione */
+    form.addEventListener('submit', function (ev) {
+      if (cur === PASSI.length - 1) return;
+      ev.preventDefault();
+      ev.stopImmediatePropagation();
+      next.click();
+    });
+    go(0, false);
+
+    return {
+      /* Prima di mostrare gli errori dell'invio: apre il passo del primo campo sbagliato */
+      reveal: function (errors) {
+        if (!errors.length) return;
+        var k = steps.findIndex(function (s) { return s.contains(errors[0].input); });
+        if (k >= 0 && k !== cur) { maxSeen = Math.max(maxSeen, k); go(k, false); }
+      }
+    };
+  }
+
   function initSegnala() {
     var form = $('proposal-form');
     var box = $('proposal-fields');
@@ -1464,6 +1546,11 @@
         : el('section', { className: 'card form-section', id: 'sec-' + sec.id, 'aria-labelledby': titleId }, [el('h2', { id: titleId, text: sec.title })].concat(body)));
     });
     var photosUi = photoSection(box);
+    var wizard = initWizard(form, box, !!id);
+    function stepErrors(f, errors, title) {
+      wizard.reveal(errors);
+      return showErrors(f, errors, title);
+    }
     show(form, true);
 
     form.addEventListener('change', function (ev) {
@@ -1506,13 +1593,13 @@
       if (!res.errors.length && initial && JSON.stringify(res.dati) === initial && !photosUi.items().length) {
         res.errors.push({ input: $(fid('nome')), text: 'Non hai cambiato niente: modifica le voci che non corrispondono più al luogo.' });
       }
-      if (showErrors(form, res.errors)) return;
+      if (stepErrors(form, res.errors)) return;
       /* Valori possibili ma strani: si chiede di controllarli, al secondo invio passano */
       var warns = unusualValues(form);
       var sigW = JSON.stringify(warns.map(function (w) { return w.text; }));
       if (warns.length && form.dataset.warned !== sigW) {
         form.dataset.warned = sigW;
-        showErrors(form, warns, warns.length === 1 ? 'Controlla questo valore' : 'Controlla questi valori');
+        stepErrors(form, warns, warns.length === 1 ? 'Controlla questo valore' : 'Controlla questi valori');
         form.querySelector('.error-summary').appendChild(el('p', { text: 'Se è tutto giusto, premi di nuovo «Invia la segnalazione».' }));
         return;
       }
@@ -1527,7 +1614,7 @@
           stop = true;
           form.dataset.farOk = sigG;
           busy(form, false);
-          showErrors(form, [{ input: $(fid('lat')), text: 'Il punto sulla mappa è a circa ' + km + ' km da ' + res.dati.citta + ': controlla la posizione o il nome della città.' }], 'Controlla la posizione');
+          stepErrors(form, [{ input: $(fid('lat')), text: 'Il punto sulla mappa è a circa ' + km + ' km da ' + res.dati.citta + ': controlla la posizione o il nome della città.' }], 'Controlla la posizione');
           form.querySelector('.error-summary').appendChild(el('p', { text: 'Se il punto è giusto, premi di nuovo «Invia la segnalazione».' }));
           return;
         }
@@ -1552,7 +1639,7 @@
         focusHeading($('proposal-done-title'));
       }).catch(function (err) {
         busy(form, false);
-        showErrors(form, [{ input: $(fid('nome')), text: err.message }]);
+        stepErrors(form, [{ input: $(fid('nome')), text: err.message }]);
       });
     });
   }

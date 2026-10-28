@@ -1810,6 +1810,161 @@ html:has(> body.app) {
   .app .explore .map {
     height: max(22rem, calc(100svh - 16rem));
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav__link .icon {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .app-nav__link[aria-current="page"] .icon {
+    outline: 2px solid CanvasText;
+  }
+}
+
+/* 18. Barra delle schede, animazioni e tablet (28 ottobre, notte).
+   Fino a 1024 px (telefono e tablet) la navigazione è la barra in basso, come nelle app per iPhone, iPad e Android:
+   «Segnala» al centro in un cerchio blu, la voce attiva con la pillola che si apre, un piccolo «schiaccio» al tocco.
+   Tra una pagina e l'altra (View Transitions, Safari 18 e Chrome) barra in alto e barra in basso restano ferme
+   e il contenuto entra in dissolvenza. Con «riduci movimento» niente animazioni. */
+@media (max-width: 63.99em) {
+  html:has(> body.app) {
+    scroll-padding-bottom: 6rem;
+  }
+
+  .app {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  .app .site-header__inner {
+    justify-content: flex-start;
+  }
+
+  .app .app-nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 1000;
+    margin: 0;
+    padding: 0.3rem var(--space-xs) calc(0.3rem + env(safe-area-inset-bottom));
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    border-radius: 0;
+    background: var(--color-white);
+    box-shadow: 0 -4px 20px rgba(22, 40, 65, 0.06);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    view-transition-name: oa-schede;
+  }
+
+  .app .app-nav__list {
+    justify-content: space-around;
+    max-width: 30rem;
+    margin-inline: auto;
+  }
+
+  .app .app-nav__list > li {
+    flex: 1 1 0;
+  }
+
+  .app .app-nav__link {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    width: 100%;
+    min-height: 3.5rem;
+    padding: 0.2rem 0;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+
+  .app .app-nav__link .icon {
+    position: relative;
+    z-index: 1;
+    box-sizing: content-box;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0.2rem 1rem;
+    border-radius: var(--radius-pill);
+    background: none;
+    fill: currentColor;
+    transition: transform 0.15s var(--ease-out);
+  }
+
+  /* La pillola dietro l'icona attiva: un elemento a parte, così si anima senza toccare l'icona */
+  .app .app-nav__link::before {
+    content: "";
+    position: absolute;
+    top: 0.2rem;
+    left: 50%;
+    width: 3.5rem;
+    height: 1.9rem;
+    margin-left: -1.75rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-sky);
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+
+  .app .app-nav__link[aria-current="page"] {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app .app-nav__link[aria-current="page"]::before {
+    opacity: 1;
+    transform: none;
+    animation: oa-pillola 0.35s var(--ease-out);
+  }
+
+  .app .app-nav__link[aria-current="page"] .icon {
+    background: none;
+    fill: var(--color-brand);
+  }
+
+  .app .app-nav__link:hover {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app .app-nav__link:active .icon {
+    transform: scale(0.88);
+  }
+
+  .app .app-nav__link:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: -3px;
+  }
+
+  /* «Segnala» al centro: cerchio blu che sporge dalla barra */
+  .app .app-nav__link[href="segnala.html"] .icon {
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-top: -1.35rem;
+    padding: 0.7rem;
+    border: 4px solid var(--color-white);
+    background: var(--color-navy);
+    fill: var(--color-white);
+    box-shadow: 0 6px 16px rgba(22, 40, 65, 0.25);
+  }
+
+  .app .app-nav__link[href="segnala.html"]::before {
+    display: none;
+  }
+
+  .app .app-nav__link[href="segnala.html"][aria-current="page"] .icon {
+    background: var(--color-brand);
+    fill: var(--color-white);
+  }
+
+  .app .app-nav__link[href="segnala.html"]:active .icon {
+    transform: scale(0.92);
+  }
 
   /* Percorso → «‹ Mappa dei luoghi», come il tasto indietro delle app */
   .app .crumbs li:last-child {
@@ -1878,14 +2033,303 @@ html:has(> body.app) {
   }
 }
 
+@keyframes oa-pillola {
+  from {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+}
+
+/* Passaggio tra le pagine dell'app */
+@view-transition {
+  navigation: auto;
+}
+
+.app .site-header {
+  view-transition-name: oa-testata;
+}
+
+::view-transition-old(root) {
+  animation: oa-esce 0.16s ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: oa-entra 0.28s var(--ease-out) both;
+}
+
+@keyframes oa-esce {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes oa-entra {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+/* Pulsanti e righe: risposta al tocco */
+.app .btn,
+.app .menu-list__link,
+.app .place {
+  transition: transform 0.12s var(--ease-out), background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.app .btn:active,
+.app .menu-list__link:active {
+  transform: scale(0.97);
+}
+
+/* Tendine che si aprono con un leggero scorrimento */
+.app details[open] > :not(summary) {
+  animation: oa-apri 0.22s var(--ease-out);
+}
+
+@keyframes oa-apri {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .app-nav__link .icon {
+  @view-transition {
+    navigation: none;
+  }
+
+  .app .app-nav__link[aria-current="page"]::before,
+  .app details[open] > :not(summary) {
+    animation: none;
+  }
+
+  .app .btn,
+  .app .menu-list__link,
+  .app .place,
+  .app .app-nav__link .icon {
+    transition: none;
+  }
+
+  .app .btn:active,
+  .app .menu-list__link:active,
+  .app .app-nav__link:active .icon {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .app .app-nav__link[aria-current="page"]::before {
+    background: Highlight;
+  }
+
+  .app .app-nav__link[href="segnala.html"] .icon {
+    border-color: Canvas;
+    background: ButtonText;
+    fill: ButtonFace;
+  }
+}
+
+/* 19. «Segnala» a passi: indicatore 1-2-3-4, una schermata per passo, «Indietro / Avanti» in una barra
+   che resta in vista sopra la barra delle schede */
+.wizard__steps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+}
+
+.wizard__steps > li {
+  position: relative;
+  min-width: 0;
+}
+
+/* Linea che unisce i numeri */
+.wizard__steps > li + li::before {
+  content: "";
+  position: absolute;
+  top: 1.35rem;
+  right: 50%;
+  left: -50%;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(22, 40, 65, 0.15);
+}
+
+.wizard__steps > li:has(.is-done, [aria-current="step"]) + li:has(.is-done, [aria-current="step"])::before {
+  background: var(--color-brand);
+}
+
+.wizard__dot {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  width: 100%;
+  min-height: var(--target-min);
+  padding: 0.2rem 0;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: none;
+  color: var(--color-navy);
+  font: inherit;
+  font-size: 0.875rem;
+  font-weight: 700;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.wizard__dot:disabled {
+  color: var(--color-muted);
+  font-weight: 400;
+  cursor: default;
+}
+
+.wizard__dot:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.wizard__num {
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  border: 2px solid var(--color-muted);
+  border-radius: 50%;
+  background: var(--color-white);
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s var(--ease-out);
+}
+
+.wizard__dot.is-done .wizard__num {
+  border-color: var(--color-brand);
+  background: var(--color-sky);
+  color: var(--color-brand);
+}
+
+.wizard__dot[aria-current="step"] .wizard__num {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+  transform: scale(1.08);
+}
+
+.wizard__name {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.wizard__count {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-muted);
+  font-weight: 700;
+  text-align: center;
+}
+
+.wizard__count:focus {
+  outline: none;
+}
+
+.wizard__count:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.wizard__step:not([hidden]) {
+  animation: oa-entra 0.28s var(--ease-out);
+}
+
+.wizard__nav {
+  display: flex;
+  gap: var(--space-sm);
+  justify-content: space-between;
+}
+
+.wizard__nav > .btn {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+.wizard__nav > .btn--primary {
+  flex-grow: 2;
+}
+
+@media (max-width: 63.99em) {
+  html:has(.wizard__nav) {
+    scroll-padding-bottom: 11rem;
+  }
+
+  .wizard__nav {
+    position: sticky;
+    bottom: calc(4.1rem + env(safe-area-inset-bottom));   /* altezza della barra delle schede */
+    z-index: 900;
+    margin-inline: calc(-1 * var(--space-md));
+    padding: var(--space-sm) var(--space-md);
+    background: var(--app-bg);
+    box-shadow: 0 -1px 0 var(--color-line);
+  }
+
+  .app form > .wizard__nav > .btn--primary[type="submit"] {
+    width: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wizard__step:not([hidden]) {
+    animation: none;
+  }
+
+  .wizard__num {
     transition: none;
   }
 }
 
 @media (forced-colors: active) {
-  .app-nav__link[aria-current="page"] .icon {
-    outline: 2px solid CanvasText;
+  .wizard__dot[aria-current="step"] .wizard__num {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* 20. Allineamenti sul telefono: pulsanti uno sotto l'altro a tutta riga e centrati, «Bagni vicino a me» largo
+   come la ricerca, titolo della pagina e testo d'apertura sempre fuori dalle schede */
+@media (max-width: 47.99em) {
+  .app .demo__actions {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .app .demo__actions > .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .app .filters__near {
+    margin: 0;
+  }
+
+  .app .filters__near .quick__link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .app .center {
+    margin-inline: auto;
+    max-width: 30ch;
+  }
+
+  .app main > .container > h1 + p,
+  .app main > .container > .stack > h1 + p {
+    color: var(--color-muted);
+  }
+
+  .app .empty {
+    text-align: center;
   }
 }
