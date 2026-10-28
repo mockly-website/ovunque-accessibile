@@ -1019,8 +1019,61 @@
     ]);
   }
 
+  /* Quante righe di un elenco <dl> hanno un'informazione (non «da verificare») → testo per la tendina */
+  function contaNote(dl) {
+    var rows = [].slice.call(dl.querySelectorAll('.facts__row'));
+    var note = rows.filter(function (r) {
+      var states = [].slice.call(r.querySelectorAll('.needs-state'));
+      var nv = states.length ? states.every(function (x) { return x.classList.contains('needs-state--nv'); }) : !!r.querySelector('.status--nv');
+      return !nv;
+    }).length;
+    return note ? (note === 1 ? '1 informazione' : note + ' informazioni') : 'ancora da raccogliere';
+  }
+
+  /* «In breve»: il giudizio per l'esigenza scelta e le voci che contano di più, in cima alla scheda */
+  function renderSummary(p, e) {
+    var box = document.getElementById('summary-list');
+    var verdict = document.getElementById('summary-verdict');
+    if (!box || !verdict) return;
+    var g = giudizio(p, e);
+    verdict.className = 'summary__verdict summary__verdict--' + g;
+    verdict.textContent = '';
+    verdict.appendChild(icon(ICONA_STATO[g]));
+    verdict.appendChild(el('span', {}, [
+      el('strong', { text: GIUDIZIO[g] }),
+      el('span', { className: 'summary__who', text: ' per ' + ESIGENZE[e].nome.toLowerCase() + (esigenzaCorrente ? '' : ' (scegli la tua esigenza qui sotto)') })
+    ]));
+    var keys = ESIGENZE[e].sensi ? ESIGENZE[e].voci : ['ingresso', 'porta', 'piani', 'bagno'].concat(e === 'anziani' ? ['sedute'] : []);
+    box.textContent = '';
+    keys.forEach(function (k) {
+      var v = voce(k);
+      var st = v.valuta(p, e);
+      if (k === 'porta' && st[0] === 'np') return;
+      box.appendChild(el('li', { className: 'summary__item summary__item--' + st[0] }, [
+        icon(ICONA_STATO[st[0]]),
+        el('span', {}, [
+          el('span', { className: 'visually-hidden', text: PREFISSO_STATO[st[0]] }),
+          el('strong', { className: 'summary__name', text: v.nome }),
+          el('span', { className: 'summary__text', text: st[1] })
+        ])
+      ]));
+    });
+    var park = (p.facoltativi || {}).parcheggio || {};
+    if (park.posti === true && !ESIGENZE[e].sensi) {
+      box.appendChild(el('li', { className: 'summary__item summary__item--si' }, [
+        icon(ICONA_STATO.si),
+        el('span', {}, [
+          el('span', { className: 'visually-hidden', text: PREFISSO_STATO.si }),
+          el('strong', { className: 'summary__name', text: 'Parcheggio' }),
+          el('span', { className: 'summary__text', text: 'Posti riservati' + (park.distanza_m != null ? (park.distanza_m === 0 ? ' all\'ingresso' : ' a ' + park.distanza_m + ' m') : '') })
+        ])
+      ]));
+    }
+  }
+
   function renderDetail(p) {
     var e = esigenza();
+    renderSummary(p, e);
 
     /* Tre giudizi affiancati: quello dell'esigenza scelta è evidenziato */
     var trio = document.getElementById('detail-verdicts');
@@ -1076,6 +1129,11 @@
     if (senses) {
       senses.hidden = !sensiNoti;
       if (sensesEmpty) sensesEmpty.hidden = sensiNoti;
+      var sc = document.getElementById('senses-count');
+      if (sc) sc.textContent = sensiNoti ? contaNote(senses) : 'ancora da raccogliere';
+      /* Per chi non vede o non sente, la tendina che gli serve è già aperta */
+      var ms = document.getElementById('more-senses');
+      if (ms && ESIGENZE[e].sensi && esigenzaCorrente) ms.open = true;
     }
 
     /* Voci facoltative */
@@ -1110,6 +1168,10 @@
     detBox.hidden = !keys.length;
     document.getElementById('detail-specific-title').textContent = TITOLO_DETTAGLI[p.categoria] || 'Dettagli';
     keys.forEach(function (k) { detList.appendChild(infoRow(DETTAGLI[k][0], valoreDettaglio(k, det[k]))); });
+    var ec = document.getElementById('extra-count');
+    if (ec) ec.textContent = contaNote(extra);
+    var dc = document.getElementById('specific-count');
+    if (dc) dc.textContent = contaNote(detList);
   }
 
   function initDetail() {

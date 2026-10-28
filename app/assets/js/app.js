@@ -640,25 +640,36 @@
     var sulPosto = p.verifica && p.verifica.livello === 'sul-posto';
     $('badge-link').href = 'bollino.html?id=' + encodeURIComponent(p.id);
     show($('owner-badge'), sulPosto && (who.gestore || who.mod));
+    var jump = $('owner-jump');
+    var g = who.owner;
+
+    /* «Sei il titolare?» in cima alla scheda: porta al riquadro in fondo e apre la richiesta */
+    function goToCard() {
+      var form = $('owner-new');
+      if (!form.hidden) form.open = true;
+      card.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+      var target = !form.hidden ? $('o-contatto') : (!$('owner-login').hidden ? $('owner-login-link') : $('owner-title'));
+      if (target === $('owner-title') && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
+      target.focus({ preventScroll: true });
+    }
+    if (jump) {
+      if (g && g.stato === 'approvato') {
+        jump.href = 'locali.html?id=' + encodeURIComponent(p.id);
+        jump.lastChild.textContent = ' Il tuo locale ';
+      } else {
+        jump.addEventListener('click', function (ev) { ev.preventDefault(); goToCard(); });
+      }
+    }
+    /* Arrivo da «Per i locali → Gestisci»: dopo un attimo (foto, recensioni e mappa spostano la scheda) */
+    if (params.get('gestisci')) setTimeout(goToCard, 600);
 
     if (!api.user()) {
       show($('owner-login'), true);
       $('owner-login-link').href = 'accedi.html?torna=' + encodeURIComponent(here());
-      if (params.get('gestisci')) setTimeout(function () { card.scrollIntoView({ block: 'start' }); }, 600);
       return;
     }
-    var g = who.owner;
     if (!g) {
       show($('owner-new'), true);
-      /* Arrivo da «Per i locali → Gestisci»: la richiesta è già aperta */
-      if (params.get('gestisci')) {
-        $('owner-new').open = true;
-        /* dopo un attimo: foto, recensioni e mappa caricati sopra spostano la scheda */
-        setTimeout(function () {
-          card.scrollIntoView({ block: 'start' });
-          $('o-ruolo').focus({ preventScroll: true });
-        }, 600);
-      }
     } else if (g.stato === 'approvato') {
       $('owner-title').textContent = 'Sei il gestore di questo luogo';
       $('owner-intro').textContent = 'Puoi rispondere alle recensioni qui sopra. Se qualcosa cambia (una rampa nuova, un bagno rifatto), proponi una correzione: la controlliamo e aggiorniamo la scheda.' +
@@ -680,7 +691,7 @@
       if (contatto.length < 5) errors.push({ input: f.contatto, text: 'Scrivi il telefono o l\'email del locale, così possiamo verificare.' });
       if (showErrors(form, errors)) return;
       busy(form, true, 'Invio…');
-      api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, contatto: contatto, nota: f.nota.value.trim() || null }).then(function () {
+      api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, contatto: contatto, nota: null }).then(function () {
         show($('owner-new'), false);
         message(note, 'Richiesta inviata. Ti contatteremo al recapito che hai indicato per confermare che gestisci il luogo.', 'ok');
         note.focus();
@@ -695,7 +706,7 @@
   var STATO_GESTORE = { 'in-attesa': 'Richiesta in attesa', approvato: 'Sei il gestore', respinto: 'Richiesta non approvata', revocato: 'Gestione revocata' };
   var STATO_VERIFICA = { 'in-attesa': 'Verifica richiesta: la stiamo organizzando', fissata: 'Verifica fissata', fatta: 'Verifica fatta', respinta: 'Verifica non possibile' };
 
-  /* Cerca il proprio locale tra le schede pubblicate → scheda con «Gestisci questo luogo?» già aperto */
+  /* Cerca il proprio locale tra le schede pubblicate → scheda con «Sei il titolare?» già aperto */
   function initFindPlace() {
     var input = $('find-q');
     var out = $('find-list');

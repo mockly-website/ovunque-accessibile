@@ -16,10 +16,10 @@
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=i1"></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p26">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p28">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="assets/js/oa-core.js?v=p24" defer></script>
+  <script src="assets/js/oa-core.js?v=p26" defer></script>
   <script src="assets/js/sito.js?v=p15" defer></script>
 </head>
 <body>
@@ -109,6 +109,13 @@
               </a>
             </div>
 
+            <section id="detail-summary" class="card detail__section summary" aria-labelledby="summary-title">
+              <h2 id="summary-title">In breve</h2>
+              <p id="summary-verdict" class="summary__verdict"></p>
+              <ul id="summary-list" class="summary__list" role="list"></ul>
+              <p class="summary__links"><a href="#come-ti-muovi">Cambia esigenza</a> · <a href="#facts-title">Tutte le misure</a></p>
+            </section>
+
             <section class="card detail__section" aria-labelledby="verdicts-title">
               <h2 id="verdicts-title">Accessibilità per esigenza</h2>
             <fieldset class="needs needs--compact" id="come-ti-muovi">
@@ -134,20 +141,28 @@
               <p id="detail-date" class="place__meta"></p>
             </section>
 
-            <section class="card detail__section" aria-labelledby="senses-title">
-              <h2 id="senses-title">Vista e udito</h2>
-              <p id="detail-senses-empty" class="place__meta" hidden>Ancora nessuna informazione per chi non vede o non sente bene (cane guida, Braille, LIS, anello magnetico…). Se le conosci, proponi una correzione.</p>
-              <dl id="detail-senses" class="facts"></dl>
-            </section>
-
-            <section class="card detail__section" aria-labelledby="extra-title">
-              <h2 id="extra-title">Altre informazioni</h2>
-              <dl id="detail-extra" class="facts"></dl>
-            </section>
-
-            <section id="detail-specific" class="card detail__section" aria-labelledby="detail-specific-title" hidden>
-              <h2 id="detail-specific-title">Dettagli</h2>
-              <dl id="detail-specific-list" class="facts"></dl>
+            <section class="card detail__section" aria-labelledby="more-info-title">
+              <h2 id="more-info-title">Altre informazioni</h2>
+              <p class="place__meta">Informazioni facoltative, raggruppate: apri quella che ti serve.</p>
+              <details id="more-senses" class="info-group">
+                <summary class="info-group__toggle"><h3 id="senses-title" class="info-group__title">Vista e udito</h3><span id="senses-count" class="info-group__count"></span></summary>
+                <div class="info-group__body">
+                  <p id="detail-senses-empty" class="place__meta" hidden>Ancora nessuna informazione per chi non vede o non sente bene (cane guida, Braille, LIS, anello magnetico…). Se le conosci, proponi una correzione.</p>
+                  <dl id="detail-senses" class="facts"></dl>
+                </div>
+              </details>
+              <details id="more-extra" class="info-group">
+                <summary class="info-group__toggle"><h3 id="extra-title" class="info-group__title">Porta, pavimento, parcheggio e assistenza</h3><span id="extra-count" class="info-group__count"></span></summary>
+                <div class="info-group__body">
+                  <dl id="detail-extra" class="facts"></dl>
+                </div>
+              </details>
+              <details id="detail-specific" class="info-group" hidden>
+                <summary class="info-group__toggle"><h3 id="detail-specific-title" class="info-group__title">Dettagli</h3><span id="specific-count" class="info-group__count"></span></summary>
+                <div class="info-group__body">
+                  <dl id="detail-specific-list" class="facts"></dl>
+                </div>
+              </details>
             </section>
           </div>
         </div>
