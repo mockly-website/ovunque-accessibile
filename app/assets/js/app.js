@@ -164,10 +164,7 @@
         ? 'Luoghi di esempio e account finti, salvati solo in questo browser'
         : 'Molti luoghi arrivano da OpenStreetMap e non sono ancora stati misurati';
     }
-    [].forEach.call(document.querySelectorAll('[data-account-link]'), function (a) {
-      a.querySelector('[data-account-label]').textContent = user ? 'Profilo' : 'Accedi';
-      a.href = user ? 'profilo.html' : 'accedi.html';
-    });
+    /* La scheda «Profilo» resta sempre «Profilo», come nelle app: senza accesso mostra «Accedi / Registrati» e le informazioni */
   }
 
   function syncNeeds() {

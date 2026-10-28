@@ -18,12 +18,12 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=i2"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p34">
-  <link rel="stylesheet" href="assets/css/app.css?v=a25">
+  <link rel="stylesheet" href="assets/css/app.css?v=a26">
   <script src="assets/js/config.js?v=a24" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=p30" defer></script>
   <script src="assets/js/api.js?v=a24" defer></script>
-  <script src="assets/js/app.js?v=a24" defer></script>
+  <script src="assets/js/app.js?v=a26" defer></script>
 </head>
 <body class="app" data-page="profilo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -58,6 +58,10 @@
     <symbol id="icon-download" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></symbol>
     <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
     <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
+    <symbol id="icon-store" viewBox="0 0 24 24"><path d="M21.9 8.89l-1.05-4.37c-.22-.9-1-1.52-1.91-1.52H5.05c-.9 0-1.69.63-1.9 1.52L2.1 8.89c-.24 1.02-.02 2.06.62 2.88.08.11.19.19.28.29V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-6.94c.09-.09.2-.18.28-.28.64-.82.87-1.87.62-2.89zM13 5h1.96l.54 4.52c.05.39-.07.78-.33 1.07-.22.26-.54.41-.95.41-.67 0-1.22-.59-1.22-1.31V5zM8.49 9.52L9.04 5H11v4.69c0 .72-.55 1.31-1.29 1.31-.34 0-.65-.15-.89-.41-.25-.29-.37-.68-.33-1.07zM5 19v-6.03c.08.01.15.03.23.03.87 0 1.66-.36 2.24-.95.6.6 1.4.95 2.31.95.87 0 1.65-.36 2.23-.93.59.57 1.39.93 2.29.93.84 0 1.64-.35 2.24-.95.58.59 1.37.95 2.24.95.08 0 .15-.02.23-.03V19H5z"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></symbol>
   </svg>
 
   <ul class="skip-links">
@@ -97,17 +101,13 @@
         <h1 id="profile-title">Il tuo profilo</h1>
         <p id="activity-note" class="notice" role="status" tabindex="-1" hidden></p>
 
-        <section id="mod-card" class="card card--accent" aria-labelledby="mod-card-title" hidden>
-          <h2 id="mod-card-title" class="h3">Moderazione</h2>
-          <p>Controlla le segnalazioni e le recensioni in attesa.</p>
-          <a class="btn btn--primary btn--small" href="moderazione.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg>Apri il pannello</a>
-        </section>
-
-        <section class="card" aria-labelledby="locali-card-title">
-          <h2 id="locali-card-title" class="h3">Hai un locale o un negozio?</h2>
-          <p>Gestisci la scheda, chiedi la verifica sul posto e stampa il bollino per la vetrina.</p>
-          <a class="btn btn--secondary btn--small" href="locali.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg>Per i locali</a>
-        </section>
+        <nav aria-labelledby="shortcut-title">
+          <h2 id="shortcut-title" class="menu-list__heading">Collegamenti</h2>
+          <ul class="menu-list" role="list">
+            <li id="mod-card" hidden><a class="menu-list__link" href="moderazione.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Moderazione</span><span class="menu-list__sub">Segnalazioni e recensioni in attesa</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+            <li><a class="menu-list__link" href="locali.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Hai un locale o un negozio?</span><span class="menu-list__sub">Gestisci la scheda, verifica sul posto, bollino</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+          </ul>
+        </nav>
 
         <section class="card" aria-labelledby="needs-title">
           <h2 id="needs-title" class="visually-hidden">La tua esigenza</h2>
@@ -184,6 +184,17 @@
         </section>
       </div>
 
+      <nav class="profile-info" aria-labelledby="info-title">
+        <h2 id="info-title" class="menu-list__heading">Informazioni</h2>
+        <ul class="menu-list" role="list">
+          <li class="profile-info__guest"><a class="menu-list__link" href="locali.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Per i locali</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+          <li><a class="menu-list__link" href="privacy.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lock"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Privacy dell'app</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+          <li><a class="menu-list__link" href="../"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-home"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Il sito</span><span class="menu-list__sub">Come funziona, chi siamo</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+          <li><a class="menu-list__link" href="mailto:ovunqueaccessibile@gmail.com"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mail"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Scrivici</span><span class="menu-list__sub">ovunqueaccessibile@gmail.com</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+        </ul>
+        <p class="profile-info__credits">© 2026 Ovunque Accessibile · Realizzata da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></p>
+      </nav>
+
       <dialog id="delete-dialog" class="dialog" aria-labelledby="delete-title">
         <form id="delete-form" class="stack" novalidate>
           <h2 id="delete-title">Eliminare l'account?</h2>
@@ -201,37 +212,5 @@
     </div>
   </main>
 
-  <footer class="site-footer">
-    <div class="container site-footer__grid">
-      <div class="site-footer__about">
-        <a class="site-footer__brand" href="./">
-          <img src="../assets/img/logo.webp" alt="" width="180" height="225" loading="lazy">
-          <span>Ovunque Accessibile</span>
-        </a>
-        <p>Cerca i luoghi accessibili, segnala quelli che conosci, salva i tuoi preferiti.</p>
-      </div>
-      <nav class="site-footer__col" aria-labelledby="footer-esplora">
-        <h2 class="site-footer__title" id="footer-esplora">Nell'app</h2>
-        <ul role="list">
-          <li><a href="index.html">Mappa dei luoghi</a></li>
-          <li><a href="segnala.html">Segnala un luogo</a></li>
-          <li><a href="profilo.html" aria-current="page">Il tuo profilo</a></li>
-          <li><a href="locali.html">Per i locali</a></li>
-          <li><a href="../">Il sito</a></li>
-        </ul>
-      </nav>
-      <div class="site-footer__col">
-        <h2 class="site-footer__title">Contatti</h2>
-        <ul role="list">
-          <li><a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a></li>
-        </ul>
-      </div>
-    </div>
-    <div class="container site-footer__bottom">
-      <span>© 2026 Ovunque Accessibile</span>
-      <a href="privacy.html">Privacy dell'app</a>
-      <span>Realizzata da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
-    </div>
-  </footer>
 </body>
 </html>

@@ -2,7 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali · 14. Ricerca del locale e completezza · 15. Luoghi OSM da approvare · 16. Intestazione
+           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali · 14. Ricerca del locale e completezza · 15. Luoghi OSM da approvare · 16. Intestazione · 17. Aspetto da app
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -1564,10 +1564,328 @@ textarea.input {
   padding-left: calc(1.5rem + var(--space-sm));
 }
 
-/* 17. Piè di pagina sul telefono: la fascia blu arriva fino in fondo, sotto la barra che galleggia */
+/* 17. Aspetto da app (28 ottobre, sera): niente piè di pagina (privacy, sito e contatti stanno nel Profilo),
+   barra in alto fissa e traslucida, barra delle schede attaccata al fondo come su iPhone e Android,
+   fondo grigio caldo con schede bianche, elenchi «impostazioni» nel profilo */
+.app {
+  --app-bg: #f3eee5;            /* testo blu 13:1, grigio del testo secondario 6,6:1 */
+  background: var(--app-bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+html:has(> body.app) {
+  scroll-padding-top: 4.5rem;   /* il focus non finisce sotto la barra in alto (WCAG 2.4.11) */
+}
+
+.app .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  padding-top: env(safe-area-inset-top);
+  background: rgba(251, 246, 236, 0.97);   /* niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
+  box-shadow: 0 1px 0 var(--color-line);
+}
+
+.app .site-header__inner {
+  min-height: 3.5rem;
+  padding-block: 0.35rem;
+}
+
+.app .brand__logo {
+  width: 1.9rem;
+}
+
+.app main:not(.explore) {
+  padding-top: var(--space-md);
+}
+
+.app main h1 {
+  margin-bottom: var(--space-xs);
+  font-size: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+}
+
+.app .card {
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--color-white);
+  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
+}
+
+.app .card--accent {
+  background: var(--color-sky);
+}
+
+.app .needs,
+.app .place,
+.app .filters__more {
+  border-color: transparent;
+  background: var(--color-white);
+}
+
+.app .input,
+.app .select {
+  min-height: 3rem;
+  background-color: var(--color-white);
+}
+
+/* Elenchi tipo «Impostazioni»: icona, titolo, riga secondaria, freccia */
+.menu-list__heading {
+  margin: var(--space-lg) var(--space-sm) var(--space-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.menu-list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: var(--color-white);
+  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
+  list-style: none;
+}
+
+.menu-list > li:not([hidden]) ~ li {
+  border-top: 1px solid var(--color-line);
+}
+
+.menu-list__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 3.5rem;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-navy);
+  text-decoration: none;
+}
+
+.menu-list__link:hover {
+  background: var(--color-card);
+}
+
+.menu-list__link:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+.menu-list__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.7rem;
+  background: var(--color-sky);
+}
+
+.menu-list__icon .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  fill: var(--color-brand);
+}
+
+.menu-list__text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.menu-list__title {
+  font-weight: 700;
+}
+
+.menu-list__sub {
+  font-size: 0.9375rem;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.menu-list__chevron {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: var(--color-muted);
+  transform: rotate(-90deg);
+}
+
+/* «La tua esigenza» dentro una scheda: niente seconda scheda dentro la prima */
+.app .card > .needs {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+#profile-main .menu-list__heading {
+  margin-top: 0;
+}
+
+.profile-info {
+  margin-top: var(--space-xl);
+}
+
+#profile-main:not([hidden]) ~ .profile-info .profile-info__guest {
+  display: none;
+}
+
+.profile-info__credits {
+  margin: var(--space-md) var(--space-sm) 0;
+  font-size: 0.9375rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+/* Telefono: barra delle schede attaccata al fondo, voce attiva con la «pillola» dietro l'icona */
 @media (max-width: 47.99em) {
-  .app .site-footer {
-    margin-bottom: calc(-5.5rem - env(safe-area-inset-bottom));
-    padding-bottom: calc(var(--space-md) + 5.5rem + env(safe-area-inset-bottom));
+  .app {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
+
+  html:has(> body.app) {
+    scroll-padding-bottom: 5.5rem;
+  }
+
+  .app-nav {
+    inset: auto 0 0;
+    padding: 0.25rem var(--space-xs) env(safe-area-inset-bottom);
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: none;
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+  }
+
+  .app-nav__link {
+    gap: 0.15rem;
+    min-height: 3.5rem;
+    padding: 0.2rem 0;
+    border-radius: var(--radius-md);
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .app-nav__link .icon {
+    box-sizing: content-box;
+    width: 1.4rem;
+    height: 1.4rem;
+    padding: 0.2rem 1rem;
+    border-radius: var(--radius-pill);
+    fill: currentColor;
+    transition: background-color 0.2s ease;
+  }
+
+  .app-nav__link:hover {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app-nav__link[aria-current="page"] {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app-nav__link[aria-current="page"] .icon {
+    background: var(--color-sky);
+    fill: var(--color-brand);
+  }
+
+  .app-nav__link:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .app .card {
+    padding: var(--space-md);
+  }
+
+  /* Il pulsante principale dei moduli occupa tutta la riga, come nelle app */
+  .app form > .btn--primary[type="submit"] {
+    width: 100%;
+  }
+
+  .app .explore .map {
+    height: max(22rem, calc(100svh - 16rem));
+  }
+
+  /* Percorso → «‹ Mappa dei luoghi», come il tasto indietro delle app */
+  .app .crumbs li:last-child {
+    display: none;
+  }
+
+  .app .crumbs a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    min-height: var(--target-min);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .app .crumbs a::before {
+    content: "";
+    width: 0.6rem;
+    height: 0.6rem;
+    border-left: 2.5px solid currentColor;
+    border-bottom: 2.5px solid currentColor;
+    transform: rotate(45deg);
+    margin-right: 0.2rem;
+  }
+
+  /* Scheda: indicazioni a tutta riga, poi tre riquadri (preferiti, titolare, correzione) */
+  .app .detail__actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-xs);
+  }
+
+  .app .detail__actions .directions {
+    grid-column: 1 / -1;
+  }
+
+  .app .detail__actions .directions > .btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .app .detail__actions > .btn {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 4.5rem;
+    padding: var(--space-xs) 0.25rem;
+    border: 0;
+    border-radius: var(--radius-md);
+    background: var(--color-white);
+    box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
+    font-size: 0.875rem;
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+
+  .app .detail__actions > .btn .icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--color-brand);
+  }
+
+  .app .detail__actions > .btn[aria-pressed="true"] {
+    background: var(--color-sky);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav__link .icon {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .app-nav__link[aria-current="page"] .icon {
+    outline: 2px solid CanvasText;
   }
 }
