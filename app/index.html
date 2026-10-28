@@ -18,16 +18,16 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
-  <script src="../assets/js/intro.js?v=i3"></script>
+  <script src="../assets/js/intro.js?v=i4"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p36">
-  <link rel="stylesheet" href="assets/css/app.css?v=a31">
+  <link rel="stylesheet" href="assets/css/app.css?v=a32">
   <script src="assets/js/config.js?v=a24" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="../assets/js/oa-core.js?v=p30" defer></script>
   <script src="assets/js/api.js?v=a24" defer></script>
-  <script src="assets/js/app.js?v=a30" defer></script>
+  <script src="assets/js/app.js?v=a32" defer></script>
 </head>
 <body class="app" data-page="mappa">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -63,6 +63,9 @@
     <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
     <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></symbol>
     <symbol id="icon-list" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></symbol>
+    <symbol id="icon-tab-map" viewBox="0 0 24 24"><path d="M9 4.6 3.6 6.7v12.8L9 17.4l6 2.1 5.4-2.1V4.6L15 6.7 9 4.6z"/><path d="M9 4.6v12.8M15 6.7v12.8"/></symbol>
+    <symbol id="icon-tab-plus" viewBox="0 0 24 24"><path d="M12 5.5v13M5.5 12h13"/></symbol>
+    <symbol id="icon-tab-user" viewBox="0 0 24 24"><circle cx="12" cy="8.3" r="3.9"/><path d="M4.6 20.2c.9-3.7 3.9-5.9 7.4-5.9s6.5 2.2 7.4 5.9z"/></symbol>
   </svg>
 
   <ul class="skip-links">
@@ -80,9 +83,9 @@
       <span class="beta" id="mode-banner">Versione di prova</span>
       <nav class="app-nav" aria-label="App">
         <ul class="app-nav__list" role="list">
-          <li><a class="app-nav__link" href="./" aria-current="page"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg><span>Mappa</span></a></li>
-          <li><a class="app-nav__link" href="segnala.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg><span>Segnala</span></a></li>
-          <li><a class="app-nav__link" href="profilo.html" data-account-link><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-user"/></svg><span data-account-label>Profilo</span></a></li>
+          <li><a class="app-nav__link" href="./" aria-current="page"><span class="app-nav__pill" aria-hidden="true"></span><svg class="icon icon--tab" aria-hidden="true" focusable="false"><use href="#icon-tab-map"/></svg><span>Mappa</span></a></li>
+          <li><a class="app-nav__link" href="segnala.html"><span class="app-nav__pill" aria-hidden="true"></span><svg class="icon icon--tab" aria-hidden="true" focusable="false"><use href="#icon-tab-plus"/></svg><span>Segnala</span></a></li>
+          <li><a class="app-nav__link" href="profilo.html" data-account-link><span class="app-nav__pill" aria-hidden="true"></span><svg class="icon icon--tab" aria-hidden="true" focusable="false"><use href="#icon-tab-user"/></svg><span data-account-label>Profilo</span></a></li>
         </ul>
       </nav>
     </div>

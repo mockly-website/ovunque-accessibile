@@ -184,6 +184,74 @@
     segnala: initSegnala, profilo: initProfilo, moderazione: initModerazione, bollino: initBollino, locali: initLocali
   };
 
+  /* Barra delle schede: la pillola scivola dalla scheda di prima a questa e l'icona fa un piccolo salto.
+     Tra una pagina e l'altra il contenuto entra dal lato giusto (a destra se si va verso Profilo, a sinistra verso
+     Mappa: classi vt-avanti / vt-indietro su <html>, vedi intro.js e app.css sezione 22) e sotto la barra in alto
+     scorre una linea finché la pagina nuova non arriva. Con «riduci movimento» niente di tutto questo. */
+  var CALMO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function tabIndex(links) {
+    for (var i = 0; i < links.length; i++) {
+      if (links[i].getAttribute('aria-current') === 'page' || links[i].classList.contains('is-section')) return i;
+    }
+    return -1;
+  }
+
+  function initTabBar() {
+    var links = [].slice.call(document.querySelectorAll('.app-nav__link'));
+    var cur = tabIndex(links);
+    var prev = -1;
+    try {
+      prev = Number(sessionStorage.getItem('oa-scheda') || -1);
+      sessionStorage.setItem('oa-scheda', String(cur));
+    } catch (e) { /* senza sessionStorage niente animazione */ }
+
+    links.forEach(function (a, i) {
+      a.addEventListener('click', function () {
+        if (i === cur || cur < 0) return;
+        try { sessionStorage.setItem('oa-verso', i > cur ? 'avanti' : 'indietro'); } catch (e) { /* niente */ }
+      });
+    });
+
+    if (CALMO || cur < 0 || prev < 0 || prev === cur || !links[prev] || !Element.prototype.animate ||
+        !matchMedia('(max-width: 63.99em)').matches) return;
+    var from = links[prev].getBoundingClientRect();
+    var to = links[cur].getBoundingClientRect();
+    var dx = (from.left + from.width / 2) - (to.left + to.width / 2);
+    var ease = 'cubic-bezier(.2, .8, .2, 1)';
+    var pill = links[cur].querySelector('.app-nav__pill');
+    if (pill && getComputedStyle(pill).display !== 'none') {
+      pill.animate([{ transform: 'translateX(' + dx + 'px) scaleX(.7)', opacity: 0.5 }, { transform: 'none', opacity: 1 }],
+        { duration: 450, easing: ease });
+    }
+    var ic = links[cur].querySelector('.icon');
+    if (ic) {
+      ic.animate([{ transform: 'translateY(4px) scale(.8)' }, { transform: 'translateY(-3px) scale(1.08)', offset: 0.6 }, { transform: 'none' }],
+        { duration: 480, easing: ease });
+    }
+  }
+
+  /* Linea sotto la barra in alto mentre si va a un'altra pagina dell'app */
+  function initPageLine() {
+    document.addEventListener('click', function (ev) {
+      var a = ev.target.closest && ev.target.closest('a[href]');
+      if (!a || ev.defaultPrevented || ev.button !== 0 || ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+      if (a.target === '_blank' || a.hasAttribute('download') || a.origin !== location.origin) return;
+      if (a.pathname === location.pathname && a.search === location.search) return;   /* solo un'ancora */
+      document.documentElement.classList.add('oa-va');
+    });
+    window.addEventListener('pageshow', function () { document.documentElement.classList.remove('oa-va'); });
+    /* Pagina che se ne va: la stessa direzione anche per la vecchia */
+    window.addEventListener('pageswap', function (e) {
+      var verso = null;
+      try { verso = sessionStorage.getItem('oa-verso'); } catch (err) { /* niente */ }
+      if (e.viewTransition && verso) document.documentElement.classList.add('vt-' + verso);
+    });
+  }
+
+  initTabBar();
+  initPageLine();
+
   api.ready.then(syncNeeds).then(function () {
     updateChrome();
     api.onAuth(updateChrome);

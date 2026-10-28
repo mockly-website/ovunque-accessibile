@@ -2398,3 +2398,171 @@ html:has(> body.app) {
     width: 100%;
   }
 }
+
+/* 22. Icone della barra e movimento tra le schede (28 ottobre, notte).
+   Icone a contorno; la scheda attiva ha l'icona piena (riempimento leggero) sopra la pillola azzurra.
+   «is-section»: la scheda di cui fa parte la pagina (scheda di un luogo → Mappa; Per i locali e privacy → Profilo).
+   La pillola è un elemento vero (.app-nav__pill) perché app.js la fa scivolare dalla scheda di prima. */
+.app .app-nav .icon--tab {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.app-nav__pill {
+  display: none;
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav__link::before {
+    display: none;
+  }
+
+  .app .app-nav__pill {
+    display: block;
+    position: absolute;
+    top: 0.15rem;
+    left: 50%;
+    width: 3.75rem;
+    height: 2rem;
+    margin-left: -1.875rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-sky);
+    opacity: 0;
+    transform: scale(0.6);
+    transition: opacity 0.2s ease, transform 0.3s var(--ease-out);
+  }
+
+  .app .app-nav__link[aria-current="page"] .app-nav__pill,
+  .app .app-nav__link.is-section .app-nav__pill {
+    opacity: 1;
+    transform: none;
+  }
+
+  .app .app-nav__link.is-section {
+    color: var(--color-navy);
+  }
+
+  .app .app-nav__link[aria-current="page"] .icon--tab,
+  .app .app-nav__link.is-section .icon--tab {
+    fill: var(--color-brand);
+    fill-opacity: 0.2;
+    stroke: var(--color-brand);
+    stroke-width: 2.1;
+  }
+
+  /* «Segnala»: il «+» bianco nel cerchio blu */
+  .app .app-nav__link[href="segnala.html"] .app-nav__pill {
+    display: none;
+  }
+
+  .app .app-nav__link[href="segnala.html"] .icon--tab,
+  .app .app-nav__link[href="segnala.html"][aria-current="page"] .icon--tab {
+    fill: none;
+    stroke: var(--color-white);
+    stroke-width: 2.6;
+  }
+
+  .app .app-nav__link[href="segnala.html"]:hover .icon--tab {
+    background: var(--color-brand);
+  }
+}
+
+/* Pagina nuova che entra dal lato della scheda scelta (classi messe da intro.js e app.js) */
+.vt-avanti::view-transition-old(root) {
+  animation: oa-esce-sinistra 0.22s ease-in both;
+}
+
+.vt-avanti::view-transition-new(root) {
+  animation: oa-entra-destra 0.32s var(--ease-out) both;
+}
+
+.vt-indietro::view-transition-old(root) {
+  animation: oa-esce-destra 0.22s ease-in both;
+}
+
+.vt-indietro::view-transition-new(root) {
+  animation: oa-entra-sinistra 0.32s var(--ease-out) both;
+}
+
+@keyframes oa-entra-destra {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes oa-entra-sinistra {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes oa-esce-sinistra {
+  to {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes oa-esce-destra {
+  to {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+/* In alto: una linea blu scorre sotto la barra mentre arriva la pagina nuova */
+.oa-va .app .site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-brand);
+  animation: oa-linea 2.5s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes oa-linea {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 88%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app .app-nav__pill {
+    transition: none;
+  }
+
+  .oa-va .app .site-header::after {
+    animation: none;
+    width: 100%;
+    opacity: 0.6;
+  }
+
+  .vt-avanti::view-transition-old(root),
+  .vt-avanti::view-transition-new(root),
+  .vt-indietro::view-transition-old(root),
+  .vt-indietro::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .app .app-nav__link[aria-current="page"] .app-nav__pill,
+  .app .app-nav__link.is-section .app-nav__pill {
+    background: Highlight;
+  }
+
+  .app .app-nav .icon--tab {
+    stroke: CanvasText;
+  }
+}

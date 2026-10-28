@@ -7,6 +7,20 @@
   var root = document.documentElement;
   /* Subito, prima che la pagina si disegni: con JavaScript il menu del sito sul telefono parte chiuso (menu.js) */
   root.classList.add('js');
+  /* App: la pagina nuova entra dal lato della scheda scelta (app.js salva «oa-verso» al tocco sulla barra).
+     Va fatto qui, prima del primo disegno: «pagereveal» arriva prima degli script con defer. */
+  if (/\/app\//.test(location.pathname) && 'onpagereveal' in window) {
+    window.addEventListener('pagereveal', function (e) {
+      var verso = null;
+      try {
+        verso = sessionStorage.getItem('oa-verso');
+        sessionStorage.removeItem('oa-verso');
+      } catch (err) { return; }
+      if (!e.viewTransition || !verso) return;
+      root.classList.add('vt-' + verso);
+      e.viewTransition.finished.then(function () { root.classList.remove('vt-' + verso); });
+    });
+  }
   var key = 'oa-intro-' + (/\/app\//.test(location.pathname) ? 'app' : 'sito');
   try {
     if (sessionStorage.getItem(key)) return;
