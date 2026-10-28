@@ -150,6 +150,7 @@
 
   /* ---------- 3. Avvio comune ---------- */
   OA.config.loadPlaces = api.listPlaces;
+  OA.config.loadPlace = api.getPlace;
   OA.config.reportHref = function (p) { return 'segnala.html?id=' + encodeURIComponent(p.id); };
   OA.config.onDetail = initDetailExtras;
 
@@ -157,9 +158,11 @@
     var user = api.user();
     var banner = $('mode-banner');
     if (banner) {
-      banner.textContent = api.mode === 'prova'
-        ? 'Modalità prova: luoghi di esempio e account finti, salvati solo in questo browser.'
-        : 'Versione di prova dell\'app: molti luoghi arrivano da OpenStreetMap e sono ancora da verificare.';
+      /* Etichetta breve accanto al logo; la spiegazione completa è nel tooltip e nella pagina «Per i locali» / privacy */
+      banner.textContent = api.mode === 'prova' ? 'Modalità prova' : 'Versione di prova';
+      banner.title = api.mode === 'prova'
+        ? 'Luoghi di esempio e account finti, salvati solo in questo browser'
+        : 'Molti luoghi arrivano da OpenStreetMap e non sono ancora stati misurati';
     }
     [].forEach.call(document.querySelectorAll('[data-account-link]'), function (a) {
       a.querySelector('[data-account-label]').textContent = user ? 'Profilo' : 'Accedi';
@@ -252,8 +255,10 @@
       if (!f.privacy.checked) errors.push({ input: f.privacy, text: 'Per registrarti devi aver letto la privacy dell\'app.' });
       if (showErrors(form, errors)) return;
       busy(form, true, 'Registrazione in corso…');
-      api.signUp({ nome: nome, email: f.email.value.trim(), password: f.password.value }).then(function (res) {
-        if (!res.confirm) return afterLogin();
+      /* «Ho un locale»: dopo l'accesso (subito o dal link di conferma) si arriva a «Per i locali» */
+      var torna = f.locale.checked ? 'locali.html' : safeReturn(params.get('torna'));
+      api.signUp({ nome: nome, email: f.email.value.trim(), password: f.password.value, torna: torna }).then(function (res) {
+        if (!res.confirm) return location.replace(torna || 'profilo.html');
         show(form, false);
         $('signup-email').textContent = f.email.value.trim();
         show($('signup-done'), true);

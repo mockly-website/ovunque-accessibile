@@ -270,6 +270,13 @@
   /* Giudizio per esigenza: ✓ se tutte le voci sono ✓ (le "non previste" non contano); – negli altri casi.
      Muoversi: ✕ se ingresso o spazi sono ✕; ? se manca l'ingresso.
      Vista e udito: ? se non si sa ancora niente; ✕ (vista) se i cani guida non sono ammessi. */
+  /* Luoghi da OpenStreetMap ancora senza misure: il giudizio per chi si muove viene dal tag wheelchair
+     (yes → accessibile, limited → in parte). Per vista e udito OpenStreetMap non dice niente. */
+  var OSM_GIUDIZIO = { yes: 'si', limited: 'parziale', no: 'no' };
+  function soloOsm(p) {
+    return !!(p.osm && p.verifica && p.verifica.livello === 'osm' && p.misure.ingresso.gradini == null && p.misure.ingresso.rampa == null);
+  }
+
   var cacheGiudizi = {};
   function giudizio(p, e) {
     var k = p.id + '|' + e;
@@ -282,6 +289,7 @@
     else if (stati.ingresso === 'no' || stati.spazi === 'no' || stati.cane === 'no') g = 'no';
     else if (tutte.every(function (k2) { return stati[k2] === 'si' || stati[k2] === 'np'; })) g = 'si';
     else g = 'parziale';
+    if (g === 'nv' && !ESIGENZE[e].sensi && soloOsm(p) && OSM_GIUDIZIO[p.osm.wheelchair]) g = OSM_GIUDIZIO[p.osm.wheelchair];
     cacheGiudizi[k] = g;
     return g;
   }
@@ -301,10 +309,11 @@
     return { note: VOCI.length - mancano.length, totale: VOCI.length, mancano: mancano };
   }
 
-  /* Ovunque Accessibile mostra solo luoghi accessibili, almeno in parte: chi ha un'esigenza per cui il luogo
-     è «non accessibile» non lo vede su mappa ed elenchi (la scheda resta raggiungibile con il suo link) */
+  /* Ovunque Accessibile mostra su mappa ed elenchi solo luoghi accessibili o accessibili in parte per l'esigenza
+     scelta: né «non accessibili» né «da verificare» (la scheda resta raggiungibile con il suo link) */
   function visibile(p, e) {
-    return giudizio(p, e) !== 'no';
+    var g = giudizio(p, e);
+    return g === 'si' || g === 'parziale';
   }
 
   /* Filtri della pagina mappa, calcolati per l'esigenza scelta (per vista e udito: ingresso e bagno
@@ -314,8 +323,8 @@
   }
   var FILTRI = {
     accessibile: function (p, e) { return giudizio(p, e) === 'si'; },
-    ingresso: function (p, e) { return valutaIngresso(p.misure.ingresso, fisica(e))[0] === 'si'; },
-    bagno: function (p, e) { return valutaBagno(p.misure.bagno, fisica(e))[0] === 'si'; },
+    ingresso: function (p, e) { return soloOsm(p) ? p.osm.wheelchair === 'yes' : valutaIngresso(p.misure.ingresso, fisica(e))[0] === 'si'; },
+    bagno: function (p, e) { return soloOsm(p) ? p.osm.toilets_wheelchair === 'yes' : valutaBagno(p.misure.bagno, fisica(e))[0] === 'si'; },
     parcheggio: function (p) { return !!(p.facoltativi && p.facoltativi.parcheggio && p.facoltativi.parcheggio.posti); }
   };
 
@@ -430,6 +439,12 @@
     return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
   }
 
+  /* Un solo luogo (scheda): se sito o app sanno chiederlo al database, non si scaricano tutti */
+  function loadPlace(id) {
+    if (config.loadPlace) return config.loadPlace(id);
+    return loadPlaces().then(function (places) { return places.filter(function (x) { return x.id === id; })[0] || null; });
+  }
+
   function loadPlaces() {
     if (config.loadPlaces) return config.loadPlaces();
     return fetch(DATA_URL, { credentials: 'omit' })
@@ -464,7 +479,7 @@
   function verificaNode(p) {
     var v = verifica(p);
     if (p.stato === 'in-revisione') return el('span', { className: 'trust trust--old' }, [icon('#icon-clock'), el('span', { text: 'Scheda in revisione' })]);
-    if (v.livello === 'osm') return el('span', { className: 'trust trust--old' }, [icon('#icon-map'), el('span', { text: 'Da OpenStreetMap: da verificare' })]);
+    if (v.livello === 'osm') return el('span', { className: 'trust trust--old' }, [icon('#icon-map'), el('span', { text: 'Secondo OpenStreetMap, non ancora misurato' })]);
     if (v.scaduta) return el('span', { className: 'trust trust--old' }, [icon('#icon-clock'), el('span', { text: 'Da ricontrollare' })]);
     if (v.livello === 'sul-posto') return el('span', { className: 'trust trust--onsite' }, [icon('#icon-shield'), el('span', { text: 'Verificato sul posto' })]);
     return el('span', { className: 'trust' }, [icon('#icon-people'), el('span', { text: 'Segnalato dalla community' })]);
@@ -494,7 +509,18 @@
     return km < 1 ? 'a ' + Math.max(10, Math.round(km * 100) * 10) + ' m' : 'a ' + (km < 10 ? km.toFixed(1).replace('.', ',') : Math.round(km)) + ' km';
   }
 
+  /* Cosa dice OpenStreetMap, per i luoghi senza misure: [stato, testo] */
+  var OSM_STATO = { yes: ['si', 'sì'], limited: ['parziale', 'in parte'], no: ['no', 'no'] };
+  function osmFatti(p) {
+    var a = OSM_STATO[p.osm.wheelchair] || ['nv', 'non indicato'];
+    var b = OSM_STATO[p.osm.toilets_wheelchair] || ['nv', 'non indicato'];
+    return [[a[0], 'In carrozzina: ' + a[1]], [b[0], 'Bagno accessibile: ' + b[1]]];
+  }
+
   function featuresNode(p, e, className) {
+    if (soloOsm(p) && !ESIGENZE[e].sensi) {
+      return el('span', { className: className }, osmFatti(p).map(function (f) { return statusNode(f, 'Secondo OpenStreetMap'); }));
+    }
     return el('span', { className: className }, ESIGENZE[e].card.map(function (k) {
       var v = voce(k);
       return statusNode(v.valuta(p, e), v.nome);
@@ -827,8 +853,10 @@
       list.textContent = '';
       if (!found.length) {
         list.appendChild(el('li', { className: 'empty' }, [
-          el('p', { text: 'Nessun luogo corrisponde alla ricerca.' }),
-          el('p', { text: 'Prova a togliere qualche filtro o a cercare un\'altra città.' })
+          el('p', { text: 'Nessun luogo accessibile corrisponde alla ricerca.' }),
+          el('p', { text: ESIGENZE[e].sensi
+            ? 'Per chi non vede o non sente bene abbiamo ancora poche informazioni: se conosci un luogo con Braille, LIS, percorsi tattili o anello magnetico, segnalalo dall\'app.'
+            : 'Prova a togliere qualche filtro o a cercare un\'altra città.' })
         ]));
       } else {
         found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null, origin ? km[p.id] : null)); });
@@ -1054,11 +1082,12 @@
     verdict.appendChild(icon(ICONA_STATO[g]));
     verdict.appendChild(el('span', {}, [
       el('strong', { text: GIUDIZIO[g] }),
-      el('span', { className: 'summary__who', text: ' per ' + ESIGENZE[e].nome.toLowerCase() + (esigenzaCorrente ? '' : ' (scegli la tua esigenza qui sotto)') })
+      el('span', { className: 'summary__who', text: ' per ' + ESIGENZE[e].nome.toLowerCase() +
+        (soloOsm(p) && g !== 'nv' ? ', secondo OpenStreetMap' : '') + (esigenzaCorrente ? '' : ' (scegli la tua esigenza qui sotto)') })
     ]));
     box.textContent = '';
     /* Luoghi da OpenStreetMap ancora senza misure: in evidenza cosa dice la mappa, invece di quattro «da verificare» */
-    if (p.osm && verifica(p).livello === 'osm' && giudizio(p, e) === 'nv') {
+    if (soloOsm(p)) {
       var OSM_TXT = { yes: ['si', 'Sì, secondo OpenStreetMap'], limited: ['parziale', 'In parte, secondo OpenStreetMap'], no: ['no', 'No, secondo OpenStreetMap'] };
       [['Accesso in carrozzina', p.osm.wheelchair], ['Bagno accessibile', p.osm.toilets_wheelchair]].forEach(function (r) {
         var st = OSM_TXT[r[1]] || ['nv', 'Non indicato'];
@@ -1215,8 +1244,7 @@
     if (!root) return;
     var id = new URLSearchParams(location.search).get('id');
 
-    loadPlaces().then(function (places) {
-      var p = places.filter(function (x) { return x.id === id; })[0];
+    loadPlace(id).then(function (p) {
       if (!p) {
         document.getElementById('detail-title').textContent = 'Luogo non trovato';
         document.getElementById('detail-intro').textContent = 'Il luogo che cerchi non esiste o è stato rimosso.';

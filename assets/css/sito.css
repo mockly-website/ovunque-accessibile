@@ -822,24 +822,124 @@ html:not(.js) .js-only {
   }
 }
 
+/* Piè di pagina (28 ottobre): fascia blu con logo, «Esplora», «Contatti» e una riga finale.
+   Su fondo blu link e focus diventano chiari (contrasto beige su blu 10:1) */
 .site-footer {
   margin-top: var(--space-3xl);
-  padding-block: var(--space-xl);
-  border-top: 1px solid var(--color-line);
+  padding-block: var(--space-2xl) var(--space-md);
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--color-navy);
+  color: var(--color-white);
   font-size: var(--text-sm);
 }
 
-.site-footer__inner {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 0 var(--space-lg);
-  text-align: center;
+.site-footer a {
+  color: var(--color-beige);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
 }
 
-.site-footer__inner a,
-.site-footer__inner > span {
+.site-footer a:hover {
+  color: var(--color-white);
+  text-decoration-thickness: 2px;
+}
+
+.site-footer a:focus-visible {
+  outline: 3px solid var(--color-white);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.site-footer a[aria-current="page"] {
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.site-footer__grid {
+  display: grid;
+  gap: var(--space-xl);
+}
+
+@media (min-width: 48em) {
+  .site-footer__grid {
+    grid-template-columns: 1.4fr 1fr 1fr;
+  }
+}
+
+.site-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: var(--target-min);
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: var(--font-heading-weight);
+  text-decoration: none;
+}
+
+.site-footer .site-footer__brand {
+  color: var(--color-white);
+}
+
+.site-footer__brand img {
+  width: 2.75rem;
+  height: auto;
+  padding: 0.3rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-white);
+}
+
+.site-footer__about p {
+  max-width: 34ch;
+  margin: var(--space-sm) 0 0;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.site-footer__title {
+  margin: 0 0 var(--space-xs);
+  font-size: var(--text-base);
+  color: var(--color-white);
+}
+
+.site-footer__col ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Telefono: i link vanno uno accanto all'altro, così il piè di pagina resta corto */
+@media (max-width: 47.99em) {
+  .site-footer__grid {
+    gap: var(--space-lg);
+  }
+
+  .site-footer__col ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--space-lg);
+  }
+}
+
+.site-footer__col a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--target-min);
+  overflow-wrap: anywhere;
+}
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0 var(--space-lg);
+  margin-top: var(--space-xl);
+  padding-top: var(--space-sm);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.site-footer__bottom > a,
+.site-footer__bottom > span {
   display: inline-flex;
   align-items: center;
   gap: 0.3em;
@@ -2607,5 +2707,173 @@ html:not(.js) .js-only {
 
   .explore .filters {
     gap: var(--space-xs);
+  }
+}
+
+/* Telefoni stretti: tre tessere per riga tagliavano «Difficoltà a camminare»; due per riga, testo intero */
+@media (max-width: 26em) {
+  .explore .needs .needs__options,
+  .explore .needs:not(.needs--ask) .needs__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .explore .needs .needs__option label {
+    min-height: 2.6rem;
+  }
+}
+
+/* 21. Intestazione e navigazione (28 ottobre): etichetta «Versione di prova» al posto della striscia, voci a pillola,
+   sul telefono un pulsante «Menu» (assets/js/menu.js) invece di due righe di link */
+.beta {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid rgba(47, 91, 156, 0.3);
+  border-radius: var(--radius-pill);
+  background: var(--color-sky);
+  color: var(--color-brand);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.site-header__inner {
+  justify-content: flex-start;
+}
+
+.site-header .nav {
+  margin-left: auto;
+}
+
+.nav__list {
+  gap: var(--space-2xs);
+}
+
+.nav__link {
+  padding: 0.45rem 0.9rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+}
+
+.nav__link:hover {
+  background: var(--color-sky);
+  text-decoration: none;
+}
+
+.nav__link[aria-current="page"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 47.99em) {
+  .site-header__inner {
+    flex-wrap: wrap;
+    gap: 0 var(--space-xs);
+    padding-block: var(--space-xs);
+  }
+
+  .site-header .beta {
+    order: 3;
+    width: max-content;
+    margin: 0 0 var(--space-2xs) calc(2rem + var(--space-xs));
+    padding-block: 0;
+    font-size: 0.75rem;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    order: 2;
+    min-height: var(--target-min);
+    margin-left: auto;
+    padding: 0 0.9rem;
+    border: var(--border-control) solid var(--color-navy);
+    border-radius: var(--radius-pill);
+    background: var(--color-white);
+    color: var(--color-navy);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .menu-toggle:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .menu-toggle__bars,
+  .menu-toggle__bars::before,
+  .menu-toggle__bars::after {
+    display: block;
+    width: 1.1rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  .menu-toggle__bars {
+    position: relative;
+  }
+
+  .menu-toggle__bars::before,
+  .menu-toggle__bars::after {
+    content: "";
+    position: absolute;
+    left: 0;
+  }
+
+  .menu-toggle__bars::before { top: -6px; }
+  .menu-toggle__bars::after { top: 6px; }
+
+  .site-header--open .menu-toggle__bars { background: transparent; }
+  .site-header--open .menu-toggle__bars::before { top: 0; transform: rotate(45deg); }
+  .site-header--open .menu-toggle__bars::after { top: 0; transform: rotate(-45deg); }
+
+  .site-header .nav {
+    order: 4;
+    width: 100%;
+    margin: 0;
+    border-top: 0;
+  }
+
+  .site-header .site-header__app {
+    order: 5;
+    width: 100%;
+    justify-content: center;
+    margin-block: var(--space-xs) var(--space-sm);
+  }
+
+  .js .site-header:not(.site-header--open) .nav,
+  .js .site-header:not(.site-header--open) .site-header__app {
+    display: none;
+  }
+
+  .site-header .nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .site-header .nav__link {
+    display: flex;
+    min-height: 3rem;
+    padding: 0.6rem var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+  }
+}
+
+@media (forced-colors: active) {
+  .nav__link[aria-current="page"] {
+    border: 2px solid CanvasText;
   }
 }

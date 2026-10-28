@@ -2,7 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali · 14. Ricerca del locale e completezza · 15. Luoghi OSM da approvare
+           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali · 14. Ricerca del locale e completezza · 15. Luoghi OSM da approvare · 16. Intestazione
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -1522,4 +1522,52 @@ textarea.input {
 .osm-item__facts,
 .osm-item__links {
   font-size: var(--text-sm);
+}
+
+/* 16. Intestazione dell'app (28 ottobre): etichetta «Versione di prova» accanto al logo, voci a destra sul computer;
+   sul telefono la barra in basso ha tre voci (Mappa, Segnala, Profilo: i locali stanno nel profilo) */
+.app .app-nav {
+  margin-left: auto;
+}
+
+.app .site-header .beta {
+  order: 0;
+  margin: 0;
+}
+
+@media (max-width: 47.99em) {
+  .app .site-header__inner {
+    flex-wrap: nowrap;
+    min-height: 3.25rem;
+  }
+
+  .app .brand__name {
+    font-size: 1.05rem;
+  }
+}
+
+.field--locale {
+  flex-wrap: wrap;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
+}
+
+.field--locale label {
+  flex: 1 1 0;
+  font-weight: 700;
+}
+
+.field--locale .field__help {
+  flex-basis: 100%;
+  margin: 0;
+  padding-left: calc(1.5rem + var(--space-sm));
+}
+
+/* 17. Piè di pagina sul telefono: la fascia blu arriva fino in fondo, sotto la barra che galleggia */
+@media (max-width: 47.99em) {
+  .app .site-footer {
+    margin-bottom: calc(-5.5rem - env(safe-area-inset-bottom));
+    padding-bottom: calc(var(--space-md) + 5.5rem + env(safe-area-inset-bottom));
+  }
 }

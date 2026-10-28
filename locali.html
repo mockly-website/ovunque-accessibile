@@ -12,8 +12,9 @@
   <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="assets/js/intro.js?v=i1"></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p32">
+  <script src="assets/js/intro.js?v=i2"></script>
+  <script src="assets/js/menu.js?v=m1" defer></script>
+  <link rel="stylesheet" href="assets/css/sito.css?v=p34">
 </head>
 <body>
   <ul class="skip-links">
@@ -21,12 +22,12 @@
   </ul>
 
   <header class="site-header">
-    <p class="proto-banner">Versione di prova: molti luoghi arrivano da OpenStreetMap e sono ancora da verificare.</p>
     <div class="container site-header__inner">
       <a class="brand" href="./">
         <img class="brand__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
         <span class="brand__name">Ovunque Accessibile</span>
       </a>
+      <span class="beta" title="Versione di prova: molti luoghi arrivano da OpenStreetMap e non sono ancora stati misurati">Versione di prova</span>
       <nav class="nav" aria-label="Principale">
         <ul class="nav__list" role="list">
           <li><a class="nav__link" href="mappa.html">Mappa dei luoghi</a></li>
@@ -91,12 +92,35 @@
   </main>
 
   <footer class="site-footer">
-    <div class="container site-footer__inner">
-      <a href="locali.html" aria-current="page">Per i locali</a>
-      <a href="privacy.html">Privacy</a>
-      <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>
-      <a href="tel:+393518332819">Angelo: 351 833 2819</a>
+    <div class="container site-footer__grid">
+      <div class="site-footer__about">
+        <a class="site-footer__brand" href="./">
+          <img src="assets/img/logo.webp" alt="" width="180" height="225" loading="lazy">
+          <span>Ovunque Accessibile</span>
+        </a>
+        <p>Luoghi accessibili in tutta Italia: ingresso, bagno, parcheggio e spazi interni, spiegati in modo chiaro.</p>
+      </div>
+      <nav class="site-footer__col" aria-labelledby="footer-esplora">
+        <h2 class="site-footer__title" id="footer-esplora">Esplora</h2>
+        <ul role="list">
+          <li><a href="mappa.html">Mappa dei luoghi</a></li>
+          <li><a href="./#come-funziona">Come funziona</a></li>
+          <li><a href="./#chi-siamo">Chi siamo</a></li>
+          <li><a href="locali.html" aria-current="page">Per i locali</a></li>
+          <li><a href="app/">Apri la web-app</a></li>
+        </ul>
+      </nav>
+      <div class="site-footer__col">
+        <h2 class="site-footer__title">Contatti</h2>
+        <ul role="list">
+          <li><a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a></li>
+          <li><a href="tel:+393518332819">Angelo: 351 833 2819</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="container site-footer__bottom">
       <span>© 2026 Ovunque Accessibile</span>
+      <a href="privacy.html">Privacy</a>
       <span>Sito realizzato da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></span>
     </div>
   </footer>

@@ -9,6 +9,8 @@
   var CFG = window.OA_CONFIG || {};
   var PRIVACY = CFG.privacyVersion || 'app';
   var COLONNE = 'id,slug,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,descrizione,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,esempio,osm';
+  /* Per mappa ed elenchi basta meno (niente descrizione, slug, esempio): un terzo di dati in meno */
+  var COLONNE_ELENCO = 'id,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,osm';
   var COLONNE_AVVISI = 'id,place_id,autore_nome,tipo,testo,scade_il,created_at';
   var COLONNE_RECENSIONI = 'id,autore_nome,esigenza,data_visita,testo,risposte,risposta,risposta_at,created_at';
   var authListeners = [];
@@ -120,8 +122,34 @@
       return new URL(page, location.href).href;
     }
 
-    /* Supabase restituisce al massimo 1000 righe per richiesta: si leggono a pagine finché non finiscono */
+    /* Supabase restituisce al massimo 1000 righe per richiesta: si leggono a pagine finché non finiscono
+       (allRows); per l'elenco dei luoghi la prima pagina dice quante sono e le altre arrivano insieme (allRowsParallel). */
     var PAGINA = 1000;
+    function allRowsParallel(query) {
+      return query(0, PAGINA - 1, true).then(function (res) {
+        var first = check(res);
+        var altre = [];
+        for (var from = PAGINA; from < Math.min(res.count || 0, 20000); from += PAGINA) altre.push(query(from, from + PAGINA - 1, false).then(check));
+        return Promise.all(altre).then(function (pp) { return pp.reduce(function (a, r) { return a.concat(r); }, first); });
+      });
+    }
+
+    /* I luoghi restano in memoria 3 minuti (sessionStorage): passando da una pagina all'altra non si riscaricano.
+       Si svuota quando un moderatore cambia qualcosa. */
+    var CACHE = 'oa-luoghi-app-v1';
+    var CACHE_MS = 3 * 60 * 1000;
+    var memo = null;
+    function dallaCache() {
+      try {
+        var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
+        return c && Date.now() - c.t < CACHE_MS ? c : null;
+      } catch (e) { return null; }
+    }
+    function svuota() {
+      memo = null;
+      try { sessionStorage.removeItem(CACHE); } catch (e) { /* niente */ }
+    }
+
     function allRows(query, from, acc) {
       from = from || 0;
       acc = acc || [];
@@ -147,7 +175,7 @@
         return sb.auth.signUp({
           email: d.email, password: d.password,
           options: {
-            emailRedirectTo: redirect('accedi.html?confermata=1'),
+            emailRedirectTo: redirect('accedi.html?confermata=1' + (d.torna ? '&torna=' + encodeURIComponent(d.torna) : '')),
             data: { nome_pubblico: d.nome, privacy_version: PRIVACY, eta_minima: true }
           }
         }).then(check).then(function (data) {
@@ -180,13 +208,22 @@
       },
 
       listPlaces: function () {
-        return Promise.all([
-          allRows(function (from, to) {
+        if (memo) return memo;
+        var c = dallaCache();
+        memo = (c ? Promise.resolve(c) : Promise.all([
+          allRowsParallel(function (from, to, conta) {
             /* solo le schede pubbliche: anche per i moderatori, i luoghi «da approvare» stanno nel pannello */
-            return sb.from('places').select(COLONNE).in('stato', ['pubblicato', 'in-revisione']).order('nome').order('id').range(from, to);
+            return sb.from('places').select(COLONNE_ELENCO, conta ? { count: 'exact' } : undefined)
+              .in('stato', ['pubblicato', 'in-revisione']).order('nome').order('id').range(from, to);
           }),
           activeAlerts().catch(function () { return []; })
-        ]).then(function (r) { return withAlerts(r[0].map(toPlace), r[1]); });
+        ]).then(function (r) {
+          var x = { t: Date.now(), rows: r[0], alerts: r[1] };
+          try { sessionStorage.setItem(CACHE, JSON.stringify(x)); } catch (e) { /* spazio finito: va bene lo stesso */ }
+          return x;
+        })).then(function (x) { return withAlerts(x.rows.map(toPlace), x.alerts); });
+        memo.catch(function () { memo = null; });
+        return memo;
       },
       allPlacesForModeration: function () {
         return allRows(function (from, to) {
@@ -194,6 +231,7 @@
         });
       },
       getPlace: function (id) {
+        if (!/^[0-9a-f-]{36}$/.test(id || '')) return Promise.resolve(null);
         return sb.from('places').select(COLONNE).eq('id', id).maybeSingle()
           .then(check).then(function (r) { return r ? toPlace(r) : null; });
       },
@@ -213,9 +251,11 @@
         });
       },
       addAlert: function (a) {
+        svuota();
         return sb.from('avvisi').insert({ place_id: a.place_id, tipo: a.tipo, testo: a.testo || null, scade_il: traGiorni(a.giorni - 1) }).then(check);
       },
       closeAlert: function (id, stato) {
+        svuota();
         return sb.rpc('chiudi_avviso', { p_id: id, p_stato: stato }).then(check);
       },
 
@@ -285,9 +325,11 @@
         });
       },
       decideOsm: function (ids, approva) {
+        svuota();
         return sb.rpc('decidi_osm', { p_ids: ids, p_approva: approva }).then(check);
       },
       decideVerification: function (id, stato, risposta) {
+        svuota();
         return sb.rpc('decidi_verifica', { p_id: id, p_stato: stato, p_risposta: risposta || null }).then(check);
       },
       addReview: function (r) {
@@ -371,6 +413,7 @@
         });
       },
       approve: function (id, livello) {
+        svuota();
         return sb.rpc('approva_proposta', { p_id: id, p_livello: livello }).then(check);
       },
       reject: function (id, motivo) {
@@ -380,6 +423,7 @@
         return sb.rpc('modera_recensione', { p_id: id, p_stato: stato, p_motivo: motivo || null }).then(check);
       },
       setPlaceState: function (id, stato) {
+        svuota();
         return sb.rpc('stato_luogo', { p_id: id, p_stato: stato }).then(check);
       }
     };

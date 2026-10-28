@@ -1,7 +1,0 @@
-# Configurazione minima per la Supabase CLI (supabase link / db push).
-# Se esegui "supabase init" la CLI completa questo file con i valori predefiniti.
-project_id = "ovunque-accessibile"
-
-[api]
-# Lo schema "private" NON va mai aggiunto qui: deve restare fuori dalle API.
-schemas = ["public", "graphql_public"]

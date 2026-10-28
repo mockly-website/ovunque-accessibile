@@ -13,3 +13,10 @@ Ovunque Accessibile – *
 
 # Luoghi scaricati da OpenStreetMap con supabase/strumenti/import_osm.py (si rigenerano)
 supabase/import/
+
+# Solo i file di sito e web-app vanno nel repository: documentazione, brief, database e strumenti restano in locale
+DOCUMENTAZIONE.md
+BRIEF-APP.md
+README.md
+doc/
+supabase/
