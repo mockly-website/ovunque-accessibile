@@ -181,7 +181,7 @@
 
   var PAGES = {
     accedi: initAccedi, registrati: initRegistrati, password: initPassword,
-    segnala: initSegnala, profilo: initProfilo, moderazione: initModerazione, bollino: initBollino
+    segnala: initSegnala, profilo: initProfilo, moderazione: initModerazione, bollino: initBollino, locali: initLocali
   };
 
   api.ready.then(syncNeeds).then(function () {
@@ -653,6 +653,7 @@
       $('owner-title').textContent = 'Sei il gestore di questo luogo';
       $('owner-intro').textContent = 'Puoi rispondere alle recensioni qui sopra. Se qualcosa cambia (una rampa nuova, un bagno rifatto), proponi una correzione: la controlliamo e aggiorniamo la scheda.' +
         (sulPosto ? '' : ' Il bollino per la vetrina arriva quando verifichiamo il luogo sul posto.');
+      $('owner-intro').after(el('p', {}, [el('a', { href: 'locali.html?id=' + encodeURIComponent(p.id), text: sulPosto ? 'I tuoi locali e la verifica sul posto' : 'Richiedi la verifica sul posto' })]));
     } else if (g.stato === 'in-attesa') {
       message(note, 'La tua richiesta è in attesa: ti contatteremo al recapito che hai indicato per confermare.', '');
     } else {
@@ -678,6 +679,132 @@
         showErrors(form, [{ input: f.contatto, text: err.message }]);
       });
     });
+  }
+
+  /* «Per i locali»: i luoghi che gestisco, lo stato della verifica sul posto, la richiesta di verifica */
+  var STATO_GESTORE = { 'in-attesa': 'Richiesta in attesa', approvato: 'Sei il gestore', respinto: 'Richiesta non approvata', revocato: 'Gestione revocata' };
+  var STATO_VERIFICA = { 'in-attesa': 'Verifica richiesta: la stiamo organizzando', fissata: 'Verifica fissata', fatta: 'Verifica fatta', respinta: 'Verifica non possibile' };
+
+  function initLocali() {
+    var list = $('owned-list');
+    var note = $('owned-note');
+    if (!api.user()) {
+      show($('owned-login'), true);
+      return;
+    }
+    var focusId = params.get('id');
+
+    function verificaForm(g) {
+      var id = 'ver-' + g.place_id;
+      var form = el('form', { className: 'stack owned__form', novalidate: '', hidden: '' }, [
+        el('div', { className: 'field' }, [
+          el('label', { className: 'field__label', 'for': id + '-quando' }, [document.createTextNode('Quando possiamo passare?'), el('span', { className: 'field__req', text: ' (obbligatorio)' })]),
+          el('p', { className: 'field__help', id: id + '-quando-aiuto', text: 'Giorni e orari, per esempio «martedì e giovedì dalle 15 alle 18». Ti scriviamo qui la data.' }),
+          el('input', { className: 'input', type: 'text', id: id + '-quando', name: 'disponibilita', maxlength: '300', 'aria-describedby': id + '-quando-aiuto' })
+        ]),
+        el('div', { className: 'field' }, [
+          el('label', { className: 'field__label', 'for': id + '-nota', text: 'Note (facoltative)' }),
+          el('textarea', { className: 'input', id: id + '-nota', name: 'nota', rows: '2', maxlength: '500' })
+        ]),
+        el('button', { type: 'submit', className: 'btn btn--primary btn--small', text: 'Invia la richiesta' })
+      ]);
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        if (isBusy(form)) return;
+        var f = form.elements;
+        var quando = f.disponibilita.value.trim();
+        if (showErrors(form, quando.length < 3 ? [{ input: f.disponibilita, text: 'Scrivi quando possiamo passare (giorni e orari).' }] : [])) return;
+        busy(form, true, 'Invio…');
+        api.requestVerification({ place_id: g.place_id, disponibilita: quando, nota: f.nota.value.trim() || null }).then(function () {
+          message(note, 'Richiesta inviata per «' + g.places.nome + '». Ti scriviamo qui la data della verifica.', 'ok');
+          note.focus();
+          load();
+        }).catch(function (err) {
+          busy(form, false);
+          showErrors(form, [{ input: f.disponibilita, text: err.message }]);
+        });
+      });
+      return form;
+    }
+
+    function item(g, verifiche) {
+      var p = g.places || { nome: 'Luogo non più disponibile' };
+      var mine = verifiche.filter(function (v) { return v.place_id === g.place_id; });
+      var aperta = mine.filter(function (v) { return v.stato === 'in-attesa' || v.stato === 'fissata'; })[0];
+      var ultima = mine[0];
+      var sulPosto = p.verifica_livello === 'sul-posto';
+      var li = el('li', { className: 'activity owned__item', id: 'locale-' + g.place_id }, [
+        el('div', { className: 'activity__head' }, [
+          el('h3', { className: 'activity__title' }, [p.id ? el('a', { href: 'luogo.html?id=' + encodeURIComponent(p.id), text: p.nome }) : document.createTextNode(p.nome)]),
+          el('span', { className: 'pill state-pill state-pill--' + (g.stato === 'approvato' ? 'approvata' : g.stato === 'in-attesa' ? 'in-attesa' : 'respinta'), text: STATO_GESTORE[g.stato] || g.stato })
+        ]),
+        p.citta ? el('p', { className: 'place__meta', text: p.citta }) : null
+      ]);
+      if (g.stato === 'in-attesa') {
+        li.appendChild(el('p', { text: 'Ti contatteremo al recapito del locale che hai indicato. Dopo potrai chiedere la verifica sul posto.' }));
+        return li;
+      }
+      if (g.stato !== 'approvato') {
+        li.appendChild(el('p', { text: g.motivo ? 'Motivo: ' + g.motivo : 'Per chiarimenti scrivi a ovunqueaccessibile@gmail.com.' }));
+        return li;
+      }
+      if (sulPosto) {
+        li.appendChild(el('p', {}, [OA.statusNode(['si', 'Verificato sul posto' + (p.verifica_data ? ' il ' + dateIt(p.verifica_data) : '')])]));
+        li.appendChild(el('a', { className: 'btn btn--primary btn--small', href: 'bollino.html?id=' + encodeURIComponent(p.id) }, [
+          icon('#icon-shield'), document.createTextNode('Bollino per la vetrina'), el('span', { className: 'visually-hidden', text: ' di ' + p.nome })
+        ]));
+      }
+      if (aperta) {
+        li.appendChild(el('p', {}, [el('strong', { text: STATO_VERIFICA[aperta.stato] }), document.createTextNode(aperta.risposta ? ': ' + aperta.risposta : '.')]));
+        li.appendChild(el('p', { className: 'place__meta', text: 'Hai indicato: ' + aperta.disponibilita }));
+        if (aperta.stato === 'in-attesa') {
+          var del = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [
+            document.createTextNode('Ritira la richiesta'), el('span', { className: 'visually-hidden', text: ' per ' + p.nome })
+          ]);
+          del.addEventListener('click', function () {
+            api.withdrawVerification(aperta.id).then(function () {
+              message(note, 'Richiesta di verifica per «' + p.nome + '» ritirata.', 'ok');
+              note.focus();
+              load();
+            }).catch(function (err) { message(note, err.message, 'error'); note.focus(); });
+          });
+          li.appendChild(del);
+        }
+        return li;
+      }
+      if (ultima && ultima.stato === 'respinta') {
+        li.appendChild(el('p', { text: STATO_VERIFICA.respinta + (ultima.risposta ? ': ' + ultima.risposta : '.') }));
+      }
+      var form = verificaForm(g);
+      var open = el('button', { type: 'button', className: sulPosto ? 'btn btn--secondary btn--small' : 'btn btn--primary btn--small', 'aria-expanded': 'false' }, [
+        document.createTextNode(sulPosto ? 'Chiedi una nuova verifica' : 'Richiedi la verifica sul posto'),
+        el('span', { className: 'visually-hidden', text: ' per ' + p.nome })
+      ]);
+      open.addEventListener('click', function () {
+        form.hidden = !form.hidden;
+        open.setAttribute('aria-expanded', form.hidden ? 'false' : 'true');
+        if (!form.hidden) form.elements.disponibilita.focus();
+      });
+      li.appendChild(open);
+      li.appendChild(form);
+      return li;
+    }
+
+    function load() {
+      Promise.all([api.myOwnerships(), api.myVerifications()]).then(function (r) {
+        list.textContent = '';
+        show($('owned-empty'), !r[0].length);
+        r[0].forEach(function (g) { list.appendChild(item(g, r[1])); });
+        var target = focusId && $('locale-' + focusId);
+        if (target) {
+          focusId = null;
+          target.scrollIntoView({ block: 'start' });
+          var btn = target.querySelector('button[aria-expanded]');
+          if (btn) btn.click();
+        }
+      }).catch(function (err) { message(note, err.message, 'error'); });
+    }
+    load();
   }
 
   /* Bollino per la vetrina: solo luoghi verificati sul posto. Il codice QR apre la scheda (sempre aggiornata). */
@@ -2018,6 +2145,7 @@
     show($('mod-panel'), true);
     focusHeading($('mod-panel-title'));
     loadPending();
+    loadChecks();
     initPlaceState();
   }
 
@@ -2200,6 +2328,66 @@
     }).catch(function (err) {
       message($('mod-note'), err.message, 'error');
     });
+  }
+
+  /* Verifiche sul posto chieste dai gestori */
+  var RUOLI_GESTORE = { titolare: 'Titolare', dipendente: 'Lavora nel luogo', altro: 'Altro ruolo' };
+
+  function loadChecks() {
+    var list = $('mod-checks');
+    if (!list) return;
+    api.pendingVerifications().then(function (rows) {
+      var n = rows.length;
+      function update() { setCount('mod-checks-count', n, 'da organizzare', 'da organizzare'); }
+      update();
+      list.textContent = '';
+      show($('mod-checks-empty'), !n);
+      rows.forEach(function (v) {
+        var place = v.places ? v.places.nome + ', ' + v.places.citta : 'Luogo';
+        var idv = 'chk-' + v.id;
+        var status = el('p', { className: 'notice', hidden: '', tabindex: '-1', role: 'status' });
+        var risposta = el('textarea', { className: 'input', id: idv + '-r', name: 'risposta', rows: '2', maxlength: '500' });
+        var buttons = [
+          ['fissata', 'Fissata', 'btn--secondary', 'Verifica fissata: il gestore vede la data che hai scritto.'],
+          ['fatta', 'Fatta: verificato sul posto', 'btn--primary', 'Fatto: la scheda ora è «Verificato sul posto».'],
+          ['respinta', 'Non possibile', 'btn--secondary', 'Richiesta chiusa: il gestore vede il motivo.']
+        ].map(function (b) {
+          var btn = el('button', { type: 'button', className: 'btn btn--small ' + b[2], text: b[1] });
+          btn.addEventListener('click', function () {
+            if (b[0] === 'fissata' && !risposta.value.trim()) {
+              message(status, 'Scrivi la data e l\'ora del sopralluogo nella risposta per il gestore.', 'error');
+              status.focus();
+              return;
+            }
+            api.decideVerification(v.id, b[0], risposta.value.trim()).then(function () {
+              message(status, b[3], 'ok');
+              status.focus();
+              if (b[0] !== 'fissata') {
+                [].forEach.call(article.querySelectorAll('button, textarea'), function (c) { c.disabled = true; });
+                n--;
+                update();
+              }
+            }).catch(function (err) { message(status, err.message, 'error'); status.focus(); });
+          });
+          return btn;
+        });
+        var article = el('article', { className: 'card mod-item', 'aria-labelledby': idv }, [
+          el('h3', { id: idv, text: 'Verifica: ' + place }),
+          el('p', { className: 'place__meta', text: 'Chiesta da ' + (v.nome || 'gestore') + ' il ' + dateIt(v.created_at) + (v.places && v.places.indirizzo ? ' · ' + v.places.indirizzo : '') }),
+          el('p', {}, [el('strong', { text: v.stato === 'fissata' ? 'Fissata: ' : 'Quando passare: ' }), document.createTextNode(v.stato === 'fissata' && v.risposta ? v.risposta + ' (il gestore aveva indicato: ' + v.disponibilita + ')' : v.disponibilita)]),
+          v.nota ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: v.nota })]) : null,
+          el('ul', { className: 'place__meta', role: 'list' }, (v.gestori || []).map(function (g) {
+            return el('li', { text: 'Contatto del gestore ' + (g.nome || '') + ' (' + (RUOLI_GESTORE[g.ruolo] || g.ruolo) + '): ' + g.contatto });
+          })),
+          el('p', {}, [el('a', { href: 'luogo.html?id=' + encodeURIComponent(v.place_id), text: 'Apri la scheda' }), document.createTextNode(' · '),
+            el('a', { href: 'segnala.html?id=' + encodeURIComponent(v.place_id), text: 'Correggi le misure' })]),
+          el('div', { className: 'field' }, [el('label', { className: 'field__label', 'for': idv + '-r', text: 'Risposta per il gestore (data del sopralluogo o motivo)' }), risposta]),
+          el('div', { className: 'decision__actions' }, buttons),
+          status
+        ]);
+        list.appendChild(el('li', {}, [article]));
+      });
+    }).catch(function (err) { message($('mod-note'), err.message, 'error'); });
   }
 
   function initPlaceState() {

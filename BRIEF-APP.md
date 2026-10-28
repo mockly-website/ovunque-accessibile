@@ -20,6 +20,7 @@
   - salvare i preferiti;
   - scrivere recensioni con **domande guidate** (sì / no) e, se si vuole, un testo (escono dopo la moderazione);
   - pubblicare un **avviso temporaneo** (si vede subito e scade da solo);
+  - dalla pagina **«Per i locali»**, da gestori riconosciuti, chiedere la **verifica sul posto** del proprio locale;
   - chiedere di essere riconosciuti come **gestori** di un luogo: dopo l'approvazione si risponde alle recensioni e, per i luoghi verificati sul posto, si stampa il **bollino con il codice QR** per la vetrina;
   - segnalare luoghi nuovi o correzioni, con misure (rampa descritta a parole), posizione trovata dall'indirizzo e **fino a 5 foto** (GPS tolto, descrizione obbligatoria per chi non vede, pubbliche solo dopo l'approvazione);
   - seguire lo stato delle proprie segnalazioni nel profilo;
@@ -28,6 +29,7 @@
   - confronto «Ora / Proposto», anteprima dei giudizi e foto da controllare (si può escluderne una);
   - approvare («community» o «verificato sul posto») o respingere con motivo;
   - moderare le recensioni e le richieste dei gestori (si verifica il contatto del luogo prima di approvare);
+  - organizzare le **verifiche sul posto** chieste dai gestori (data, poi «fatta»: la scheda diventa «Verificato sul posto»);
   - togliere avvisi e risposte non adatti;
   - mettere una scheda in revisione o archiviarla.
 

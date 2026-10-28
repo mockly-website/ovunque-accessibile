@@ -2313,3 +2313,28 @@ html:not(.js) .js-only {
     transition: none;
   }
 }
+
+/* 18. Per i locali (locali.html e blocco della home) */
+.locali__passi {
+  display: grid;
+  gap: var(--space-sm);
+  padding-left: 1.4em;
+}
+
+.locali__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.business {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-sm);
+  border-left: 6px solid var(--color-brand);
+}
+
+.business h2,
+.business p {
+  margin: 0;
+}

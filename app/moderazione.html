@@ -17,13 +17,13 @@
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=i1"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p24">
-  <link rel="stylesheet" href="assets/css/app.css?v=a15">
-  <script src="assets/js/config.js?v=a15" defer></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=p25">
+  <link rel="stylesheet" href="assets/css/app.css?v=a16">
+  <script src="assets/js/config.js?v=a16" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=p23" defer></script>
-  <script src="assets/js/api.js?v=a15" defer></script>
-  <script src="assets/js/app.js?v=a15" defer></script>
+  <script src="assets/js/api.js?v=a16" defer></script>
+  <script src="assets/js/app.js?v=a16" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -110,6 +110,12 @@
           <p id="mod-owners-empty" class="place__meta" hidden>Nessuna richiesta in attesa.</p>
           <ul id="mod-owners" class="mod-list" role="list"></ul>
         </section>
+        <section aria-labelledby="mod-checks-title">
+          <h2 id="mod-checks-title">Verifiche sul posto <span class="pill" id="mod-checks-count"></span></h2>
+          <p class="place__meta">Richieste dei gestori. Accordatevi al contatto del gestore, segnate «Fissata» con la data, andate a misurare. Se le misure sono cambiate, prima correggete la scheda (Proponi una correzione, poi approvate); poi «Fatta»: la scheda diventa «Verificato sul posto» con la data di oggi.</p>
+          <p id="mod-checks-empty" class="place__meta" hidden>Nessuna verifica da organizzare.</p>
+          <ul id="mod-checks" class="mod-list" role="list"></ul>
+        </section>
         <section class="card" aria-labelledby="state-title">
           <h2 id="state-title">Stato di una scheda</h2>
           <p>«In revisione» quando arrivano segnalazioni in conflitto (la scheda resta visibile, con l'avviso); «Archiviata» se il luogo ha chiuso (sparisce dalla mappa).</p>
@@ -134,6 +140,7 @@
 
   <footer class="site-footer">
     <div class="container site-footer__inner">
+      <a href="locali.html">Per i locali</a>
       <a href="privacy.html">Privacy dell'app</a>
       <a href="../">Il sito</a>
       <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>

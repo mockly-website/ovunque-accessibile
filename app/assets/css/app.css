@@ -2,7 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti
+           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -1326,4 +1326,79 @@ textarea.input {
   .suggest__item[aria-selected="true"] {
     outline: 3px solid Highlight;
   }
+}
+
+/* 13. Per i locali: passi numerati e locali gestiti */
+.steps-list {
+  display: grid;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+}
+
+.steps-list > li {
+  position: relative;
+  padding-left: 3rem;
+  counter-increment: passo;
+}
+
+.steps-list > li::before {
+  content: counter(passo);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.steps-list h2,
+.steps-list p {
+  margin: 0 0 var(--space-2xs);
+}
+
+.steps-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
+
+.owned {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.owned__item > .btn {
+  justify-self: start;
+}
+
+.owned__form {
+  margin-top: var(--space-xs);
+}
+
+@media (forced-colors: active) {
+  .steps-list > li::before {
+    border: 2px solid CanvasText;
+  }
+}
+
+.owned__item {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.owned__item p {
+  margin: 0;
 }

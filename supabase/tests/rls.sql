@@ -383,9 +383,9 @@ begin
   assert not public.proposta_valida(jsonb_set(ok, '{facoltativi,udito}', '{"telepatia": true}')), 'voce sconosciuta accettata';
 
   -- Avvisi: si vedono subito, durano al massimo 30 giorni, non li chiude chiunque
-  insert into public.avvisi (place_id, tipo, testo) values (luogo, 'ascensore', '  Ascensore fermo per manutenzione ');
+  insert into public.avvisi (place_id, tipo, testo) values (luogo, 'ascensore', '  Ascensore fermo per manutenzione – è già in riparazione ');
   assert (select scade_il from public.avvisi) = current_date + 7, 'scadenza predefinita di 7 giorni';
-  assert (select testo from public.avvisi) = 'Ascensore fermo per manutenzione', 'testo non ripulito';
+  assert (select testo from public.avvisi) = 'Ascensore fermo per manutenzione – è già in riparazione', 'testo non ripulito';
   assert (select autore_nome from public.avvisi) <> '', 'nome pubblico non copiato nell''avviso';
   assert (select count(*) from public.avvisi_miei(luogo)) = 1, 'avvisi_miei non trova l''avviso di B';
   begin
@@ -514,3 +514,62 @@ do $$ begin
     raise exception 'DOVEVA FALLIRE: scheda con tipo sconosciuto';
   exception when check_violation then null; end;
 end $$;
+
+-- 14. Richieste di verifica sul posto (20261028000000): B è il gestore approvato della trattoria (sezione 12)
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  luogo uuid := (select id from public.places where slug = 'esempio-trattoria-roma');
+  altro uuid := (select id from public.places where slug <> 'esempio-trattoria-roma' and stato = 'pubblicato' limit 1);
+begin
+  update public.profiles set nome_pubblico = 'Nicolò D’Angelo' where id = auth.uid();
+  assert (select nome_pubblico from public.profiles) = 'Nicolò D’Angelo', 'nome con accento e apostrofo rifiutato';
+  begin
+    update public.profiles set nome_pubblico = 'Bruno' || chr(7) where id = auth.uid();
+    raise exception 'DOVEVA FALLIRE: nome con carattere di controllo';
+  exception when check_violation then null; end;
+  insert into public.verifiche (place_id, disponibilita, nota) values (luogo, ' Martedì e giovedì, 15–18 ', 'Chiedere di Bruno');
+  assert (select disponibilita from public.verifiche) = 'Martedì e giovedì, 15–18', 'disponibilità non ripulita';
+  begin
+    insert into public.verifiche (place_id, disponibilita) values (luogo, 'Sabato mattina');
+    raise exception 'DOVEVA FALLIRE: seconda richiesta aperta';
+  exception when check_violation then null; end;
+  begin
+    insert into public.verifiche (place_id, disponibilita) values (altro, 'Sabato mattina');
+    raise exception 'DOVEVA FALLIRE: richiesta per un luogo che non gestisco';
+  exception when insufficient_privilege then null; end;
+  begin
+    perform public.decidi_verifica((select id from public.verifiche limit 1), 'fatta');
+    raise exception 'DOVEVA FALLIRE: il gestore segna da solo la verifica fatta';
+  exception when insufficient_privilege then null; end;
+  assert jsonb_array_length(public.i_miei_dati() -> 'verifiche') = 1, 'export: verifiche';
+end $$;
+reset role;
+
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  begin
+    perform 1 from public.verifiche;
+    raise exception 'DOVEVA FALLIRE: anon legge le richieste di verifica';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  v uuid := (select id from public.verifiche limit 1);
+begin
+  perform public.decidi_verifica(v, 'fissata', 'Giovedì 6 novembre alle 16');
+  perform public.decidi_verifica(v, 'fatta', 'Fatto, grazie!');
+  assert (select verifica_livello from public.places where slug = 'esempio-trattoria-roma') = 'sul-posto', 'scheda non segnata come verificata sul posto';
+  assert (select verifica_data from public.places where slug = 'esempio-trattoria-roma') = current_date, 'data della verifica';
+  begin
+    perform public.decidi_verifica(v, 'respinta');
+    raise exception 'DOVEVA FALLIRE: richiesta già chiusa';
+  exception when no_data_found then null; end;
+end $$;
+reset role;
