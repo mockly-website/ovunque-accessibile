@@ -2224,6 +2224,7 @@
     show($('mod-panel'), true);
     focusHeading($('mod-panel-title'));
     loadPending();
+    initOsmQueue();
     loadChecks();
     initPlaceState();
     initOsmImport();
@@ -2468,6 +2469,102 @@
         list.appendChild(el('li', {}, [article]));
       });
     }).catch(function (err) { message($('mod-note'), err.message, 'error'); });
+  }
+
+  /* Luoghi da OpenStreetMap da approvare: per città, 20 alla volta, uno per uno o selezionati in blocco */
+  var OSM_PAGINA = 20;
+  var OSM_SI = { yes: 'sì', limited: 'in parte', no: 'no' };
+
+  function initOsmQueue() {
+    var list = $('mod-osm');
+    if (!list) return;
+    var select = $('osm-citta');
+    var status = $('osm-status');
+    var more = $('osm-more');
+    var shown = 0;
+    var totale = 0;
+
+    function say(text, kind) { message(status, text, kind); status.focus(); }
+
+    function cities() {
+      return api.osmCities().then(function (rows) {
+        var tot = rows.reduce(function (a, r) { return a + r.n; }, 0);
+        setCount('mod-osm-count', tot, 'da approvare', 'da approvare');
+        var keep = select.value;
+        select.textContent = '';
+        select.appendChild(el('option', { value: '', text: 'Tutte le città (' + tot + ')' }));
+        rows.forEach(function (r) { select.appendChild(el('option', { value: r.citta, text: r.citta + ' (' + r.n + ')' })); });
+        if (keep && rows.some(function (r) { return r.citta === keep; })) select.value = keep;
+      });
+    }
+
+    function decide(ids, approva, items) {
+      if (!ids.length) return say('Seleziona almeno un luogo.', 'error');
+      api.decideOsm(ids, approva).then(function (n) {
+        items.forEach(function (li) { li.remove(); });
+        shown -= items.length;
+        totale -= items.length;
+        say((approva ? 'Approvati: ' : 'Archiviati: ') + n + (n === 1 ? ' luogo.' : ' luoghi.') + (approva ? ' Ora sono sulla mappa come «da verificare».' : ''), 'ok');
+        show($('mod-osm-empty'), !list.children.length && !totale);
+        if (!list.children.length && totale > 0) load(false);
+        cities();
+      }).catch(function (err) { say(err.message, 'error'); });
+    }
+
+    function item(p) {
+      var cb = el('input', { type: 'checkbox', id: 'osm-' + p.id, value: p.id });
+      var q = encodeURIComponent(p.nome + ', ' + p.indirizzo + ', ' + p.citta);
+      var yes = el('button', { type: 'button', className: 'btn btn--primary btn--small' }, [document.createTextNode('Approva'), el('span', { className: 'visually-hidden', text: ' ' + p.nome })]);
+      var no = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [document.createTextNode('Non approvare'), el('span', { className: 'visually-hidden', text: ' ' + p.nome })]);
+      var li = el('li', { className: 'osm-item' }, [
+        el('div', { className: 'osm-item__check' }, [cb, el('label', { 'for': 'osm-' + p.id }, [el('span', { className: 'visually-hidden', text: 'Seleziona ' }), el('strong', { text: p.nome })])]),
+        el('p', { className: 'place__meta', text: (OA.CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta }),
+        el('p', { className: 'osm-item__facts', text: 'Su OpenStreetMap: accesso in carrozzina ' + (OSM_SI[(p.osm || {}).wheelchair] || 'non indicato') +
+          ' · bagno accessibile ' + (OSM_SI[(p.osm || {}).toilets_wheelchair] || 'non indicato') }),
+        el('p', { className: 'osm-item__links' }, [
+          p.osm && p.osm.ref ? el('a', { href: 'https://www.openstreetmap.org/' + p.osm.ref, rel: 'noopener', target: '_blank' }, [document.createTextNode('OpenStreetMap'), el('span', { className: 'visually-hidden', text: ' (si apre in una nuova scheda)' })]) : null,
+          document.createTextNode(' · '),
+          el('a', { href: 'https://www.google.com/maps/search/?api=1&query=' + q, rel: 'noopener', target: '_blank' }, [document.createTextNode('Google Maps e Street View'), el('span', { className: 'visually-hidden', text: ' (si apre in una nuova scheda)' })])
+        ]),
+        el('div', { className: 'decision__actions' }, [yes, no])
+      ]);
+      yes.addEventListener('click', function () { decide([p.id], true, [li]); });
+      no.addEventListener('click', function () { decide([p.id], false, [li]); });
+      return li;
+    }
+
+    function load(append) {
+      if (!append) { list.textContent = ''; shown = 0; }
+      api.pendingOsm(select.value || null, shown, OSM_PAGINA).then(function (res) {
+        totale = res.totale;
+        res.rows.forEach(function (p) { list.appendChild(item(p)); });
+        shown += res.rows.length;
+        show($('mod-osm-empty'), !totale);
+        show(more, shown < totale);
+        more.textContent = 'Mostra altri (' + (totale - shown) + ')';
+      }).catch(function (err) { say(err.message, 'error'); });
+    }
+
+    function selected() {
+      return [].slice.call(list.querySelectorAll('input[type="checkbox"]:checked'));
+    }
+    $('osm-all').addEventListener('click', function () {
+      var boxes = [].slice.call(list.querySelectorAll('input[type="checkbox"]'));
+      var all = boxes.every(function (b) { return b.checked; });
+      boxes.forEach(function (b) { b.checked = !all; });
+      say(all ? 'Selezione tolta.' : 'Selezionati ' + boxes.length + ' luoghi.', '');
+    });
+    $('osm-yes').addEventListener('click', function () {
+      var cbs = selected();
+      decide(cbs.map(function (c) { return c.value; }), true, cbs.map(function (c) { return c.closest('li'); }));
+    });
+    $('osm-no').addEventListener('click', function () {
+      var cbs = selected();
+      decide(cbs.map(function (c) { return c.value; }), false, cbs.map(function (c) { return c.closest('li'); }));
+    });
+    select.addEventListener('change', function () { load(false); });
+    more.addEventListener('click', function () { load(true); });
+    cities().then(function () { load(false); });
   }
 
   /* Import da OpenStreetMap (solo admin): file JSON di import_osm.py, a blocchi di 500 */

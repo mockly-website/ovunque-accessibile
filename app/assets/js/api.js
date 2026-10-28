@@ -182,7 +182,8 @@
       listPlaces: function () {
         return Promise.all([
           allRows(function (from, to) {
-            return sb.from('places').select(COLONNE).neq('stato', 'archiviato').order('nome').order('id').range(from, to);
+            /* solo le schede pubbliche: anche per i moderatori, i luoghi «da approvare» stanno nel pannello */
+            return sb.from('places').select(COLONNE).in('stato', ['pubblicato', 'in-revisione']).order('nome').order('id').range(from, to);
           }),
           activeAlerts().catch(function () { return []; })
         ]).then(function (r) { return withAlerts(r[0].map(toPlace), r[1]); });
@@ -265,6 +266,26 @@
       },
       importOsm: function (righe) {
         return sb.rpc('importa_luoghi_osm', { p_righe: righe }).then(check);
+      },
+      /* Luoghi da OpenStreetMap da approvare: città con il numero di luoghi, poi i luoghi di una città a pagine */
+      osmCities: function () {
+        return allRows(function (from, to) {
+          return sb.from('places').select('citta').eq('stato', 'da-approvare').order('citta').order('id').range(from, to);
+        }).then(function (rows) {
+          var by = {};
+          rows.forEach(function (r) { by[r.citta] = (by[r.citta] || 0) + 1; });
+          return Object.keys(by).sort(function (a, b) { return a.localeCompare(b, 'it'); }).map(function (c) { return { citta: c, n: by[c] }; });
+        });
+      },
+      pendingOsm: function (citta, from, n) {
+        var q = sb.from('places').select(COLONNE, { count: 'exact' }).eq('stato', 'da-approvare');
+        if (citta) q = q.eq('citta', citta);
+        return q.order('categoria').order('nome').range(from, from + n - 1).then(function (res) {
+          return { rows: check(res).map(toPlace), totale: res.count || 0 };
+        });
+      },
+      decideOsm: function (ids, approva) {
+        return sb.rpc('decidi_osm', { p_ids: ids, p_approva: approva }).then(check);
       },
       decideVerification: function (id, stato, risposta) {
         return sb.rpc('decidi_verifica', { p_id: id, p_stato: stato, p_risposta: risposta || null }).then(check);
@@ -691,6 +712,9 @@
       importOsm: function () {
         return fail('In modalità prova non si importa: serve Supabase');
       },
+      osmCities: function () { return wait([]); },
+      pendingOsm: function () { return wait({ rows: [], totale: 0 }); },
+      decideOsm: function () { return fail('In modalità prova non ci sono luoghi da OpenStreetMap'); },
       decideVerification: function (id, stato, risposta) {
         if (!isMod()) return fail('Riservato ai moderatori');
         var db = load();

@@ -42,6 +42,7 @@ CATEGORIE = [
     ('tourism', {'museum', 'gallery'}, 'museo'),
     ('tourism', {'hotel', 'hostel', 'guest_house', 'motel', 'apartment', 'chalet'}, 'hotel'),
     ('leisure', {'beach_resort'}, 'spiaggia'),
+    ('natural', {'beach'}, 'spiaggia'),
     ('leisure', {'park', 'garden', 'nature_reserve'}, 'parco'),
     ('amenity', {'cinema', 'theatre', 'arts_centre', 'library', 'concert_hall'}, 'cultura'),
     ('railway', {'station'}, 'trasporti'),
@@ -85,12 +86,16 @@ def trova_comune(comune, provincia):
     codice, testo = una_richiesta(NOMINATIM + '?' + params, None)
     if codice != 200:
         sys.exit('Nominatim ha risposto con l\'errore {}.'.format(codice))
-    for r in json.loads(testo):
-        if r.get('osm_type') != 'relation' or r.get('addresstype') not in ('city', 'town', 'village', 'municipality'):
-            continue
-        prov = str((r.get('address') or {}).get('ISO3166-2-lvl6', '')).replace('IT-', '')
-        if provincia and prov and prov != provincia:
-            continue
+    candidati = [r for r in json.loads(testo)
+                 if r.get('osm_type') == 'relation' and r.get('addresstype') in ('city', 'town', 'village', 'municipality')]
+    def prov(r):
+        return str((r.get('address') or {}).get('ISO3166-2-lvl6', '')).replace('IT-', '')
+    giusti = [r for r in candidati if not provincia or not prov(r) or prov(r) == provincia]
+    # Province appena cambiate (es. Sardegna 2025): se la sigla non torna ma il comune è uno solo, va bene lo stesso
+    if not giusti and len(candidati) == 1:
+        print('Attenzione: su OpenStreetMap la provincia è {}, non {}'.format(prov(candidati[0]) or '?', provincia), file=sys.stderr)
+        giusti = candidati
+    for r in giusti:
         return 3600000000 + int(r['osm_id']), r.get('display_name', comune)
     sys.exit('Non trovo il comune «{}»{} su OpenStreetMap.'.format(comune, ' in provincia ' + provincia if provincia else ''))
 
@@ -133,7 +138,8 @@ def scheda(el, comune, regione, provincia, oggi):
         return None
     civico = pulito(tags.get('addr:housenumber'), 15)
     cap = pulito(tags.get('addr:postcode'), 5)
-    citta = pulito(tags.get('addr:city') or comune, 80)
+    # Sempre il nome del comune: addr:city a volte è una frazione o è bilingue («Casteddu/Cagliari») e sporca i filtri
+    citta = pulito(comune, 80)
     osm = {'ref': '{}/{}'.format(el['type'], el['id']), 'wheelchair': 'yes', 'importato': oggi}
     if tags.get('toilets:wheelchair') in ('yes', 'limited', 'no'):
         osm['toilets_wheelchair'] = tags['toilets:wheelchair']

@@ -18,7 +18,7 @@
   }
 
   function pagina(from, acc) {
-    var url = CFG.supabaseUrl + '/rest/v1/places?select=' + COLONNE + '&stato=neq.archiviato&order=nome,id' +
+    var url = CFG.supabaseUrl + '/rest/v1/places?select=' + COLONNE + '&stato=in.(pubblicato,in-revisione)&order=nome,id' +
       '&limit=' + PAGINA + '&offset=' + from;
     return fetch(url, { credentials: 'omit', headers: { apikey: CFG.supabaseKey, Authorization: 'Bearer ' + CFG.supabaseKey } })
       .then(function (r) { if (!r.ok) throw new Error('dati'); return r.json(); })

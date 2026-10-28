@@ -18,12 +18,12 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=i1"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p29">
-  <link rel="stylesheet" href="assets/css/app.css?v=a21">
-  <script src="assets/js/config.js?v=a21" defer></script>
+  <link rel="stylesheet" href="assets/css/app.css?v=a22">
+  <script src="assets/js/config.js?v=a22" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=p28" defer></script>
-  <script src="assets/js/api.js?v=a21" defer></script>
-  <script src="assets/js/app.js?v=a21" defer></script>
+  <script src="assets/js/api.js?v=a22" defer></script>
+  <script src="assets/js/app.js?v=a22" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -99,6 +99,25 @@
           <h2 id="mod-proposals-title">Segnalazioni <span class="pill" id="mod-proposals-count"></span></h2>
           <p id="mod-proposals-empty" class="place__meta" hidden>Nessuna segnalazione in attesa.</p>
           <ul id="mod-proposals" class="mod-list" role="list"></ul>
+        </section>
+        <section aria-labelledby="mod-osm-title">
+          <h2 id="mod-osm-title">Luoghi da OpenStreetMap da approvare <span class="pill" id="mod-osm-count"></span></h2>
+          <p class="place__meta">Sulla mappa di OpenStreetMap questi luoghi sono segnati come accessibili in carrozzina, ma nessuno li ha misurati. Controllali (foto, Street View, se li conosci) e approva quelli credibili: compaiono sulla mappa come «da verificare». Quelli non approvati vengono archiviati e non tornano con un nuovo import.</p>
+          <div class="osm-tools">
+            <div class="field">
+              <label class="field__label" for="osm-citta">Città</label>
+              <select class="select" id="osm-citta"><option value="">Caricamento…</option></select>
+            </div>
+            <p class="osm-tools__bulk">
+              <button id="osm-all" class="btn btn--secondary btn--small" type="button">Seleziona tutti quelli mostrati</button>
+              <button id="osm-yes" class="btn btn--primary btn--small" type="button">Approva i selezionati</button>
+              <button id="osm-no" class="btn btn--secondary btn--small" type="button">Non approvare i selezionati</button>
+            </p>
+          </div>
+          <p id="osm-status" class="notice" role="status" tabindex="-1" hidden></p>
+          <p id="mod-osm-empty" class="place__meta" hidden>Nessun luogo da approvare.</p>
+          <ul id="mod-osm" class="osm-list" role="list"></ul>
+          <button id="osm-more" class="btn btn--secondary btn--small" type="button" hidden>Mostra altri</button>
         </section>
         <section aria-labelledby="mod-reviews-title">
           <h2 id="mod-reviews-title">Recensioni <span class="pill" id="mod-reviews-count"></span></h2>

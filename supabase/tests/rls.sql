@@ -611,3 +611,55 @@ begin
   exception when check_violation then null; end;
 end $$;
 reset role;
+
+-- 16. Luoghi da OpenStreetMap da approvare (20261028020000): nascosti al pubblico finché un moderatore non decide
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  riga jsonb := '[{"slug": "osm-node-901", "nome": "Bar OSM 1", "categoria": "ristorante", "indirizzo": "Via Roma 1", "cap": "09170",
+                   "citta": "Oristano", "provincia": "OR", "regione": "Sardegna", "lat": 39.9, "lng": 8.59,
+                   "osm": {"ref": "node/901", "wheelchair": "yes"}},
+                  {"slug": "osm-node-902", "nome": "Bar OSM 2", "categoria": "ristorante", "indirizzo": "Via Roma 2", "cap": "09170",
+                   "citta": "Oristano", "provincia": "OR", "regione": "Sardegna", "lat": 39.9, "lng": 8.59,
+                   "osm": {"ref": "node/902", "wheelchair": "yes"}}]';
+begin
+  assert public.importa_luoghi_osm(riga) = 2, 'import';
+  assert (select stato from public.places where slug = 'osm-node-901') = 'da-approvare', 'i nuovi import devono essere da approvare';
+  assert (select stato from public.places where slug = 'osm-node-777') = 'da-approvare', 'i vecchi import devono tornare da approvare';
+end $$;
+reset role;
+
+set role anon;
+select set_config('request.jwt.claims', '{"role":"anon"}', false);
+do $$ begin
+  assert not exists (select 1 from public.places where stato = 'da-approvare'), 'anon vede un luogo da approvare';
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000002","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$ begin
+  begin
+    perform public.decidi_osm(array[(select gen_random_uuid())], true);
+    raise exception 'DOVEVA FALLIRE: un utente approva luoghi OSM';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  a uuid := (select id from public.places where slug = 'osm-node-901');
+  b uuid := (select id from public.places where slug = 'osm-node-902');
+begin
+  assert public.decidi_osm(array[a], true) = 1, 'approvazione';
+  assert public.decidi_osm(array[b], false) = 1, 'rifiuto';
+  assert public.decidi_osm(array[a, b], true) = 0, 'luoghi già decisi non si toccano';
+  assert (select stato from public.places where id = a) = 'pubblicato', 'approvato = pubblicato';
+  assert (select stato from public.places where id = b) = 'archiviato', 'rifiutato = archiviato';
+  assert public.importa_luoghi_osm('[{"slug": "osm-node-902", "nome": "Bar OSM 2", "categoria": "ristorante", "indirizzo": "Via Roma 2",
+    "citta": "Oristano", "lat": 39.9, "lng": 8.59, "osm": {"ref": "node/902", "wheelchair": "yes"}}]') = 0, 'un luogo rifiutato torna con un nuovo import';
+end $$;
+reset role;
