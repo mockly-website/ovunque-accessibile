@@ -573,3 +573,41 @@ begin
   exception when no_data_found then null; end;
 end $$;
 reset role;
+
+-- 15. Import da OpenStreetMap dall'app (20261028010000): solo admin, righe controllate, niente doppioni
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  riga jsonb := '[{"slug": "osm-node-777", "nome": "Farmacia OSM", "categoria": "sanita", "indirizzo": "Via Roma 1", "cap": "09124",
+                   "citta": "Cagliari", "provincia": "CA", "regione": "Sardegna", "lat": 39.21, "lng": 9.11,
+                   "osm": {"ref": "node/777", "wheelchair": "yes", "importato": "2026-10-28"}}]';
+begin
+  begin
+    perform public.importa_luoghi_osm(riga);
+    raise exception 'DOVEVA FALLIRE: una verificatrice importa luoghi';
+  exception when insufficient_privilege then null; end;
+end $$;
+reset role;
+update public.profiles set ruolo = 'admin' where id = 'aaaaaaaa-0000-0000-0000-000000000003';
+select set_config('request.jwt.claims', '{"sub":"aaaaaaaa-0000-0000-0000-000000000003","role":"authenticated","aal":"aal1"}', false);
+set role authenticated;
+do $$
+declare
+  riga jsonb := '[{"slug": "osm-node-777", "nome": "Farmacia OSM", "categoria": "sanita", "indirizzo": "Via Roma 1", "cap": "09124",
+                   "citta": "Cagliari", "provincia": "CA", "regione": "Sardegna", "lat": 39.21, "lng": 9.11,
+                   "osm": {"ref": "node/777", "wheelchair": "yes", "importato": "2026-10-28"}}]';
+begin
+  assert public.importa_luoghi_osm(riga) = 1, 'luogo OSM non importato';
+  assert public.importa_luoghi_osm(riga) = 0, 'luogo OSM importato due volte';
+  assert (select verifica_livello from public.places where slug = 'osm-node-777') = 'osm', 'livello di verifica';
+  begin
+    perform public.importa_luoghi_osm(jsonb_set(riga, '{0,osm,wheelchair}', '"limited"'));
+    raise exception 'DOVEVA FALLIRE: luogo non segnato wheelchair=yes';
+  exception when check_violation then null; end;
+  begin
+    perform public.importa_luoghi_osm(jsonb_set(jsonb_set(riga, '{0,slug}', '"osm-node-778"'), '{0,categoria}', '"astronave"'));
+    raise exception 'DOVEVA FALLIRE: tipo sconosciuto';
+  exception when check_violation then null; end;
+end $$;
+reset role;

@@ -2,7 +2,7 @@
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
    Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
            4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali
+           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali · 14. Ricerca del locale e completezza
    ========================================================================== */
 
 /* 1. Struttura e navigazione */
@@ -1401,4 +1401,73 @@ textarea.input {
 
 .owned__item p {
   margin: 0;
+}
+
+/* 14. Per i locali: ricerca del proprio locale, completezza della scheda, consigli */
+.find-list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.find-list:empty {
+  display: none;
+}
+
+.find-list__item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+}
+
+.find-list__item p {
+  margin: 0;
+}
+
+.completezza {
+  display: grid;
+  gap: var(--space-2xs);
+  justify-items: start;
+}
+
+.completezza__barra {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  height: 0.6rem;
+  border: 1px solid var(--color-navy);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+.completezza__pieno {
+  display: block;
+  height: 100%;
+  background: var(--color-success);
+}
+.completezza__pieno--0 { width: 0%; }
+.completezza__pieno--1 { width: 10%; }
+.completezza__pieno--2 { width: 20%; }
+.completezza__pieno--3 { width: 30%; }
+.completezza__pieno--4 { width: 40%; }
+.completezza__pieno--5 { width: 50%; }
+.completezza__pieno--6 { width: 60%; }
+.completezza__pieno--7 { width: 70%; }
+.completezza__pieno--8 { width: 80%; }
+.completezza__pieno--9 { width: 90%; }
+.completezza__pieno--10 { width: 100%; }
+
+@media (forced-colors: active) {
+  .completezza__pieno {
+    background: Highlight;
+  }
 }

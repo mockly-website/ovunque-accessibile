@@ -644,11 +644,21 @@
     if (!api.user()) {
       show($('owner-login'), true);
       $('owner-login-link').href = 'accedi.html?torna=' + encodeURIComponent(here());
+      if (params.get('gestisci')) setTimeout(function () { card.scrollIntoView({ block: 'start' }); }, 600);
       return;
     }
     var g = who.owner;
     if (!g) {
       show($('owner-new'), true);
+      /* Arrivo da «Per i locali → Gestisci»: la richiesta è già aperta */
+      if (params.get('gestisci')) {
+        $('owner-new').open = true;
+        /* dopo un attimo: foto, recensioni e mappa caricati sopra spostano la scheda */
+        setTimeout(function () {
+          card.scrollIntoView({ block: 'start' });
+          $('o-ruolo').focus({ preventScroll: true });
+        }, 600);
+      }
     } else if (g.stato === 'approvato') {
       $('owner-title').textContent = 'Sei il gestore di questo luogo';
       $('owner-intro').textContent = 'Puoi rispondere alle recensioni qui sopra. Se qualcosa cambia (una rampa nuova, un bagno rifatto), proponi una correzione: la controlliamo e aggiorniamo la scheda.' +
@@ -685,14 +695,56 @@
   var STATO_GESTORE = { 'in-attesa': 'Richiesta in attesa', approvato: 'Sei il gestore', respinto: 'Richiesta non approvata', revocato: 'Gestione revocata' };
   var STATO_VERIFICA = { 'in-attesa': 'Verifica richiesta: la stiamo organizzando', fissata: 'Verifica fissata', fatta: 'Verifica fatta', respinta: 'Verifica non possibile' };
 
+  /* Cerca il proprio locale tra le schede pubblicate → scheda con «Gestisci questo luogo?» già aperto */
+  function initFindPlace() {
+    var input = $('find-q');
+    var out = $('find-list');
+    var status = $('find-status');
+    if (!input) return;
+    var places = null;
+    var timer = null;
+    function render() {
+      var q = OA.normalize(input.value.trim());
+      out.textContent = '';
+      if (q.length < 2) { status.textContent = ''; return; }
+      var words = q.split(/\s+/);
+      var found = (places || []).filter(function (p) {
+        var hay = OA.normalize([p.nome, p.citta, p.indirizzo].join(' '));
+        return words.every(function (w) { return hay.indexOf(w) !== -1; });
+      }).slice(0, 8);
+      status.textContent = found.length ? (found.length === 1 ? '1 locale trovato.' : found.length + ' locali trovati (al massimo 8: scrivi anche la città per restringere).') : 'Nessun locale trovato con questo nome.';
+      found.forEach(function (p) {
+        out.appendChild(el('li', { className: 'find-list__item' }, [
+          el('div', {}, [
+            el('strong', { text: p.nome }),
+            el('p', { className: 'place__meta', text: (OA.CATEGORIE[p.categoria] || '') + ' · ' + p.indirizzo + ', ' + p.citta })
+          ]),
+          el('a', { className: 'btn btn--secondary btn--small', href: 'luogo.html?id=' + encodeURIComponent(p.id) + '&gestisci=1#owner-card' }, [
+            document.createTextNode('Gestisci'), el('span', { className: 'visually-hidden', text: ' ' + p.nome + ', ' + p.citta })
+          ])
+        ]));
+      });
+    }
+    input.addEventListener('input', function () {
+      clearTimeout(timer);
+      timer = setTimeout(function () {
+        if (places) return render();
+        status.textContent = 'Carico i locali…';
+        api.listPlaces().then(function (rows) { places = rows; render(); }).catch(function (err) { status.textContent = err.message; });
+      }, 250);
+    });
+  }
+
   function initLocali() {
     var list = $('owned-list');
     var note = $('owned-note');
+    initFindPlace();
     if (!api.user()) {
       show($('owned-login'), true);
       return;
     }
     var focusId = params.get('id');
+    var byId = {};
 
     function verificaForm(g) {
       var id = 'ver-' + g.place_id;
@@ -748,6 +800,20 @@
         li.appendChild(el('p', { text: g.motivo ? 'Motivo: ' + g.motivo : 'Per chiarimenti scrivi a ovunqueaccessibile@gmail.com.' }));
         return li;
       }
+      /* Quanto è completa la scheda: chi la gestisce sa cosa manca e la completa con una correzione */
+      var full = byId[g.place_id];
+      if (full) {
+        var c = OA.completezza(full);
+        var pct = Math.round(c.note / c.totale * 100);
+        li.appendChild(el('div', { className: 'completezza' }, [
+          el('p', {}, [el('strong', { text: 'Scheda completa al ' + pct + '%' }), document.createTextNode(' (' + c.note + ' voci su ' + c.totale + ')')]),
+          el('span', { className: 'completezza__barra', 'aria-hidden': 'true' }, [el('span', { className: 'completezza__pieno completezza__pieno--' + Math.round(pct / 10) })]),
+          c.mancano.length ? el('p', { className: 'place__meta', text: 'Da completare: ' + c.mancano.join(', ') + '.' }) : null,
+          c.mancano.length ? el('a', { className: 'btn btn--secondary btn--small', href: 'segnala.html?id=' + encodeURIComponent(g.place_id) }, [
+            icon('#icon-edit'), document.createTextNode('Completa la scheda'), el('span', { className: 'visually-hidden', text: ' di ' + p.nome })
+          ]) : null
+        ]));
+      }
       if (sulPosto) {
         li.appendChild(el('p', {}, [OA.statusNode(['si', 'Verificato sul posto' + (p.verifica_data ? ' il ' + dateIt(p.verifica_data) : '')])]));
         li.appendChild(el('a', { className: 'btn btn--primary btn--small', href: 'bollino.html?id=' + encodeURIComponent(p.id) }, [
@@ -791,7 +857,9 @@
     }
 
     function load() {
-      Promise.all([api.myOwnerships(), api.myVerifications()]).then(function (r) {
+      Promise.all([api.myOwnerships(), api.myVerifications(), api.listPlaces().catch(function () { return []; })]).then(function (r) {
+        byId = {};
+        r[2].forEach(function (x) { byId[x.id] = x; });
         list.textContent = '';
         show($('owned-empty'), !r[0].length);
         r[0].forEach(function (g) { list.appendChild(item(g, r[1])); });
@@ -2147,6 +2215,7 @@
     loadPending();
     loadChecks();
     initPlaceState();
+    initOsmImport();
   }
 
   function decisionForm(kind, item, onDone) {
@@ -2388,6 +2457,48 @@
         list.appendChild(el('li', {}, [article]));
       });
     }).catch(function (err) { message($('mod-note'), err.message, 'error'); });
+  }
+
+  /* Import da OpenStreetMap (solo admin): file JSON di import_osm.py, a blocchi di 500 */
+  function initOsmImport() {
+    var card = $('osm-card');
+    if (!card) return;
+    api.profile().then(function (prof) {
+      if (!prof || prof.ruolo !== 'admin') return;
+      show(card, true);
+      var note = $('osm-note');
+      var btn = $('osm-import');
+      btn.addEventListener('click', function () {
+        var file = $('osm-file').files[0];
+        if (!file) { message(note, 'Scegli prima il file JSON.', 'error'); note.focus(); return; }
+        if (btn.getAttribute('aria-disabled') === 'true') return;
+        btn.setAttribute('aria-disabled', 'true');
+        file.text().then(function (txt) {
+          var righe = JSON.parse(txt);
+          if (!Array.isArray(righe)) throw new Error('Il file non contiene un elenco di luoghi.');
+          var fatti = 0;
+          var creati = 0;
+          message(note, 'Importo ' + righe.length + ' luoghi…', '');
+          return righe.reduce(function (prev, _, i) {
+            if (i % 500) return prev;
+            return prev.then(function () {
+              return api.importOsm(righe.slice(i, i + 500)).then(function (n) {
+                creati += n;
+                fatti = Math.min(i + 500, righe.length);
+                message(note, 'Importo… ' + fatti + ' di ' + righe.length, '');
+              });
+            });
+          }, Promise.resolve()).then(function () {
+            message(note, 'Fatto: ' + creati + ' schede nuove su ' + righe.length + ' (le altre c\'erano già).', 'ok');
+          });
+        }).catch(function (err) {
+          message(note, err instanceof SyntaxError ? 'Il file non è un JSON valido.' : err.message, 'error');
+        }).then(function () {
+          btn.removeAttribute('aria-disabled');
+          note.focus();
+        });
+      });
+    });
   }
 
   function initPlaceState() {

@@ -17,13 +17,13 @@
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=i1"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p25">
-  <link rel="stylesheet" href="assets/css/app.css?v=a16">
-  <script src="assets/js/config.js?v=a16" defer></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=p26">
+  <link rel="stylesheet" href="assets/css/app.css?v=a18">
+  <script src="assets/js/config.js?v=a18" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
-  <script src="../assets/js/oa-core.js?v=p23" defer></script>
-  <script src="assets/js/api.js?v=a16" defer></script>
-  <script src="assets/js/app.js?v=a16" defer></script>
+  <script src="../assets/js/oa-core.js?v=p24" defer></script>
+  <script src="assets/js/api.js?v=a18" defer></script>
+  <script src="assets/js/app.js?v=a18" defer></script>
 </head>
 <body class="app" data-page="locali">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -112,12 +112,39 @@
         <p class="place__meta">Il bollino non è una certificazione di legge: dice che abbiamo misurato il locale di persona, in quella data. Dopo 24 mesi la scheda torna «da ricontrollare».</p>
       </section>
 
+      <section class="card" aria-labelledby="find-title">
+        <h2 id="find-title">Trova il tuo locale</h2>
+        <div class="field">
+          <label class="field__label" for="find-q">Nome del locale o città</label>
+          <input class="input" type="search" id="find-q" autocomplete="off" aria-describedby="find-status">
+        </div>
+        <p id="find-status" class="place__meta" role="status"></p>
+        <ul id="find-list" class="find-list" role="list"></ul>
+        <p class="place__meta">Non lo trovi? <a href="segnala.html">Segnala il tuo locale</a>: quando è pubblicato, torna qui e chiedi di gestirlo.</p>
+      </section>
+
       <section id="owned" class="card" aria-labelledby="owned-title">
         <h2 id="owned-title">I tuoi locali</h2>
         <p id="owned-note" class="notice" role="status" tabindex="-1" hidden></p>
         <p id="owned-login" hidden><a id="owned-login-link" href="accedi.html?torna=locali.html">Accedi</a> per vedere i locali che gestisci e chiedere la verifica sul posto.</p>
         <p id="owned-empty" class="place__meta" hidden>Non gestisci ancora nessun locale. Cercalo sulla mappa, apri la scheda e premi «Gestisci questo luogo?».</p>
         <ul id="owned-list" class="owned" role="list"></ul>
+      </section>
+
+      <section class="card" aria-labelledby="consigli-title">
+        <h2 id="consigli-title">Piccoli interventi che fanno la differenza</h2>
+        <p>Non servono sempre lavori: spesso bastano attenzioni che costano poco.</p>
+        <ul class="tips">
+          <li><strong>Un campanello all'ingresso</strong>, a 80–90 cm da terra (l'altezza di chi è seduto), con scritto un numero da chiamare se ci sono gradini.</li>
+          <li><strong>Una rampa mobile</strong> per uno o due gradini, sempre pronta vicino alla porta, e un cartello che dice che c'è.</li>
+          <li><strong>Passaggi liberi di almeno 90 cm</strong> tra tavoli, espositori e scaffali, anche nelle ore piene.</li>
+          <li><strong>Il bagno sgombro</strong>: niente scatole, scope o seggioloni nello spazio per girarsi davanti al WC.</li>
+          <li><strong>Bordi dei gradini colorati</strong> con una striscia a contrasto: aiutano chi vede poco e chi cammina con fatica.</li>
+          <li><strong>Menu e cartelli a caratteri grandi</strong>, scuri su fondo chiaro, e il menu leggibile anche sul telefono.</li>
+          <li><strong>Prenotazioni anche per scritto</strong> (chat, email, SMS), per chi non sente o non parla al telefono.</li>
+          <li><strong>Il personale sa come aiutare</strong>: chiedere prima di spingere una carrozzina, offrire il braccio a chi non vede, parlare guardando in faccia chi legge le labbra, accogliere i cani guida.</li>
+        </ul>
+        <p class="place__meta">Per i lavori veri e propri (rampe fisse, bagni, ascensori) le regole sono nel DM 236/1989: chiedete a un tecnico. Quando cambiate qualcosa, proponete una correzione della scheda.</p>
       </section>
 
       <section class="card" aria-labelledby="contatti-title">

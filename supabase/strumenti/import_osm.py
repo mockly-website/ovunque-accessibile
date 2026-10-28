@@ -4,7 +4,8 @@ Uso (dalla cartella del progetto):
   python3 supabase/strumenti/import_osm.py --comune "Roma" --regione Lazio --provincia RM
   python3 supabase/strumenti/import_osm.py --comune "Cagliari" --regione Sardegna --provincia CA --limite 200 --anteprima
 
-Scrive supabase/import/osm-<comune>.sql: si incolla nel SQL Editor di Supabase (vedi DOCUMENTAZIONE.md).
+Scrive supabase/import/osm-<comune>.sql (da incollare nel SQL Editor) e osm-<comune>.json (per importa_luoghi_osm(),
+quando il file SQL è troppo grande per l'editor): vedi DOCUMENTAZIONE.md.
 Con --anteprima stampa solo quanti luoghi troverebbe, per tipo, senza scrivere niente.
 
 Regole:
@@ -30,7 +31,9 @@ import urllib.request
 
 ROOT = pathlib.Path(__file__).resolve().parents[2]
 OUT_DIR = ROOT / 'supabase' / 'import'
-OVERPASS = 'https://overpass-api.de/api/interpreter'
+# Server Overpass pubblici: se il primo è pieno si prova il secondo
+OVERPASS = ['https://overpass-api.de/api/interpreter', 'https://maps.mail.ru/osm/tools/overpass/api/interpreter']
+NOMINATIM = 'https://nominatim.openstreetmap.org/search'
 USER_AGENT = 'OvunqueAccessibile-import/1.0 (ovunqueaccessibile@gmail.com)'
 
 # Tag OSM → categoria della scheda (il primo che corrisponde vince)
@@ -63,15 +66,33 @@ NOME_PREDEFINITO = {'bagni': 'Bagno pubblico'}
 MISURE_VUOTE = {'ingresso': {}, 'spazi': {}, 'piani': {}, 'bagno': {}}
 
 
-def query(comune):
+def query(area_id):
+    """Luoghi wheelchair=yes dentro l'area del comune (id dell'area Overpass = 3600000000 + id della relazione)."""
     filtri = ''.join(
         '  nwr(area.a)["wheelchair"="yes"]{}["{}"{}];\n'.format(
             '' if cat in NOME_PREDEFINITO else '["name"]', k, '' if v is None else '~"^({})$"'.format('|'.join(sorted(v))))
         for k, v, cat in CATEGORIE)
-    nome = comune.replace('\\', '').replace('"', '')
     return ('[out:json][timeout:120];\n'
-            'rel["boundary"="administrative"]["admin_level"="8"]["name"="{}"];\nmap_to_area->.a;\n'
-            '(\n{});\nout center tags;\n').format(nome, filtri)
+            'area(id:{})->.a;\n'
+            '(\n{});\nout center tags;\n').format(area_id, filtri)
+
+
+def trova_comune(comune, provincia):
+    """Il confine del comune lo trova Nominatim, che capisce anche i nomi bilingui («Casteddu/Cagliari», «Bolzano - Bozen»)
+    e dice in che provincia è: con --provincia si scarta un comune omonimo di un'altra provincia."""
+    params = urllib.parse.urlencode({'city': comune, 'countrycodes': 'it', 'format': 'jsonv2', 'addressdetails': '1',
+                                     'limit': '10', 'accept-language': 'it'})
+    codice, testo = una_richiesta(NOMINATIM + '?' + params, None)
+    if codice != 200:
+        sys.exit('Nominatim ha risposto con l\'errore {}.'.format(codice))
+    for r in json.loads(testo):
+        if r.get('osm_type') != 'relation' or r.get('addresstype') not in ('city', 'town', 'village', 'municipality'):
+            continue
+        prov = str((r.get('address') or {}).get('ISO3166-2-lvl6', '')).replace('IT-', '')
+        if provincia and prov and prov != provincia:
+            continue
+        return 3600000000 + int(r['osm_id']), r.get('display_name', comune)
+    sys.exit('Non trovo il comune «{}»{} su OpenStreetMap.'.format(comune, ' in provincia ' + provincia if provincia else ''))
 
 
 def categoria(tags):
@@ -126,10 +147,11 @@ def scheda(el, comune, regione, provincia, oggi):
     }
 
 
-def una_richiesta(corpo):
-    """→ (codice HTTP, testo). Il Python di macOS (LibreSSL vecchia) a volte non parla con Overpass: allora curl."""
+def una_richiesta(url, corpo):
+    """→ (codice HTTP, testo); corpo None = GET. Il Python di macOS (LibreSSL vecchia) a volte non parla con questi
+    server: allora curl."""
     try:
-        req = urllib.request.Request(OVERPASS, data=corpo, headers={'User-Agent': USER_AGENT})
+        req = urllib.request.Request(url, data=corpo, headers={'User-Agent': USER_AGENT})
         with urllib.request.urlopen(req, timeout=180) as r:
             return r.status, r.read()
     except urllib.error.HTTPError as err:
@@ -137,8 +159,10 @@ def una_richiesta(corpo):
     except urllib.error.URLError as err:
         if not shutil.which('curl') or 'SSL' not in str(err):
             raise
-        out = subprocess.run(['curl', '-sS', '--max-time', '180', '-A', USER_AGENT, '--data-binary', '@-',
-                              '-w', '\n%{http_code}', OVERPASS], input=corpo, capture_output=True, check=True)
+        cmd = ['curl', '-sS', '--max-time', '180', '-A', USER_AGENT, '-w', '\n%{http_code}']
+        if corpo is not None:
+            cmd += ['--data-binary', '@-']
+        out = subprocess.run(cmd + [url], input=corpo, capture_output=True)
         testo, _, codice = out.stdout.rpartition(b'\n')
         return int(codice or 0), testo
 
@@ -146,16 +170,38 @@ def una_richiesta(corpo):
 def scarica(q):
     """Overpass pubblico: se è occupato (429, 502, 504) si riprova aspettando sempre di più, come chiedono le sue regole."""
     corpo = urllib.parse.urlencode({'data': q}).encode()
-    for attesa in (0, 20, 60, 120):
-        if attesa:
-            print('Overpass è occupato: riprovo tra {} secondi…'.format(attesa), file=sys.stderr)
-            time.sleep(attesa)
-        codice, testo = una_richiesta(corpo)
-        if codice == 200:
-            return json.loads(testo)
-        if codice not in (429, 502, 503, 504):
-            sys.exit('Overpass ha risposto con l\'errore {}.'.format(codice))
+    for attesa in (0, 20, 60, 120, 240):
+        for server in OVERPASS:
+            codice, testo = una_richiesta(server, corpo)
+            if codice == 200:
+                try:
+                    dati = json.loads(testo)
+                except ValueError:
+                    continue                     # pagina d'errore («too busy») invece dei dati
+                if 'runtime error' in str(dati.get('remark', '')):
+                    continue                     # risposta interrotta: dati incompleti, non si usano
+                return dati
+            if codice not in (0, 429, 502, 503, 504):
+                sys.exit('Overpass ha risposto con l\'errore {}.'.format(codice))
+        print('Overpass è occupato: riprovo tra {} secondi…'.format(attesa or 20), file=sys.stderr)
+        time.sleep(attesa or 20)
     sys.exit('Overpass è ancora occupato: riprova più tardi.')
+
+
+def scegli(righe, limite):
+    """Al massimo «limite» schede, a rotazione tra i tipi (così non restano fuori farmacie o stazioni perché vengono dopo
+    in ordine alfabetico). In ogni tipo prima i luoghi con anche il bagno accessibile (toilets:wheelchair=yes)."""
+    gruppi = {}
+    for s in righe:
+        gruppi.setdefault(s['categoria'], []).append(s)
+    for g in gruppi.values():
+        g.sort(key=lambda s: (s['osm'].get('toilets_wheelchair') != 'yes', s['nome']))
+    scelte = []
+    while len(scelte) < limite and any(gruppi.values()):
+        for cat in sorted(gruppi):
+            if gruppi[cat] and len(scelte) < limite:
+                scelte.append(gruppi[cat].pop(0))
+    return sorted(scelte, key=lambda s: (s['categoria'], s['nome']))
 
 
 def main():
@@ -169,7 +215,9 @@ def main():
     if a.provincia and not re.fullmatch(r'[A-Z]{2}', a.provincia):
         sys.exit('La provincia è una sigla di 2 lettere maiuscole, es. RM')
 
-    dati = scarica(query(a.comune))
+    area_id, nome_completo = trova_comune(a.comune, a.provincia)
+    print('Comune: ' + nome_completo, file=sys.stderr)
+    dati = scarica(query(area_id))
     if dati.get('remark'):
         print('Attenzione, Overpass dice: ' + dati['remark'], file=sys.stderr)
 
@@ -180,8 +228,7 @@ def main():
         if s and s['slug'] not in visti:
             visti.add(s['slug'])
             righe.append(s)
-    righe.sort(key=lambda s: (s['categoria'], s['nome']))
-    righe = righe[:a.limite]
+    righe = scegli(righe, a.limite)
 
     conta = {}
     for s in righe:
@@ -195,7 +242,9 @@ def main():
     OUT_DIR.mkdir(exist_ok=True)
     out = OUT_DIR / 'osm-{}.sql'.format(re.sub(r'[^a-z0-9]+', '-', a.comune.lower()).strip('-'))
     out.write_text(sql(righe, a.comune, oggi), encoding='utf-8')
-    print('Scritto', out.relative_to(ROOT))
+    # Stesse righe in JSON, per importa_luoghi_osm() (migrazione 20261028010000): i file grandi non entrano nel SQL Editor
+    out.with_suffix('.json').write_text(json.dumps(righe, ensure_ascii=False), encoding='utf-8')
+    print('Scritto', out.relative_to(ROOT), 'e', out.with_suffix('.json').name)
 
 
 def sql(righe, comune, oggi):

@@ -248,6 +248,9 @@
           });
         });
       },
+      importOsm: function (righe) {
+        return sb.rpc('importa_luoghi_osm', { p_righe: righe }).then(check);
+      },
       decideVerification: function (id, stato, risposta) {
         return sb.rpc('decidi_verifica', { p_id: id, p_stato: stato, p_risposta: risposta || null }).then(check);
       },
@@ -669,6 +672,9 @@
             });
           });
         });
+      },
+      importOsm: function () {
+        return fail('In modalità prova non si importa: serve Supabase');
       },
       decideVerification: function (id, stato, risposta) {
         if (!isMod()) return fail('Riservato ai moderatori');

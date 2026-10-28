@@ -10,3 +10,6 @@ supabase/.branches/
 Ovunque Accessibile – *
 *.pages
 *.docx
+
+# Luoghi scaricati da OpenStreetMap con supabase/strumenti/import_osm.py (si rigenerano)
+supabase/import/

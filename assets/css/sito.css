@@ -2338,3 +2338,9 @@ html:not(.js) .js-only {
 .business p {
   margin: 0;
 }
+
+.tips {
+  display: grid;
+  gap: var(--space-xs);
+  padding-left: 1.2em;
+}

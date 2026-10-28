@@ -289,6 +289,17 @@
   var ICONA_STATO = { si: '#icon-yes', parziale: '#icon-partial', no: '#icon-no', nv: '#icon-unknown', np: '#icon-na' };
   var PREFISSO_STATO = { si: 'Sì: ', parziale: 'In parte: ', no: 'No: ', nv: 'Non verificato: ', np: 'Non previsto: ' };
 
+  /* Quanto è completa una scheda: per ogni voce, se si sa com'è (per la prima esigenza a cui serve).
+     → { note, totale, mancano: [nomi delle voci «da verificare»] }. Serve ai gestori («Per i locali»). */
+  function completezza(p) {
+    var mancano = [];
+    VOCI.forEach(function (v) {
+      var e = ORDINE_ESIGENZE.filter(function (k) { return ESIGENZE[k].voci.indexOf(v.key) !== -1; })[0];
+      if (v.valuta(p, e)[0] === 'nv') mancano.push(v.nome);
+    });
+    return { note: VOCI.length - mancano.length, totale: VOCI.length, mancano: mancano };
+  }
+
   /* Ovunque Accessibile mostra solo luoghi accessibili, almeno in parte: chi ha un'esigenza per cui il luogo
      è «non accessibile» non lo vede su mappa ed elenchi (la scheda resta raggiungibile con il suo link) */
   function visibile(p, e) {
@@ -1180,7 +1191,7 @@
     },
     CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, SOGLIE: SOGLIE,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, DETTAGLI: DETTAGLI, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
-    giudizio: giudizio, visibile: visibile, verifica: verifica, distanceKm: distanceKm,
+    giudizio: giudizio, visibile: visibile, verifica: verifica, distanceKm: distanceKm, completezza: completezza,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, verificaNode: verificaNode, placeCard: placeCard,
