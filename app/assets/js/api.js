@@ -120,6 +120,17 @@
       return new URL(page, location.href).href;
     }
 
+    /* Supabase restituisce al massimo 1000 righe per richiesta: si leggono a pagine finché non finiscono */
+    var PAGINA = 1000;
+    function allRows(query, from, acc) {
+      from = from || 0;
+      acc = acc || [];
+      return query(from, from + PAGINA - 1).then(check).then(function (rows) {
+        acc = acc.concat(rows);
+        return rows.length < PAGINA || acc.length >= 20000 ? acc : allRows(query, from + PAGINA, acc);
+      });
+    }
+
     function activeAlerts(placeId) {
       var q = sb.from('avvisi').select(COLONNE_AVVISI).eq('stato', 'attivo').gte('scade_il', oggi());
       if (placeId) q = q.eq('place_id', placeId);
@@ -170,12 +181,16 @@
 
       listPlaces: function () {
         return Promise.all([
-          sb.from('places').select(COLONNE).neq('stato', 'archiviato').order('nome').limit(5000).then(check),
+          allRows(function (from, to) {
+            return sb.from('places').select(COLONNE).neq('stato', 'archiviato').order('nome').order('id').range(from, to);
+          }),
           activeAlerts().catch(function () { return []; })
         ]).then(function (r) { return withAlerts(r[0].map(toPlace), r[1]); });
       },
       allPlacesForModeration: function () {
-        return sb.from('places').select('id,nome,citta,stato').order('nome').limit(2000).then(check);
+        return allRows(function (from, to) {
+          return sb.from('places').select('id,nome,citta,stato').order('nome').order('id').range(from, to);
+        });
       },
       getPlace: function (id) {
         return sb.from('places').select(COLONNE).eq('id', id).maybeSingle()
