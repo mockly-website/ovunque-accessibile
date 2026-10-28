@@ -16,11 +16,11 @@
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=i1"></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p29">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p32">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="app/assets/js/config.js?v=a22" defer></script>
-  <script src="assets/js/oa-core.js?v=p28" defer></script>
+  <script src="app/assets/js/config.js?v=a23" defer></script>
+  <script src="assets/js/oa-core.js?v=p29" defer></script>
   <script src="assets/js/sito.js?v=p17" defer></script>
 </head>
 <body>
@@ -108,42 +108,47 @@
               </div>
             </div>
 
-            <fieldset>
-              <legend>Filtra</legend>
-              <div class="chips">
-                <div class="chip"><input type="checkbox" id="f-accessibile" name="f" value="accessibile"><label for="f-accessibile"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Solo luoghi accessibili</label></div>
-                <div class="chip"><input type="checkbox" id="f-ingresso" name="f" value="ingresso"><label for="f-ingresso"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Ingresso accessibile</label></div>
-                <div class="chip"><input type="checkbox" id="f-bagno" name="f" value="bagno"><label for="f-bagno"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Bagno accessibile</label></div>
-                <div class="chip"><input type="checkbox" id="f-parcheggio" name="f" value="parcheggio"><label for="f-parcheggio"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</label></div>
+            <details id="filters-more" class="filters__more">
+              <summary class="filters__toggle">Filtri e tipo di luogo <span id="filters-active" class="filters__active"></span></summary>
+              <div class="filters__body">
+                <fieldset>
+                  <legend>Filtra</legend>
+                  <div class="chips">
+                    <div class="chip"><input type="checkbox" id="f-accessibile" name="f" value="accessibile"><label for="f-accessibile"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Solo luoghi accessibili</label></div>
+                    <div class="chip"><input type="checkbox" id="f-ingresso" name="f" value="ingresso"><label for="f-ingresso"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Ingresso accessibile</label></div>
+                    <div class="chip"><input type="checkbox" id="f-bagno" name="f" value="bagno"><label for="f-bagno"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Bagno accessibile</label></div>
+                    <div class="chip"><input type="checkbox" id="f-parcheggio" name="f" value="parcheggio"><label for="f-parcheggio"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</label></div>
+                  </div>
+                </fieldset>
+
+                <div class="filters__row">
+                <div class="field">
+                  <label class="field__label" for="cat">Tipo di luogo</label>
+                  <select class="select" id="cat" name="cat">
+                    <option value="">Tutti i tipi</option>
+                    <option value="ristorante">Ristoranti e bar</option>
+                    <option value="museo">Musei</option>
+                    <option value="hotel">Hotel e alloggi</option>
+                    <option value="spiaggia">Spiagge</option>
+                    <option value="parco">Parchi e natura</option>
+                    <option value="cultura">Cinema, teatro e cultura</option>
+                    <option value="negozio">Negozi</option>
+                    <option value="trasporti">Trasporti</option>
+                    <option value="sanita">Salute (farmacie, ospedali…)</option>
+                    <option value="servizi">Uffici e servizi (comune, poste…)</option>
+                    <option value="supermercato">Supermercati</option>
+                    <option value="sport">Sport e piscine</option>
+                    <option value="istruzione">Scuole e università</option>
+                    <option value="culto">Luoghi di culto</option>
+                    <option value="svago">Svago (zoo, acquari…)</option>
+                    <option value="bagni">Bagni pubblici</option>
+                  </select>
+                </div>
+
+                <button class="btn btn--secondary btn--small filters__reset" type="reset">Azzera</button>
+                </div>
               </div>
-            </fieldset>
-
-            <div class="filters__row">
-            <div class="field">
-              <label class="field__label" for="cat">Tipo di luogo</label>
-              <select class="select" id="cat" name="cat">
-                <option value="">Tutti i tipi</option>
-                <option value="ristorante">Ristoranti e bar</option>
-                <option value="museo">Musei</option>
-                <option value="hotel">Hotel e alloggi</option>
-                <option value="spiaggia">Spiagge</option>
-                <option value="parco">Parchi e natura</option>
-                <option value="cultura">Cinema, teatro e cultura</option>
-                <option value="negozio">Negozi</option>
-                <option value="trasporti">Trasporti</option>
-                <option value="sanita">Salute (farmacie, ospedali…)</option>
-                <option value="servizi">Uffici e servizi (comune, poste…)</option>
-                <option value="supermercato">Supermercati</option>
-                <option value="sport">Sport e piscine</option>
-                <option value="istruzione">Scuole e università</option>
-                <option value="culto">Luoghi di culto</option>
-                <option value="svago">Svago (zoo, acquari…)</option>
-                <option value="bagni">Bagni pubblici</option>
-              </select>
-            </div>
-
-            <button class="btn btn--secondary btn--small filters__reset" type="reset">Azzera</button>
-            </div>
+            </details>
           </form>
         </div>
 

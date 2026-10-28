@@ -465,6 +465,7 @@ html:not(.js) .js-only {
 }
 
 .needs__options {
+  clear: both;               /* sotto la legenda (float) anche quando il testo d'aiuto è nascosto */
   display: grid;
   gap: var(--space-xs);
 }
@@ -2508,4 +2509,103 @@ html:not(.js) .js-only {
 
 .summary__item--wide {
   grid-column: 1 / -1;
+}
+
+/* 20. Pagina mappa più corta sul telefono: esigenza in tessere compatte, filtri in una tendina, mappa subito sotto */
+.filters__more {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.filters__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  padding: var(--space-xs) var(--space-md);
+  font-weight: 700;
+  color: var(--color-navy);
+  cursor: pointer;
+  list-style: none;
+}
+
+.filters__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.filters__toggle::before {
+  content: "";
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: 3px solid var(--color-brand);
+  border-bottom: 3px solid var(--color-brand);
+  transform: rotate(-45deg);
+}
+
+.filters__more[open] > .filters__toggle::before {
+  transform: rotate(45deg);
+}
+
+.filters__toggle:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.filters__active {
+  color: var(--color-brand);
+}
+
+.filters__body {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+/* Dentro la tendina i filtri vanno a capo: niente fila tagliata a destra */
+.filters__more .chips {
+  flex-wrap: wrap;
+  overflow: visible;
+  margin-inline: 0;
+  padding: 0;
+}
+
+@media (max-width: 47.99em) {
+  .explore .needs {
+    margin-bottom: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm) var(--space-sm);
+  }
+
+  /* Esigenza già scelta: la spiegazione diventa una riga breve («Giudizi calcolati per: …»).
+     Resta nel flusso: Safari, senza, mette le tessere accanto alla legenda invece che sotto */
+  .explore .needs:not(.needs--ask) .needs__help {
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+  }
+
+  .explore .needs .needs__options {
+    gap: 6px;
+  }
+
+  .explore .needs .needs__option label {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    min-height: 2.9rem;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.15;
+    text-align: left;
+  }
+
+  .explore .needs .needs__option label .icon {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .explore .filters {
+    gap: var(--space-xs);
+  }
 }

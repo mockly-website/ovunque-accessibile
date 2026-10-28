@@ -602,8 +602,8 @@ begin
   assert public.importa_luoghi_osm(riga) = 0, 'luogo OSM importato due volte';
   assert (select verifica_livello from public.places where slug = 'osm-node-777') = 'osm', 'livello di verifica';
   begin
-    perform public.importa_luoghi_osm(jsonb_set(riga, '{0,osm,wheelchair}', '"limited"'));
-    raise exception 'DOVEVA FALLIRE: luogo non segnato wheelchair=yes';
+    perform public.importa_luoghi_osm(jsonb_set(riga, '{0,osm,wheelchair}', '"no"'));
+    raise exception 'DOVEVA FALLIRE: luogo segnato non accessibile (wheelchair=no)';
   exception when check_violation then null; end;
   begin
     perform public.importa_luoghi_osm(jsonb_set(jsonb_set(riga, '{0,slug}', '"osm-node-778"'), '{0,categoria}', '"astronave"'));

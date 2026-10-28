@@ -735,6 +735,10 @@
       if (box) box.checked = true;
     });
 
+    /* Sul computer la tendina dei filtri è aperta; sul telefono chiusa, così la mappa si vede subito */
+    var more = document.getElementById('filters-more');
+    if (more && window.matchMedia('(min-width: 64em)').matches) more.open = true;
+
     var places = [];
     var map = null;
     var markers = {};
@@ -830,6 +834,10 @@
         found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null, origin ? km[p.id] : null)); });
       }
       if (view) view.count(found.length);
+      /* «Filtri e tipo di luogo» (tendina): quanti sono attivi */
+      var attivi = filters.length + (cat ? 1 : 0);
+      var badge = document.getElementById('filters-active');
+      if (badge) badge.textContent = attivi ? '(' + attivi + (attivi === 1 ? ' attivo)' : ' attivi)') : '';
       count.textContent = (found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati') +
         (origin ? ', dal più vicino' : '') + ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase();
 
@@ -841,7 +849,11 @@
         });
         if (!keepView) {
           if (found.length) {
-            map.fitBounds(L.latLngBounds(found.map(function (p) { return [p.lat, p.lng]; })), { padding: [40, 40], maxZoom: 14 });
+            /* Nell'app la barra in basso copre il fondo della mappa: i luoghi restano sopra la barra */
+            var nav = document.querySelector('.app-nav');
+            var sotto = nav && getComputedStyle(nav).position === 'fixed' ? nav.offsetHeight + 16 : 0;
+            map.fitBounds(L.latLngBounds(found.map(function (p) { return [p.lat, p.lng]; })),
+              { paddingTopLeft: [40, 40], paddingBottomRight: [40, 40 + sotto], maxZoom: 14 });
           } else {
             map.setView(ITALY.center, ITALY.zoom);
           }

@@ -9,7 +9,8 @@ quando il file SQL è troppo grande per l'editor): vedi DOCUMENTAZIONE.md.
 Con --anteprima stampa solo quanti luoghi troverebbe, per tipo, senza scrivere niente.
 
 Regole:
-- solo wheelchair=yes (Ovunque Accessibile mostra luoghi davvero accessibili; «limited» e «no» restano fuori);
+- solo wheelchair=yes (Ovunque Accessibile mostra luoghi davvero accessibili); con --anche-in-parte anche «limited»,
+  per le zone con pochi dati (tutti passano comunque dalla moderazione); «no» resta sempre fuori;
 - solo luoghi con nome e via (senza indirizzo una scheda non serve a nessuno); i bagni pubblici senza nome si chiamano «Bagno pubblico»;
 - nessuna misura inventata: misure vuote, giudizio «da verificare», verifica_livello = 'osm';
 - i tag di origine restano nella colonna osm (ref, wheelchair, toilets_wheelchair, data dell'import);
@@ -67,10 +68,12 @@ NOME_PREDEFINITO = {'bagni': 'Bagno pubblico'}
 MISURE_VUOTE = {'ingresso': {}, 'spazi': {}, 'piani': {}, 'bagno': {}}
 
 
-def query(area_id):
-    """Luoghi wheelchair=yes dentro l'area del comune (id dell'area Overpass = 3600000000 + id della relazione)."""
+def query(area_id, in_parte=False):
+    """Luoghi wheelchair=yes (con in_parte anche =limited) dentro l'area del comune
+    (id dell'area Overpass = 3600000000 + id della relazione)."""
+    ruota = '["wheelchair"~"^(yes|limited)$"]' if in_parte else '["wheelchair"="yes"]'
     filtri = ''.join(
-        '  nwr(area.a)["wheelchair"="yes"]{}["{}"{}];\n'.format(
+        '  nwr(area.a)' + ruota + '{}["{}"{}];\n'.format(
             '' if cat in NOME_PREDEFINITO else '["name"]', k, '' if v is None else '~"^({})$"'.format('|'.join(sorted(v))))
         for k, v, cat in CATEGORIE)
     return ('[out:json][timeout:120];\n'
@@ -140,7 +143,7 @@ def scheda(el, comune, regione, provincia, oggi):
     cap = pulito(tags.get('addr:postcode'), 5)
     # Sempre il nome del comune: addr:city a volte è una frazione o è bilingue («Casteddu/Cagliari») e sporca i filtri
     citta = pulito(comune, 80)
-    osm = {'ref': '{}/{}'.format(el['type'], el['id']), 'wheelchair': 'yes', 'importato': oggi}
+    osm = {'ref': '{}/{}'.format(el['type'], el['id']), 'wheelchair': tags.get('wheelchair', 'yes'), 'importato': oggi}
     if tags.get('toilets:wheelchair') in ('yes', 'limited', 'no'):
         osm['toilets_wheelchair'] = tags['toilets:wheelchair']
     return {
@@ -201,7 +204,7 @@ def scegli(righe, limite):
     for s in righe:
         gruppi.setdefault(s['categoria'], []).append(s)
     for g in gruppi.values():
-        g.sort(key=lambda s: (s['osm'].get('toilets_wheelchair') != 'yes', s['nome']))
+        g.sort(key=lambda s: (s['osm'].get('wheelchair') != 'yes', s['osm'].get('toilets_wheelchair') != 'yes', s['nome']))
     scelte = []
     while len(scelte) < limite and any(gruppi.values()):
         for cat in sorted(gruppi):
@@ -216,6 +219,8 @@ def main():
     ap.add_argument('--regione', help='es. Lazio')
     ap.add_argument('--provincia', help='sigla, es. RM')
     ap.add_argument('--limite', type=int, default=300, help='al massimo quanti luoghi (predefinito 300)')
+    ap.add_argument('--anche-in-parte', action='store_true',
+                    help='anche wheelchair=limited (accessibile in parte): per zone con pochi dati; passano comunque dalla moderazione')
     ap.add_argument('--anteprima', action='store_true', help='conta e basta, senza scrivere il file')
     a = ap.parse_args()
     if a.provincia and not re.fullmatch(r'[A-Z]{2}', a.provincia):
@@ -223,7 +228,7 @@ def main():
 
     area_id, nome_completo = trova_comune(a.comune, a.provincia)
     print('Comune: ' + nome_completo, file=sys.stderr)
-    dati = scarica(query(area_id))
+    dati = scarica(query(area_id, a.anche_in_parte))
     if dati.get('remark'):
         print('Attenzione, Overpass dice: ' + dati['remark'], file=sys.stderr)
 
