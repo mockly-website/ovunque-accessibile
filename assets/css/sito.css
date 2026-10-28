@@ -2505,3 +2505,7 @@ html:not(.js) .js-only {
     border: 2px solid CanvasText;
   }
 }
+
+.summary__item--wide {
+  grid-column: 1 / -1;
+}

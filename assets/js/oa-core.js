@@ -1043,8 +1043,31 @@
       el('strong', { text: GIUDIZIO[g] }),
       el('span', { className: 'summary__who', text: ' per ' + ESIGENZE[e].nome.toLowerCase() + (esigenzaCorrente ? '' : ' (scegli la tua esigenza qui sotto)') })
     ]));
-    var keys = ESIGENZE[e].sensi ? ESIGENZE[e].voci : ['ingresso', 'porta', 'piani', 'bagno'].concat(e === 'anziani' ? ['sedute'] : []);
     box.textContent = '';
+    /* Luoghi da OpenStreetMap ancora senza misure: in evidenza cosa dice la mappa, invece di quattro «da verificare» */
+    if (p.osm && verifica(p).livello === 'osm' && giudizio(p, e) === 'nv') {
+      var OSM_TXT = { yes: ['si', 'Sì, secondo OpenStreetMap'], limited: ['parziale', 'In parte, secondo OpenStreetMap'], no: ['no', 'No, secondo OpenStreetMap'] };
+      [['Accesso in carrozzina', p.osm.wheelchair], ['Bagno accessibile', p.osm.toilets_wheelchair]].forEach(function (r) {
+        var st = OSM_TXT[r[1]] || ['nv', 'Non indicato'];
+        box.appendChild(el('li', { className: 'summary__item summary__item--' + st[0] }, [
+          icon(ICONA_STATO[st[0]]),
+          el('span', {}, [
+            el('span', { className: 'visually-hidden', text: PREFISSO_STATO[st[0]] }),
+            el('strong', { className: 'summary__name', text: r[0] }),
+            el('span', { className: 'summary__text', text: st[1] })
+          ])
+        ]));
+      });
+      box.appendChild(el('li', { className: 'summary__item summary__item--nv summary__item--wide' }, [
+        icon(ICONA_STATO.nv),
+        el('span', {}, [
+          el('strong', { className: 'summary__name', text: 'Misure da raccogliere' }),
+          el('span', { className: 'summary__text', text: 'Gradini, porta e bagno non li ha ancora misurati nessuno. Ci sei stato? Proponi una correzione.' })
+        ])
+      ]));
+      return;
+    }
+    var keys = ESIGENZE[e].sensi ? ESIGENZE[e].voci : ['ingresso', 'porta', 'piani', 'bagno'].concat(e === 'anziani' ? ['sedute'] : []);
     keys.forEach(function (k) {
       var v = voce(k);
       var st = v.valuta(p, e);
