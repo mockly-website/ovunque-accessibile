@@ -18,12 +18,12 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=i4"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p36">
-  <link rel="stylesheet" href="assets/css/app.css?v=a32">
+  <link rel="stylesheet" href="assets/css/app.css?v=a33">
   <script src="assets/js/config.js?v=a24" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=p30" defer></script>
   <script src="assets/js/api.js?v=a24" defer></script>
-  <script src="assets/js/app.js?v=a32" defer></script>
+  <script src="assets/js/app.js?v=a33" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -104,7 +104,7 @@
         </section>
         <section aria-labelledby="mod-osm-title">
           <h2 id="mod-osm-title">Luoghi da OpenStreetMap da approvare <span class="pill" id="mod-osm-count"></span></h2>
-          <p class="place__meta">Sulla mappa di OpenStreetMap questi luoghi sono segnati come accessibili in carrozzina, ma nessuno li ha misurati. Controllali (foto, Street View, se li conosci) e approva quelli credibili: compaiono sulla mappa come «da verificare». Quelli non approvati vengono archiviati e non tornano con un nuovo import.</p>
+          <p class="place__meta">Sulla mappa di OpenStreetMap questi luoghi sono segnati come accessibili in carrozzina (o in parte), ma nessuno li ha misurati. Controllali (foto, Street View, se li conosci) e approva quelli credibili: compaiono sulla mappa come «accessibile» o «in parte» secondo OpenStreetMap, finché qualcuno non li misura. Quelli non approvati vengono archiviati e non tornano con un nuovo import.</p>
           <div class="osm-tools">
             <div class="field">
               <label class="field__label" for="osm-citta">Città</label>
@@ -140,7 +140,7 @@
         </section>
         <section id="osm-card" class="card" aria-labelledby="osm-title" hidden>
           <h2 id="osm-title">Importa da OpenStreetMap</h2>
-          <p>Solo per gli admin. Scegli un file <code>osm-…json</code> creato con <code>supabase/strumenti/import_osm.py</code>: i luoghi diventano schede «Da OpenStreetMap: da verificare». Quelli già presenti si saltano.</p>
+          <p>Solo per gli admin. Scegli un file <code>osm-…json</code> creato con <code>supabase/strumenti/import_osm.py</code>: i luoghi arrivano qui sopra, in «Luoghi da OpenStreetMap da approvare». Quelli già presenti si saltano.</p>
           <div class="field">
             <label class="field__label" for="osm-file">File JSON</label>
             <input class="input" type="file" id="osm-file" accept="application/json,.json">

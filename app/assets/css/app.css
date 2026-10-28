@@ -2566,3 +2566,8 @@ html:has(> body.app) {
     stroke: CanvasText;
   }
 }
+
+/* Indirizzi email e link lunghi negli avvisi vanno a capo invece di allargare la pagina (bollino a 320 px) */
+.app .notice {
+  overflow-wrap: anywhere;
+}

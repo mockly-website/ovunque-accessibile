@@ -992,7 +992,7 @@
     api.getPlace(id).then(function (p) {
       if (!p) return message(note, 'Luogo non trovato.', 'error');
       if (!p.verifica || p.verifica.livello !== 'sul-posto') {
-        return message(note, 'Il bollino è per i luoghi verificati sul posto da noi. «' + p.nome + '» non lo è ancora: scrivici a ovunqueaccessibile@gmail.com per organizzare una verifica.', 'error');
+        return message(note, 'Il bollino è per i luoghi verificati sul posto da noi. «' + p.nome + '» non lo è ancora: il gestore del locale può chiedere la verifica sul posto dalla pagina «Per i locali» del profilo.', 'error');
       }
       document.title = 'Bollino: ' + p.nome + ' – Ovunque Accessibile';
       $('badge-place').textContent = p.nome + ', ' + p.citta;
@@ -1326,6 +1326,10 @@
       else setPath(out, f.path, v);
     });
 
+    /* «CABRAS» o «cabras» → «Cabras» (nomi di città scritti tutti maiuscoli o minuscoli) */
+    if (out.citta && (out.citta === out.citta.toUpperCase() || out.citta === out.citta.toLowerCase())) {
+      out.citta = out.citta.toLowerCase().replace(/(^|[\s'’-])(\S)/g, function (m, sep, ch) { return sep + ch.toUpperCase(); });
+    }
     out.misure.ingresso.porta_cm = x.nessuna_porta ? 0 : (out.misure.ingresso.porta_cm == null ? null : out.misure.ingresso.porta_cm);
     if (x.nessuna_porta) out.misure.ingresso.nota_porta = null;
     var asc = null;
@@ -2678,7 +2682,7 @@
         items.forEach(function (li) { li.remove(); });
         shown -= items.length;
         totale -= items.length;
-        say((approva ? 'Approvati: ' : 'Archiviati: ') + n + (n === 1 ? ' luogo.' : ' luoghi.') + (approva ? ' Ora sono sulla mappa come «da verificare».' : ''), 'ok');
+        say((approva ? 'Approvati: ' : 'Archiviati: ') + n + (n === 1 ? ' luogo.' : ' luoghi.') + (approva ? ' Ora sono sulla mappa, con il giudizio di OpenStreetMap.' : ''), 'ok');
         show($('mod-osm-empty'), !list.children.length && !totale);
         if (!list.children.length && totale > 0) load(false);
         cities();
