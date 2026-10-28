@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=i4"></script>
   <script src="assets/js/menu.js?v=m1" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p37">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p38">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="app/assets/js/config.js?v=a24" defer></script>
@@ -82,8 +82,14 @@
 
   <main id="main" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
+      <picture class="hero__photo">
+        <source type="image/webp" srcset="assets/img/hero-800.webp 800w, assets/img/hero-1200.webp 1200w" sizes="(min-width: 60em) 50vw, 100vw">
+        <img src="assets/img/hero-1200.jpg" srcset="assets/img/hero-800.jpg 800w, assets/img/hero-1200.jpg 1200w" sizes="(min-width: 60em) 50vw, 100vw"
+             width="1200" height="1600" fetchpriority="high"
+             alt="Due ragazzi in carrozzina elettrica su un belvedere in Sardegna, con il paese e le colline alle spalle.">
+      </picture>
       <div class="container hero__inner">
-        <div class="reveal">
+        <div class="hero__text reveal">
           <h1 id="hero-title" class="hero__title">Trova luoghi <span class="hero__accent">davvero accessibili</span></h1>
           <p class="hero__lead">Ingresso, bagno, parcheggio e spazi interni: informazioni concrete, raccolte da chi ci è stato. In tutta Italia.</p>
 
@@ -108,10 +114,18 @@
             <li><a class="quick__link" href="mappa.html?f=parcheggio"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</a></li>
           </ul>
         </div>
+      </div>
+    </section>
 
+    <section class="section map-preview" aria-labelledby="map-preview-title">
+      <div class="container map-preview__inner">
+        <div class="section__head map-preview__head">
+          <h2 id="map-preview-title">I luoghi sulla mappa</h2>
+          <p>Ogni segnaposto è un luogo con le sue misure: verde se è accessibile, marrone se lo è solo in parte.</p>
+        </div>
         <div>
           <div id="home-map" class="hero__map" role="region" aria-label="Anteprima della mappa dei luoghi">
-            <noscript><p class="map__fallback">La mappa ha bisogno di JavaScript. Puoi comunque cercare un luogo con il campo qui accanto.</p></noscript>
+            <noscript><p class="map__fallback">La mappa ha bisogno di JavaScript. Puoi comunque cercare un luogo con il campo di ricerca qui sopra.</p></noscript>
           </div>
           <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
             <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>

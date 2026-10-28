@@ -946,46 +946,115 @@ html:not(.js) .js-only {
   min-height: var(--target-min);
 }
 
-/* 7. Home */
+/* 7. Home
+   Hero con la foto (assets/img/hero-*.jpg|webp): sul telefono la foto sta in alto e sfuma nel blu, dove c'è il testo;
+   da 960 px la foto occupa la metà destra e sfuma verso sinistra. Il testo sta sempre sul blu pieno (contrasto sicuro). */
 .hero {
-  padding-block: var(--space-2xl) var(--space-xl);
-  background:
-    radial-gradient(42rem 28rem at 90% 10%, rgba(230, 244, 253, 0.95), transparent 70%),
-    radial-gradient(32rem 24rem at 0% 100%, rgba(231, 214, 185, 0.5), transparent 70%);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding-bottom: var(--space-2xl);
+  background: var(--color-navy);
+  color: var(--color-white);
+  --color-focus: var(--color-white);
+}
+
+.hero__photo {
+  position: relative;
+  display: block;
+  height: clamp(18rem, 88vw, 30rem);
+}
+
+.hero__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 55%;
+}
+
+.hero__photo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(22, 40, 65, 0) 40%, rgba(22, 40, 65, 0.7) 78%, var(--color-navy) 100%);
 }
 
 .hero__inner {
-  display: grid;
-  gap: var(--space-xl);
-  align-items: center;
+  position: relative;
+  margin-top: -3.5rem;
+}
+
+.hero__text {
+  max-width: 36rem;
 }
 
 @media (min-width: 60em) {
+  .hero {
+    display: flex;
+    align-items: center;
+    min-height: min(40rem, 82vh);
+    padding-block: var(--space-2xl);
+  }
+
+  .hero__photo {
+    position: absolute;
+    inset: 0 0 0 auto;
+    z-index: -1;
+    width: 58%;
+    height: auto;
+  }
+
+  .hero__photo img {
+    object-position: 50% 55%;
+  }
+
+  .hero__photo::after {
+    background:
+      linear-gradient(to right, var(--color-navy) 0, var(--color-navy) 2px, rgba(22, 40, 65, 0.55) 9%, rgba(22, 40, 65, 0) 24%),
+      linear-gradient(to top, rgba(22, 40, 65, 0.35), rgba(22, 40, 65, 0) 30%);
+  }
+
   .hero__inner {
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: var(--space-2xl);
+    width: 100%;
+    margin-top: 0;
+  }
+
+  .hero__text {
+    max-width: min(34rem, 40%);
   }
 }
 
 .hero__title {
   max-width: 16ch;
+  color: var(--color-white);
   font-size: var(--text-3xl);
   line-height: 1.04;
   letter-spacing: -0.02em;
 }
 
 .hero__accent {
-  color: var(--color-brand);
+  color: var(--color-beige);
 }
 
 .hero__lead {
   max-width: 44ch;
+  color: rgba(255, 255, 255, 0.92);
   font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3rem);
 }
 
 .hero__search {
   max-width: 38rem;
   margin-top: var(--space-lg);
+}
+
+.hero .field__label {
+  color: var(--color-white);
+}
+
+.hero .input {
+  border-color: transparent;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
 }
 
 .quick {
@@ -1018,6 +1087,52 @@ html:not(.js) .js-only {
   width: 1.2rem;
   height: 1.2rem;
   color: var(--color-success);
+}
+
+@media (min-width: 60em) and (max-width: 74.99em) {
+  .hero__photo {
+    width: 52%;
+  }
+
+  .hero__text {
+    max-width: 46%;
+  }
+}
+
+/* Sul blu del hero le scorciatoie sono chiare con il bordo bianco */
+.hero .quick__link {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+.hero .quick__link:hover {
+  border-color: var(--color-white);
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+}
+
+.hero .quick__link .icon {
+  color: var(--color-beige);
+}
+
+/* Anteprima della mappa, subito sotto il hero */
+.map-preview__inner {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (min-width: 60em) {
+  .map-preview__inner {
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: var(--space-2xl);
+  }
+
+  .map-preview__head {
+    position: sticky;
+    top: var(--space-xl);
+  }
 }
 
 .hero__map {
@@ -2027,12 +2142,14 @@ html:not(.js) .js-only {
   }
 }
 
-/* 13. Schermata di caricamento (assets/js/intro.js): un pezzo di mappa come l'icona dell'app, il percorso si disegna
-   e il segnaposto con il simbolo dell'accessibilità cade sul punto (assets/img/intro.svg, dal 28 ottobre).
+/* 13. Schermata di caricamento (assets/js/intro.js): sul blu del marchio, un pezzo di mappa come l'icona dell'app,
+   il percorso si disegna e il segnaposto con il simbolo dell'accessibilità cade sul punto (assets/img/intro.svg).
+   Sotto, il nome e una barra che si riempie; all'uscita tutto si allarga un poco e svanisce, come all'apertura di un'app.
    Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori dall'albero di accessibilità. */
 .oa-intro,
 .oa-intro-out {
-  --intro-size: min(15rem, 62vw);
+  --intro-size: min(13rem, 56vw);
+  --intro-bar: min(10rem, 44vw);
 }
 
 .oa-intro::before,
@@ -2051,33 +2168,61 @@ html:not(.js) .js-only {
   content: "";
   top: 0;
   bottom: 0;
-  background: var(--color-card, #fbf6ec) url("../img/intro.svg?v=3") center / var(--intro-size) no-repeat;
+  background:
+    url("../img/intro.svg?v=3") center calc(50% - 1.5rem) / var(--intro-size) no-repeat,
+    radial-gradient(50rem 36rem at 50% 38%, #24436f, var(--color-navy, #162841) 72%);
+  animation: oa-intro-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
 .oa-intro::after,
 .oa-intro-out::after {
   content: "Ovunque Accessibile";
-  top: calc(50% + var(--intro-size) / 2);
-  color: var(--color-navy, #162841);
+  top: calc(50% - 1.5rem + var(--intro-size) / 2 + 0.25rem);
+  padding-bottom: 1.4rem;
+  color: var(--color-white, #fff);
   font-family: var(--font-heading, sans-serif);
   font-weight: 600;
   font-size: clamp(1.4rem, 1.1rem + 1.5vw, 2rem);
   text-align: center;
+  background:
+    linear-gradient(var(--color-beige, #e7d6b9), var(--color-beige, #e7d6b9)) center bottom / 0 0.25rem no-repeat,
+    linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)) center bottom / var(--intro-bar) 0.25rem no-repeat;
+  animation: oa-intro-barra 1.3s cubic-bezier(0.3, 0.6, 0.3, 1) 0.1s forwards;
+}
+
+@keyframes oa-intro-in {
+  from {
+    background-size: calc(var(--intro-size) * 0.82), auto;
+  }
+}
+
+@keyframes oa-intro-barra {
+  to {
+    background-size: var(--intro-bar) 0.25rem, var(--intro-bar) 0.25rem;
+  }
 }
 
 .oa-intro-out::before,
 .oa-intro-out::after {
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transform: scale(1.05);
+  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .oa-intro::before {
-    background-image: url("../img/intro-fermo.svg?v=2");
+    background-image: url("../img/intro-fermo.svg?v=2"), radial-gradient(50rem 36rem at 50% 38%, #24436f, #162841 72%);
+    animation: none;
+  }
+
+  .oa-intro::after {
+    background: none;
+    animation: none;
   }
 
   .oa-intro-out::before,
   .oa-intro-out::after {
+    transform: none;
     transition: none;
   }
 }
@@ -2375,6 +2520,17 @@ html:not(.js) .js-only {
 }
 
 .quick__link--near .icon {
+  color: var(--color-brand);
+}
+
+.hero .quick__link--near,
+.hero .quick__link--near:hover {
+  border-color: var(--color-white);
+  background: var(--color-white);
+  color: var(--color-navy);
+}
+
+.hero .quick__link--near .icon {
   color: var(--color-brand);
 }
 
@@ -2752,7 +2908,7 @@ html:not(.js) .js-only {
 }
 
 .nav__link {
-  padding: 0.45rem 0.9rem;
+  padding: 0.45rem 0.75rem;
   border-radius: var(--radius-pill);
   font-weight: 700;
 }
