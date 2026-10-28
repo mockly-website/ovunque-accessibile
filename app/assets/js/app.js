@@ -159,7 +159,7 @@
     if (banner) {
       banner.textContent = api.mode === 'prova'
         ? 'Modalità prova: luoghi di esempio e account finti, salvati solo in questo browser.'
-        : 'Versione di prova dell\'app: alcuni luoghi sono ancora esempi.';
+        : 'Versione di prova dell\'app: molti luoghi arrivano da OpenStreetMap e sono ancora da verificare.';
     }
     [].forEach.call(document.querySelectorAll('[data-account-link]'), function (a) {
       a.querySelector('[data-account-label]').textContent = user ? 'Profilo' : 'Accedi';

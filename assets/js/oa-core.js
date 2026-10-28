@@ -1,6 +1,7 @@
 /* Ovunque Accessibile – codice comune a sito e web-app (window.OA).
    Il sito lo avvia con sito.js, l'app con app/assets/js/app.js: le regole e i giudizi sono gli stessi.
-   Dati: assets/data/luoghi.json (esempi) se OA.config.loadPlaces non dice altro (l'app li prende da Supabase).
+   Dati: da Supabase (sito.js e api.js impostano OA.config.loadPlaces); assets/data/luoghi.json (esempi inventati) resta
+   solo per la modalità prova dell'app e come ripiego senza configurazione.
    Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni.
    Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta «La tua esigenza»
            4. Utilità DOM · 5. Componenti · 6. Mappa · 7. Home · 8. Pagina mappa
@@ -703,7 +704,7 @@
         if (latest) {
           latest.textContent = '';
           places
-            .filter(function (p) { return p.verifica && p.verifica.data && visibile(p, esigenza()); })
+            .filter(function (p) { return p.verifica && p.verifica.data && p.verifica.livello !== 'osm' && visibile(p, esigenza()); })
             .sort(function (a, b) { return a.verifica.data < b.verifica.data ? 1 : -1; })
             .slice(0, 3)
             .forEach(function (p) { latest.appendChild(placeCard(p)); });
