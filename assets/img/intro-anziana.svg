@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240">
+  <!-- Ovunque Accessibile: schermata di caricamento (persona anziana con il bastone). Percorre il sentiero a puntini del logo e la
+       rampa con il corrimano fino alla porta, che si apre; sopra, il segnaposto fa un saltello all’arrivo. -->
+  <defs><mask id="traccia" maskUnits="userSpaceOnUse"><rect x="0" y="200" width="10" height="24" fill="#fff"><animate attributeName="width" values="10;240;240" keyTimes="0;0.55;1" calcMode="spline" keySplines=".25 .1 .35 1;0 0 1 1" dur="1.8s" repeatCount="indefinite"/></rect></mask></defs>
+  <circle cx="156" cy="140" r="92" fill="#e6f4fd"/>
+  <!-- edificio e porta ad arco -->
+  <rect x="236" y="98" width="72" height="98" rx="8" fill="#fbf6ec" stroke="#e7d6b9" stroke-width="3"/>
+  <path d="M250 194 V130 a18 18 0 0 1 36 0 V194 Z" fill="#162841"/>
+  <g transform="translate(250 0)"><g><animateTransform attributeName="transform" type="scale" values="1 1;1 1;0.28 1;0.28 1;1 1" keyTimes="0;0.52;0.63;0.9;1" dur="1.8s" repeatCount="indefinite"/><g transform="translate(-250 0)">
+    <path d="M250 194 V130 a18 18 0 0 1 36 0 V194 Z" fill="#2f5b9c"/>
+    <path d="M258 141 a10 10 0 0 1 20 0 v5 h-20z" fill="#e6f4fd"/>
+    <circle cx="280" cy="168" r="2.2" fill="#e7d6b9"/></g></g></g>
+  <g><animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -12;0 0;0 -3;0 0;0 0" keyTimes="0;0.55;0.6200000000000001;0.6900000000000001;0.73;0.77;1" dur="1.8s" repeatCount="indefinite"/><g transform="translate(270 90) scale(0.48) translate(-160 -188)"><path d="M160 72c-26 0-47 20.6-47 46.2C113 152 160 188 160 188s47-36 47-69.8C207 92.6 186 72 160 72z" fill="#2f5b9c"/>
+      <circle cx="160" cy="118" r="30" fill="#fff"/>
+      <g transform="translate(137.5 95.5) scale(1.875)" fill="#162841"><circle cx="12" cy="4" r="2"/><path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/></g></g></g>
+  <!-- pavimento, pianerottolo e rampa -->
+  <rect x="226" y="194" width="86" height="16" fill="#e7d6b9"/>
+  <path d="M146 210 L226 194 V210 Z" fill="#e7d6b9"/>
+  <path d="M146 210 L226 194 H312" fill="none" stroke="#8b7d6b" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M20 215 H140" fill="none" stroke="#8b7d6b" stroke-width="6" stroke-linecap="round" stroke-dasharray="0 13" mask="url(#traccia)"/>
+  <!-- chi arriva -->
+  <g><animateMotion path="M30 210 H146 L226 194 L246 194" keyPoints="0;1;1" keyTimes="0;0.55;1" calcMode="spline" keySplines=".25 .1 .35 1;0 0 1 1" dur="1.8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.05;0.88;1" dur="1.8s" repeatCount="indefinite"/>
+    <g>
+      <g><animateTransform attributeName="transform" type="rotate" values="0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;0 0 -29" keyTimes="0.0;0.0275;0.055;0.0825;0.11;0.1375;0.165;0.1925;0.22;0.2475;0.275;0.3025;0.33;0.3575;0.385;0.4125;0.44;0.4675;0.495;0.5225;0.55;1" dur="1.8s" repeatCount="indefinite"/><path d="M0 -29 V-4" stroke="#4a5568" stroke-width="7.5" stroke-linecap="round"/><path d="M0 -2 h6" stroke="#162841" stroke-width="5" stroke-linecap="round"/></g>
+      <path d="M0 -30 Q1 -46 6 -54" fill="none" stroke="#8b7d6b" stroke-width="15" stroke-linecap="round"/>
+      <circle cx="3" cy="-68" r="4.2" fill="#c9ced6"/>
+      <circle cx="9.5" cy="-64" r="8.6" fill="#c9ced6"/><circle cx="11.8" cy="-61.4" r="7.6" fill="#f1c7a5"/><path d="M3 -63 a8.6 8.6 0 0 1 15.5 -5.2 a10 10 0 0 0 -15.5 5.2z" fill="#c9ced6"/><path d="M14 -63 h5" stroke="#162841" stroke-width="1.6" stroke-linecap="round"/>
+      <g><animateTransform attributeName="transform" type="rotate" values="0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;-11 0 -29;0 0 -29;11 0 -29;0 0 -29;0 0 -29" keyTimes="0.0;0.0275;0.055;0.0825;0.11;0.1375;0.165;0.1925;0.22;0.2475;0.275;0.3025;0.33;0.3575;0.385;0.4125;0.44;0.4675;0.495;0.5225;0.55;1" dur="1.8s" repeatCount="indefinite"/><path d="M0 -29 V-4" stroke="#4a5568" stroke-width="7.5" stroke-linecap="round"/><path d="M0 -2 h6" stroke="#162841" stroke-width="5" stroke-linecap="round"/></g>
+      <g><animateTransform attributeName="transform" type="rotate" values="0 15 -34;6 15 -34;0 15 -34;-6 15 -34;0 15 -34;6 15 -34;0 15 -34;-6 15 -34;0 15 -34;6 15 -34;0 15 -34;-6 15 -34;0 15 -34;6 15 -34;0 15 -34;-6 15 -34;0 15 -34;0 15 -34" keyTimes="0.0;0.0344;0.0688;0.1031;0.1375;0.1719;0.2063;0.2406;0.275;0.3094;0.3438;0.3781;0.4125;0.4469;0.4813;0.5156;0.55;1" dur="1.8s" repeatCount="indefinite"/><path d="M15 0 V-36 a3.6 3.6 0 0 0 -7.2 0" fill="none" stroke="#162841" stroke-width="3" stroke-linecap="round"/></g>
+      <path d="M6 -50 L12 -39" stroke="#8b7d6b" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="14" cy="-36" r="3" fill="#f1c7a5"/>
+    </g>
+  </g>
+  <!-- corrimano, davanti -->
+  <path d="M152 208.8 v-19 M188 201.6 v-19 M224 194.4 v-19 M150 190 L226 175" fill="none" stroke="#2f5b9c" stroke-width="2.8" stroke-linecap="round"/>
+</svg>

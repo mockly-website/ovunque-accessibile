@@ -2366,10 +2366,11 @@ html:not(.js) .js-only {
   }
 }
 
-/* 13. Schermata di caricamento (assets/js/intro.js), 29 ottobre: sul chiaro del sito una persona in carrozzina elettrica
-   percorre il sentiero marrone del logo, che si disegna a puntini, fino al segnaposto blu (assets/img/intro.svg);
-   sotto, il nome. All'uscita la schermata sale come un sipario e scopre la pagina. Pseudo-elementi di <html>: compaiono
-   prima del contenuto e restano fuori dall'albero di accessibilità. */
+/* 13. Schermata di caricamento (assets/js/intro.js), 29 ottobre: sul chiaro del sito una scenetta in cui qualcuno percorre
+   il sentiero a puntini del logo e la rampa con il corrimano fino alla porta, che si apre, con il segnaposto blu sopra
+   (assets/img/intro-*.svg). intro.js sceglie a caso chi arriva (classe oa-intro--…); sotto, il nome.
+   All'uscita la schermata sale come un sipario e scopre la pagina. Pseudo-elementi di <html>: compaiono prima del
+   contenuto e restano fuori dall'albero di accessibilità. */
 .oa-intro,
 .oa-intro-out {
   --intro-size: min(19rem, 86vw);
@@ -2392,7 +2393,7 @@ html:not(.js) .js-only {
   top: 0;
   bottom: 0;
   background:
-    url("../img/intro.svg?v=5") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
+    url("../img/intro-elettrica.svg?v=1") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
     radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
 }
 
@@ -2408,6 +2409,12 @@ html:not(.js) .js-only {
   text-align: center;
   animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
 }
+
+.oa-intro--manuale::before { background-image: url("../img/intro-manuale.svg?v=1"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%); }
+.oa-intro--stampelle::before { background-image: url("../img/intro-stampelle.svg?v=1"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%); }
+.oa-intro--anziana::before { background-image: url("../img/intro-anziana.svg?v=1"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%); }
+.oa-intro--cieco::before { background-image: url("../img/intro-cieco.svg?v=1"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%); }
+.oa-intro--skate::before { background-image: url("../img/intro-skate.svg?v=1"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%); }
 
 @keyframes oa-intro-nome {
   from {
@@ -2431,8 +2438,9 @@ html:not(.js) .js-only {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .oa-intro::before {
-    background-image: url("../img/intro-fermo.svg?v=4"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
+  :root.oa-intro::before,
+  :root.oa-intro-out::before {
+    background-image: url("../img/intro-fermo.svg?v=5"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
   }
 
   .oa-intro::after {
