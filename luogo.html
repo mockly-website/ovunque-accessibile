@@ -17,11 +17,11 @@
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=i7"></script>
   <script src="assets/js/menu.js?v=m3" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p45">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p47">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="app/assets/js/config.js?v=a24" defer></script>
-  <script src="assets/js/oa-core.js?v=p32" defer></script>
+  <script src="assets/js/oa-core.js?v=p34" defer></script>
   <script src="assets/js/sito.js?v=p19" defer></script>
 </head>
 <body>
@@ -109,13 +109,15 @@
       </nav>
 
       <article id="detail" class="detail" aria-labelledby="detail-title">
-        <div>
-          <p id="detail-cat" class="pill"></p>
-          <h1 id="detail-title" class="detail__title">Scheda luogo</h1>
-          <noscript><p class="empty">Per vedere la scheda serve JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>: ti mandiamo noi le informazioni.</p></noscript>
-          <address id="detail-address" class="detail__address"></address>
-          <p id="detail-trust" class="detail__trust"></p>
-          <p id="detail-intro"></p>
+        <div class="detail__main">
+          <header class="detail__head">
+            <p id="detail-cat" class="detail__cat"></p>
+            <h1 id="detail-title" class="detail__title">Scheda luogo</h1>
+            <noscript><p class="empty">Per vedere la scheda serve JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>: ti mandiamo noi le informazioni.</p></noscript>
+            <address id="detail-address" class="detail__address"></address>
+            <p id="detail-trust" class="detail__trust"></p>
+            <p id="detail-intro" class="detail__intro"></p>
+          </header>
 
           <div id="detail-body" hidden>
             <div class="detail__actions">
@@ -136,60 +138,50 @@
               </a>
             </div>
 
-            <section id="detail-summary" class="card detail__section summary" aria-labelledby="summary-title">
-              <h2 id="summary-title">In breve</h2>
+            <section id="detail-summary" class="detail__section summary" aria-labelledby="summary-title">
+              <div class="summary__top">
+                <h2 id="summary-title" class="summary__title">In breve</h2>
+                <div class="summary__per">
+                  <label class="summary__per-label" for="per-chi">Valuto per</label>
+                  <select class="select summary__select" id="per-chi" aria-describedby="per-chi-aiuto"><option value="manuale">Carrozzina manuale</option><option value="elettrica">Carrozzina elettrica</option><option value="cammino">Difficoltà a camminare</option><option value="anziani">Persona anziana</option><option value="vista">Disabilità visiva</option><option value="udito">Disabilità uditiva</option></select>
+                </div>
+              </div>
               <p id="summary-verdict" class="summary__verdict"></p>
               <ul id="summary-list" class="summary__list" role="list"></ul>
-              <p class="summary__links"><a href="#come-ti-muovi">Cambia esigenza</a> · <a href="#facts-title">Tutte le misure</a></p>
+              <p id="per-chi-aiuto" class="place__meta summary__help"></p>
+              <p id="per-chi-live" class="visually-hidden" role="status"></p>
             </section>
 
-            <section class="card detail__section" aria-labelledby="verdicts-title">
-              <h2 id="verdicts-title">Accessibilità per esigenza</h2>
-            <fieldset class="needs needs--compact" id="come-ti-muovi">
-              <legend class="needs__legend">La tua esigenza</legend>
-              <p class="needs__help">Scegli la tua esigenza: i giudizi cambiano in base a quella.</p>
-              <div class="needs__options">
-                <div class="needs__option"><input type="radio" id="need-manuale" name="esigenza" value="manuale"><label for="need-manuale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</label></div>
-                <div class="needs__option"><input type="radio" id="need-elettrica" name="esigenza" value="elettrica"><label for="need-elettrica"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</label></div>
-                <div class="needs__option"><input type="radio" id="need-cammino" name="esigenza" value="cammino"><label for="need-cammino"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</label></div>
-                <div class="needs__option"><input type="radio" id="need-anziani" name="esigenza" value="anziani"><label for="need-anziani"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg>Persona anziana</label></div>
-                <div class="needs__option"><input type="radio" id="need-vista" name="esigenza" value="vista"><label for="need-vista"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>Disabilità visiva</label></div>
-                <div class="needs__option"><input type="radio" id="need-udito" name="esigenza" value="udito"><label for="need-udito"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-ear"/></svg>Disabilità uditiva</label></div>
-              </div>
-              <p class="needs__live visually-hidden" role="status"></p>
-            </fieldset>
-              <ul id="detail-verdicts" class="needs-verdicts" role="list"></ul>
+            <section class="detail__section detail__group" aria-labelledby="entrare-title">
+              <h2 id="entrare-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg></span>Entrare</h2>
+              <dl id="detail-entrare" class="facts"></dl>
             </section>
-
-            <section class="card detail__section" aria-labelledby="facts-title">
-              <h2 id="facts-title">Le misure</h2>
-              <p class="place__meta">Per ogni voce: cosa c'è e il giudizio per le esigenze a cui serve.</p>
-              <dl id="detail-facts" class="facts"></dl>
-              <p id="detail-date" class="place__meta"></p>
+            <section class="detail__section detail__group" aria-labelledby="dentro-title">
+              <h2 id="dentro-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg></span>Dentro</h2>
+              <dl id="detail-dentro" class="facts"></dl>
             </section>
-
-            <section class="card detail__section" aria-labelledby="more-info-title">
-              <h2 id="more-info-title">Altre informazioni</h2>
-              <p class="place__meta">Informazioni facoltative, raggruppate: apri quella che ti serve.</p>
-              <details id="more-senses" class="info-group">
-                <summary class="info-group__toggle"><h3 id="senses-title" class="info-group__title">Vista e udito</h3><span id="senses-count" class="info-group__count"></span></summary>
-                <div class="info-group__body">
-                  <p id="detail-senses-empty" class="place__meta" hidden>Ancora nessuna informazione per chi non vede o non sente bene (cane guida, Braille, LIS, anello magnetico…). Se le conosci, proponi una correzione.</p>
-                  <dl id="detail-senses" class="facts"></dl>
-                </div>
-              </details>
-              <details id="more-extra" class="info-group">
-                <summary class="info-group__toggle"><h3 id="extra-title" class="info-group__title">Porta, pavimento, parcheggio e assistenza</h3><span id="extra-count" class="info-group__count"></span></summary>
-                <div class="info-group__body">
-                  <dl id="detail-extra" class="facts"></dl>
-                </div>
-              </details>
-              <details id="detail-specific" class="info-group" hidden>
-                <summary class="info-group__toggle"><h3 id="detail-specific-title" class="info-group__title">Dettagli</h3><span id="specific-count" class="info-group__count"></span></summary>
-                <div class="info-group__body">
-                  <dl id="detail-specific-list" class="facts"></dl>
-                </div>
-              </details>
+            <section class="detail__section detail__group" aria-labelledby="bagno-title">
+              <h2 id="bagno-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg></span>Bagno</h2>
+              <dl id="detail-bagno" class="facts"></dl>
+            </section>
+            <section class="detail__section detail__group" aria-labelledby="arrivare-title">
+              <h2 id="arrivare-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg></span>Arrivare</h2>
+              <dl id="detail-arrivare" class="facts"></dl>
+            </section>
+            <section class="detail__section detail__group" aria-labelledby="senses-title">
+              <h2 id="senses-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg></span>Vista e udito</h2>
+              <p id="detail-senses-empty" class="place__meta" hidden>Ancora nessuna informazione per chi non vede o non sente bene (cane guida, Braille, LIS, anello magnetico…). Se le conosci, proponi una correzione.</p>
+              <dl id="detail-senses" class="facts"></dl>
+            </section>
+            <section id="detail-specific" class="detail__section detail__group" aria-labelledby="detail-specific-title" hidden>
+              <h2 id="detail-specific-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-list"/></svg></span>Dettagli</h2>
+              <dl id="detail-specific-list" class="facts"></dl>
+            </section>
+            <section class="detail__section detail__source" aria-labelledby="source-title">
+              <h2 id="source-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span>Da dove arrivano le informazioni</h2>
+              <p id="detail-date"></p>
+              <dl id="detail-osm" class="facts" hidden></dl>
+              <p id="detail-source-fix" class="place__meta"></p>
             </section>
           </div>
         </div>
@@ -210,17 +202,7 @@
           </div>
           <div class="card">
             <h2 class="h3">Recensioni</h2>
-            <!-- Modello grafico: nessuna recensione reale. Le recensioni vere sono nella web-app. -->
-            <article class="review" aria-label="Esempio di recensione">
-              <div class="review__head">
-                <span class="review__avatar" aria-hidden="true">N</span>
-                <strong>Nome utente</strong>
-                <span class="pill pill--soon">Esempio</span>
-                <span class="review__date">· data della visita</span>
-              </div>
-              <p>Qui comparirà l'esperienza di chi è stato in questo luogo: com'è andata all'ingresso, in bagno, con il personale.</p>
-            </article>
-            <p>Le recensioni si leggono e si scrivono nella web-app.</p>
+            <p>Le esperienze di chi ci è stato si leggono e si scrivono nella web-app.</p>
             <a class="btn btn--secondary btn--small" href="app/">Apri la web-app</a>
           </div>
         </aside>

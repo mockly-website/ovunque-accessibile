@@ -1100,17 +1100,6 @@
     ]);
   }
 
-  /* Quante righe di un elenco <dl> hanno un'informazione (non «da verificare») → testo per la tendina */
-  function contaNote(dl) {
-    var rows = [].slice.call(dl.querySelectorAll('.facts__row'));
-    var note = rows.filter(function (r) {
-      var states = [].slice.call(r.querySelectorAll('.needs-state'));
-      var nv = states.length ? states.every(function (x) { return x.classList.contains('needs-state--nv'); }) : !!r.querySelector('.status--nv');
-      return !nv;
-    }).length;
-    return note ? (note === 1 ? '1 informazione' : note + ' informazioni') : 'ancora da raccogliere';
-  }
-
   /* «In breve»: il giudizio per l'esigenza scelta e le voci che contano di più, in cima alla scheda */
   function renderSummary(p, e) {
     var box = document.getElementById('summary-list');
@@ -1123,8 +1112,13 @@
     verdict.appendChild(el('span', {}, [
       el('strong', { text: GIUDIZIO[g] }),
       el('span', { className: 'summary__who', text: ' per ' + ESIGENZE[e].nome.toLowerCase() +
-        (soloOsm(p) && g !== 'nv' ? ', secondo OpenStreetMap' : '') + (esigenzaCorrente ? '' : ' (scegli la tua esigenza qui sotto)') })
+        (soloOsm(p) && g !== 'nv' ? ', secondo OpenStreetMap' : '') })
     ]));
+    var aiuto = document.getElementById('per-chi-aiuto');
+    if (aiuto) {
+      aiuto.textContent = esigenzaCorrente ? '' : 'Non hai ancora scelto la tua esigenza: per ora vedi i giudizi per la carrozzina manuale. Cambiala da «Valuto per».';
+      aiuto.hidden = !!esigenzaCorrente;
+    }
     box.textContent = '';
     /* Luoghi da OpenStreetMap ancora senza misure: in evidenza cosa dice la mappa, invece di quattro «da verificare» */
     if (soloOsm(p)) {
@@ -1176,92 +1170,90 @@
     }
   }
 
+  /* Scheda divisa per momento della visita: Entrare, Dentro, Bagno, Arrivare, Vista e udito, dettagli del tipo di
+     luogo. Ogni voce ha un giudizio solo, quello per l'esigenza scelta («Valuto per», in «In breve»); le voci che non
+     contano per quell'esigenza (gradini per chi non vede, per esempio) si giudicano come per chi cammina con fatica. */
+  var GRUPPI_VOCI = { ingresso: 'entrare', porta: 'entrare', spazi: 'dentro', piani: 'dentro', sedute: 'dentro', bagno: 'bagno' };
+
+  function rigaVoce(v, p, e) {
+    var st = v.valuta(p, ESIGENZE[e].sensi && !v.sensi ? 'cammino' : e);
+    if (v.key === 'porta' && st[0] === 'np') return null;
+    return infoRow(v.nome, st, v.nota(p));
+  }
+
   function renderDetail(p) {
     var e = esigenza();
     renderSummary(p, e);
 
-    /* Tre giudizi affiancati: quello dell'esigenza scelta è evidenziato */
-    var trio = document.getElementById('detail-verdicts');
-    trio.textContent = '';
-    ORDINE_ESIGENZE.forEach(function (k) {
-      var g = giudizio(p, k);
-      var mine = k === e && !!esigenzaCorrente;
-      trio.appendChild(el('li', { className: 'needs-verdict needs-verdict--' + g + (mine ? ' is-current' : '') }, [
-        icon(ESIGENZE[k].icona, 'needs-verdict__who'),
-        el('span', { className: 'needs-verdict__name', text: ESIGENZE[k].nome }),
-        el('span', { className: 'needs-verdict__value' }, [icon(ICONA_STATO[g]), el('span', { text: GIUDIZIO[g] })]),
-        mine ? el('span', { className: 'needs-verdict__mine', text: 'La tua scelta' }) : null
-      ]));
+    var box = {};
+    ['entrare', 'dentro', 'bagno', 'arrivare'].forEach(function (k) {
+      box[k] = document.getElementById('detail-' + k);
+      if (box[k]) box[k].textContent = '';
     });
-
-    /* Misure: descrizione + stato per ogni esigenza a cui la voce serve.
-       Muoversi in #detail-facts; vista e udito in #detail-senses (se la pagina lo prevede) */
-    var facts = document.getElementById('detail-facts');
     var senses = document.getElementById('detail-senses');
     var sensesEmpty = document.getElementById('detail-senses-empty');
-    facts.textContent = '';
     if (senses) senses.textContent = '';
     var sensiNoti = false;
+    var f = p.facoltativi || {};
+
     VOCI.forEach(function (v) {
-      var chi = ORDINE_ESIGENZE.filter(function (k) { return ESIGENZE[k].voci.indexOf(v.key) !== -1; });
-      var states = chi.map(function (k) { return [k, v.valuta(p, k)]; });
-      var nonPrevista = states.every(function (s) { return s[1][0] === 'np'; });
-      var nota = v.nota(p);
-      var box = facts;
       if (v.sensi) {
         if (!senses) return;
-        if (states[0][1][0] !== 'nv') sensiNoti = true;
-        box = senses;
+        if (v.valuta(p, e)[0] !== 'nv') sensiNoti = true;
+        senses.appendChild(rigaVoce(v, p, e));
+        return;
       }
-      box.appendChild(el('div', { className: 'facts__row facts__row--needs' }, [
-        el('dt', { text: v.nome }),
-        el('dd', {}, [
-          el('p', { className: 'facts__desc', text: states[0][1][1] }),
-          nota ? el('p', { className: 'facts__note', text: nota }) : null,
-          nonPrevista ? null : el('ul', { className: 'needs-states', role: 'list' }, states.map(function (s) {
-            var st = s[1];
-            return el('li', { className: 'needs-state needs-state--' + st[0] + (s[0] === e && esigenzaCorrente ? ' is-current' : '') }, [
-              icon(ICONA_STATO[st[0]]),
-              el('span', {}, [
-                el('span', { className: 'visually-hidden', text: ESIGENZE[s[0]].nome + ', ' + PREFISSO_STATO[st[0]].replace(': ', '') }),
-                el('span', { 'aria-hidden': 'true', text: ESIGENZE[s[0]].breve })
-              ])
-            ]);
-          }))
-        ])
-      ]));
+      var dove = box[GRUPPI_VOCI[v.key]];
+      var riga = dove && rigaVoce(v, p, e);
+      if (riga) dove.appendChild(riga);
+      /* dopo la porta, com'è fatta e il pavimento */
+      if (v.key === 'porta' && box.entrare) {
+        var porta = { automatica: 'Automatica', manuale: 'Da aprire a mano', pesante: 'Pesante da aprire' }[f.porta_tipo];
+        var pav = { liscio: 'Liscio', irregolare: 'Irregolare (sampietrini, legno, sabbia)', ghiaia: 'Ghiaia' }[f.pavimento];
+        if (p.misure.ingresso.porta_cm !== 0) box.entrare.appendChild(infoRow('Tipo di porta', porta ? ['info', porta] : ['nv', 'Da verificare']));
+        box.entrare.appendChild(infoRow('Pavimento', pav ? ['info', pav] : ['nv', 'Da verificare']));
+      }
     });
     if (senses) {
       senses.hidden = !sensiNoti;
       if (sensesEmpty) sensesEmpty.hidden = sensiNoti;
-      var sc = document.getElementById('senses-count');
-      if (sc) sc.textContent = sensiNoti ? contaNote(senses) : 'ancora da raccogliere';
-      /* Per chi non vede o non sente, la tendina che gli serve è già aperta */
-      var ms = document.getElementById('more-senses');
-      if (ms && ESIGENZE[e].sensi && esigenzaCorrente) ms.open = true;
     }
 
-    /* Voci facoltative */
-    var f = p.facoltativi || {};
-    var extra = document.getElementById('detail-extra');
-    extra.textContent = '';
-    var porta = { automatica: 'Automatica', manuale: 'Da aprire a mano', pesante: 'Pesante da aprire' }[f.porta_tipo];
-    var pav = { liscio: 'Liscio', irregolare: 'Irregolare (sampietrini, legno, sabbia)', ghiaia: 'Ghiaia' }[f.pavimento];
-    if (p.misure.ingresso.porta_cm !== 0) extra.appendChild(infoRow('Tipo di porta', porta ? ['info', porta] : ['nv', 'Da verificare']));
-    extra.appendChild(infoRow('Pavimento', pav ? ['info', pav] : ['nv', 'Da verificare']));
-    var park = f.parcheggio || {};
-    var parkSt = park.posti === true
-      ? ['si', 'Posti riservati' + (park.distanza_m != null ? (park.distanza_m === 0 ? ' all\'ingresso' : ' a ' + park.distanza_m + ' m') : '')]
-      : park.posti === false ? ['no', 'Nessun posto riservato vicino'] : ['nv', 'Da verificare'];
-    extra.appendChild(infoRow('Parcheggio', parkSt, park.nota));
-    var ass = f.assistenza || {};
-    extra.appendChild(infoRow('Assistenza del personale', ass.valore === true ? ['si', 'Disponibile'] : ass.valore === false ? ['no', 'Non disponibile'] : ['nv', 'Da verificare'], ass.nota));
-    /* Luoghi importati da OpenStreetMap: cosa dice la mappa, finché qualcuno non verifica */
-    var osm = p.osm || null;
-    if (osm) {
-      var OSM_VAL = { yes: ['si', 'Sì'], limited: ['parziale', 'In parte'], no: ['no', 'No'] };
-      extra.appendChild(infoRow('OpenStreetMap: accesso in carrozzina', OSM_VAL[osm.wheelchair] || ['nv', 'Non indicato']));
-      extra.appendChild(infoRow('OpenStreetMap: bagno accessibile', OSM_VAL[osm.toilets_wheelchair] || ['nv', 'Non indicato']));
+    if (box.arrivare) {
+      var park = f.parcheggio || {};
+      var parkSt = park.posti === true
+        ? ['si', 'Posti riservati' + (park.distanza_m != null ? (park.distanza_m === 0 ? ' all\'ingresso' : ' a ' + park.distanza_m + ' m') : '')]
+        : park.posti === false ? ['no', 'Nessun posto riservato vicino'] : ['nv', 'Da verificare'];
+      box.arrivare.appendChild(infoRow('Parcheggio', parkSt, park.nota));
+      var ass = f.assistenza || {};
+      box.arrivare.appendChild(infoRow('Assistenza del personale', ass.valore === true ? ['si', 'Disponibile'] : ass.valore === false ? ['no', 'Non disponibile'] : ['nv', 'Da verificare'], ass.nota));
+    }
+
+    /* Un riquadro in cui non si sa ancora niente: una riga sola invece di tanti «Da verificare» */
+    Object.keys(box).forEach(function (k) {
+      var dl = box[k];
+      if (!dl) return;
+      var vuoto = !dl.querySelector('.status:not(.status--nv)');
+      var msg = dl.parentNode.querySelector('.detail__vuoto');
+      if (!msg) {
+        msg = el('p', { className: 'place__meta detail__vuoto', text: 'Nessuno ha ancora raccolto queste informazioni. Ci sei stato? Proponi una correzione.' });
+        dl.parentNode.insertBefore(msg, dl);
+      }
+      msg.hidden = !vuoto;
+      dl.hidden = vuoto;
+    });
+
+    /* Luoghi importati da OpenStreetMap: cosa dice la mappa, nella parte sulla provenienza dei dati */
+    var osmBox = document.getElementById('detail-osm');
+    if (osmBox) {
+      osmBox.textContent = '';
+      var osm = p.osm || null;
+      osmBox.hidden = !osm;
+      if (osm) {
+        var OSM_VAL = { yes: ['si', 'Sì'], limited: ['parziale', 'In parte'], no: ['no', 'No'] };
+        osmBox.appendChild(infoRow('OpenStreetMap: accesso in carrozzina', OSM_VAL[osm.wheelchair] || ['nv', 'Non indicato']));
+        osmBox.appendChild(infoRow('OpenStreetMap: bagno accessibile', OSM_VAL[osm.toilets_wheelchair] || ['nv', 'Non indicato']));
+      }
     }
 
     /* Dettagli per tipo di luogo */
@@ -1271,12 +1263,9 @@
     var detList = document.getElementById('detail-specific-list');
     detList.textContent = '';
     detBox.hidden = !keys.length;
-    document.getElementById('detail-specific-title').textContent = TITOLO_DETTAGLI[p.categoria] || 'Dettagli';
+    var detTitle = document.getElementById('detail-specific-title');
+    detTitle.lastChild.textContent = TITOLO_DETTAGLI[p.categoria] || 'Dettagli';
     keys.forEach(function (k) { detList.appendChild(infoRow(DETTAGLI[k][0], valoreDettaglio(k, det[k]))); });
-    var ec = document.getElementById('extra-count');
-    if (ec) ec.textContent = contaNote(extra);
-    var dc = document.getElementById('specific-count');
-    if (dc) dc.textContent = contaNote(detList);
   }
 
   function initDetail() {
@@ -1326,6 +1315,23 @@
       var report = document.getElementById('detail-report');
       report.href = config.reportHref ? config.reportHref(p) : 'mailto:ovunqueaccessibile@gmail.com?subject=' +
         encodeURIComponent('Correzione scheda: ' + p.nome + ', ' + p.citta + ' (' + p.id + ')');
+
+      var fix = document.getElementById('detail-source-fix');
+      if (fix) {
+        fix.textContent = 'Qualcosa non torna o è cambiato? ';
+        fix.appendChild(el('a', { href: report.href, text: 'Proponi una correzione' }));
+      }
+
+      var per = document.getElementById('per-chi');
+      if (per) {
+        per.value = esigenza();
+        per.addEventListener('change', function () {
+          setEsigenza(per.value);
+          var live = document.getElementById('per-chi-live');
+          if (live) live.textContent = 'Giudizi aggiornati per ' + ESIGENZE[esigenza()].nome.toLowerCase() + '.';
+        });
+        onEsigenza(function () { per.value = esigenza(); });
+      }
 
       renderDetail(p);
       onEsigenza(function () { renderDetail(p); });
