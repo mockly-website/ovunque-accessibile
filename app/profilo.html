@@ -16,14 +16,14 @@
   <link rel="apple-touch-icon" href="assets/img/icon-180.png">
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="../assets/js/intro.js?v=i7"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p48">
-  <link rel="stylesheet" href="assets/css/app.css?v=a41">
-  <script src="assets/js/config.js?v=a25" defer></script>
+  <script src="../assets/js/intro.js?v=85d27344"></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=ef5d01b2">
+  <link rel="stylesheet" href="assets/css/app.css?v=343f404e">
+  <script src="assets/js/config.js?v=2dce3a73" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
-  <script src="../assets/js/oa-core.js?v=p35" defer></script>
-  <script src="assets/js/api.js?v=a27" defer></script>
-  <script src="assets/js/app.js?v=a40" defer></script>
+  <script src="../assets/js/oa-core.js?v=d8a1d744" defer></script>
+  <script src="assets/js/api.js?v=41a85dcc" defer></script>
+  <script src="assets/js/app.js?v=e9b828a7" defer></script>
 </head>
 <body class="app" data-page="profilo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -143,19 +143,19 @@
         <h2 class="menu-list__heading">Le tue attività</h2>
         <section class="card" aria-labelledby="fav-title">
           <h3 id="fav-title" class="card__title">I tuoi preferiti</h3>
-          <p id="fav-empty" class="place__meta" hidden>Non hai ancora preferiti. Nella scheda di un luogo premi «Salva nei preferiti».</p>
+          <p id="fav-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-heart"/></svg></span><span>Non hai ancora preferiti. Nella scheda di un luogo premi «Salva nei preferiti»: li ritrovi qui.</span></p>
           <ul id="fav-list" class="results__list" role="list"></ul>
         </section>
 
         <section class="card" aria-labelledby="proposals-title">
           <h3 id="proposals-title" class="card__title">Le tue segnalazioni</h3>
-          <p id="proposals-empty" class="place__meta" hidden>Non hai ancora segnalato luoghi. <a href="segnala.html">Segnala un luogo</a></p>
+          <p id="proposals-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pin"/></svg></span><span>Non hai ancora segnalato luoghi. <a href="segnala.html">Segnala un luogo</a></span></p>
           <ul id="my-proposals" class="activities" role="list"></ul>
         </section>
 
         <section class="card" aria-labelledby="my-reviews-title">
           <h3 id="my-reviews-title" class="card__title">Le tue recensioni</h3>
-          <p id="reviews-mine-empty" class="place__meta" hidden>Non hai ancora scritto recensioni.</p>
+          <p id="reviews-mine-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-edit"/></svg></span><span>Non hai ancora scritto recensioni. Sei stato in un posto? <a href="./">Cercalo sulla mappa</a> e racconta com'è andata.</span></p>
           <ul id="my-reviews" class="activities" role="list"></ul>
         </section>
 

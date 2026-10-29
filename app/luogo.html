@@ -18,16 +18,16 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
-  <script src="../assets/js/intro.js?v=i7"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p48">
-  <link rel="stylesheet" href="assets/css/app.css?v=a41">
-  <script src="assets/js/config.js?v=a25" defer></script>
+  <script src="../assets/js/intro.js?v=85d27344"></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=ef5d01b2">
+  <link rel="stylesheet" href="assets/css/app.css?v=343f404e">
+  <script src="assets/js/config.js?v=2dce3a73" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="../assets/js/oa-core.js?v=p35" defer></script>
-  <script src="assets/js/api.js?v=a27" defer></script>
-  <script src="assets/js/app.js?v=a40" defer></script>
+  <script src="../assets/js/oa-core.js?v=d8a1d744" defer></script>
+  <script src="assets/js/api.js?v=41a85dcc" defer></script>
+  <script src="assets/js/app.js?v=e9b828a7" defer></script>
 </head>
 <body class="app" data-page="luogo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -156,6 +156,10 @@
               </a>
             </div>
             <p id="fav-status" class="visually-hidden" role="status"></p>
+            <section id="photos-card" class="detail__photos" aria-labelledby="photos-title" hidden>
+              <h2 id="photos-title" class="visually-hidden">Foto</h2>
+              <ul id="photos-list" class="photos photos--striscia" role="list"></ul>
+            </section>
             <div class="alert-new">
             <details id="alert-new" class="more" hidden>
               <summary class="more__toggle">Segnala un problema di oggi (ascensore guasto, rampa bloccata, lavori…)</summary>
@@ -203,8 +207,17 @@
               </div>
               <p id="summary-verdict" class="summary__verdict"></p>
               <ul id="summary-list" class="summary__list" role="list"></ul>
+              <div id="summary-visitors"></div>
               <p id="per-chi-aiuto" class="place__meta summary__help"></p>
               <p id="per-chi-live" class="visually-hidden" role="status"></p>
+            </section>
+
+            <section id="veloce" class="detail__section veloce" aria-labelledby="veloce-title" tabindex="-1" hidden>
+              <h2 id="veloce-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Ci sei stato?</h2>
+              <p class="place__meta">Mancano alcune informazioni. Rispondi solo a quello che sai: bastano pochi secondi, e prima di pubblicare controlliamo.</p>
+              <form id="veloce-form" class="stack" novalidate></form>
+              <p id="veloce-login" class="place__meta" hidden><a id="veloce-login-link" href="accedi.html">Accedi</a> per rispondere: così sappiamo chi ha dato l'informazione.</p>
+              <p id="veloce-note" class="notice" role="status" tabindex="-1" hidden></p>
             </section>
 
             <section class="detail__section detail__group" aria-labelledby="entrare-title">
@@ -255,14 +268,10 @@
               <li><span class="status status--np"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-na"/></svg>Non previsto in questo luogo</span></li>
             </ul>
           </div>
-          <section id="photos-card" class="card" aria-labelledby="photos-title" hidden>
-            <h2 id="photos-title" class="h3">Foto</h2>
-            <ul id="photos-list" class="photos" role="list"></ul>
-          </section>
           <section class="card" aria-labelledby="reviews-title">
             <h2 id="reviews-title" class="h3">Recensioni</h2>
             <p id="reviews-note" class="notice" role="status" tabindex="-1" hidden></p>
-            <p id="reviews-empty" class="place__meta" hidden>Nessuna recensione ancora. Sei stato qui? Racconta com'è andata.</p>
+            <p id="reviews-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-people"/></svg></span><span>Nessuna recensione ancora. Sei stato qui? Racconta com'è andata.</span></p>
             <ul id="reviews-list" class="reviews" role="list"></ul>
 
             <form id="review-form" class="review-form" novalidate hidden>

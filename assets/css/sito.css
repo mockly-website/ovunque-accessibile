@@ -2090,7 +2090,7 @@ main > .section {
   top: 0;
   bottom: 0;
   background:
-    url("../img/intro-skate.svg?v=2") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
+    url("../img/intro-skate.svg?v=c551b20c") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
     radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
 }
 
@@ -2131,7 +2131,7 @@ main > .section {
 @media (prefers-reduced-motion: reduce) {
   :root.oa-intro::before,
   :root.oa-intro-out::before {
-    background-image: url("../img/intro-fermo.svg?v=6"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
+    background-image: url("../img/intro-fermo.svg?v=1f242d28"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
   }
 
   .oa-intro::after {
@@ -3319,5 +3319,41 @@ main > .how + .section {
 
 .detail__source .facts {
   margin-bottom: var(--space-sm);
+}
+
+.summary__cta {
+  margin: var(--space-sm) 0 0;
+}
+
+/* Stati vuoti (29 ottobre): un'icona in un tondo azzurro, la frase e, quando serve, cosa fare */
+.vuoto {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: var(--space-lg) var(--space-md);
+  border: 1px dashed var(--color-line);
+  border-radius: var(--radius-lg);
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.vuoto[hidden] {
+  display: none;
+}
+
+.vuoto__icona {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-sky);
+  color: var(--color-brand);
+}
+
+.vuoto--elenco p {
+  margin: 0;
+  max-width: 40ch;
 }
 

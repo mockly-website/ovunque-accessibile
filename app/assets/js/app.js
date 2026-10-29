@@ -388,12 +388,45 @@
   initOnda();
   initPageLine();
 
+  /* Prima apertura della mappa senza un'esigenza scelta: una finestra chiede «Come ti muovi?», così i giudizi di tutte le
+     schede sono subito quelli giusti. Si apre dopo la schermata di caricamento, una volta sola (anche con «Scegli dopo»). */
+  function initBenvenuto() {
+    if (page !== 'mappa' || OA.scelta() || !window.HTMLDialogElement) return;
+    try {
+      if (localStorage.getItem('oa-benvenuto')) return;
+    } catch (e) { return; }
+    var dlg = el('dialog', { className: 'benvenuto', 'aria-labelledby': 'benvenuto-title', 'aria-describedby': 'benvenuto-testo' }, [
+      el('h2', { id: 'benvenuto-title', text: 'Come ti muovi?' }),
+      el('p', { id: 'benvenuto-testo', text: 'Scegli la tua esigenza: i giudizi di tutte le schede si adattano a te. Puoi cambiarla quando vuoi.' }),
+      el('ul', { className: 'benvenuto__scelte', role: 'list' }, OA.ORDINE_ESIGENZE.map(function (k) {
+        var b = el('button', { type: 'button', className: 'benvenuto__scelta' }, [
+          el('span', { className: 'benvenuto__icona' }, [icon(OA.ESIGENZE[k].icona)]), document.createTextNode(OA.ESIGENZE[k].nome)
+        ]);
+        b.addEventListener('click', function () { OA.setEsigenza(k); dlg.close(); });
+        return el('li', {}, [b]);
+      })),
+      el('button', { type: 'button', className: 'btn btn--secondary benvenuto__dopo', text: 'Scegli dopo' })
+    ]);
+    dlg.querySelector('.benvenuto__dopo').addEventListener('click', function () { dlg.close(); });
+    dlg.addEventListener('close', function () {
+      try { localStorage.setItem('oa-benvenuto', '1'); } catch (e) { /* niente */ }
+      dlg.remove();
+    });
+    document.body.appendChild(dlg);
+    var root = document.documentElement;
+    (function apri() {
+      if (root.classList.contains('oa-intro') || root.classList.contains('oa-intro-out')) return setTimeout(apri, 150);
+      dlg.showModal();
+    })();
+  }
+
   api.ready.then(syncNeeds).then(function () {
     updateChrome();
     api.onAuth(updateChrome);
     initPasswordToggles();
     OA.start();
     if (PAGES[page]) PAGES[page]();
+    initBenvenuto();
   });
 
   if ('serviceWorker' in navigator && window.isSecureContext) {
@@ -531,7 +564,101 @@
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
 
+  /* «Ci sei stato?»: fino a tre domande veloci su quello che manca (gradini e rampa, porta, bagno). Le risposte
+     diventano una proposta di correzione come le altre: la scheda attuale con solo quei valori cambiati, che i
+     moderatori vedono con le differenze evidenziate e approvano. */
+  function initVeloce(p) {
+    var box = $('veloce');
+    var form = $('veloce-form');
+    if (!box || !form) return;
+    var manca = OA.mancanti(p);
+    if (!manca.length) return;
+    show(box, true);
+    if (!api.user()) {
+      show(form, false);
+      show($('veloce-login'), true);
+      $('veloce-login-link').href = 'accedi.html?torna=' + encodeURIComponent(here() + '#veloce');
+      return;
+    }
+    function radios(id, legend, opts) {
+      return el('fieldset', { className: 'group', id: id }, [el('legend', { className: 'field__label', text: legend })].concat(opts.map(function (o, i) {
+        return el('div', { className: 'radio' }, [
+          el('input', { type: 'radio', id: id + '-' + i, name: id, value: o[0] }),
+          el('label', { 'for': id + '-' + i, text: o[1] })
+        ]);
+      })));
+    }
+    function numero(id, label, help, min, max) {
+      return el('div', { className: 'field field--short' }, [
+        el('label', { className: 'field__label', 'for': id, text: label }),
+        el('p', { className: 'field__help', id: id + '-aiuto', text: help }),
+        el('input', { className: 'input', type: 'number', id: id, name: id, min: String(min), max: String(max), inputmode: 'numeric', 'aria-describedby': id + '-aiuto' })
+      ]);
+    }
+    var rampa = null;
+    if (manca.indexOf('gradini') !== -1) {
+      form.appendChild(numero('v-gradini', 'Quanti gradini ci sono per entrare?', 'Scrivi 0 se non ce ne sono.', 0, 100));
+      rampa = radios('v-rampa', 'C\'è una rampa?', [['true', 'Sì'], ['false', 'No']]);
+      show(rampa, false);
+      form.appendChild(rampa);
+      $('v-gradini').addEventListener('input', function () { show(rampa, Number(this.value) > 0); });
+    }
+    if (manca.indexOf('porta') !== -1) {
+      form.appendChild(numero('v-porta', 'Quanto è larga la porta d\'ingresso? (cm)', 'Lo spazio libero quando è aperta, se l\'hai misurato.', 40, 300));
+    }
+    if (manca.indexOf('bagno') !== -1) {
+      form.appendChild(radios('v-bagno', 'C\'è un bagno accessibile?', [['attrezzato', 'Sì, attrezzato'], ['non-attrezzato', 'C\'è, ma non è attrezzato'], ['assente', 'No'], ['non-previsto', 'Qui non c\'è un bagno']]));
+    }
+    form.appendChild(el('button', { className: 'btn btn--primary', type: 'submit', text: 'Invia le risposte' }));
+
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (isBusy(form)) return;
+      var f = form.elements;
+      var errors = [];
+      var d = {
+        nome: p.nome, categoria: p.categoria, indirizzo: p.indirizzo, cap: p.cap || null, citta: p.citta,
+        provincia: p.provincia || null, regione: p.regione || null, lat: p.lat, lng: p.lng, descrizione: p.descrizione || null,
+        misure: JSON.parse(JSON.stringify(p.misure || {})), facoltativi: JSON.parse(JSON.stringify(p.facoltativi || {})),
+        dettagli: JSON.parse(JSON.stringify(p.dettagli || {}))
+      };
+      var ing = d.misure.ingresso = d.misure.ingresso || {};
+      d.misure.bagno = d.misure.bagno || {};
+      var risposte = 0;
+      if (f['v-gradini'] && f['v-gradini'].value !== '') {
+        var g = Number(f['v-gradini'].value);
+        if (!Number.isInteger(g) || g < 0 || g > 100) errors.push({ input: f['v-gradini'], text: 'Scrivi un numero di gradini da 0 a 100.' });
+        else {
+          ing.gradini = g;
+          risposte++;
+          if (g === 0) { ing.gradino_cm = null; ing.corrimano = null; }
+          var r = form.querySelector('input[name="v-rampa"]:checked');
+          if (g > 0 && r) { ing.rampa = r.value === 'true'; if (!ing.rampa) ing.rampa_pendenza = null; }
+        }
+      }
+      if (f['v-porta'] && f['v-porta'].value !== '') {
+        var c = Number(f['v-porta'].value);
+        if (!(c >= 40 && c <= 300)) errors.push({ input: f['v-porta'], text: 'Scrivi una larghezza tra 40 e 300 cm.' });
+        else { ing.porta_cm = Math.round(c); risposte++; }
+      }
+      var b = form.querySelector('input[name="v-bagno"]:checked');
+      if (b) { d.misure.bagno.valore = b.value; risposte++; }
+      if (!errors.length && !risposte) errors.push({ input: form.querySelector('input'), text: 'Rispondi ad almeno una domanda.' });
+      if (showErrors(form, errors)) return;
+      busy(form, true, 'Invio…');
+      api.propose({ tipo: 'correzione', place_id: p.id, dati: d, nota: 'Risposte veloci dalla scheda' }).then(function () {
+        show(form, false);
+        message($('veloce-note'), 'Grazie! Controlliamo le risposte e aggiorniamo la scheda. Le trovi nel tuo profilo, in «Le tue segnalazioni».', 'ok');
+        $('veloce-note').focus();
+      }).catch(function (err) {
+        busy(form, false);
+        showErrors(form, [{ input: form.querySelector('input'), text: err.message }]);
+      });
+    });
+  }
+
   function initDetailExtras(p) {
+    initVeloce(p);
     var favBtn = $('fav-toggle');
     var favStatus = $('fav-status');
     var saved = false;
@@ -741,6 +868,12 @@
         if (summaryBox) summaryBox.remove();
         summaryBox = summaryNode(rows);
         if (summaryBox) list.parentNode.insertBefore(summaryBox, list);
+        /* lo stesso riepilogo anche in «In breve», in cima alla scheda */
+        var sv = $('summary-visitors');
+        if (sv) {
+          sv.textContent = '';
+          if (summaryBox) sv.appendChild(summaryBox.cloneNode(true));
+        }
         show($('reviews-empty'), !rows.length);
         rows.forEach(function (r) {
           list.appendChild(el('li', {}, [

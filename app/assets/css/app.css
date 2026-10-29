@@ -2733,3 +2733,126 @@ html:has(> body.app) {
   }
 }
 
+/* 28. Prima apertura: «Come ti muovi?» (dialog, app.js initBenvenuto) e «Ci sei stato?» nella scheda (initVeloce) */
+.benvenuto {
+  width: min(28rem, calc(100% - 2rem));
+  max-height: calc(100dvh - 2rem);
+  padding: var(--space-xl) var(--space-lg) var(--space-lg);
+  border: 0;
+  border-radius: var(--radius-xl);
+  background: var(--color-card);
+  color: var(--color-navy);
+  box-shadow: 0 24px 60px rgba(22, 40, 65, 0.3);
+}
+
+.benvenuto::backdrop {
+  background: rgba(22, 40, 65, 0.45);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+}
+
+.benvenuto h2 {
+  margin-bottom: var(--space-xs);
+  font-size: var(--text-2xl);
+}
+
+.benvenuto__scelte {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+  margin: var(--space-md) 0;
+}
+
+.benvenuto__scelta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  min-height: 6.5rem;
+  padding: var(--space-sm);
+  border: 2px solid transparent;
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  color: var(--color-navy);
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.benvenuto__scelta:hover {
+  border-color: var(--color-brand);
+}
+
+.benvenuto__scelta:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.benvenuto__icona {
+  display: inline-grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--color-sky);
+  color: var(--color-brand);
+}
+
+.benvenuto__icona .icon {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+.benvenuto__dopo {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .benvenuto[open] {
+    animation: oa-sale 0.4s var(--ease-out) both;
+  }
+
+  .benvenuto__scelta:active {
+    transform: scale(0.97);
+  }
+}
+
+.veloce {
+  border: 2px dashed var(--color-brand);
+  background: var(--color-sky);
+}
+
+.veloce .field--short .input {
+  max-width: 10rem;
+}
+
+/* Foto della scheda in alto, come striscia che scorre di lato (si ferma su ogni foto) */
+.detail__photos {
+  margin-bottom: var(--space-md);
+}
+
+.photos--striscia {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-xs);
+}
+
+.photos--striscia > li {
+  flex: 0 0 min(78%, 18rem);
+  scroll-snap-align: start;
+}
+
+.photos--striscia .photo img {
+  border-radius: var(--radius-md);
+}
+
+#summary-visitors .review-summary {
+  margin-top: var(--space-md);
+}
+

@@ -446,6 +446,17 @@
     return config.loadPlaces ? config.loadPlaces() : Promise.reject(new Error('dati'));
   }
 
+  /* Le tre cose che chi passa di lì sa dire in pochi secondi e che spesso mancano: gradini, porta, bagno */
+  function mancanti(p) {
+    var m = p.misure || {};
+    var ing = m.ingresso || {};
+    var out = [];
+    if (ing.gradini == null) out.push('gradini');
+    if (ing.porta_cm == null) out.push('porta');
+    if ((m.bagno || {}).valore == null) out.push('bagno');
+    return out;
+  }
+
   /* ---------- 5. Componenti ---------- */
 
   /* Stato con icona + prefisso nascosto per screen reader: il significato non dipende dal colore */
@@ -886,7 +897,8 @@
 
       list.textContent = '';
       if (!found.length) {
-        list.appendChild(el('li', { className: 'empty' }, [
+        list.appendChild(el('li', { className: 'empty vuoto vuoto--elenco' }, [
+          el('span', { className: 'vuoto__icona' }, [icon('#icon-search')]),
           el('p', { text: 'Nessun luogo accessibile corrisponde alla ricerca.' }),
           el('p', { text: ESIGENZE[e].sensi
             ? 'Per chi non vede o non sente bene abbiamo ancora poche informazioni: se conosci un luogo con Braille, LIS, percorsi tattili o anello magnetico, segnalalo dall\'app.'
@@ -1132,7 +1144,7 @@
         icon(ICONA_STATO.nv),
         el('span', {}, [
           el('strong', { className: 'summary__name', text: 'Misure da raccogliere' }),
-          el('span', { className: 'summary__text', text: 'Gradini, porta e bagno non li ha ancora misurati nessuno. Ci sei stato? Proponi una correzione.' })
+          el('span', { className: 'summary__text', text: 'Gradini, porta e bagno non li ha ancora misurati nessuno. Ci sei stato? Rispondi alle domande qui sotto.' })
         ])
       ]));
       return;
@@ -1310,6 +1322,12 @@
       report.href = config.reportHref ? config.reportHref(p) : 'mailto:ovunqueaccessibile@gmail.com?subject=' +
         encodeURIComponent('Correzione scheda: ' + p.nome + ', ' + p.citta + ' (' + p.id + ')');
 
+      var invito = document.getElementById('veloce-link');
+      if (invito) {
+        invito.hidden = !mancanti(p).length;
+        invito.querySelector('a').href = 'app/luogo.html?id=' + encodeURIComponent(p.id) + '#veloce';
+      }
+
       var fix = document.getElementById('detail-source-fix');
       if (fix) {
         fix.textContent = 'Qualcosa non torna o è cambiato? ';
@@ -1358,7 +1376,7 @@
     },
     CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
-    giudizio: giudizio, distanceKm: distanceKm, completezza: completezza,
+    giudizio: giudizio, distanceKm: distanceKm, completezza: completezza, mancanti: mancanti,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, placeCard: placeCard,

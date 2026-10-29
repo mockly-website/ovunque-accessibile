@@ -16,14 +16,14 @@
   <link rel="apple-touch-icon" href="assets/img/icon-180.png">
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <script src="../assets/js/intro.js?v=i7"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=p48">
-  <link rel="stylesheet" href="assets/css/app.css?v=a41">
-  <script src="assets/js/config.js?v=a25" defer></script>
+  <script src="../assets/js/intro.js?v=85d27344"></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=ef5d01b2">
+  <link rel="stylesheet" href="assets/css/app.css?v=343f404e">
+  <script src="assets/js/config.js?v=2dce3a73" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
-  <script src="../assets/js/oa-core.js?v=p35" defer></script>
-  <script src="assets/js/api.js?v=a27" defer></script>
-  <script src="assets/js/app.js?v=a40" defer></script>
+  <script src="../assets/js/oa-core.js?v=d8a1d744" defer></script>
+  <script src="assets/js/api.js?v=41a85dcc" defer></script>
+  <script src="assets/js/app.js?v=e9b828a7" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -113,7 +113,7 @@
         <h2 id="mod-panel-title" class="visually-hidden">Pannello di moderazione</h2>
         <section aria-labelledby="mod-proposals-title">
           <h2 id="mod-proposals-title">Segnalazioni <span class="pill" id="mod-proposals-count"></span></h2>
-          <p id="mod-proposals-empty" class="place__meta" hidden>Nessuna segnalazione in attesa.</p>
+          <p id="mod-proposals-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna segnalazione in attesa.</span></p>
           <ul id="mod-proposals" class="mod-list" role="list"></ul>
         </section>
         <section aria-labelledby="mod-osm-title">
@@ -131,25 +131,25 @@
             </p>
           </div>
           <p id="osm-status" class="notice" role="status" tabindex="-1" hidden></p>
-          <p id="mod-osm-empty" class="place__meta" hidden>Nessun luogo da approvare.</p>
+          <p id="mod-osm-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Nessun luogo da approvare.</span></p>
           <ul id="mod-osm" class="osm-list" role="list"></ul>
           <button id="osm-more" class="btn btn--secondary btn--small" type="button" hidden>Mostra altri</button>
         </section>
         <section aria-labelledby="mod-reviews-title">
           <h2 id="mod-reviews-title">Recensioni <span class="pill" id="mod-reviews-count"></span></h2>
-          <p id="mod-reviews-empty" class="place__meta" hidden>Nessuna recensione in attesa.</p>
+          <p id="mod-reviews-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna recensione in attesa.</span></p>
           <ul id="mod-reviews" class="mod-list" role="list"></ul>
         </section>
         <section aria-labelledby="mod-owners-title">
           <h2 id="mod-owners-title">Gestori dei luoghi <span class="pill" id="mod-owners-count"></span></h2>
           <p class="place__meta">Prima di approvare, chiama o scrivi al contatto indicato e verifica che corrisponda a quello pubblico del luogo (sito, insegna, pagine gialle).</p>
-          <p id="mod-owners-empty" class="place__meta" hidden>Nessuna richiesta in attesa.</p>
+          <p id="mod-owners-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna richiesta in attesa.</span></p>
           <ul id="mod-owners" class="mod-list" role="list"></ul>
         </section>
         <section aria-labelledby="mod-checks-title">
           <h2 id="mod-checks-title">Verifiche sul posto <span class="pill" id="mod-checks-count"></span></h2>
           <p class="place__meta">Richieste dei gestori. Accordatevi al contatto del gestore, segnate «Fissata» con la data, andate a misurare. Se le misure sono cambiate, prima correggete la scheda (Proponi una correzione, poi approvate); poi «Fatta»: la scheda diventa «Verificato sul posto» con la data di oggi.</p>
-          <p id="mod-checks-empty" class="place__meta" hidden>Nessuna verifica da organizzare.</p>
+          <p id="mod-checks-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna verifica da organizzare.</span></p>
           <ul id="mod-checks" class="mod-list" role="list"></ul>
         </section>
         <section id="osm-card" class="card" aria-labelledby="osm-title" hidden>
