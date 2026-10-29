@@ -1,11 +1,25 @@
 /* ==========================================================================
-   Ovunque Accessibile – sito (prototipo)
-   Indice: 1. Font · 2. Token · 3. Base · 4. Utility · 5. Componenti
-           6. Header e footer · 7. Home · 8. Mappa · 9. Scheda luogo
-           10. Animazioni · 11. Forced colors e stampa
+   Ovunque Accessibile – fogli di stile del sito (li usa anche la web-app, prima di app/assets/css/app.css)
+   Ogni componente è in un punto solo, con dentro le sue varianti per schermo, «riduci movimento»,
+   colori forzati e stampa. Il movimento parte solo con (prefers-reduced-motion: no-preference).
+
+   Indice
+    1. Font                     9. Scelta dell'esigenza
+    2. Token                   10. Intestazione e menu
+    3. Base                    11. Piè di pagina
+    4. Utilità                 12. Schermata di caricamento
+    5. Pulsanti                13. Schede dei luoghi
+    6. Campi dei moduli        14. Home
+    7. Etichette e stati       15. Per i locali
+    8. Ricerca a pillola       16. Pagina mappa
+                               17. Scheda luogo
    ========================================================================== */
 
-/* 1. Font ospitati in locale (niente Google Fonts: GDPR) */
+/* ==========================================================================
+   1. Font
+   Ospitati in locale (niente Google Fonts: GDPR).
+   ========================================================================== */
+
 @font-face {
   font-family: "Atkinson Hyperlegible";
   font-style: normal;
@@ -13,6 +27,7 @@
   font-display: swap;
   src: url("../fonts/atkinson-hyperlegible-400-latin.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "Atkinson Hyperlegible";
   font-style: normal;
@@ -20,6 +35,7 @@
   font-display: swap;
   src: url("../fonts/atkinson-hyperlegible-700-latin.woff2") format("woff2");
 }
+
 @font-face {
   font-family: "Fredoka";
   font-style: normal;
@@ -28,7 +44,11 @@
   src: url("../fonts/fredoka-latin.woff2") format("woff2");
 }
 
-/* 2. Token (stessa palette della pagina "in arrivo") */
+/* ==========================================================================
+   2. Token
+   Stessa palette della pagina «in arrivo».
+   ========================================================================== */
+
 :root {
   --color-navy: #162841;
   --color-beige: #e7d6b9;
@@ -84,7 +104,10 @@
   --border-control: 2px;
 }
 
-/* 3. Base */
+/* ==========================================================================
+   3. Base
+   ========================================================================== */
+
 *,
 *::before,
 *::after {
@@ -187,7 +210,17 @@ main:focus {
   color: var(--color-card);
 }
 
-/* 4. Utility */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ==========================================================================
+   4. Utilità
+   Contenitore, link «Salta al contenuto», testo solo per screen reader, sprite e icone.
+   ========================================================================== */
+
 .visually-hidden {
   position: absolute !important;
   width: 1px !important;
@@ -261,7 +294,23 @@ html:not(.js) .js-only {
   color: var(--color-white);
 }
 
-/* 5. Componenti */
+@media (forced-colors: active) {
+  .icon {
+    color: CanvasText;
+  }
+}
+
+@media print {
+  .skip-links {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   5. Pulsanti
+   Al tocco si schiacciano un poco (solo senza «riduci movimento»).
+   ========================================================================== */
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -315,29 +364,43 @@ html:not(.js) .js-only {
   height: 1.25rem;
 }
 
-.card {
-  padding: var(--space-lg);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
+.btn--light {
   background: var(--color-white);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--color-white);
+  color: var(--color-navy);
 }
 
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.7rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-sky);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  line-height: 1.5;
-}
-
-.pill--soon {
+.btn--light:hover {
   background: var(--color-beige);
+  border-color: var(--color-beige);
+  color: var(--color-navy);
 }
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--ease-out);
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (forced-colors: active) {
+  .btn {
+    border: 2px solid CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .btn:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ==========================================================================
+   6. Campi dei moduli
+   ========================================================================== */
 
 /* Campi */
 .field {
@@ -370,31 +433,33 @@ html:not(.js) .js-only {
   background-size: 1.5rem;
 }
 
-.search {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
+/* ==========================================================================
+   7. Etichette e stati
+   Pillole, stato con icona + testo (mai solo colore), affidabilità delle informazioni, riquadri.
+   ========================================================================== */
+
+.card {
+  padding: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
 }
 
-.search .input {
-  flex: 1 1 14rem;
-  min-height: 3.5rem;
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-sky);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.5;
 }
 
-.search .btn {
-  flex: 0 0 auto;
-  min-height: 3.5rem;
-}
-
-@media (max-width: 29.99em) {
-  .search .input {
-    flex-basis: 0;
-    min-width: 0;
-  }
-
-  .search .btn {
-    padding-inline: var(--space-md);
-  }
+.pill--soon {
+  background: var(--color-beige);
 }
 
 /* Stato di accessibilità: icona + testo, mai solo colore */
@@ -414,11 +479,113 @@ html:not(.js) .js-only {
 }
 
 .status--np .icon { background: none; padding: 0; color: var(--color-muted); }
+
 .status--info { font-weight: 700; }
+
 .status--si .icon { background: var(--color-success); }
+
 .status--parziale .icon { background: var(--color-warning); }
+
 .status--no .icon { background: var(--color-error); }
+
 .status--nv .icon { background: var(--color-muted); }
+
+/* Livello di affidabilità della scheda */
+.trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-muted);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.trust .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.trust--onsite {
+  color: var(--color-success);
+}
+
+.trust--old {
+  color: var(--color-warning);
+}
+
+@media (forced-colors: active) {
+  .card {
+    border: 2px solid CanvasText;
+  }
+}
+
+/* ==========================================================================
+   8. Ricerca a pillola
+   Sito e app.
+   ========================================================================== */
+
+@media (max-width: 29.99em) {
+  .search .btn {
+    padding-inline: var(--space-md);
+  }
+}
+
+/* Telefono: i tre giudizi della scheda diventano righe compatte (icona · esigenza · giudizio) */
+.search {
+  display: flex;
+  gap: var(--space-xs);
+  position: relative;
+  flex-wrap: nowrap;
+  padding: 5px;
+  border: 1.5px solid var(--color-navy);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  box-shadow: 0 6px 20px rgba(22, 40, 65, 0.06);
+}
+
+.search:focus-within {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px rgba(47, 91, 156, 0.18);
+}
+
+.search .input {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 3rem;
+  border: 0;
+  border-radius: var(--radius-pill);
+  box-shadow: none;
+}
+
+.search .input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.search .btn {
+  flex: 0 0 auto;
+  min-height: 3rem;
+}
+
+@media (max-width: 47.99em) {
+  /* Ricerca: il pulsante diventa solo lente, il nome resta per gli screen reader */
+  .search .btn {
+    width: 3rem;
+    padding: 0;
+    justify-content: center;
+    font-size: 0;
+  }
+
+  .search .btn .icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+}
+
+/* ==========================================================================
+   9. Scelta dell'esigenza
+   Sei esigenze (anche persone anziane, vista e udito); sul telefono in tessere compatte.
+   ========================================================================== */
 
 /* "Come ti muovi?": scelta dell'esigenza */
 .needs {
@@ -463,8 +630,8 @@ html:not(.js) .js-only {
   }
 }
 
-/* Telefono, esigenza già scelta: le tre opzioni affiancate e compatte */
 @media (max-width: 63.99em) {
+  /* Telefono, esigenza già scelta: le tre opzioni affiancate e compatte */
   .needs:not(.needs--ask) {
     padding: var(--space-sm) var(--space-md);
   }
@@ -480,13 +647,6 @@ html:not(.js) .js-only {
     padding: var(--space-xs) 0.3rem;
     font-size: 0.9rem;
     text-align: center;
-  }
-}
-
-/* Computer, pagina mappa: colonna stretta, scelte una sotto l'altra */
-@media (min-width: 64em) {
-  .explore__controls .needs__options {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -540,62 +700,51 @@ html:not(.js) .js-only {
   outline-offset: 3px;
 }
 
-/* Livello di affidabilità della scheda */
-.trust {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  color: var(--color-muted);
-  font-size: 0.95rem;
-  font-weight: 700;
+@media (max-width: 47.99em) {
+  /* «Come ti muovi?» sempre su una riga di tre, anche alla prima visita */
+  .needs {
+    padding: var(--space-sm) var(--space-md) var(--space-md);
+  }
+
+  .needs .needs__options {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .needs .needs__option label {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    padding: var(--space-xs) 0.3rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+
+  .needs__legend {
+    font-size: var(--text-base);
+  }
+
+  .needs__help {
+    margin-bottom: var(--space-xs);
+  }
 }
 
-.trust .icon {
-  width: 1.15rem;
-  height: 1.15rem;
+@media (max-width: 22em) {
+  /* Telefono molto stretto: due colonne, così «Difficoltà a camminare» non si spezza a ogni sillaba */
+  .needs .needs__options,
+  .needs:not(.needs--ask) .needs__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
-.trust--onsite {
-  color: var(--color-success);
-}
+/* ==========================================================================
+   10. Intestazione e menu
+   Intestazione non fissa (WCAG 2.4.11). Voci a pillola; sul telefono un pulsante «Menu»
+   (assets/js/menu.js) apre un pannello invece di due righe di link.
+   ========================================================================== */
 
-.trust--old {
-  color: var(--color-warning);
-}
-
-.detail__trust {
-  margin: 0 0 var(--space-xs);
-}
-
-.detail__section + .detail__section {
-  margin-top: var(--space-md);
-}
-
-.detail__section .needs {
-  margin-bottom: var(--space-md);
-  padding: var(--space-sm) var(--space-md) var(--space-md);
-}
-
-.place__top {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2xs) var(--space-sm);
-}
-
-/* 6. Header e footer (header non sticky: WCAG 2.4.11) */
 .site-header {
   border-bottom: 1px solid var(--color-line);
   background: var(--color-card);
-}
-
-.site-header__inner {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-xs) var(--space-md);
-  padding-block: var(--space-sm);
 }
 
 .brand {
@@ -621,25 +770,16 @@ html:not(.js) .js-only {
   line-height: 1.1;
 }
 
-.nav__list {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2xs) var(--space-md);
-}
-
 .nav__link {
   display: inline-flex;
   align-items: center;
   min-height: var(--target-min);
-  padding-inline: var(--space-xs);
   color: var(--color-navy);
   text-decoration: none;
 }
 
 .nav__link:hover,
 .nav__link[aria-current="page"] {
-  text-decoration: underline;
   text-decoration-thickness: 0.15em;
   text-underline-offset: 0.3em;
 }
@@ -648,18 +788,9 @@ html:not(.js) .js-only {
   flex: none;
 }
 
-/* Telefono: logo e "Scarica l'app" sulla prima riga, link sotto */
 @media (max-width: 47.99em) {
-  .site-header__inner {
-    padding-bottom: 0;
-  }
-
   .brand__logo {
     width: 2rem;
-  }
-
-  .site-header__inner {
-    gap: var(--space-xs);
   }
 
   .brand {
@@ -682,14 +813,241 @@ html:not(.js) .js-only {
 
   .nav__list {
     justify-content: space-between;
-    gap: 0;
   }
 
   .nav__link {
-    padding-inline: 0.2rem;
     font-size: 0.95rem;
   }
 }
+
+@media print {
+  .site-header .nav {
+    display: none;
+  }
+}
+
+.site-header__inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs) var(--space-md);
+  padding-block: var(--space-sm);
+  justify-content: flex-start;
+}
+
+.site-header .nav {
+  margin-left: auto;
+}
+
+.nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+}
+
+.nav__link {
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+}
+
+.nav__link:hover {
+  background: var(--color-sky);
+  text-decoration: none;
+}
+
+.nav__link[aria-current="page"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.menu-toggle {
+  display: none;
+}
+
+@media (max-width: 47.99em) {
+  /* Telefono: logo e "Scarica l'app" sulla prima riga, link sotto */
+  .site-header__inner {
+    flex-wrap: wrap;
+    gap: 0 var(--space-xs);
+    padding-block: var(--space-xs);
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    order: 2;
+    min-height: var(--target-min);
+    margin-left: auto;
+    padding: 0 0.9rem;
+    border: var(--border-control) solid var(--color-navy);
+    border-radius: var(--radius-pill);
+    background: var(--color-white);
+    color: var(--color-navy);
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .menu-toggle:focus-visible {
+    outline: var(--focus-width) solid var(--color-focus);
+    outline-offset: 2px;
+  }
+
+  .menu-toggle__bars,
+  .menu-toggle__bars::before,
+  .menu-toggle__bars::after {
+    display: block;
+    width: 1.1rem;
+    height: 2px;
+    border-radius: 2px;
+    background: currentColor;
+  }
+
+  .menu-toggle__bars {
+    position: relative;
+  }
+
+  .menu-toggle__bars::before,
+  .menu-toggle__bars::after {
+    content: "";
+    position: absolute;
+    left: 0;
+  }
+
+  .menu-toggle__bars::before { top: -6px; }
+
+  .menu-toggle__bars::after { top: 6px; }
+
+  .site-header--open .menu-toggle__bars { background: transparent; }
+
+  .site-header--open .menu-toggle__bars::before { top: 0; transform: rotate(45deg); }
+
+  .site-header--open .menu-toggle__bars::after { top: 0; transform: rotate(-45deg); }
+
+  /* Pannello del menu (menu.js): scende sotto la barra, il resto della pagina è sfocato dal velo */
+  .site-header {
+    position: relative;
+    z-index: 1001;
+  }
+
+  .js .site-header__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: calc(100vh - 5rem);
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    padding: var(--space-sm) var(--space-md) var(--space-lg);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    background: var(--color-card);
+    box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.22);
+  }
+
+  .site-header .nav {
+    width: 100%;
+    margin: 0;
+    border-top: 0;
+  }
+
+  .site-header .site-header__app {
+    width: 100%;
+    justify-content: center;
+    margin-block: var(--space-sm) var(--space-xs);
+  }
+
+  .js .site-header:not(.site-header--open) .site-header__panel {
+    display: none;
+  }
+
+  .menu-aperto .menu-velo {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .menu-aperto {
+    overflow: hidden;
+  }
+
+  .site-header .nav__list {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2px;
+    padding-top: var(--space-xs);
+    border-top: 1px solid var(--color-line);
+  }
+
+  .site-header .nav__link {
+    display: flex;
+    min-height: 3rem;
+    padding: 0.6rem var(--space-md);
+    border-radius: var(--radius-md);
+    font-size: var(--text-base);
+  }
+}
+
+.site-header__panel {
+  display: contents;
+}
+
+.menu-velo {
+  display: none;
+}
+
+@media (max-width: 47.99em) {
+  .site-header__panel {
+    order: 4;
+    width: 100%;
+    display: block;
+  }
+
+  .menu-velo {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(22, 40, 65, 0.4);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    display: block;
+  }
+}
+
+@media (max-width: 47.99em) and (prefers-reduced-motion: no-preference) {
+  .menu-velo {
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+  }
+
+  .menu-aperto .menu-velo {
+    transition: opacity 0.25s ease;
+  }
+
+  .site-header--open .site-header__panel {
+    animation: menu-scende 0.28s var(--ease-out) both;
+  }
+
+  @keyframes menu-scende {
+    from {
+      opacity: 0;
+      transform: translateY(-0.75rem);
+    }
+  }
+}
+
+@media (forced-colors: active) {
+  .nav__link[aria-current="page"] {
+    border: 2px solid CanvasText;
+  }
+}
+
+/* ==========================================================================
+   11. Piè di pagina
+   ========================================================================== */
 
 /* Piè di pagina (28 ottobre): fascia blu con logo, «Esplora», «Contatti» e una riga finale.
    Su fondo blu link e focus diventano chiari (contrasto beige su blu 10:1) */
@@ -776,8 +1134,8 @@ html:not(.js) .js-only {
   list-style: none;
 }
 
-/* Telefono: i link vanno uno accanto all'altro, così il piè di pagina resta corto */
 @media (max-width: 47.99em) {
+  /* Telefono: i link vanno uno accanto all'altro, così il piè di pagina resta corto */
   .site-footer__grid {
     gap: var(--space-lg);
   }
@@ -815,9 +1173,248 @@ html:not(.js) .js-only {
   min-height: var(--target-min);
 }
 
-/* 7. Home (29 ottobre, riscritta): impaginazione asciutta, senza etichette sopra i titoli né riquadri ripetuti.
-   Le sezioni sono separate da una riga sottile; da 960 px titolo a sinistra e contenuto a destra (stile A, scelto dal
-   cliente il 29 ottobre tra tre proposte). */
+/* ==========================================================================
+   12. Schermata di caricamento
+   assets/js/intro.js: sul chiaro del sito una rampa da skate in cui chi è in carrozzina, con il
+   casco, va su e giù; sul fianco il simbolo dell'accessibilità e sulla piattaforma il segnaposto
+   (assets/img/intro-skate.svg). Sotto, il nome. All'uscita la schermata sale come un sipario e scopre la pagina.
+   Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori dall'albero di accessibilità.
+   ========================================================================== */
+
+.oa-intro,
+.oa-intro-out {
+  --intro-size: min(19rem, 86vw);
+}
+
+.oa-intro::before,
+.oa-intro::after,
+.oa-intro-out::before,
+.oa-intro-out::after {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 2147483000;
+  pointer-events: none;
+}
+
+.oa-intro::before,
+.oa-intro-out::before {
+  content: "";
+  top: 0;
+  bottom: 0;
+  background:
+    url("../img/intro-skate.svg?v=c551b20c") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
+    radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
+}
+
+.oa-intro::after,
+.oa-intro-out::after {
+  content: "Ovunque Accessibile";
+  top: calc(50% - 2rem + var(--intro-size) * 0.375 + 0.75rem);
+  color: var(--color-navy, #162841);
+  font-family: var(--font-heading, sans-serif);
+  font-weight: 600;
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.1rem);
+  letter-spacing: -0.01em;
+  text-align: center;
+  animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+}
+
+@keyframes oa-intro-nome {
+  from {
+    transform: translateY(0.6rem);
+  }
+}
+
+.oa-intro-out::before,
+.oa-intro-out::after {
+  transform: translateY(-100%);
+  transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.oa-intro-out::before {
+  border-radius: 0 0 2rem 2rem;
+  box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.18);
+}
+
+.oa-intro-out::after {
+  transform: translateY(-100vh);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root.oa-intro::before,
+  :root.oa-intro-out::before {
+    background-image: url("../img/intro-fermo.svg?v=1f242d28"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
+  }
+
+  .oa-intro::after {
+    animation: none;
+  }
+
+  .oa-intro-out::before,
+  .oa-intro-out::after {
+    opacity: 0;
+    transform: none;
+    transition: opacity 0.3s ease;
+  }
+}
+
+@media (forced-colors: active) {
+  .oa-intro::before,
+  .oa-intro::after {
+    display: none;
+  }
+}
+
+/* ==========================================================================
+   13. Schede dei luoghi
+   Le schede dell'elenco della mappa e degli «ultimi verificati» della home (oa-core.js).
+   ========================================================================== */
+
+.place__top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs) var(--space-sm);
+}
+
+.place {
+  position: relative;
+  display: grid;
+  gap: var(--space-2xs);
+  padding: var(--space-md) var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+}
+
+.place:hover,
+.place.is-active {
+  border-color: var(--color-brand);
+  box-shadow: var(--shadow-sm);
+}
+
+.place__title {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+/* Tutta la card è cliccabile tramite il link del titolo */
+.place__link {
+  color: var(--color-navy);
+  text-decoration: none;
+}
+
+.place__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.place__link:focus-visible {
+  outline: none;
+}
+
+.place:focus-within {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.place__meta {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.place__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2xs) var(--space-md);
+  margin-top: var(--space-2xs);
+  font-size: var(--text-sm);
+}
+
+/* "Mostra sulla mappa": sopra il link che copre la card */
+.place__show {
+  position: relative;
+  z-index: 1;
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: var(--target-min);
+  margin-top: var(--space-2xs);
+  padding: 0 var(--space-md) 0 var(--space-sm);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-card);
+  color: var(--color-navy);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.place__show:hover {
+  border-color: var(--color-navy);
+}
+
+.place__show .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--color-brand);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .place {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--ease-out);
+  }
+}
+
+@media (forced-colors: active) {
+  .place {
+    border: 2px solid CanvasText;
+  }
+}
+
+.place__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: var(--space-2xs) 0 0;
+  padding: 0.35rem 0.6rem;
+  border-left: 4px solid var(--color-warning);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  background: #fdf3e1;
+  color: var(--color-warning);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.place__alert .icon {
+  flex: none;
+  width: 1.2rem;
+  height: 1.2rem;
+  margin-top: 0.1rem;
+}
+
+@media (forced-colors: active) {
+  .place__alert {
+    border: 2px solid CanvasText;
+  }
+}
+
+/* ==========================================================================
+   14. Home
+   Impaginazione asciutta, senza etichette sopra i titoli né riquadri ripetuti. Le sezioni sono
+   separate da una riga sottile; da 960 px titolo a sinistra e contenuto a destra (stile scelto dal cliente).
+   Movimento: il titolo sale riga per riga, la foto si scopre dal basso con un leggero zoom, poi ricerca e
+   scorciatoie; parte mentre il sipario del caricamento sale (.oa-intro tolta). Allo scorrimento gli elementi con
+   .svela (messi da sito.js) entrano in sequenza; nella mappa della home i segnaposto spuntano quando si vede.
+   Tutto solo con JavaScript e senza «riduci movimento»: altrimenti la pagina è già ferma e completa.
+   ========================================================================== */
+
 .hero {
   padding-block: var(--space-xl) var(--space-2xl);
 }
@@ -1002,10 +1599,6 @@ main > .section {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .link-arrow .icon {
-    transition: transform 0.2s var(--ease-out);
-  }
-
   .link-arrow:hover .icon {
     transform: translateX(3px);
   }
@@ -1074,15 +1667,6 @@ main > .section {
   column-gap: var(--space-md);
   padding-block: var(--space-md);
   border-bottom: 1px solid var(--color-line);
-}
-
-.how__list > li::before {
-  content: counter(passo);
-  grid-row: span 2;
-  color: var(--color-brand);
-  font-family: var(--font-heading);
-  font-size: 2.25rem;
-  line-height: 1;
 }
 
 .how__list h3 {
@@ -1175,18 +1759,6 @@ main > .section {
   color: var(--color-beige);
 }
 
-.btn--light {
-  background: var(--color-white);
-  border-color: var(--color-white);
-  color: var(--color-navy);
-}
-
-.btn--light:hover {
-  background: var(--color-beige);
-  border-color: var(--color-beige);
-  color: var(--color-navy);
-}
-
 /* Per i locali */
 .business-home__inner > * {
   max-width: 48rem;
@@ -1219,7 +1791,279 @@ main > .section {
   line-height: 1.25;
 }
 
-/* 8. Pagina mappa */
+@media (prefers-reduced-motion: no-preference) {
+  .quick__link {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--ease-out);
+  }
+}
+
+@media print {
+  .hero__map {
+    display: none;
+  }
+
+  .apps {
+    display: none;
+  }
+}
+
+.quick__link--near {
+  border-color: var(--color-navy);
+  font-weight: 700;
+}
+
+.quick__link--near .icon {
+  color: var(--color-brand);
+}
+
+.hero .quick__link--near,
+.hero .quick__link--near:hover {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.hero .quick__link--near .icon {
+  color: var(--color-beige);
+}
+
+.hero__riga {
+  display: inline-block;
+}
+
+.stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+  margin: var(--space-md) 0;
+}
+
+.stats[hidden] {
+  display: none;
+}
+
+.stats > div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.stats dt {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.stats dd {
+  margin: 0;
+  color: var(--color-brand);
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Come funziona: fascia blu a tutta larghezza, per spezzare il ritmo della pagina */
+main > .how {
+  border-top: 0;
+  background: var(--color-navy);
+  color: var(--color-white);
+  --color-focus: var(--color-white);
+}
+
+.how h2,
+.how h3 {
+  color: var(--color-white);
+}
+
+.how a {
+  color: var(--color-beige);
+}
+
+.how__list,
+.how__list > li {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.how__list > li::before {
+  content: counter(passo);
+  grid-row: span 2;
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--color-beige);
+}
+
+main > .how + .section {
+  border-top: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .hero__riga,
+  .js .hero__lead,
+  .js .hero__search,
+  .js .quick > li,
+  .js .hero__caption {
+    opacity: 0;
+  }
+
+  .js:not(.oa-intro) .hero__riga {
+    animation: oa-sale 0.9s var(--ease-out) both;
+  }
+
+  .js:not(.oa-intro) .hero__riga + .hero__riga {
+    animation-delay: 0.12s;
+  }
+
+  .js:not(.oa-intro) .hero__lead {
+    animation: oa-sale 0.8s var(--ease-out) 0.28s both;
+  }
+
+  .js:not(.oa-intro) .hero__search {
+    animation: oa-sale 0.8s var(--ease-out) 0.38s both;
+  }
+
+  .js:not(.oa-intro) .quick > li {
+    animation: oa-sale 0.7s var(--ease-out) both;
+  }
+
+  .js:not(.oa-intro) .quick > li:nth-child(1) { animation-delay: 0.48s; }
+
+  .js:not(.oa-intro) .quick > li:nth-child(2) { animation-delay: 0.54s; }
+
+  .js:not(.oa-intro) .quick > li:nth-child(3) { animation-delay: 0.6s; }
+
+  .js:not(.oa-intro) .quick > li:nth-child(4) { animation-delay: 0.66s; }
+
+  .js:not(.oa-intro) .hero__photo {
+    animation: oa-scopri 1.1s cubic-bezier(0.7, 0, 0.2, 1) 0.1s both;
+  }
+
+  .js:not(.oa-intro) .hero__photo img {
+    animation: oa-zoom 1.8s var(--ease-out) 0.1s both;
+  }
+
+  .js:not(.oa-intro) .hero__caption {
+    animation: oa-sale 0.7s var(--ease-out) 0.9s both;
+  }
+
+  .svela {
+    opacity: 0;
+    transform: translateY(1.5rem);
+    transition: opacity 0.7s var(--ease-out), transform 0.8s var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  .svela.is-visto {
+    opacity: 1;
+    transform: none;
+  }
+
+  /* la mappa non si sposta: solo i segnaposto spuntano (scale, che non tocca la posizione data da Leaflet) */
+  #home-map.svela {
+    opacity: 1;
+    transform: none;
+  }
+
+  #home-map.is-visto .cluster,
+  #home-map.is-visto .pin__drop {
+    animation: oa-spunta 0.55s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
+  }
+
+  #home-map.is-visto .leaflet-marker-icon:nth-child(4n + 2) .pin__drop,
+  #home-map.is-visto .cluster:nth-child(4n + 2) { animation-delay: 0.08s; }
+
+  #home-map.is-visto .leaflet-marker-icon:nth-child(4n + 3) .pin__drop,
+  #home-map.is-visto .cluster:nth-child(4n + 3) { animation-delay: 0.16s; }
+
+  #home-map.is-visto .leaflet-marker-icon:nth-child(4n) .pin__drop,
+  #home-map.is-visto .cluster:nth-child(4n) { animation-delay: 0.24s; }
+
+  .needs-home__list .icon,
+  .link-arrow .icon {
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .needs-home__list a:hover .icon {
+    transform: translateX(3px) rotate(-6deg);
+  }
+}
+
+@keyframes oa-sale {
+  from {
+    opacity: 0;
+    transform: translateY(0.6em);
+  }
+
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes oa-scopri {
+  from {
+    clip-path: inset(100% 0 0 0 round var(--radius-md));
+  }
+
+  to {
+    clip-path: inset(0 0 0 0 round var(--radius-md));
+  }
+}
+
+@keyframes oa-zoom {
+  from {
+    transform: scale(1.15);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .quick__link:active {
+    transform: scale(0.97);
+  }
+}
+
+/* ==========================================================================
+   15. Per i locali
+   locali.html e blocco della home.
+   ========================================================================== */
+
+.locali__passi {
+  display: grid;
+  gap: var(--space-sm);
+  padding-left: 1.4em;
+}
+
+.locali__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.business {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-sm);
+  border-left: 6px solid var(--color-brand);
+}
+
+.business h2,
+.business p {
+  margin: 0;
+}
+
+.tips {
+  display: grid;
+  gap: var(--space-xs);
+  padding-left: 1.2em;
+}
+
+/* ==========================================================================
+   16. Pagina mappa
+   Ricerca, filtri, elenco e mappa (Leaflet), segnaposto, gruppi, legenda e riquadro del luogo.
+   Telefono e tablet: «Mappa / Elenco», filtri in una tendina, mappa subito sotto. Nelle pagine che scorrono un dito
+   scorre la pagina e due dita spostano la mappa (oa-core.js, dueDita). Movimento: segnaposto e gruppi spuntano
+   (anche avvicinando o allontanando la mappa), le prime schede dell'elenco entrano in sequenza.
+   ========================================================================== */
+
 .explore {
   padding-block: var(--space-lg) 0;
 }
@@ -1244,8 +2088,8 @@ main > .section {
   min-width: 0;
 }
 
-/* Telefono: ricerca, mappa, elenco. Computer: ricerca ed elenco a sinistra, mappa a destra */
 @media (min-width: 64em) {
+  /* Telefono: ricerca, mappa, elenco. Computer: ricerca ed elenco a sinistra, mappa a destra */
   .explore__layout {
     grid-template-columns: minmax(20rem, 26rem) minmax(0, 1fr);
     grid-template-areas:
@@ -1256,6 +2100,7 @@ main > .section {
   }
 
   .explore__controls { grid-area: filters; }
+
   #results { grid-area: results; }
 
   .explore__map-wrap {
@@ -1304,8 +2149,8 @@ main > .section {
   min-height: 3.25rem;
 }
 
-/* Telefono: filtri in una fila che scorre di lato, così la mappa resta vicina */
 @media (max-width: 63.99em) {
+  /* Telefono: filtri in una fila che scorre di lato, così la mappa resta vicina */
   .chips {
     flex-wrap: nowrap;
     overflow-x: auto;
@@ -1377,63 +2222,6 @@ main > .section {
   gap: var(--space-sm);
 }
 
-.place {
-  position: relative;
-  display: grid;
-  gap: var(--space-2xs);
-  padding: var(--space-md) var(--space-lg);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-white);
-}
-
-.place:hover,
-.place.is-active {
-  border-color: var(--color-brand);
-  box-shadow: var(--shadow-sm);
-}
-
-.place__title {
-  margin: 0;
-  font-size: var(--text-lg);
-}
-
-/* Tutta la card è cliccabile tramite il link del titolo */
-.place__link {
-  color: var(--color-navy);
-  text-decoration: none;
-}
-
-.place__link::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-}
-
-.place__link:focus-visible {
-  outline: none;
-}
-
-.place:focus-within {
-  outline: var(--focus-width) solid var(--color-focus);
-  outline-offset: 3px;
-}
-
-.place__meta {
-  margin: 0;
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-.place__features {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2xs) var(--space-md);
-  margin-top: var(--space-2xs);
-  font-size: var(--text-sm);
-}
-
 .empty {
   padding: var(--space-lg);
   border-radius: var(--radius-lg);
@@ -1478,10 +2266,6 @@ main > .section {
   filter: grayscale(0.6) sepia(0.12) brightness(1.04) contrast(0.92);
 }
 
-.leaflet-container {
-  background: #eef2ef;
-}
-
 /* Segnaposto: goccia con il simbolo del giudizio (divIcon di Leaflet).
    Il contenitore lo posiziona Leaflet con transform: rotazione e zoom solo sull'elemento interno. */
 .pin {
@@ -1511,8 +2295,11 @@ main > .section {
 }
 
 .pin--si .pin__drop, .map-legend__dot.pin--si { background: var(--color-success); }
+
 .pin--parziale .pin__drop, .map-legend__dot.pin--parziale { background: var(--color-warning); }
+
 .pin--no .pin__drop, .map-legend__dot.pin--no { background: var(--color-error); }
+
 .pin--nv .pin__drop, .map-legend__dot.pin--nv { background: var(--color-muted); }
 
 .pin:focus-visible {
@@ -1636,40 +2423,12 @@ main > .section {
 }
 
 .verdict--si { background: var(--color-success); }
+
 .verdict--parziale { background: var(--color-warning); }
+
 .verdict--no { background: var(--color-error); }
+
 .verdict--nv { background: var(--color-muted); }
-
-/* "Mostra sulla mappa": sopra il link che copre la card */
-.place__show {
-  position: relative;
-  z-index: 1;
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  min-height: var(--target-min);
-  margin-top: var(--space-2xs);
-  padding: 0 var(--space-md) 0 var(--space-sm);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-card);
-  color: var(--color-navy);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.place__show:hover {
-  border-color: var(--color-navy);
-}
-
-.place__show .icon {
-  width: 1.2rem;
-  height: 1.2rem;
-  color: var(--color-brand);
-}
 
 /* Riquadro del segnaposto */
 .popup {
@@ -1703,6 +2462,7 @@ main > .section {
 
 /* Popup e controlli di Leaflet con i font e i colori del sito */
 .leaflet-container {
+  background: #eef2ef;
   font: inherit;
 }
 
@@ -1730,9 +2490,6 @@ main > .section {
 
 .leaflet-popup-content {
   padding-right: var(--space-xl);
-}
-
-.leaflet-popup-content {
   margin: var(--space-sm) var(--space-md);
   font-size: var(--text-sm);
   line-height: 1.4;
@@ -1763,17 +2520,357 @@ main > .section {
   color: var(--color-navy);
 }
 
-/* 9. Scheda luogo */
+@media (prefers-reduced-motion: no-preference) {
+  .chip label {
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--ease-out);
+  }
+}
+
+@media (forced-colors: active) {
+  .chip label {
+    border: 2px solid CanvasText;
+  }
+
+  .chip input:checked + label {
+    border-width: 4px;
+  }
+}
+
+@media print {
+  .map {
+    display: none;
+  }
+}
+
+.view-switch {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.view-switch__btn {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: var(--target-min);
+  padding: 0 var(--space-sm);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-navy);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.view-switch__btn:hover {
+  background: var(--color-sky);
+}
+
+.view-switch__btn[aria-pressed="true"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.view-switch__btn .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.view-switch__btn:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.view-switch__count {
+  font-weight: 400;
+}
+
+@media (min-width: 64em) {
+  .view-switch {
+    display: none;
+  }
+}
+
+@media (max-width: 63.99em) {
+  .explore__layout {
+    gap: var(--space-md);
+  }
+
+  .explore__layout[data-view="map"] #results,
+  .explore__layout[data-view="list"] .explore__map-wrap {
+    display: none;
+  }
+
+  /* La mappa riempie lo schermo che resta sotto i pulsanti */
+  .explore .map {
+    height: 62vh;
+    height: max(22rem, calc(100svh - 13rem));
+  }
+
+  .explore .needs {
+    margin-bottom: var(--space-md);
+  }
+
+  .filters {
+    gap: var(--space-sm);
+  }
+
+  /* Pulsanti sulla mappa: solo icona, il testo resta per gli screen reader */
+  .map-tools__btn {
+    justify-content: center;
+    width: var(--target-min);
+    padding: 0;
+  }
+
+  .map-tools__btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 47.99em) {
+  /* Telefono (sito e app): etichette ovvie nascoste a vista, «Come ti muovi?» su una riga, ricerca con la sola lente */
+  /* Etichette che sul telefono si capiscono già dal campo: restano per gli screen reader */
+  .explore .filters .field:first-child > .field__label,
+  .explore .filters legend {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 64em) {
+  /* Computer, pagina mappa: colonna stretta, scelte una sotto l'altra */
+  /* Computer, pagina mappa: due colonne nella colonna dei controlli */
+  .explore__controls .needs__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .explore__controls .needs__option label {
+    padding: var(--space-xs) var(--space-sm);
+  }
+}
+
+.popup .place__alert {
+  margin: 0;
+}
+
+.filters__near {
+  margin: 0;
+}
+
+.map-hint {
+  position: absolute;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: var(--space-md);
+  background: rgba(22, 40, 65, 0.72);   /* testo bianco leggibile anche sulle zone chiare della mappa */
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: var(--text-base);
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+
+.map-hint.is-on {
+  opacity: 1;
+}
+
+/* Il segnaposto da trascinare segue il dito invece di far scorrere la pagina */
+.leaflet-marker-draggable {
+  touch-action: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-hint {
+    transition: none;
+  }
+}
+
+.filters__more {
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.filters__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  padding: var(--space-xs) var(--space-md);
+  font-weight: 700;
+  color: var(--color-navy);
+  cursor: pointer;
+  list-style: none;
+}
+
+.filters__toggle::-webkit-details-marker {
+  display: none;
+}
+
+.filters__toggle::before {
+  content: "";
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: 3px solid var(--color-brand);
+  border-bottom: 3px solid var(--color-brand);
+  transform: rotate(-45deg);
+}
+
+.filters__more[open] > .filters__toggle::before {
+  transform: rotate(45deg);
+}
+
+.filters__toggle:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.filters__active {
+  color: var(--color-brand);
+}
+
+.filters__body {
+  display: grid;
+  gap: var(--space-sm);
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+/* Dentro la tendina i filtri vanno a capo: niente fila tagliata a destra */
+.filters__more .chips {
+  flex-wrap: wrap;
+  overflow: visible;
+  margin-inline: 0;
+  padding: 0;
+}
+
+@media (max-width: 47.99em) {
+  .explore .needs {
+    margin-bottom: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm) var(--space-sm);
+  }
+
+  /* Esigenza già scelta: la spiegazione diventa una riga breve («Giudizi calcolati per: …»).
+     Resta nel flusso: Safari, senza, mette le tessere accanto alla legenda invece che sotto */
+  .explore .needs:not(.needs--ask) .needs__help {
+    margin-bottom: 6px;
+    font-size: 0.875rem;
+  }
+
+  .explore .needs .needs__options {
+    gap: 6px;
+  }
+
+  .explore .needs .needs__option label {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    min-height: 2.9rem;
+    padding: 0.3rem 0.4rem;
+    font-size: 0.8125rem;
+    line-height: 1.15;
+    text-align: left;
+  }
+
+  .explore .needs .needs__option label .icon {
+    flex: none;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+
+  .explore .filters {
+    gap: var(--space-xs);
+  }
+}
+
+@media (max-width: 26em) {
+  /* Telefoni stretti: tre tessere per riga tagliavano «Difficoltà a camminare»; due per riga, testo intero */
+  .explore .needs .needs__options,
+  .explore .needs:not(.needs--ask) .needs__options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .explore .needs .needs__option label {
+    min-height: 2.6rem;
+  }
+}
+
+@keyframes oa-spunta {
+  from {
+    scale: 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .leaflet-container:not(#home-map) .cluster,
+  .leaflet-container:not(#home-map) .pin__drop {
+    animation: oa-spunta 0.45s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
+  }
+
+  .results__list > li:nth-child(-n + 8) {
+    animation: oa-sale 0.5s var(--ease-out) both;
+  }
+
+  .results__list > li:nth-child(2) { animation-delay: 0.05s; }
+
+  .results__list > li:nth-child(3) { animation-delay: 0.1s; }
+
+  .results__list > li:nth-child(4) { animation-delay: 0.15s; }
+
+  .results__list > li:nth-child(5) { animation-delay: 0.2s; }
+
+  .results__list > li:nth-child(6) { animation-delay: 0.25s; }
+
+  .results__list > li:nth-child(7) { animation-delay: 0.3s; }
+
+  .results__list > li:nth-child(8) { animation-delay: 0.35s; }
+}
+
+/* ==========================================================================
+   17. Scheda luogo
+   Intestazione (tipo di luogo, nome, indirizzo, affidabilità, descrizione), azioni, «In breve» con
+   «Valuto per», poi le informazioni per momento della visita (Entrare, Dentro, Bagno, Arrivare, Vista e udito,
+   dettagli del tipo di luogo), ognuna in un riquadro con la sua icona, e in fondo da dove arrivano le
+   informazioni. Un giudizio per voce, per l'esigenza scelta. Avvisi temporanei, indicazioni stradali, recensioni.
+   ========================================================================== */
+
+.detail__trust {
+  margin: 0 0 var(--space-xs);
+}
+
+.detail__section + .detail__section {
+  margin-top: var(--space-md);
+}
+
+.detail__section .needs {
+  margin-bottom: var(--space-md);
+  padding: var(--space-sm) var(--space-md) var(--space-md);
+}
+
 .crumbs {
   margin: var(--space-lg) 0 var(--space-md);
   font-size: var(--text-sm);
-}
-
-.crumbs ol {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  list-style: none;
 }
 
 .crumbs li + li::before {
@@ -1893,13 +2990,6 @@ main > .section {
   border-bottom: 1px solid var(--color-line);
 }
 
-@media (min-width: 36em) {
-  .facts__row {
-    grid-template-columns: 14rem 1fr;
-    align-items: center;
-  }
-}
-
 .facts__row:last-child {
   border-bottom: 0;
 }
@@ -1921,6 +3011,7 @@ main > .section {
 
 @media (min-width: 36em) {
   .facts__row {
+    grid-template-columns: 14rem 1fr;
     align-items: start;
   }
 }
@@ -2010,156 +3101,17 @@ main > .section {
   margin-top: var(--space-xs);
 }
 
-/* 10. Animazioni: solo se l'utente non ha chiesto di ridurle */
-@media (prefers-reduced-motion: no-preference) {
-  html {
-    scroll-behavior: smooth;
-  }
-
-  .btn,
-  .quick__link,
-  .chip label,
-  .place {
-    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.25s var(--ease-out);
-  }
-
-  .btn:hover {
-    transform: translateY(-2px);
-  }
-
-  .reveal {
-    animation: rise 0.7s var(--ease-out) both;
-  }
-
-  @keyframes rise {
-    from {
-      opacity: 0;
-      transform: translateY(14px);
-    }
-  }
-}
-
-/* 11. Forced colors e stampa */
-@media (forced-colors: active) {
-  .btn,
-  .chip label,
-  .place,
-  .card {
-    border: 2px solid CanvasText;
-  }
-
-  .chip input:checked + label {
-    border-width: 4px;
-  }
-
-  .icon {
-    color: CanvasText;
-  }
-}
-
 @media print {
-  .skip-links,
-  .site-header .nav,
-  .map,
-  .hero__map,
-  .detail__map,
-  .apps {
+  .detail__map {
     display: none;
   }
 }
 
-/* 13. Schermata di caricamento (assets/js/intro.js), 29 ottobre: sul chiaro del sito una rampa da skate in cui chi è in
-   carrozzina, con il casco, va su e giù; sul fianco il simbolo dell'accessibilità e sulla piattaforma il segnaposto
-   (assets/img/intro-skate.svg). Sotto, il nome.
-   All'uscita la schermata sale come un sipario e scopre la pagina. Pseudo-elementi di <html>: compaiono prima del
-   contenuto e restano fuori dall'albero di accessibilità. */
-.oa-intro,
-.oa-intro-out {
-  --intro-size: min(19rem, 86vw);
-}
-
-.oa-intro::before,
-.oa-intro::after,
-.oa-intro-out::before,
-.oa-intro-out::after {
-  position: fixed;
-  left: 0;
-  right: 0;
-  z-index: 2147483000;
-  pointer-events: none;
-}
-
-.oa-intro::before,
-.oa-intro-out::before {
-  content: "";
-  top: 0;
-  bottom: 0;
-  background:
-    url("../img/intro-skate.svg?v=c551b20c") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
-    radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
-}
-
-.oa-intro::after,
-.oa-intro-out::after {
-  content: "Ovunque Accessibile";
-  top: calc(50% - 2rem + var(--intro-size) * 0.375 + 0.75rem);
-  color: var(--color-navy, #162841);
-  font-family: var(--font-heading, sans-serif);
-  font-weight: 600;
-  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.1rem);
-  letter-spacing: -0.01em;
-  text-align: center;
-  animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
-}
-
-@keyframes oa-intro-nome {
-  from {
-    transform: translateY(0.6rem);
-  }
-}
-
-.oa-intro-out::before,
-.oa-intro-out::after {
-  transform: translateY(-100%);
-  transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
-}
-
-.oa-intro-out::before {
-  border-radius: 0 0 2rem 2rem;
-  box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.18);
-}
-
-.oa-intro-out::after {
-  transform: translateY(-100vh);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :root.oa-intro::before,
-  :root.oa-intro-out::before {
-    background-image: url("../img/intro-fermo.svg?v=1f242d28"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
-  }
-
-  .oa-intro::after {
-    animation: none;
-  }
-
-  .oa-intro-out::before,
-  .oa-intro-out::after {
-    opacity: 0;
-    transform: none;
-    transition: opacity 0.3s ease;
-  }
-}
-
-@media (forced-colors: active) {
-  .oa-intro::before,
-  .oa-intro::after {
-    display: none;
-  }
-}
-
-/* 14. Telefono e tablet: pagina mappa con «Mappa / Elenco», percorso allineato, pulsanti della mappa compatti */
 .crumbs ol {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  list-style: none;
   align-items: center;
 }
 
@@ -2168,333 +3120,6 @@ main > .section {
   align-items: center;
 }
 
-.view-switch {
-  display: flex;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-pill);
-  background: var(--color-white);
-  box-shadow: var(--shadow-sm);
-}
-
-.view-switch__btn {
-  flex: 1 1 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  min-height: var(--target-min);
-  padding: 0 var(--space-sm);
-  border: 0;
-  border-radius: var(--radius-pill);
-  background: transparent;
-  color: var(--color-navy);
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.view-switch__btn:hover {
-  background: var(--color-sky);
-}
-
-.view-switch__btn[aria-pressed="true"] {
-  background: var(--color-navy);
-  color: var(--color-white);
-}
-
-.view-switch__btn .icon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
-
-.view-switch__btn:focus-visible {
-  outline: var(--focus-width) solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.view-switch__count {
-  font-weight: 400;
-}
-
-@media (min-width: 64em) {
-  .view-switch {
-    display: none;
-  }
-}
-
-@media (max-width: 63.99em) {
-  .explore__layout {
-    gap: var(--space-md);
-  }
-
-  .explore__layout[data-view="map"] #results,
-  .explore__layout[data-view="list"] .explore__map-wrap {
-    display: none;
-  }
-
-  /* La mappa riempie lo schermo che resta sotto i pulsanti */
-  .explore .map {
-    height: 62vh;
-    height: max(22rem, calc(100svh - 13rem));
-  }
-
-  .explore .needs {
-    margin-bottom: var(--space-md);
-  }
-
-  .filters {
-    gap: var(--space-sm);
-  }
-
-  /* Pulsanti sulla mappa: solo icona, il testo resta per gli screen reader */
-  .map-tools__btn {
-    justify-content: center;
-    width: var(--target-min);
-    padding: 0;
-  }
-
-  .map-tools__btn span {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-}
-
-/* Telefono: i tre giudizi della scheda diventano righe compatte (icona · esigenza · giudizio) */
-/* 15. Ricerca a forma di pillola (sito e app) */
-.search {
-  position: relative;
-  flex-wrap: nowrap;
-  padding: 5px;
-  border: 1.5px solid var(--color-navy);
-  border-radius: var(--radius-pill);
-  background: var(--color-white);
-  box-shadow: 0 6px 20px rgba(22, 40, 65, 0.06);
-}
-
-.search:focus-within {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 4px rgba(47, 91, 156, 0.18);
-}
-
-.search .input {
-  flex: 1 1 auto;
-  min-width: 0;
-  min-height: 3rem;
-  border: 0;
-  border-radius: var(--radius-pill);
-  box-shadow: none;
-}
-
-.search .input:focus-visible {
-  outline: none;
-  box-shadow: none;
-}
-
-.search .btn {
-  min-height: 3rem;
-}
-
-/* Telefono (sito e app): etichette ovvie nascoste a vista, «Come ti muovi?» su una riga, ricerca con la sola lente */
-@media (max-width: 47.99em) {
-  /* Etichette che sul telefono si capiscono già dal campo: restano per gli screen reader */
-  .explore .filters .field:first-child > .field__label,
-  .explore .filters legend {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-  }
-
-  /* «Come ti muovi?» sempre su una riga di tre, anche alla prima visita */
-  .needs {
-    padding: var(--space-sm) var(--space-md) var(--space-md);
-  }
-
-  .needs .needs__options {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .needs .needs__option label {
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.2rem;
-    padding: var(--space-xs) 0.3rem;
-    font-size: 0.875rem;
-    text-align: center;
-  }
-
-  .needs__legend {
-    font-size: var(--text-base);
-  }
-
-  .needs__help {
-    margin-bottom: var(--space-xs);
-  }
-
-  /* Ricerca: il pulsante diventa solo lente, il nome resta per gli screen reader */
-  .search .btn {
-    width: 3rem;
-    padding: 0;
-    justify-content: center;
-    font-size: 0;
-  }
-
-  .search .btn .icon {
-    width: 1.4rem;
-    height: 1.4rem;
-  }
-
-}
-
-/* 16. Sei esigenze (27 ottobre: anche persone anziane, vista e udito) e avvisi temporanei sulle schede */
-/* Computer, pagina mappa: due colonne nella colonna dei controlli */
-@media (min-width: 64em) {
-  .explore__controls .needs__options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .explore__controls .needs__option label {
-    padding: var(--space-xs) var(--space-sm);
-  }
-}
-
-/* Telefono molto stretto: due colonne, così «Difficoltà a camminare» non si spezza a ogni sillaba */
-@media (max-width: 22em) {
-  .needs .needs__options,
-  .needs:not(.needs--ask) .needs__options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.place__alert {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.4rem;
-  margin: var(--space-2xs) 0 0;
-  padding: 0.35rem 0.6rem;
-  border-left: 4px solid var(--color-warning);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
-  background: #fdf3e1;
-  color: var(--color-warning);
-  font-size: var(--text-sm);
-  font-weight: 700;
-}
-
-.place__alert .icon {
-  flex: none;
-  width: 1.2rem;
-  height: 1.2rem;
-  margin-top: 0.1rem;
-}
-
-.popup .place__alert {
-  margin: 0;
-}
-
-@media (forced-colors: active) {
-  .place__alert {
-    border: 2px solid CanvasText;
-  }
-}
-
-.quick__link--near {
-  border-color: var(--color-navy);
-  font-weight: 700;
-}
-
-.quick__link--near .icon {
-  color: var(--color-brand);
-}
-
-.hero .quick__link--near,
-.hero .quick__link--near:hover {
-  border-color: var(--color-navy);
-  background: var(--color-navy);
-  color: var(--color-white);
-}
-
-.hero .quick__link--near .icon {
-  color: var(--color-beige);
-}
-
-.filters__near {
-  margin: 0;
-}
-
-/* 17. Mappe dentro pagine che scorrono, sul telefono: un dito scorre la pagina, due dita spostano la mappa (oa-core.js, dueDita) */
-.map-hint {
-  position: absolute;
-  inset: 0;
-  z-index: 1000;
-  display: grid;
-  place-items: center;
-  margin: 0;
-  padding: var(--space-md);
-  background: rgba(22, 40, 65, 0.72);   /* testo bianco leggibile anche sulle zone chiare della mappa */
-  color: var(--color-white);
-  font-weight: 700;
-  font-size: var(--text-base);
-  text-align: center;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s;
-}
-
-.map-hint.is-on {
-  opacity: 1;
-}
-
-/* Il segnaposto da trascinare segue il dito invece di far scorrere la pagina */
-.leaflet-marker-draggable {
-  touch-action: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .map-hint {
-    transition: none;
-  }
-}
-
-/* 18. Per i locali (locali.html e blocco della home) */
-.locali__passi {
-  display: grid;
-  gap: var(--space-sm);
-  padding-left: 1.4em;
-}
-
-.locali__azioni {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
-
-.business {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-sm);
-  border-left: 6px solid var(--color-brand);
-}
-
-.business h2,
-.business p {
-  margin: 0;
-}
-
-.tips {
-  display: grid;
-  gap: var(--space-xs);
-  padding-left: 1.2em;
-}
-
-/* 19. Scheda luogo: «In breve» in evidenza e informazioni facoltative raggruppate in tendine */
 .summary {
   border: 2px solid var(--color-navy);
   border-left-width: 8px;
@@ -2523,7 +3148,9 @@ main > .section {
 }
 
 .summary__verdict--si .icon { background: var(--color-success); }
+
 .summary__verdict--parziale .icon { background: var(--color-warning); }
+
 .summary__verdict--no .icon { background: var(--color-error); }
 
 .summary__who {
@@ -2559,18 +3186,19 @@ main > .section {
   width: 1.5rem;
   height: 1.5rem;
   margin-top: 0.1rem;
-}
-
-.summary__item .icon {
   padding: 0.2rem;
   border-radius: 50%;
   color: var(--color-white);
 }
 
 .summary__item--si .icon { background: var(--color-success); }
+
 .summary__item--parziale .icon { background: var(--color-warning); }
+
 .summary__item--no .icon { background: var(--color-error); }
+
 .summary__item--nv .icon { background: var(--color-muted); }
+
 .summary__item--np .icon { background: none; padding: 0; color: var(--color-muted); }
 
 .summary__name {
@@ -2654,558 +3282,12 @@ main > .section {
   grid-column: 1 / -1;
 }
 
-/* 20. Pagina mappa più corta sul telefono: esigenza in tessere compatte, filtri in una tendina, mappa subito sotto */
-.filters__more {
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-}
-
-.filters__toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  min-height: var(--target-min);
-  padding: var(--space-xs) var(--space-md);
-  font-weight: 700;
-  color: var(--color-navy);
-  cursor: pointer;
-  list-style: none;
-}
-
-.filters__toggle::-webkit-details-marker {
-  display: none;
-}
-
-.filters__toggle::before {
-  content: "";
-  flex: none;
-  width: 0.6rem;
-  height: 0.6rem;
-  border-right: 3px solid var(--color-brand);
-  border-bottom: 3px solid var(--color-brand);
-  transform: rotate(-45deg);
-}
-
-.filters__more[open] > .filters__toggle::before {
-  transform: rotate(45deg);
-}
-
-.filters__toggle:focus-visible {
-  outline: var(--focus-width) solid var(--color-focus);
-  outline-offset: 2px;
-}
-
-.filters__active {
-  color: var(--color-brand);
-}
-
-.filters__body {
-  display: grid;
-  gap: var(--space-sm);
-  padding: 0 var(--space-md) var(--space-md);
-}
-
-/* Dentro la tendina i filtri vanno a capo: niente fila tagliata a destra */
-.filters__more .chips {
-  flex-wrap: wrap;
-  overflow: visible;
-  margin-inline: 0;
-  padding: 0;
-}
-
-@media (max-width: 47.99em) {
-  .explore .needs {
-    margin-bottom: var(--space-sm);
-    padding: var(--space-xs) var(--space-sm) var(--space-sm);
-  }
-
-  /* Esigenza già scelta: la spiegazione diventa una riga breve («Giudizi calcolati per: …»).
-     Resta nel flusso: Safari, senza, mette le tessere accanto alla legenda invece che sotto */
-  .explore .needs:not(.needs--ask) .needs__help {
-    margin-bottom: 6px;
-    font-size: 0.875rem;
-  }
-
-  .explore .needs .needs__options {
-    gap: 6px;
-  }
-
-  .explore .needs .needs__option label {
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 0.3rem;
-    min-height: 2.9rem;
-    padding: 0.3rem 0.4rem;
-    font-size: 0.8125rem;
-    line-height: 1.15;
-    text-align: left;
-  }
-
-  .explore .needs .needs__option label .icon {
-    flex: none;
-    width: 1.25rem;
-    height: 1.25rem;
-  }
-
-  .explore .filters {
-    gap: var(--space-xs);
-  }
-}
-
-/* Telefoni stretti: tre tessere per riga tagliavano «Difficoltà a camminare»; due per riga, testo intero */
-@media (max-width: 26em) {
-  .explore .needs .needs__options,
-  .explore .needs:not(.needs--ask) .needs__options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .explore .needs .needs__option label {
-    min-height: 2.6rem;
-  }
-}
-
-/* 21. Intestazione e navigazione (28 ottobre): voci a pillola; sul telefono un pulsante «Menu» (assets/js/menu.js)
-   che apre un pannello (sezione più sotto) invece di due righe di link */
-
-.site-header__inner {
-  justify-content: flex-start;
-}
-
-.site-header .nav {
-  margin-left: auto;
-}
-
-.nav__list {
-  gap: var(--space-2xs);
-}
-
-.nav__link {
-  padding: 0.45rem 0.75rem;
-  border-radius: var(--radius-pill);
-  font-weight: 700;
-}
-
-.nav__link:hover {
-  background: var(--color-sky);
-  text-decoration: none;
-}
-
-.nav__link[aria-current="page"] {
-  background: var(--color-navy);
-  color: var(--color-white);
-  text-decoration: none;
-}
-
-.menu-toggle {
-  display: none;
-}
-
-@media (max-width: 47.99em) {
-  .site-header__inner {
-    flex-wrap: wrap;
-    gap: 0 var(--space-xs);
-    padding-block: var(--space-xs);
-  }
-
-  .menu-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    order: 2;
-    min-height: var(--target-min);
-    margin-left: auto;
-    padding: 0 0.9rem;
-    border: var(--border-control) solid var(--color-navy);
-    border-radius: var(--radius-pill);
-    background: var(--color-white);
-    color: var(--color-navy);
-    font: inherit;
-    font-weight: 700;
-    cursor: pointer;
-  }
-
-  .menu-toggle:focus-visible {
-    outline: var(--focus-width) solid var(--color-focus);
-    outline-offset: 2px;
-  }
-
-  .menu-toggle__bars,
-  .menu-toggle__bars::before,
-  .menu-toggle__bars::after {
-    display: block;
-    width: 1.1rem;
-    height: 2px;
-    border-radius: 2px;
-    background: currentColor;
-  }
-
-  .menu-toggle__bars {
-    position: relative;
-  }
-
-  .menu-toggle__bars::before,
-  .menu-toggle__bars::after {
-    content: "";
-    position: absolute;
-    left: 0;
-  }
-
-  .menu-toggle__bars::before { top: -6px; }
-  .menu-toggle__bars::after { top: 6px; }
-
-  .site-header--open .menu-toggle__bars { background: transparent; }
-  .site-header--open .menu-toggle__bars::before { top: 0; transform: rotate(45deg); }
-  .site-header--open .menu-toggle__bars::after { top: 0; transform: rotate(-45deg); }
-
-  /* Pannello del menu (menu.js): scende sotto la barra, il resto della pagina è sfocato dal velo */
-  .site-header {
-    position: relative;
-    z-index: 1001;
-  }
-
-  .site-header__panel {
-    order: 4;
-    width: 100%;
-  }
-
-  .js .site-header__panel {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    max-height: calc(100vh - 5rem);
-    max-height: calc(100dvh - 5rem);
-    overflow-y: auto;
-    padding: var(--space-sm) var(--space-md) var(--space-lg);
-    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
-    background: var(--color-card);
-    box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.22);
-  }
-
-  .site-header .nav {
-    width: 100%;
-    margin: 0;
-    border-top: 0;
-  }
-
-  .site-header .site-header__app {
-    width: 100%;
-    justify-content: center;
-    margin-block: var(--space-sm) var(--space-xs);
-  }
-
-  .js .site-header:not(.site-header--open) .site-header__panel {
-    display: none;
-  }
-
-  .menu-velo {
-    position: fixed;
-    inset: 0;
-    z-index: 1000;
-    background: rgba(22, 40, 65, 0.4);
-    -webkit-backdrop-filter: blur(8px);
-    backdrop-filter: blur(8px);
-    opacity: 0;
-    visibility: hidden;
-  }
-
-  .menu-aperto .menu-velo {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .menu-aperto {
-    overflow: hidden;
-  }
-
-  .site-header .nav__list {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 2px;
-    padding-top: var(--space-xs);
-    border-top: 1px solid var(--color-line);
-  }
-
-  .site-header .nav__link {
-    display: flex;
-    min-height: 3rem;
-    padding: 0.6rem var(--space-md);
-    border-radius: var(--radius-md);
-    font-size: var(--text-base);
-  }
-}
-
-.site-header__panel {
-  display: contents;
-}
-
-.menu-velo {
-  display: none;
-}
-
-@media (max-width: 47.99em) {
-  .site-header__panel {
-    display: block;
-  }
-
-  .menu-velo {
-    display: block;
-  }
-}
-
-@media (max-width: 47.99em) and (prefers-reduced-motion: no-preference) {
-  .menu-velo {
-    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
-  }
-
-  .menu-aperto .menu-velo {
-    transition: opacity 0.25s ease;
-  }
-
-  .site-header--open .site-header__panel {
-    animation: menu-scende 0.28s var(--ease-out) both;
-  }
-
-  @keyframes menu-scende {
-    from {
-      opacity: 0;
-      transform: translateY(-0.75rem);
-    }
-  }
-}
-
-@media (forced-colors: active) {
-  .nav__link[aria-current="page"] {
-    border: 2px solid CanvasText;
-  }
-}
-
 /* Luogo non trovato: restano solo titolo e spiegazione, niente mappa vuota né riquadri della scheda */
 .detail--missing .detail__side,
 .detail--missing #detail-cat {
   display: none;
 }
 
-/* 22. Movimento e ritmo della home (29 ottobre).
-   Hero: il titolo sale riga per riga, la foto si scopre dal basso con un leggero zoom, poi ricerca e scorciatoie;
-   parte mentre il sipario del caricamento sale (.oa-intro tolta). Allo scorrimento gli elementi con .svela (messi da
-   sito.js) entrano in sequenza; nella mappa della home i segnaposto spuntano quando si vede. Tutto solo con
-   JavaScript e senza «riduci movimento»: altrimenti la pagina è già ferma e completa. */
-.hero__riga {
-  display: inline-block;
-}
-
-.stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-lg);
-  margin: var(--space-md) 0;
-}
-
-.stats[hidden] {
-  display: none;
-}
-
-.stats > div {
-  display: flex;
-  flex-direction: column-reverse;
-}
-
-.stats dt {
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-.stats dd {
-  margin: 0;
-  color: var(--color-brand);
-  font-family: var(--font-heading);
-  font-size: clamp(2rem, 1.6rem + 1.6vw, 2.75rem);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-}
-
-/* Come funziona: fascia blu a tutta larghezza, per spezzare il ritmo della pagina */
-main > .how {
-  border-top: 0;
-  background: var(--color-navy);
-  color: var(--color-white);
-  --color-focus: var(--color-white);
-}
-
-.how h2,
-.how h3 {
-  color: var(--color-white);
-}
-
-.how a {
-  color: var(--color-beige);
-}
-
-.how__list,
-.how__list > li {
-  border-color: rgba(255, 255, 255, 0.2);
-}
-
-.how__list > li::before {
-  color: var(--color-beige);
-}
-
-main > .how + .section {
-  border-top: 0;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .js .hero__riga,
-  .js .hero__lead,
-  .js .hero__search,
-  .js .quick > li,
-  .js .hero__caption {
-    opacity: 0;
-  }
-
-  .js:not(.oa-intro) .hero__riga {
-    animation: oa-sale 0.9s var(--ease-out) both;
-  }
-
-  .js:not(.oa-intro) .hero__riga + .hero__riga {
-    animation-delay: 0.12s;
-  }
-
-  .js:not(.oa-intro) .hero__lead {
-    animation: oa-sale 0.8s var(--ease-out) 0.28s both;
-  }
-
-  .js:not(.oa-intro) .hero__search {
-    animation: oa-sale 0.8s var(--ease-out) 0.38s both;
-  }
-
-  .js:not(.oa-intro) .quick > li {
-    animation: oa-sale 0.7s var(--ease-out) both;
-  }
-
-  .js:not(.oa-intro) .quick > li:nth-child(1) { animation-delay: 0.48s; }
-  .js:not(.oa-intro) .quick > li:nth-child(2) { animation-delay: 0.54s; }
-  .js:not(.oa-intro) .quick > li:nth-child(3) { animation-delay: 0.6s; }
-  .js:not(.oa-intro) .quick > li:nth-child(4) { animation-delay: 0.66s; }
-
-  .js:not(.oa-intro) .hero__photo {
-    animation: oa-scopri 1.1s cubic-bezier(0.7, 0, 0.2, 1) 0.1s both;
-  }
-
-  .js:not(.oa-intro) .hero__photo img {
-    animation: oa-zoom 1.8s var(--ease-out) 0.1s both;
-  }
-
-  .js:not(.oa-intro) .hero__caption {
-    animation: oa-sale 0.7s var(--ease-out) 0.9s both;
-  }
-
-  .svela {
-    opacity: 0;
-    transform: translateY(1.5rem);
-    transition: opacity 0.7s var(--ease-out), transform 0.8s var(--ease-out);
-    transition-delay: calc(var(--i, 0) * 70ms);
-  }
-
-  .svela.is-visto {
-    opacity: 1;
-    transform: none;
-  }
-
-  /* la mappa non si sposta: solo i segnaposto spuntano (scale, che non tocca la posizione data da Leaflet) */
-  #home-map.svela {
-    opacity: 1;
-    transform: none;
-  }
-
-  #home-map.is-visto .cluster,
-  #home-map.is-visto .pin__drop {
-    animation: oa-spunta 0.55s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
-  }
-
-  #home-map.is-visto .leaflet-marker-icon:nth-child(4n + 2) .pin__drop,
-  #home-map.is-visto .cluster:nth-child(4n + 2) { animation-delay: 0.08s; }
-  #home-map.is-visto .leaflet-marker-icon:nth-child(4n + 3) .pin__drop,
-  #home-map.is-visto .cluster:nth-child(4n + 3) { animation-delay: 0.16s; }
-  #home-map.is-visto .leaflet-marker-icon:nth-child(4n) .pin__drop,
-  #home-map.is-visto .cluster:nth-child(4n) { animation-delay: 0.24s; }
-
-  .needs-home__list .icon,
-  .link-arrow .icon {
-    transition: transform 0.25s var(--ease-out);
-  }
-
-  .needs-home__list a:hover .icon {
-    transform: translateX(3px) rotate(-6deg);
-  }
-}
-
-@keyframes oa-sale {
-  from {
-    opacity: 0;
-    transform: translateY(0.6em);
-  }
-
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes oa-scopri {
-  from {
-    clip-path: inset(100% 0 0 0 round var(--radius-md));
-  }
-
-  to {
-    clip-path: inset(0 0 0 0 round var(--radius-md));
-  }
-}
-
-@keyframes oa-zoom {
-  from {
-    transform: scale(1.15);
-  }
-}
-
-@keyframes oa-spunta {
-  from {
-    scale: 0;
-  }
-}
-
-/* 23. Movimento nelle mappe e negli elenchi (sito e web-app, 29 ottobre): sulle mappe i segnaposto e i gruppi
-   spuntano (anche quando si avvicina o si allontana la mappa); le prime schede dell'elenco entrano in sequenza;
-   i pulsanti si schiacciano un poco al tocco. Niente con «riduci movimento». */
-@media (prefers-reduced-motion: no-preference) {
-  .leaflet-container:not(#home-map) .cluster,
-  .leaflet-container:not(#home-map) .pin__drop {
-    animation: oa-spunta 0.45s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
-  }
-
-  .results__list > li:nth-child(-n + 8) {
-    animation: oa-sale 0.5s var(--ease-out) both;
-  }
-
-  .results__list > li:nth-child(2) { animation-delay: 0.05s; }
-  .results__list > li:nth-child(3) { animation-delay: 0.1s; }
-  .results__list > li:nth-child(4) { animation-delay: 0.15s; }
-  .results__list > li:nth-child(5) { animation-delay: 0.2s; }
-  .results__list > li:nth-child(6) { animation-delay: 0.25s; }
-  .results__list > li:nth-child(7) { animation-delay: 0.3s; }
-  .results__list > li:nth-child(8) { animation-delay: 0.35s; }
-
-  .btn:active,
-  .quick__link:active {
-    transform: scale(0.97);
-  }
-}
-
-/* 24. Scheda luogo riorganizzata (29 ottobre): intestazione, azioni, «In breve» con «Valuto per», poi le informazioni
-   per momento della visita (Entrare, Dentro, Bagno, Arrivare, Vista e udito, dettagli del tipo di luogo), ognuna in
-   un riquadro con la sua icona, e in fondo da dove arrivano le informazioni. Un giudizio per voce, per l'esigenza scelta. */
 .detail__head {
   margin-bottom: var(--space-sm);
 }
@@ -3361,4 +3443,3 @@ main > .how + .section {
   margin: 0;
   max-width: 40ch;
 }
-

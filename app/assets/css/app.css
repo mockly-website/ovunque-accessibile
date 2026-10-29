@@ -1,19 +1,29 @@
 /* ==========================================================================
    Ovunque Accessibile – web-app. Si aggiunge a ../assets/css/sito.css (token e componenti del sito).
-   Indice: 1. Struttura e navigazione · 2. Moduli ed errori · 3. Avvisi e pulsanti
-           4. Scheda luogo · 5. Profilo · 6. Moderazione · 7. Forced colors · 8. Foto · 9. Grafica dell'app
-           10. Avvisi, recensioni guidate, gestori, bollino · 11. Mappa del punto e tastiera sul telefono · 12. Indirizzi suggeriti · 13. Per i locali · 14. Ricerca del locale e completezza · 15. Luoghi OSM da approvare · 16. Intestazione · 17. Aspetto da app
+   Aspetto da app: fondo grigio caldo con schede bianche, barra in alto fissa e traslucida, barra delle schede
+   sospesa in basso (telefono e tablet), niente piè di pagina (privacy, sito e contatti stanno nel Profilo).
+   Ogni componente è in un punto solo, con dentro le sue varianti per schermo, «riduci movimento» e colori forzati.
+
+   Indice
+    1. Struttura e titoli          8. Scheda luogo
+    2. Intestazione                9. Segnala un luogo
+    3. Barra delle schede         10. Profilo
+    4. Passaggio tra le pagine    11. Per i locali
+    5. Moduli ed errori           12. Bollino per la vetrina
+    6. Avvisi e pulsanti          13. Moderazione
+    7. Mappa                      14. Prima apertura: «Come ti muovi?»
    ========================================================================== */
 
-/* 1. Struttura e navigazione */
+/* ==========================================================================
+   1. Struttura e titoli
+   Contenitori, colonne, riquadri. Gerarchia: titolo della pagina > titolo di gruppo > titolo del
+   riquadro; ritmo verticale unico (1 rem tra i riquadri, 2 rem prima di un nuovo gruppo). Sul telefono titolo
+   della pagina e testo d'apertura sempre fuori dalle schede.
+   ========================================================================== */
 
 /* "hidden" vince sempre, anche su elementi con display impostato (.btn, .card.stack, img…) */
 [hidden] {
   display: none !important;
-}
-
-.app main:not(.explore) {
-  padding-top: var(--space-lg);
 }
 
 /* I livelli interni di Leaflet (z-index fino a 1000) restano dentro la mappa, sotto la barra dell'app */
@@ -44,6 +54,223 @@
   margin-top: var(--space-lg);
   text-align: center;
 }
+
+@media (max-width: 47.99em) {
+  /* Telefono: la navigazione diventa una barra in basso, come nelle app */
+  html {
+    scroll-padding-bottom: 6rem;     /* il focus non finisce mai sotto la barra (WCAG 2.4.11) */
+  }
+}
+
+@media (max-width: 47.99em) {
+  .app .container {
+    padding-inline: var(--space-md);
+  }
+}
+
+.app {
+  --app-bg: #f3eee5;            /* testo blu 13:1, grigio del testo secondario 6,6:1 */
+  background: var(--app-bg);
+  -webkit-tap-highlight-color: transparent;
+}
+
+html:has(> body.app) {
+  scroll-padding-top: 4.5rem;   /* il focus non finisce sotto la barra in alto (WCAG 2.4.11) */
+}
+
+.app main:not(.explore) {
+  padding-top: var(--space-md);
+}
+
+.app main h1 {
+  letter-spacing: -0.01em;
+  margin-bottom: var(--space-xs);
+  font-size: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+}
+
+.app .card {
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--color-white);
+  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
+}
+
+/* «La tua esigenza» dentro una scheda: niente seconda scheda dentro la prima */
+.app .card > .needs {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+@media (max-width: 47.99em) {
+  /* Telefono: barra in basso che galleggia, con l'icona attiva su fondo azzurro */
+  /* Telefono: barra delle schede attaccata al fondo, voce attiva con la «pillola» dietro l'icona */
+  .app {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
+  }
+
+  html:has(> body.app) {
+    scroll-padding-bottom: 5.5rem;
+  }
+
+  .app .card {
+    padding: var(--space-md);
+  }
+}
+
+@media (max-width: 47.99em) {
+  .app .center {
+    margin-inline: auto;
+    max-width: 30ch;
+  }
+
+  .app main > .container > h1 + p,
+  .app main > .container > .stack > h1 + p {
+    color: var(--color-muted);
+  }
+}
+
+.app main h2 {
+  font-size: 1.3rem;
+  line-height: 1.25;
+}
+
+.app main h3 {
+  font-size: 1.125rem;
+  line-height: 1.3;
+}
+
+.app main .card > h2:first-child,
+.app main .card > h3:first-child {
+  margin-top: 0;
+}
+
+.app .card__title {
+  margin: 0 0 var(--space-xs);
+  font-size: 1.2rem;
+}
+
+.app .card__subtitle {
+  margin: var(--space-lg) 0 var(--space-xs);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.app .card > .needs + .field__help {
+  margin-top: var(--space-sm);
+}
+
+.app main .stack > .menu-list__heading {
+  margin-bottom: 0;
+}
+
+.app main {
+  padding-bottom: var(--space-2xl);
+}
+
+.app main h1 + p {
+  margin-top: 0;
+}
+
+@media (max-width: 63.99em) {
+  .app {
+    padding-bottom: calc(6.75rem + env(safe-area-inset-bottom));
+  }
+
+  html:has(> body.app) {
+    scroll-padding-bottom: 8rem;
+  }
+}
+
+/* ==========================================================================
+   2. Intestazione
+   Barra in alto bianca, fissa e traslucida; voci a destra sul computer. Una linea sotto la barra
+   mentre si va a un'altra pagina dell'app (.oa-va, app.js initPageLine).
+   ========================================================================== */
+
+@media (max-width: 47.99em) {
+  .app .site-header__inner {
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+  }
+
+  .app .brand__name {
+    font-size: 1.05rem;
+  }
+}
+
+.app .site-header__inner {
+  min-height: 3.5rem;
+  padding-block: 0.35rem;
+}
+
+.app .brand__logo {
+  width: 1.9rem;
+}
+
+@media (max-width: 63.99em) {
+  .app .site-header__inner {
+    justify-content: flex-start;
+  }
+}
+
+.app .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  padding-top: env(safe-area-inset-top);
+  background: rgb(251, 246, 236);   /* opaca: il testo che scorre sotto non deve vedersi. Niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
+  box-shadow: 0 1px 0 var(--color-line);
+  border-bottom: 0;
+  view-transition-name: oa-testata;
+}
+
+/* In alto: una linea blu scorre sotto la barra mentre arriva la pagina nuova */
+.oa-va .app .site-header::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--color-brand);
+  animation: oa-linea 2.5s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+}
+
+@keyframes oa-linea {
+  from {
+    width: 0;
+  }
+
+  to {
+    width: 88%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .oa-va .app .site-header::after {
+    animation: none;
+    width: 100%;
+    opacity: 0.6;
+  }
+}
+
+/* ==========================================================================
+   3. Barra delle schede
+   Fino a 1024 px (telefono e tablet) la navigazione è la barra in basso, come nelle app per iPhone,
+   iPad e Android: tre voci (Mappa, Segnala, Profilo), «Segnala» al centro in un cerchio blu. Sospesa: staccata dai
+   bordi, angoli tondi, «vetro» che lascia intravedere sfocato quello che scorre sotto (con «riduci trasparenza»
+   è bianca). Icone a contorno; la scheda attiva ha un riempimento leggero; «is-section» è la scheda di cui fa
+   parte la pagina (scheda di un luogo → Mappa; Per i locali e privacy → Profilo).
+   Un indicatore solo (.app-nav__indice, creato da app.js) passa da una scheda all'altra allungandosi come un
+   elastico; l'icona della scheda nuova si disegna tratto per tratto (le icone Tabler hanno pathLength="1"); su
+   «Segnala» il «+» fa un giro. Al tocco un'onda azzurra parte dal punto toccato (initOnda) e l'icona si schiaccia
+   (is-premuto). Pallino rosso con il numero di cose da moderare sulla scheda «Profilo» (solo moderatori).
+   Con «riduci movimento» niente animazioni.
+   ========================================================================== */
 
 .app-nav__list {
   display: flex;
@@ -83,26 +310,7 @@
   color: var(--color-white);
 }
 
-/* Telefono: la navigazione diventa una barra in basso, come nelle app */
 @media (max-width: 47.99em) {
-  html {
-    scroll-padding-bottom: 6rem;     /* il focus non finisce mai sotto la barra (WCAG 2.4.11) */
-  }
-
-  .app {
-    padding-bottom: calc(4.75rem + env(safe-area-inset-bottom));
-  }
-
-  .app-nav {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 1000;
-    padding: var(--space-2xs) var(--space-xs) calc(var(--space-2xs) + env(safe-area-inset-bottom));
-    border-top: 1px solid var(--color-line);
-    background: var(--color-card);
-    box-shadow: 0 -6px 18px rgba(22, 40, 65, 0.08);
-  }
-
   .app-nav__list {
     justify-content: space-around;
   }
@@ -113,22 +321,544 @@
 
   .app-nav__link {
     flex-direction: column;
-    gap: 0;
     width: 100%;
-    min-height: 3.5rem;
-    padding: var(--space-2xs);
-    border-radius: var(--radius-md);
-    font-size: var(--text-sm);
     line-height: 1.2;
     justify-content: center;
   }
+}
 
-  .app .site-header__inner {
-    justify-content: flex-start;
+@media (forced-colors: active) {
+  .app-nav__link[aria-current="page"] {
+    border: 3px solid Highlight;
   }
 }
 
-/* 2. Moduli ed errori */
+@media (max-width: 47.99em) {
+  /* Mentre si scrive, la barra in basso salirebbe sopra la tastiera e coprirebbe il campo: si nasconde */
+  body.app:has(input:not([type="radio"]):not([type="checkbox"]):focus, textarea:focus, select:focus) .app-nav {
+    display: none;
+  }
+}
+
+.app .app-nav {
+  margin-left: auto;
+}
+
+@media (max-width: 47.99em) {
+  .app-nav {
+    position: fixed;
+    z-index: 1000;
+    inset: auto 0 0;
+    padding: 0.25rem var(--space-xs) env(safe-area-inset-bottom);
+    border: 0;
+    border-top: 1px solid var(--color-line);
+    border-radius: 0;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: none;
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    backdrop-filter: saturate(1.4) blur(14px);
+  }
+
+  .app-nav__link {
+    gap: 0.15rem;
+    min-height: 3.5rem;
+    padding: 0.2rem 0;
+    border-radius: var(--radius-md);
+    color: var(--color-muted);
+    font-size: 0.875rem;
+  }
+
+  .app-nav__link .icon {
+    box-sizing: content-box;
+    width: 1.4rem;
+    height: 1.4rem;
+    padding: 0.2rem 1rem;
+    border-radius: var(--radius-pill);
+    transition: background-color 0.2s ease;
+  }
+
+  .app-nav__link:hover {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app-nav__link[aria-current="page"] {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app-nav__link[aria-current="page"] .icon {
+    background: var(--color-sky);
+    color: var(--color-brand);
+  }
+
+  .app-nav__link:focus-visible {
+    outline-offset: -2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-nav__link .icon {
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .app-nav__link[aria-current="page"] .icon {
+    outline: 2px solid CanvasText;
+  }
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav__link {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.2rem;
+    width: 100%;
+    min-height: 3.5rem;
+    padding: 0.2rem 0;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--color-muted);
+    font-size: 0.875rem;
+    line-height: 1.2;
+  }
+
+  .app .app-nav__link .icon {
+    position: relative;
+    z-index: 1;
+    box-sizing: content-box;
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0.2rem 1rem;
+    border-radius: var(--radius-pill);
+    background: none;
+    transition: transform 0.15s var(--ease-out);
+  }
+
+  .app .app-nav__link[aria-current="page"] {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app .app-nav__link[aria-current="page"] .icon {
+    background: none;
+    color: var(--color-brand);
+  }
+
+  .app .app-nav__link:hover {
+    background: none;
+    color: var(--color-navy);
+  }
+
+  .app .app-nav__link:active .icon {
+    transform: scale(0.88);
+  }
+
+  .app .app-nav__link:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: -3px;
+  }
+
+  /* «Segnala» al centro: cerchio blu che sporge dalla barra */
+  .app .app-nav__link[href="segnala.html"] .icon {
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-top: -1.35rem;
+    padding: 0.7rem;
+    border: 4px solid var(--color-white);
+    background: var(--color-navy);
+    color: var(--color-white);
+    box-shadow: 0 6px 16px rgba(22, 40, 65, 0.25);
+  }
+
+  .app .app-nav__link[href="segnala.html"]::before {
+    display: none;
+  }
+
+  .app .app-nav__link[href="segnala.html"][aria-current="page"] .icon {
+    background: var(--color-brand);
+    color: var(--color-white);
+  }
+
+  .app .app-nav__link[href="segnala.html"]:active .icon {
+    transform: scale(0.92);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app .app-nav__link .icon {
+    transition: none;
+  }
+
+  .app .app-nav__link:active .icon {
+    transform: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .app .app-nav__link[href="segnala.html"] .icon {
+    border-color: Canvas;
+    background: ButtonText;
+    color: ButtonFace;
+  }
+}
+
+.app .app-nav .icon--tab {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav__link.is-section {
+    color: var(--color-navy);
+  }
+
+  .app .app-nav__link[aria-current="page"] .icon--tab,
+  .app .app-nav__link.is-section .icon--tab {
+    fill: var(--color-brand);
+    fill-opacity: 0.2;
+    stroke: var(--color-brand);
+    stroke-width: 2.1;
+  }
+
+  .app .app-nav__link[href="segnala.html"] .icon--tab,
+  .app .app-nav__link[href="segnala.html"][aria-current="page"] .icon--tab {
+    fill: none;
+    stroke: var(--color-white);
+    stroke-width: 2.6;
+  }
+
+  .app .app-nav__link[href="segnala.html"]:hover .icon--tab {
+    background: var(--color-brand);
+  }
+}
+
+@media (forced-colors: active) {
+  .app .app-nav .icon--tab {
+    stroke: CanvasText;
+  }
+}
+
+.app-nav__onde {
+  display: none;
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav__onde {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .app .app-nav__onda {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle closest-side,
+      rgba(47, 91, 156, 0.12) 0, rgba(47, 91, 156, 0.16) 70%,
+      rgba(47, 91, 156, 0.5) 86%, rgba(47, 91, 156, 0) 100%);
+  }
+}
+
+.app-nav__indice {
+  display: none;
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav__indice {
+    display: block;
+    position: absolute;
+    top: 0.15rem;
+    left: 0;
+    width: 3.75rem;
+    height: 2rem;
+    margin-left: -1.875rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-sky);
+    pointer-events: none;
+  }
+
+  .app .app-nav__indice[hidden] {
+    display: none;
+  }
+
+  .app .app-nav__list > li {
+    flex: 1 1 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .app .app-nav__link span {
+    transition: color 0.25s ease;
+  }
+
+  .app .app-nav__link.is-arriva .icon--tab {
+    animation: oa-disegna 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+  }
+
+  .app .app-nav__link[href="segnala.html"].is-arriva .icon {
+    animation: oa-segnala 0.6s cubic-bezier(0.3, 0.7, 0.2, 1.3) both;
+  }
+}
+
+@keyframes oa-disegna {
+  from {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    fill-opacity: 0;
+  }
+
+  75% {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    fill-opacity: 0;
+  }
+
+  to {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes oa-segnala {
+  from {
+    transform: scale(0.7) rotate(-90deg);
+  }
+
+  60% {
+    transform: scale(1.12) rotate(8deg);
+  }
+
+  to {
+    transform: none;
+  }
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav {
+    position: fixed;
+    inset: auto 0 0;
+    z-index: 1000;
+    margin: 0;
+    view-transition-name: oa-schede;
+    left: var(--space-sm);
+    right: var(--space-sm);
+    bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+    max-width: 30rem;
+    margin-inline: auto;
+    padding: 0.35rem var(--space-xs);
+    border: 1px solid rgba(22, 40, 65, 0.08);
+    border-radius: 1.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow: 0 14px 34px rgba(22, 40, 65, 0.2), 0 2px 6px rgba(22, 40, 65, 0.08);
+  }
+
+  .app .app-nav__onde {
+    border-radius: inherit;
+  }
+
+  .app .app-nav__list {
+    position: relative;
+    justify-content: space-around;
+    margin-inline: auto;
+    max-width: none;
+  }
+
+  .app .app-nav__link.is-premuto .icon {
+    transform: scale(0.86);
+  }
+
+  .app .app-nav__link[href="segnala.html"].is-premuto .icon {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 63.99em) and (prefers-reduced-transparency: reduce) {
+  .app .app-nav {
+    background: var(--color-white);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app .app-nav {
+    background: var(--color-white);
+  }
+}
+
+.app-nav__link {
+  position: relative;
+}
+
+.app-nav__badge {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 0.55rem);
+  z-index: 2;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border: 2px solid var(--color-white);
+  border-radius: var(--radius-pill);
+  background: var(--color-error);
+  color: var(--color-white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-sizing: content-box;
+}
+
+@media (min-width: 64em) {
+  .app-nav__badge {
+    top: 0.1rem;
+    left: auto;
+    right: 0.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-nav__badge {
+    animation: oa-spunta 0.45s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
+  }
+}
+
+@media (forced-colors: active) {
+  .app .app-nav {
+    border: 2px solid CanvasText;
+  }
+
+  .app-nav__badge {
+    border-color: Canvas;
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
+/* ==========================================================================
+   4. Passaggio tra le pagine
+   View Transitions (Safari 18 e Chrome): barra in alto e barra in basso restano ferme e il contenuto
+   entra dal lato giusto (classi vt-avanti / vt-indietro su <html>, intro.js e app.js). Tendine che si aprono.
+   ========================================================================== */
+
+/* Passaggio tra le pagine dell'app */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: oa-esce 0.16s ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: oa-entra 0.28s var(--ease-out) both;
+}
+
+@keyframes oa-esce {
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes oa-entra {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+}
+
+/* Tendine che si aprono con un leggero scorrimento */
+.app details[open] > :not(summary) {
+  animation: oa-apri 0.22s var(--ease-out);
+}
+
+@keyframes oa-apri {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @view-transition {
+    navigation: none;
+  }
+
+  .app details[open] > :not(summary) {
+    animation: none;
+  }
+}
+
+/* Pagina nuova che entra dal lato della scheda scelta (classi messe da intro.js e app.js) */
+.vt-avanti::view-transition-old(root) {
+  animation: oa-esce-sinistra 0.22s ease-in both;
+}
+
+.vt-avanti::view-transition-new(root) {
+  animation: oa-entra-destra 0.32s var(--ease-out) both;
+}
+
+.vt-indietro::view-transition-old(root) {
+  animation: oa-esce-destra 0.22s ease-in both;
+}
+
+.vt-indietro::view-transition-new(root) {
+  animation: oa-entra-sinistra 0.32s var(--ease-out) both;
+}
+
+@keyframes oa-entra-destra {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@keyframes oa-entra-sinistra {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes oa-esce-sinistra {
+  to {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+}
+
+@keyframes oa-esce-destra {
+  to {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vt-avanti::view-transition-old(root),
+  .vt-avanti::view-transition-new(root),
+  .vt-indietro::view-transition-old(root),
+  .vt-indietro::view-transition-new(root) {
+    animation: none;
+  }
+}
+
+/* ==========================================================================
+   5. Moduli ed errori
+   Riepilogo degli errori e messaggio accanto al campo, gruppi di scelte, password, sezioni del modulo
+   che si aprono, punto sulla mappa, indirizzi suggeriti mentre si scrive (combobox).
+   ========================================================================== */
+
 .field,
 .field > * {
   min-width: 0;
@@ -430,7 +1160,151 @@ textarea.input {
   justify-self: start;
 }
 
-/* 3. Avvisi e pulsanti */
+@media (forced-colors: active) {
+  .error-summary {
+    border: 2px solid CanvasText;
+  }
+}
+
+.app .input:focus-visible,
+.app .select:focus-visible {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 4px rgba(47, 91, 156, 0.18);
+}
+
+.pick__suggest {
+  display: flex;
+}
+
+.pick__suggest[hidden] {
+  display: none;
+}
+
+.pick__suggest .btn {
+  height: auto;
+  min-height: var(--target-min);
+  padding-block: var(--space-xs);
+  text-align: left;
+  white-space: normal;
+}
+
+@media (max-width: 47.99em) {
+  /* Mappa più alta: il punto si mette con il dito, senza dover ingrandire per forza */
+  .pick__map {
+    height: min(26rem, 60svh);
+    margin-inline: calc(var(--space-md) * -1);
+    border-radius: 0;
+    border-inline: 0;
+  }
+}
+
+.field--suggest {
+  position: relative;
+}
+
+.suggest {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1100;
+  max-height: 18rem;
+  margin: 4px 0 0;
+  padding: 4px;
+  overflow-y: auto;
+  list-style: none;
+  border: 2px solid var(--color-navy);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+.suggest[hidden] {
+  display: none;
+}
+
+.suggest__item {
+  display: grid;
+  gap: 2px;
+  min-height: var(--target-min);
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.suggest__item:hover,
+.suggest__item[aria-selected="true"] {
+  background: var(--color-sky);
+  outline: 2px solid var(--color-brand);
+  outline-offset: -2px;
+}
+
+.suggest__main {
+  font-weight: 700;
+}
+
+.suggest__sub {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+@media (forced-colors: active) {
+  .suggest__item[aria-selected="true"] {
+    outline: 3px solid Highlight;
+  }
+}
+
+.field--locale {
+  flex-wrap: wrap;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
+}
+
+.field--locale label {
+  flex: 1 1 0;
+  font-weight: 700;
+}
+
+.field--locale .field__help {
+  flex-basis: 100%;
+  margin: 0;
+  padding-left: calc(1.5rem + var(--space-sm));
+}
+
+.app .input,
+.app .select {
+  border-radius: var(--radius-md);
+  border-width: 1.5px;
+  min-height: 3rem;
+  background-color: var(--color-white);
+}
+
+.app main .form-section > h2:first-child {
+  margin-top: 0;
+}
+
+/* Il primo passo della segnalazione: mappa subito sotto i campi, più alta sul telefono */
+.app .pick .pick__map {
+  margin-top: 0;
+}
+
+@media (max-width: 47.99em) {
+  .app .pick__actions {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .app .pick__actions .btn {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* ==========================================================================
+   6. Avvisi e pulsanti
+   ========================================================================== */
+
 .notice {
   margin: 0 0 var(--space-md);
   padding: var(--space-sm) var(--space-md);
@@ -475,99 +1349,10 @@ textarea.input {
   color: var(--color-white);
 }
 
-.demo {
-  margin-top: var(--space-xl);
-  border-style: dashed;
-}
-
 .demo__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
-}
-
-/* 4. Scheda luogo */
-.fav .icon {
-  fill: transparent;
-  stroke: currentColor;
-  stroke-width: 2;
-}
-
-.fav[aria-pressed="true"] {
-  background: var(--color-navy);
-  color: var(--color-white);
-}
-
-.fav[aria-pressed="true"] .icon {
-  fill: var(--color-white);
-}
-
-.reviews {
-  margin: 0 0 var(--space-md);
-  padding: 0;
-  list-style: none;
-}
-
-.review--real {
-  border-style: solid;
-  border-color: var(--color-line);
-  background: var(--color-white);
-}
-
-.review__text {
-  margin: 0;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-.review-form {
-  display: grid;
-  gap: var(--space-md);
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-line);
-}
-
-.review-form > * {
-  margin: 0;
-}
-
-/* 5. Profilo */
-.activities {
-  display: grid;
-  gap: var(--space-md);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.activity {
-  padding: var(--space-md);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-card);
-}
-
-.activity__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-xs);
-}
-
-.activity__title {
-  margin: 0;
-  font-size: var(--text-base);
-}
-
-.activity__text {
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-.activity__reason {
-  font-style: italic;
 }
 
 .state-pill {
@@ -585,269 +1370,60 @@ textarea.input {
   color: var(--color-error);
 }
 
-.dialog {
-  width: min(32rem, calc(100vw - 2rem));
-  padding: var(--space-lg);
-  border: 0;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
-  color: var(--color-text);
-}
-
-.dialog::backdrop {
-  background: rgba(22, 40, 65, 0.55);
-}
-
-/* 6. Moderazione */
-.mod-list {
-  display: grid;
-  gap: var(--space-lg);
-  margin: 0 0 var(--space-xl);
-  padding: 0;
-  list-style: none;
-}
-
-.mod-item h3 {
-  font-size: var(--text-lg);
-}
-
-.mod-item h4 {
-  margin: var(--space-lg) 0 var(--space-xs);
-  font-size: var(--text-base);
-}
-
-.mod-item__note {
-  margin: 0 0 var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  border-left: 4px solid var(--color-beige);
-  background: var(--color-card);
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-.mod-item__note p {
-  margin: 0;
-}
-
-.verdict-preview {
-  display: grid;
-  gap: var(--space-xs);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.verdict-preview li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.verdict-preview__who {
-  min-width: 12rem;
-}
-
-.table-wrap {
-  max-width: 100%;
-  overflow-x: auto;
-}
-
-.table-wrap:focus-visible {
-  outline: var(--focus-width) solid var(--color-focus);
-}
-
-.diff {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.diff th,
-.diff td {
-  padding: var(--space-xs) var(--space-sm);
-  border-bottom: 1px solid var(--color-line);
-  text-align: left;
-  vertical-align: top;
-  overflow-wrap: anywhere;
-}
-
-.diff thead th {
-  background: var(--color-card);
-}
-
-.diff tbody th {
-  font-weight: 700;
-  min-width: 10rem;
-}
-
-.decision {
-  display: grid;
-  gap: var(--space-md);
-  margin-top: var(--space-lg);
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--color-line);
-}
-
-.decision > * {
-  margin: 0;
-}
-
-.decision__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-}
-
-/* 7. Forced colors */
 @media (forced-colors: active) {
-  .app-nav__link[aria-current="page"],
-  .fav[aria-pressed="true"] {
-    border: 3px solid Highlight;
-  }
-
-  .notice,
-  .error-summary {
+  .notice {
     border: 2px solid CanvasText;
   }
 }
 
-/* 8. Foto */
-.photo-input {
-  width: 100%;
-  max-width: 100%;
-  min-height: var(--target-min);
-  font: inherit;
-}
-
-.photo-picks {
-  display: grid;
-  gap: var(--space-md);
-  margin: var(--space-md) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.photo-pick {
-  display: grid;
-  grid-template-columns: 7.5rem minmax(0, 1fr);
-  gap: var(--space-sm) var(--space-md);
-  align-items: start;
-  padding: var(--space-sm);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-card);
-}
-
-.photo-pick img {
-  max-width: 100%;
-  width: 7.5rem;
-  height: 5.6rem;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-}
-
-.photo-pick .btn {
-  grid-column: 2;
-  justify-self: start;
-}
-
-@media (max-width: 29.99em) {
-  .photo-pick {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .photo-pick img {
+@media (max-width: 47.99em) {
+  /* Il pulsante principale dei moduli occupa tutta la riga, come nelle app */
+  .app form > .btn--primary[type="submit"] {
     width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-  }
-
-  .photo-pick .btn {
-    grid-column: 1;
   }
 }
 
-.photos {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
-  gap: var(--space-sm);
-  margin: 0;
-  padding: 0;
-  list-style: none;
+/* Pulsanti e righe: risposta al tocco */
+.app .btn {
+  border-radius: var(--radius-pill);
+  transition: transform 0.12s var(--ease-out), background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.photos > li {
-  display: grid;
-  gap: var(--space-xs);
-  align-content: start;
+.app .btn:active {
+  transform: scale(0.97);
 }
 
-.photo {
-  margin: 0;
+@media (prefers-reduced-motion: reduce) {
+  .app .btn {
+    transition: none;
+  }
+
+  .app .btn:active {
+    transform: none;
+  }
 }
 
-.photo img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius-sm);
-  background: var(--color-card);
+@media (max-width: 47.99em) {
+  .app .demo__actions {
+    display: grid;
+    gap: var(--space-xs);
+  }
+
+  .app .demo__actions > .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
-.photo figcaption {
-  margin-top: var(--space-2xs);
-  color: var(--color-muted);
-  font-size: var(--text-sm);
+/* Indirizzi email e link lunghi negli avvisi vanno a capo invece di allargare la pagina (bollino a 320 px) */
+.app .notice {
   overflow-wrap: anywhere;
 }
 
-/* 9. Grafica dell'app (27 ottobre): più «app» e meno pagina web.
-   Fondo caldo, barra in alto bianca e leggera, schede arrotondate, barra di navigazione che galleggia in basso. */
-.app {
-  background: linear-gradient(180deg, var(--color-sky) 0, var(--color-card) 22rem) no-repeat, var(--color-card);
-}
-
-.app .site-header {
-  border-bottom: 0;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 1px 0 var(--color-line), 0 6px 18px rgba(22, 40, 65, 0.05);
-}
-
-.app .site-header__inner {
-  padding-block: var(--space-xs);
-}
-
-.app .brand__logo {
-  width: 2.1rem;
-}
-
-.app main h1 {
-  font-size: clamp(1.6rem, 1.3rem + 1.4vw, 2.25rem);
-  letter-spacing: -0.01em;
-}
-
-.app .card {
-  border-radius: var(--radius-xl);
-  border-color: rgba(22, 40, 65, 0.08);
-  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.05), 0 10px 30px rgba(22, 40, 65, 0.07);
-}
-
-.app .btn {
-  border-radius: var(--radius-pill);
-}
-
-.app .input,
-.app .select {
-  border-radius: var(--radius-md);
-  border-width: 1.5px;
-}
-
-.app .input:focus-visible,
-.app .select:focus-visible {
-  border-color: var(--color-brand);
-  box-shadow: 0 0 0 4px rgba(47, 91, 156, 0.18);
-}
+/* ==========================================================================
+   7. Mappa
+   La pagina mappa del sito dentro l'app: a tutta altezza, sotto la barra in alto.
+   ========================================================================== */
 
 /* Pagina mappa dell'app */
 .app .explore {
@@ -894,13 +1470,6 @@ textarea.input {
   box-shadow: 0 10px 30px rgba(22, 40, 65, 0.12);
 }
 
-.app .place {
-  border-radius: var(--radius-xl);
-  border-color: rgba(22, 40, 65, 0.08);
-  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.04), 0 6px 18px rgba(22, 40, 65, 0.05);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
 .app .place:hover,
 .app .place.is-active {
   transform: translateY(-2px);
@@ -911,44 +1480,7 @@ textarea.input {
   margin-top: var(--space-sm);
 }
 
-/* Telefono: barra in basso che galleggia, con l'icona attiva su fondo azzurro */
 @media (max-width: 47.99em) {
-  .app {
-    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
-  }
-
-  .app .container {
-    padding-inline: var(--space-md);
-  }
-
-  .app-nav {
-    inset: auto var(--space-sm) calc(var(--space-xs) + env(safe-area-inset-bottom));
-    padding: 6px;
-    border: 1px solid rgba(22, 40, 65, 0.08);
-    border-radius: var(--radius-xl);
-    background: rgba(255, 255, 255, 0.97);
-    box-shadow: 0 10px 30px rgba(22, 40, 65, 0.16);
-  }
-
-  .app-nav__link {
-    min-height: 3.25rem;
-    border-radius: var(--radius-lg);
-    font-size: 0.9rem;
-  }
-
-  .app-nav__link[aria-current="page"] {
-    background: var(--color-sky);
-    color: var(--color-navy);
-  }
-
-  .app-nav__link[aria-current="page"] .icon {
-    color: var(--color-brand);
-  }
-
-  .app .card {
-    padding: var(--space-md) var(--space-md) var(--space-lg);
-  }
-
   /* «Segnala» c'è già nella barra in basso */
   .app .explore__head .btn {
     display: none;
@@ -957,24 +1489,147 @@ textarea.input {
   .app .explore__head {
     margin-bottom: var(--space-sm);
   }
-
-  .app .explore .map {
-    height: max(22rem, calc(100svh - 17rem));
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app .place {
-    transition: none;
-  }
-
   .app .place:hover,
   .app .place.is-active {
     transform: none;
   }
 }
 
-/* 10. Avvisi temporanei, recensioni guidate, gestori, bollino (27 ottobre) */
+.app .needs,
+.app .place,
+.app .filters__more {
+  border-color: transparent;
+  background: var(--color-white);
+}
+
+@media (max-width: 47.99em) {
+  .app .explore .map {
+    height: max(22rem, calc(100svh - 17rem));
+    height: max(22rem, calc(100svh - 16rem));
+  }
+}
+
+.app .place {
+  border-radius: var(--radius-xl);
+  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.04), 0 6px 18px rgba(22, 40, 65, 0.05);
+  transition: transform 0.12s var(--ease-out), background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app .place {
+    transition: none;
+  }
+}
+
+@media (max-width: 47.99em) {
+  .app .filters__near {
+    margin: 0;
+  }
+
+  .app .filters__near .quick__link {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .app .empty {
+    text-align: center;
+  }
+}
+
+/* ==========================================================================
+   8. Scheda luogo
+   Preferiti, avvisi temporanei, «Ci sei stato?» (initVeloce), recensioni guidate con foto e
+   «Cosa dicono i visitatori».
+   ========================================================================== */
+
+.fav .icon {
+  fill: transparent;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.fav[aria-pressed="true"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.fav[aria-pressed="true"] .icon {
+  fill: var(--color-white);
+}
+
+.reviews {
+  margin: 0 0 var(--space-md);
+  padding: 0;
+  list-style: none;
+}
+
+.review--real {
+  border-style: solid;
+  border-color: var(--color-line);
+  background: var(--color-white);
+}
+
+.review__text {
+  margin: 0;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.review-form {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-line);
+}
+
+.review-form > * {
+  margin: 0;
+}
+
+@media (forced-colors: active) {
+  .fav[aria-pressed="true"] {
+    border: 3px solid Highlight;
+  }
+}
+
+.photos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photos > li {
+  display: grid;
+  gap: var(--space-xs);
+  align-content: start;
+}
+
+.photo {
+  margin: 0;
+}
+
+.photo img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+  background: var(--color-card);
+}
+
+.photo figcaption {
+  margin-top: var(--space-2xs);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
 .alerts {
   display: grid;
   gap: var(--space-sm);
@@ -1092,829 +1747,7 @@ textarea.input {
   font-weight: 700;
 }
 
-/* Bollino per la vetrina: a schermo un'anteprima, in stampa solo il bollino */
-.badge-page {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-md);
-  padding-block: var(--space-lg);
-}
-
-.badge-page__back {
-  justify-self: start;
-  margin: 0;
-}
-
-.badge-page__actions {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-xs);
-  max-width: 34rem;
-  text-align: center;
-}
-
-.badge {
-  display: grid;
-  justify-items: center;
-  gap: var(--space-xs);
-  width: min(100%, 26rem);
-  padding: var(--space-lg) var(--space-lg) var(--space-md);
-  border: 6px solid var(--color-navy);
-  border-radius: var(--radius-xl);
-  background: var(--color-white);
-  text-align: center;
-}
-
-.badge__logo {
-  width: 4.5rem;
-  height: auto;
-}
-
-.badge__kicker {
-  margin: 0;
-  font-size: var(--text-sm);
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.badge__brand {
-  margin: 0;
-  font-size: var(--text-2xl);
-  line-height: 1.1;
-}
-
-.badge__place {
-  margin: 0;
-  font-size: var(--text-lg);
-  font-weight: 700;
-}
-
-.badge__verdicts {
-  display: grid;
-  gap: var(--space-2xs);
-  margin: var(--space-xs) 0;
-  padding: 0;
-  list-style: none;
-  text-align: left;
-}
-
-.badge__verdict {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-weight: 700;
-}
-
-.badge__verdict .icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-success);
-}
-
-.badge__verdict--parziale .icon {
-  color: var(--color-warning);
-}
-
-.badge__qr {
-  width: min(70%, 14rem);
-}
-
-.badge__qr svg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.badge__cta,
-.badge__date {
-  margin: 0;
-  font-size: var(--text-sm);
-}
-
-.badge__date {
-  color: var(--color-muted);
-  overflow-wrap: anywhere;
-}
-
-@media print {
-  .site-header,
-  .site-footer,
-  .app-nav,
-  .no-print,
-  .notice {
-    display: none !important;
-  }
-
-  body.app {
-    background: #ffffff;
-  }
-
-  .badge-page {
-    padding: 0;
-  }
-
-  .badge {
-    width: 13cm;
-    break-inside: avoid;
-  }
-}
-
-/* 11. Mappa del punto e tastiera sul telefono (27 ottobre) */
-.pick__suggest {
-  display: flex;
-}
-
-.pick__suggest[hidden] {
-  display: none;
-}
-
-.pick__suggest .btn {
-  height: auto;
-  min-height: var(--target-min);
-  padding-block: var(--space-xs);
-  text-align: left;
-  white-space: normal;
-}
-
-@media (max-width: 47.99em) {
-  /* Mappa più alta: il punto si mette con il dito, senza dover ingrandire per forza */
-  .pick__map {
-    height: min(26rem, 60svh);
-    margin-inline: calc(var(--space-md) * -1);
-    border-radius: 0;
-    border-inline: 0;
-  }
-
-  /* Mentre si scrive, la barra in basso salirebbe sopra la tastiera e coprirebbe il campo: si nasconde */
-  body.app:has(input:not([type="radio"]):not([type="checkbox"]):focus, textarea:focus, select:focus) .app-nav {
-    display: none;
-  }
-}
-
-/* 12. Indirizzi suggeriti mentre si scrive (combobox) */
-.field--suggest {
-  position: relative;
-}
-
-.suggest {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  z-index: 1100;
-  max-height: 18rem;
-  margin: 4px 0 0;
-  padding: 4px;
-  overflow-y: auto;
-  list-style: none;
-  border: 2px solid var(--color-navy);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-  box-shadow: var(--shadow-md);
-}
-
-.suggest[hidden] {
-  display: none;
-}
-
-.suggest__item {
-  display: grid;
-  gap: 2px;
-  min-height: var(--target-min);
-  padding: var(--space-xs) var(--space-sm);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.suggest__item:hover,
-.suggest__item[aria-selected="true"] {
-  background: var(--color-sky);
-  outline: 2px solid var(--color-brand);
-  outline-offset: -2px;
-}
-
-.suggest__main {
-  font-weight: 700;
-}
-
-.suggest__sub {
-  color: var(--color-muted);
-  font-size: var(--text-sm);
-}
-
-@media (forced-colors: active) {
-  .suggest__item[aria-selected="true"] {
-    outline: 3px solid Highlight;
-  }
-}
-
-/* 13. Per i locali: passi numerati e locali gestiti */
-.steps-list {
-  display: grid;
-  gap: var(--space-md);
-  margin: var(--space-md) 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: passo;
-}
-
-.steps-list > li {
-  position: relative;
-  padding-left: 3rem;
-  counter-increment: passo;
-}
-
-.steps-list > li::before {
-  content: counter(passo);
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: grid;
-  place-items: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 50%;
-  background: var(--color-navy);
-  color: var(--color-white);
-  font-family: var(--font-heading);
-  font-weight: 700;
-}
-
-.steps-list h2,
-.steps-list p {
-  margin: 0 0 var(--space-2xs);
-}
-
-.steps-list__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin-top: var(--space-xs);
-}
-
-.owned {
-  display: grid;
-  gap: var(--space-sm);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.owned__item > .btn {
-  justify-self: start;
-}
-
-.owned__form {
-  margin-top: var(--space-xs);
-}
-
-@media (forced-colors: active) {
-  .steps-list > li::before {
-    border: 2px solid CanvasText;
-  }
-}
-
-.owned__item {
-  display: grid;
-  gap: var(--space-xs);
-}
-
-.owned__item p {
-  margin: 0;
-}
-
-/* 14. Per i locali: ricerca del proprio locale, completezza della scheda, consigli */
-.find-list {
-  display: grid;
-  gap: var(--space-xs);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.find-list:empty {
-  display: none;
-}
-
-.find-list__item {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-xs) var(--space-md);
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-card);
-}
-
-.find-list__item p {
-  margin: 0;
-}
-
-.completezza {
-  display: grid;
-  gap: var(--space-2xs);
-  justify-items: start;
-}
-
-.completezza__barra {
-  display: block;
-  width: 100%;
-  max-width: 20rem;
-  height: 0.6rem;
-  border: 1px solid var(--color-navy);
-  border-radius: var(--radius-pill);
-  overflow: hidden;
-  background: var(--color-white);
-}
-
-.completezza__pieno {
-  display: block;
-  height: 100%;
-  background: var(--color-success);
-}
-.completezza__pieno--0 { width: 0%; }
-.completezza__pieno--1 { width: 10%; }
-.completezza__pieno--2 { width: 20%; }
-.completezza__pieno--3 { width: 30%; }
-.completezza__pieno--4 { width: 40%; }
-.completezza__pieno--5 { width: 50%; }
-.completezza__pieno--6 { width: 60%; }
-.completezza__pieno--7 { width: 70%; }
-.completezza__pieno--8 { width: 80%; }
-.completezza__pieno--9 { width: 90%; }
-.completezza__pieno--10 { width: 100%; }
-
-@media (forced-colors: active) {
-  .completezza__pieno {
-    background: Highlight;
-  }
-}
-
-/* 15. Luoghi da OpenStreetMap da approvare (moderazione) */
-.osm-tools {
-  display: grid;
-  gap: var(--space-sm);
-  margin-block: var(--space-md) var(--space-sm);
-}
-
-.osm-tools__bulk {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin: 0;
-}
-
-.osm-list {
-  display: grid;
-  gap: var(--space-sm);
-  margin: 0 0 var(--space-sm);
-  padding: 0;
-  list-style: none;
-}
-
-.osm-item {
-  display: grid;
-  gap: var(--space-2xs);
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
-}
-
-.osm-item p {
-  margin: 0;
-}
-
-.osm-item__check {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-}
-
-.osm-item__check input {
-  width: 1.5rem;
-  height: 1.5rem;
-  flex: none;
-}
-
-.osm-item__facts,
-.osm-item__links {
-  font-size: var(--text-sm);
-}
-
-/* 16. Intestazione dell'app (28 ottobre): etichetta «Modalità prova» accanto al logo (solo con i dati finti), voci a destra sul computer;
-   sul telefono la barra in basso ha tre voci (Mappa, Segnala, Profilo: i locali stanno nel profilo) */
-.app .app-nav {
-  margin-left: auto;
-}
-
-@media (max-width: 47.99em) {
-  .app .site-header__inner {
-    flex-wrap: nowrap;
-    min-height: 3.25rem;
-  }
-
-  .app .brand__name {
-    font-size: 1.05rem;
-  }
-}
-
-.field--locale {
-  flex-wrap: wrap;
-  padding: var(--space-sm);
-  border-radius: var(--radius-md);
-  background: var(--color-sky);
-}
-
-.field--locale label {
-  flex: 1 1 0;
-  font-weight: 700;
-}
-
-.field--locale .field__help {
-  flex-basis: 100%;
-  margin: 0;
-  padding-left: calc(1.5rem + var(--space-sm));
-}
-
-/* 17. Aspetto da app (28 ottobre, sera): niente piè di pagina (privacy, sito e contatti stanno nel Profilo),
-   barra in alto fissa e traslucida, barra delle schede attaccata al fondo come su iPhone e Android,
-   fondo grigio caldo con schede bianche, elenchi «impostazioni» nel profilo */
-.app {
-  --app-bg: #f3eee5;            /* testo blu 13:1, grigio del testo secondario 6,6:1 */
-  background: var(--app-bg);
-  -webkit-tap-highlight-color: transparent;
-}
-
-html:has(> body.app) {
-  scroll-padding-top: 4.5rem;   /* il focus non finisce sotto la barra in alto (WCAG 2.4.11) */
-}
-
-.app .site-header {
-  position: sticky;
-  top: 0;
-  z-index: 1001;
-  padding-top: env(safe-area-inset-top);
-  background: rgb(251, 246, 236);   /* opaca: il testo che scorre sotto non deve vedersi. Niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
-  box-shadow: 0 1px 0 var(--color-line);
-}
-
-.app .site-header__inner {
-  min-height: 3.5rem;
-  padding-block: 0.35rem;
-}
-
-.app .brand__logo {
-  width: 1.9rem;
-}
-
-.app main:not(.explore) {
-  padding-top: var(--space-md);
-}
-
-.app main h1 {
-  margin-bottom: var(--space-xs);
-  font-size: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
-}
-
-.app .card {
-  border: 0;
-  border-radius: 1.25rem;
-  background: var(--color-white);
-  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
-}
-
-.app .needs,
-.app .place,
-.app .filters__more {
-  border-color: transparent;
-  background: var(--color-white);
-}
-
-.app .input,
-.app .select {
-  min-height: 3rem;
-  background-color: var(--color-white);
-}
-
-/* Elenchi tipo «Impostazioni»: icona, titolo, riga secondaria, freccia */
-.menu-list__heading {
-  margin: var(--space-lg) var(--space-sm) var(--space-xs);
-  font-family: var(--font-body);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--color-muted);
-}
-
-.menu-list {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border-radius: 1.25rem;
-  background: var(--color-white);
-  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
-  list-style: none;
-}
-
-.menu-list > li:not([hidden]) ~ li {
-  border-top: 1px solid var(--color-line);
-}
-
-.menu-list__link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  min-height: 3.5rem;
-  padding: var(--space-sm) var(--space-md);
-  color: var(--color-navy);
-  text-decoration: none;
-}
-
-.menu-list__link:hover {
-  background: var(--color-card);
-}
-
-.menu-list__link:focus-visible {
-  outline: 3px solid var(--color-focus);
-  outline-offset: -3px;
-}
-
-.menu-list__icon {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 2.25rem;
-  height: 2.25rem;
-  border-radius: 0.7rem;
-  background: var(--color-sky);
-}
-
-.menu-list__icon .icon {
-  width: 1.3rem;
-  height: 1.3rem;
-  color: var(--color-brand);
-}
-
-.menu-list__text {
-  display: grid;
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.menu-list__title {
-  font-weight: 700;
-}
-
-.menu-list__sub {
-  font-size: 0.9375rem;
-  color: var(--color-muted);
-  overflow-wrap: anywhere;
-}
-
-.menu-list__chevron {
-  flex: none;
-  width: 1.5rem;
-  height: 1.5rem;
-  color: var(--color-muted);
-  transform: rotate(-90deg);
-}
-
-/* «La tua esigenza» dentro una scheda: niente seconda scheda dentro la prima */
-.app .card > .needs {
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-
-#profile-main .menu-list__heading {
-  margin-top: 0;
-}
-
-.profile-info {
-  margin-top: var(--space-xl);
-}
-
-#profile-main:not([hidden]) ~ .profile-info .profile-info__guest {
-  display: none;
-}
-
-.profile-info__credits {
-  margin: var(--space-md) var(--space-sm) 0;
-  font-size: 0.9375rem;
-  color: var(--color-muted);
-  text-align: center;
-}
-
-/* Telefono: barra delle schede attaccata al fondo, voce attiva con la «pillola» dietro l'icona */
-@media (max-width: 47.99em) {
-  .app {
-    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom));
-  }
-
-  html:has(> body.app) {
-    scroll-padding-bottom: 5.5rem;
-  }
-
-  .app-nav {
-    inset: auto 0 0;
-    padding: 0.25rem var(--space-xs) env(safe-area-inset-bottom);
-    border: 0;
-    border-top: 1px solid var(--color-line);
-    border-radius: 0;
-    background: rgba(255, 255, 255, 0.94);
-    box-shadow: none;
-    -webkit-backdrop-filter: saturate(1.4) blur(14px);
-    backdrop-filter: saturate(1.4) blur(14px);
-  }
-
-  .app-nav__link {
-    gap: 0.15rem;
-    min-height: 3.5rem;
-    padding: 0.2rem 0;
-    border-radius: var(--radius-md);
-    color: var(--color-muted);
-    font-size: 0.875rem;
-  }
-
-  .app-nav__link .icon {
-    box-sizing: content-box;
-    width: 1.4rem;
-    height: 1.4rem;
-    padding: 0.2rem 1rem;
-    border-radius: var(--radius-pill);
-    transition: background-color 0.2s ease;
-  }
-
-  .app-nav__link:hover {
-    background: none;
-    color: var(--color-navy);
-  }
-
-  .app-nav__link[aria-current="page"] {
-    background: none;
-    color: var(--color-navy);
-  }
-
-  .app-nav__link[aria-current="page"] .icon {
-    background: var(--color-sky);
-    color: var(--color-brand);
-  }
-
-  .app-nav__link:focus-visible {
-    outline-offset: -2px;
-  }
-
-  .app .card {
-    padding: var(--space-md);
-  }
-
-  /* Il pulsante principale dei moduli occupa tutta la riga, come nelle app */
-  .app form > .btn--primary[type="submit"] {
-    width: 100%;
-  }
-
-  .app .explore .map {
-    height: max(22rem, calc(100svh - 16rem));
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .app-nav__link .icon {
-    transition: none;
-  }
-}
-
-@media (forced-colors: active) {
-  .app-nav__link[aria-current="page"] .icon {
-    outline: 2px solid CanvasText;
-  }
-}
-
-/* 18. Barra delle schede, animazioni e tablet (28 ottobre, notte).
-   Fino a 1024 px (telefono e tablet) la navigazione è la barra in basso, come nelle app per iPhone, iPad e Android:
-   «Segnala» al centro in un cerchio blu, la voce attiva con la pillola che si apre, un piccolo «schiaccio» al tocco.
-   Tra una pagina e l'altra (View Transitions, Safari 18 e Chrome) barra in alto e barra in basso restano ferme
-   e il contenuto entra in dissolvenza. Con «riduci movimento» niente animazioni. */
 @media (max-width: 63.99em) {
-  html:has(> body.app) {
-    scroll-padding-bottom: 6rem;
-  }
-
-  .app {
-    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
-  }
-
-  .app .site-header__inner {
-    justify-content: flex-start;
-  }
-
-  .app .app-nav {
-    position: fixed;
-    inset: auto 0 0;
-    z-index: 1000;
-    margin: 0;
-    padding: 0.3rem var(--space-xs) calc(0.3rem + env(safe-area-inset-bottom));
-    border: 0;
-    border-top: 1px solid var(--color-line);
-    border-radius: 0;
-    background: var(--color-white);
-    box-shadow: 0 -4px 20px rgba(22, 40, 65, 0.06);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-    view-transition-name: oa-schede;
-  }
-
-  .app .app-nav__list {
-    justify-content: space-around;
-    max-width: 30rem;
-    margin-inline: auto;
-  }
-
-  .app .app-nav__list > li {
-    flex: 1 1 0;
-  }
-
-  .app .app-nav__link {
-    position: relative;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.2rem;
-    width: 100%;
-    min-height: 3.5rem;
-    padding: 0.2rem 0;
-    border-radius: var(--radius-md);
-    background: none;
-    color: var(--color-muted);
-    font-size: 0.875rem;
-    line-height: 1.2;
-  }
-
-  .app .app-nav__link .icon {
-    position: relative;
-    z-index: 1;
-    box-sizing: content-box;
-    width: 1.5rem;
-    height: 1.5rem;
-    padding: 0.2rem 1rem;
-    border-radius: var(--radius-pill);
-    background: none;
-    transition: transform 0.15s var(--ease-out);
-  }
-
-  .app .app-nav__link[aria-current="page"] {
-    background: none;
-    color: var(--color-navy);
-  }
-
-  .app .app-nav__link[aria-current="page"] .icon {
-    background: none;
-    color: var(--color-brand);
-  }
-
-  .app .app-nav__link:hover {
-    background: none;
-    color: var(--color-navy);
-  }
-
-  .app .app-nav__link:active .icon {
-    transform: scale(0.88);
-  }
-
-  .app .app-nav__link:focus-visible {
-    outline: 3px solid var(--color-focus);
-    outline-offset: -3px;
-  }
-
-  /* «Segnala» al centro: cerchio blu che sporge dalla barra */
-  .app .app-nav__link[href="segnala.html"] .icon {
-    width: 1.6rem;
-    height: 1.6rem;
-    margin-top: -1.35rem;
-    padding: 0.7rem;
-    border: 4px solid var(--color-white);
-    background: var(--color-navy);
-    color: var(--color-white);
-    box-shadow: 0 6px 16px rgba(22, 40, 65, 0.25);
-  }
-
-  .app .app-nav__link[href="segnala.html"]::before {
-    display: none;
-  }
-
-  .app .app-nav__link[href="segnala.html"][aria-current="page"] .icon {
-    background: var(--color-brand);
-    color: var(--color-white);
-  }
-
-  .app .app-nav__link[href="segnala.html"]:active .icon {
-    transform: scale(0.92);
-  }
-
   /* Percorso → «‹ Mappa dei luoghi», come il tasto indietro delle app */
   .app .crumbs li:last-child {
     display: none;
@@ -1982,94 +1815,102 @@ html:has(> body.app) {
   }
 }
 
-/* Passaggio tra le pagine dell'app */
-@view-transition {
-  navigation: auto;
+.veloce {
+  border: 2px dashed var(--color-brand);
+  background: var(--color-sky);
 }
 
-.app .site-header {
-  view-transition-name: oa-testata;
+.veloce .field--short .input {
+  max-width: 10rem;
 }
 
-::view-transition-old(root) {
-  animation: oa-esce 0.16s ease-in both;
+/* Foto della scheda in alto, come striscia che scorre di lato (si ferma su ogni foto) */
+.detail__photos {
+  margin-bottom: var(--space-md);
 }
 
-::view-transition-new(root) {
-  animation: oa-entra 0.28s var(--ease-out) both;
+.photos--striscia {
+  display: flex;
+  gap: var(--space-xs);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: var(--space-xs);
 }
 
-@keyframes oa-esce {
-  to {
-    opacity: 0;
+.photos--striscia > li {
+  flex: 0 0 min(78%, 18rem);
+  scroll-snap-align: start;
+}
+
+.photos--striscia .photo img {
+  border-radius: var(--radius-md);
+}
+
+#summary-visitors .review-summary {
+  margin-top: var(--space-md);
+}
+
+/* ==========================================================================
+   9. Segnala un luogo
+   A passi: indicatore 1-2-3-4, una schermata per passo, «Indietro / Avanti» in una barra che resta
+   in vista sopra la barra delle schede. Foto con anteprima e descrizione.
+   ========================================================================== */
+
+.photo-input {
+  width: 100%;
+  max-width: 100%;
+  min-height: var(--target-min);
+  font: inherit;
+}
+
+.photo-picks {
+  display: grid;
+  gap: var(--space-md);
+  margin: var(--space-md) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.photo-pick {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: var(--space-sm) var(--space-md);
+  align-items: start;
+  padding: var(--space-sm);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
+}
+
+.photo-pick img {
+  max-width: 100%;
+  width: 7.5rem;
+  height: 5.6rem;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.photo-pick .btn {
+  grid-column: 2;
+  justify-self: start;
+}
+
+@media (max-width: 29.99em) {
+  .photo-pick {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .photo-pick img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .photo-pick .btn {
+    grid-column: 1;
   }
 }
 
-@keyframes oa-entra {
-  from {
-    opacity: 0;
-    transform: translateY(0.75rem);
-  }
-}
-
-/* Pulsanti e righe: risposta al tocco */
-.app .btn,
-.app .menu-list__link,
-.app .place {
-  transition: transform 0.12s var(--ease-out), background-color 0.15s ease, box-shadow 0.15s ease;
-}
-
-.app .btn:active,
-.app .menu-list__link:active {
-  transform: scale(0.97);
-}
-
-/* Tendine che si aprono con un leggero scorrimento */
-.app details[open] > :not(summary) {
-  animation: oa-apri 0.22s var(--ease-out);
-}
-
-@keyframes oa-apri {
-  from {
-    opacity: 0;
-    transform: translateY(-0.4rem);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  @view-transition {
-    navigation: none;
-  }
-
-  .app details[open] > :not(summary) {
-    animation: none;
-  }
-
-  .app .btn,
-  .app .menu-list__link,
-  .app .place,
-  .app .app-nav__link .icon {
-    transition: none;
-  }
-
-  .app .btn:active,
-  .app .menu-list__link:active,
-  .app .app-nav__link:active .icon {
-    transform: none;
-  }
-}
-
-@media (forced-colors: active) {
-
-  .app .app-nav__link[href="segnala.html"] .icon {
-    border-color: Canvas;
-    background: ButtonText;
-    color: ButtonFace;
-  }
-}
-
-/* 19. «Segnala» a passi: indicatore 1-2-3-4, una schermata per passo, «Indietro / Avanti» in una barra
-   che resta in vista sopra la barra delle schede */
 .wizard__steps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -2222,72 +2063,178 @@ html:has(> body.app) {
   }
 }
 
-/* 20. Allineamenti sul telefono: pulsanti uno sotto l'altro a tutta riga e centrati, «Bagni vicino a me» largo
-   come la ricerca, titolo della pagina e testo d'apertura sempre fuori dalle schede */
-@media (max-width: 47.99em) {
-  .app .demo__actions {
-    display: grid;
-    gap: var(--space-xs);
-  }
+/* ==========================================================================
+   10. Profilo
+   Attività, stato delle proposte, elenchi «impostazioni», finestra di conferma.
+   ========================================================================== */
 
-  .app .demo__actions > .btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .app .filters__near {
-    margin: 0;
-  }
-
-  .app .filters__near .quick__link {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .app .center {
-    margin-inline: auto;
-    max-width: 30ch;
-  }
-
-  .app main > .container > h1 + p,
-  .app main > .container > .stack > h1 + p {
-    color: var(--color-muted);
-  }
-
-  .app .empty {
-    text-align: center;
-  }
+.activities {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-/* 21. Gerarchia e spazi (28 ottobre, notte): titolo della pagina > titolo di gruppo > titolo del riquadro.
-   Prima i titoli dei riquadri erano grandi quasi come quello della pagina. Ritmo verticale unico: 1 rem tra i
-   riquadri, 2 rem prima di un nuovo gruppo. */
-.app main h2 {
-  font-size: 1.3rem;
-  line-height: 1.25;
+.activity {
+  padding: var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
 }
 
-.app main h3 {
-  font-size: 1.125rem;
-  line-height: 1.3;
+.activity__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs);
 }
 
-.app main .card > h2:first-child,
-.app main .card > h3:first-child,
-.app main .form-section > h2:first-child {
+.activity__title {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+.activity__text {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.activity__reason {
+  font-style: italic;
+}
+
+.dialog {
+  width: min(32rem, calc(100vw - 2rem));
+  padding: var(--space-lg);
+  border: 0;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  color: var(--color-text);
+}
+
+.dialog::backdrop {
+  background: rgba(22, 40, 65, 0.55);
+}
+
+/* Elenchi tipo «Impostazioni»: icona, titolo, riga secondaria, freccia */
+.menu-list__heading {
+  margin: var(--space-lg) var(--space-sm) var(--space-xs);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-muted);
+}
+
+.menu-list {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: var(--color-white);
+  box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
+  list-style: none;
+}
+
+.menu-list > li:not([hidden]) ~ li {
+  border-top: 1px solid var(--color-line);
+}
+
+.menu-list__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 3.5rem;
+  padding: var(--space-sm) var(--space-md);
+  color: var(--color-navy);
+  text-decoration: none;
+}
+
+.menu-list__link:hover {
+  background: var(--color-card);
+}
+
+.menu-list__link:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: -3px;
+}
+
+.menu-list__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 0.7rem;
+  background: var(--color-sky);
+}
+
+.menu-list__icon .icon {
+  width: 1.3rem;
+  height: 1.3rem;
+  color: var(--color-brand);
+}
+
+.menu-list__text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.menu-list__title {
+  font-weight: 700;
+}
+
+.menu-list__sub {
+  font-size: 0.9375rem;
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+.menu-list__chevron {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-muted);
+  transform: rotate(-90deg);
+}
+
+#profile-main .menu-list__heading {
   margin-top: 0;
 }
 
-.app .card__title {
-  margin: 0 0 var(--space-xs);
-  font-size: 1.2rem;
+.profile-info {
+  margin-top: var(--space-xl);
 }
 
-.app .card__subtitle {
-  margin: var(--space-lg) 0 var(--space-xs);
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 700;
+#profile-main:not([hidden]) ~ .profile-info .profile-info__guest {
+  display: none;
+}
+
+.profile-info__credits {
+  margin: var(--space-md) var(--space-sm) 0;
+  font-size: 0.9375rem;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.app .menu-list__link {
+  transition: transform 0.12s var(--ease-out), background-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.app .menu-list__link:active {
+  transform: scale(0.97);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app .menu-list__link {
+    transition: none;
+  }
+
+  .app .menu-list__link:active {
+    transform: none;
+  }
 }
 
 .app .menu-list__heading {
@@ -2306,296 +2253,165 @@ html:has(> body.app) {
   font-weight: 400;
 }
 
-.app .card > .needs + .field__help {
-  margin-top: var(--space-sm);
+/* ==========================================================================
+   11. Per i locali
+   Passi numerati, ricerca del proprio locale, locali gestiti, completezza della scheda, consigli,
+   anteprima della foto dell'ingresso nella richiesta del gestore.
+   ========================================================================== */
+
+.steps-list {
+  display: grid;
+  gap: var(--space-md);
+  margin: var(--space-md) 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
 }
 
-.app main .stack > .menu-list__heading {
-  margin-bottom: 0;
+.steps-list > li {
+  position: relative;
+  padding-left: 3rem;
+  counter-increment: passo;
 }
 
-.app main {
-  padding-bottom: var(--space-2xl);
-}
-
-.app main h1 + p {
-  margin-top: 0;
-}
-
-/* Il primo passo della segnalazione: mappa subito sotto i campi, più alta sul telefono */
-.app .pick .pick__map {
-  margin-top: 0;
-}
-
-@media (max-width: 47.99em) {
-  .app .pick__actions {
-    display: grid;
-    gap: var(--space-xs);
-  }
-
-  .app .pick__actions .btn {
-    justify-content: center;
-    width: 100%;
-  }
-}
-
-/* 22. Icone della barra (28 ottobre, notte): a contorno; la scheda attiva ha l'icona con un riempimento leggero.
-   «is-section»: la scheda di cui fa parte la pagina (scheda di un luogo → Mappa; Per i locali e privacy → Profilo).
-   L'indicatore che passa da una scheda all'altra è nella sezione 24. */
-.app .app-nav .icon--tab {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.9;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-@media (max-width: 63.99em) {
-
-  .app .app-nav__link.is-section {
-    color: var(--color-navy);
-  }
-
-  .app .app-nav__link[aria-current="page"] .icon--tab,
-  .app .app-nav__link.is-section .icon--tab {
-    fill: var(--color-brand);
-    fill-opacity: 0.2;
-    stroke: var(--color-brand);
-    stroke-width: 2.1;
-  }
-
-  .app .app-nav__link[href="segnala.html"] .icon--tab,
-  .app .app-nav__link[href="segnala.html"][aria-current="page"] .icon--tab {
-    fill: none;
-    stroke: var(--color-white);
-    stroke-width: 2.6;
-  }
-
-  .app .app-nav__link[href="segnala.html"]:hover .icon--tab {
-    background: var(--color-brand);
-  }
-}
-
-/* Pagina nuova che entra dal lato della scheda scelta (classi messe da intro.js e app.js) */
-.vt-avanti::view-transition-old(root) {
-  animation: oa-esce-sinistra 0.22s ease-in both;
-}
-
-.vt-avanti::view-transition-new(root) {
-  animation: oa-entra-destra 0.32s var(--ease-out) both;
-}
-
-.vt-indietro::view-transition-old(root) {
-  animation: oa-esce-destra 0.22s ease-in both;
-}
-
-.vt-indietro::view-transition-new(root) {
-  animation: oa-entra-sinistra 0.32s var(--ease-out) both;
-}
-
-@keyframes oa-entra-destra {
-  from {
-    opacity: 0;
-    transform: translateX(2.5rem);
-  }
-}
-
-@keyframes oa-entra-sinistra {
-  from {
-    opacity: 0;
-    transform: translateX(-2.5rem);
-  }
-}
-
-@keyframes oa-esce-sinistra {
-  to {
-    opacity: 0;
-    transform: translateX(-2.5rem);
-  }
-}
-
-@keyframes oa-esce-destra {
-  to {
-    opacity: 0;
-    transform: translateX(2.5rem);
-  }
-}
-
-/* In alto: una linea blu scorre sotto la barra mentre arriva la pagina nuova */
-.oa-va .app .site-header::after {
-  content: "";
+.steps-list > li::before {
+  content: counter(passo);
   position: absolute;
   left: 0;
-  bottom: -1px;
-  height: 3px;
-  border-radius: 0 3px 3px 0;
-  background: var(--color-brand);
-  animation: oa-linea 2.5s cubic-bezier(0.1, 0.7, 0.2, 1) forwards;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-family: var(--font-heading);
+  font-weight: 700;
 }
 
-@keyframes oa-linea {
-  from {
-    width: 0;
-  }
-
-  to {
-    width: 88%;
-  }
+.steps-list h2,
+.steps-list p {
+  margin: 0 0 var(--space-2xs);
 }
 
-@media (prefers-reduced-motion: reduce) {
+.steps-list__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+}
 
-  .oa-va .app .site-header::after {
-    animation: none;
-    width: 100%;
-    opacity: 0.6;
-  }
+.owned {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
 
-  .vt-avanti::view-transition-old(root),
-  .vt-avanti::view-transition-new(root),
-  .vt-indietro::view-transition-old(root),
-  .vt-indietro::view-transition-new(root) {
-    animation: none;
-  }
+.owned__item > .btn {
+  justify-self: start;
+}
+
+.owned__form {
+  margin-top: var(--space-xs);
 }
 
 @media (forced-colors: active) {
-
-  .app .app-nav .icon--tab {
-    stroke: CanvasText;
+  .steps-list > li::before {
+    border: 2px solid CanvasText;
   }
 }
 
-/* Indirizzi email e link lunghi negli avvisi vanno a capo invece di allargare la pagina (bollino a 320 px) */
-.app .notice {
-  overflow-wrap: anywhere;
+.owned__item {
+  display: grid;
+  gap: var(--space-xs);
 }
 
-/* Moderazione: aria tra il titolo della pagina e la prima sezione */
-#mod-panel {
-  margin-top: var(--space-lg);
+.owned__item p {
+  margin: 0;
 }
 
-/* 23. Onda al tocco sulla barra delle schede (app.js, initOnda), 29 ottobre: un anello azzurro che parte dal punto
-   toccato e si allarga su tutta la barra, sotto le voci. Solo dove la barra sta in basso (telefono e tablet). */
-.app-nav__onde {
+.find-list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.find-list:empty {
   display: none;
 }
 
-@media (max-width: 63.99em) {
-  .app .app-nav__onde {
-    display: block;
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .app .app-nav__onda {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle closest-side,
-      rgba(47, 91, 156, 0.12) 0, rgba(47, 91, 156, 0.16) 70%,
-      rgba(47, 91, 156, 0.5) 86%, rgba(47, 91, 156, 0) 100%);
-  }
-
-  .app .app-nav__list {
-    position: relative;
-  }
-}
-
-/* 24. Barra delle schede, il viaggio (29 ottobre): un indicatore solo (.app-nav__indice, creato da app.js) che passa da
-   una scheda all'altra allungandosi come un elastico, al posto delle pillole di ogni voce. L'icona della scheda
-   nuova si disegna tratto per tratto (le icone Tabler hanno pathLength="1"); su «Segnala» il «+» fa un giro. */
-.app-nav__indice {
-  display: none;
-}
-
-@media (max-width: 63.99em) {
-
-  .app .app-nav__indice {
-    display: block;
-    position: absolute;
-    top: 0.15rem;
-    left: 0;
-    width: 3.75rem;
-    height: 2rem;
-    margin-left: -1.875rem;
-    border-radius: var(--radius-pill);
-    background: var(--color-sky);
-    pointer-events: none;
-  }
-
-  .app .app-nav__indice[hidden] {
-    display: none;
-  }
-
-  .app .app-nav__list > li {
-    position: relative;
-    z-index: 1;
-  }
-
-  .app .app-nav__link span {
-    transition: color 0.25s ease;
-  }
-
-  .app .app-nav__link.is-arriva .icon--tab {
-    animation: oa-disegna 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
-  }
-
-  .app .app-nav__link[href="segnala.html"].is-arriva .icon {
-    animation: oa-segnala 0.6s cubic-bezier(0.3, 0.7, 0.2, 1.3) both;
-  }
-}
-
-@keyframes oa-disegna {
-  from {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    fill-opacity: 0;
-  }
-
-  75% {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 0;
-    fill-opacity: 0;
-  }
-
-  to {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes oa-segnala {
-  from {
-    transform: scale(0.7) rotate(-90deg);
-  }
-
-  60% {
-    transform: scale(1.12) rotate(8deg);
-  }
-
-  to {
-    transform: none;
-  }
-}
-
-/* 25. Codice QR per la vetrina (bollino.html, 29 ottobre): due pulsanti, scarica l'immagine e stampa */
-.badge-page__buttons {
+.find-list__item {
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-xs);
-  margin: 0 0 var(--space-xs);
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
 }
 
-.badge__verdicts[hidden] {
-  display: none;
+.find-list__item p {
+  margin: 0;
 }
 
-/* 26. Richiesta del gestore (29 ottobre): anteprima della foto dell'ingresso nel modulo; nel pannello di moderazione
-   titolare, telefono, email e la foto */
+.completezza {
+  display: grid;
+  gap: var(--space-2xs);
+  justify-items: start;
+}
+
+.completezza__barra {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  height: 0.6rem;
+  border: 1px solid var(--color-navy);
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  background: var(--color-white);
+}
+
+.completezza__pieno {
+  display: block;
+  height: 100%;
+  background: var(--color-success);
+}
+
+.completezza__pieno--0 { width: 0%; }
+
+.completezza__pieno--1 { width: 10%; }
+
+.completezza__pieno--2 { width: 20%; }
+
+.completezza__pieno--3 { width: 30%; }
+
+.completezza__pieno--4 { width: 40%; }
+
+.completezza__pieno--5 { width: 50%; }
+
+.completezza__pieno--6 { width: 60%; }
+
+.completezza__pieno--7 { width: 70%; }
+
+.completezza__pieno--8 { width: 80%; }
+
+.completezza__pieno--9 { width: 90%; }
+
+.completezza__pieno--10 { width: 100%; }
+
+@media (forced-colors: active) {
+  .completezza__pieno {
+    background: Highlight;
+  }
+}
+
 .owner-photo-preview {
   display: block;
   width: 100%;
@@ -2608,6 +2424,313 @@ html:has(> body.app) {
 
 .owner-photo-preview[hidden] {
   display: none;
+}
+
+/* ==========================================================================
+   12. Bollino per la vetrina
+   bollino.html: il bollino, il codice QR, «Scarica l'immagine» e «Stampa».
+   ========================================================================== */
+
+/* Bollino per la vetrina: a schermo un'anteprima, in stampa solo il bollino */
+.badge-page {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  padding-block: var(--space-lg);
+}
+
+.badge-page__back {
+  justify-self: start;
+  margin: 0;
+}
+
+.badge-page__actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  max-width: 34rem;
+  text-align: center;
+}
+
+.badge {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  width: min(100%, 26rem);
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  border: 6px solid var(--color-navy);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  text-align: center;
+}
+
+.badge__logo {
+  width: 4.5rem;
+  height: auto;
+}
+
+.badge__kicker {
+  margin: 0;
+  font-size: var(--text-sm);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.badge__brand {
+  margin: 0;
+  font-size: var(--text-2xl);
+  line-height: 1.1;
+}
+
+.badge__place {
+  margin: 0;
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.badge__verdicts {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: var(--space-xs) 0;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+
+.badge__verdict {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 700;
+}
+
+.badge__verdict .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-success);
+}
+
+.badge__verdict--parziale .icon {
+  color: var(--color-warning);
+}
+
+.badge__qr {
+  width: min(70%, 14rem);
+}
+
+.badge__qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.badge__cta,
+.badge__date {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.badge__date {
+  color: var(--color-muted);
+  overflow-wrap: anywhere;
+}
+
+@media print {
+  .site-header,
+  .site-footer,
+  .app-nav,
+  .no-print,
+  .notice {
+    display: none !important;
+  }
+
+  body.app {
+    background: #ffffff;
+  }
+
+  .badge-page {
+    padding: 0;
+  }
+
+  .badge {
+    width: 13cm;
+    break-inside: avoid;
+  }
+}
+
+.badge-page__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-xs);
+}
+
+.badge__verdicts[hidden] {
+  display: none;
+}
+
+/* ==========================================================================
+   13. Moderazione
+   Proposte con le differenze evidenziate, decisioni, richieste dei gestori (titolare, telefono,
+   email e foto), luoghi da OpenStreetMap da approvare.
+   ========================================================================== */
+
+.mod-list {
+  display: grid;
+  gap: var(--space-lg);
+  margin: 0 0 var(--space-xl);
+  padding: 0;
+  list-style: none;
+}
+
+.mod-item h3 {
+  font-size: var(--text-lg);
+}
+
+.mod-item h4 {
+  margin: var(--space-lg) 0 var(--space-xs);
+  font-size: var(--text-base);
+}
+
+.mod-item__note {
+  margin: 0 0 var(--space-md);
+  padding: var(--space-sm) var(--space-md);
+  border-left: 4px solid var(--color-beige);
+  background: var(--color-card);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.mod-item__note p {
+  margin: 0;
+}
+
+.verdict-preview {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.verdict-preview li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.verdict-preview__who {
+  min-width: 12rem;
+}
+
+.table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrap:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+}
+
+.diff {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.diff th,
+.diff td {
+  padding: var(--space-xs) var(--space-sm);
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+
+.diff thead th {
+  background: var(--color-card);
+}
+
+.diff tbody th {
+  font-weight: 700;
+  min-width: 10rem;
+}
+
+.decision {
+  display: grid;
+  gap: var(--space-md);
+  margin-top: var(--space-lg);
+  padding-top: var(--space-lg);
+  border-top: 1px solid var(--color-line);
+}
+
+.decision > * {
+  margin: 0;
+}
+
+.decision__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.osm-tools {
+  display: grid;
+  gap: var(--space-sm);
+  margin-block: var(--space-md) var(--space-sm);
+}
+
+.osm-tools__bulk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+}
+
+.osm-list {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0 0 var(--space-sm);
+  padding: 0;
+  list-style: none;
+}
+
+.osm-item {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+}
+
+.osm-item p {
+  margin: 0;
+}
+
+.osm-item__check {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.osm-item__check input {
+  width: 1.5rem;
+  height: 1.5rem;
+  flex: none;
+}
+
+.osm-item__facts,
+.osm-item__links {
+  font-size: var(--text-sm);
+}
+
+/* Moderazione: aria tra il titolo della pagina e la prima sezione */
+#mod-panel {
+  margin-top: var(--space-lg);
 }
 
 .mod-owner {
@@ -2625,115 +2748,11 @@ html:has(> body.app) {
   border-radius: var(--radius-md);
 }
 
-/* 27. Barra in basso sospesa (29 ottobre): staccata dai bordi, angoli tondi, «vetro» che lascia intravedere sfocato
-   quello che scorre sotto; l'icona si schiaccia appena il dito appoggia (is-premuto, app.js); pallino rosso con il
-   numero di cose da moderare sulla scheda «Profilo» (solo moderatori). Con «riduci trasparenza» la barra è bianca. */
-@media (max-width: 63.99em) {
-  .app {
-    padding-bottom: calc(6.75rem + env(safe-area-inset-bottom));
-  }
+/* ==========================================================================
+   14. Prima apertura: «Come ti muovi?»
+   Finestra (dialog) di app.js initBenvenuto.
+   ========================================================================== */
 
-  html:has(> body.app) {
-    scroll-padding-bottom: 8rem;
-  }
-
-  .app .app-nav {
-    left: var(--space-sm);
-    right: var(--space-sm);
-    bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
-    max-width: 30rem;
-    margin-inline: auto;
-    padding: 0.35rem var(--space-xs);
-    border: 1px solid rgba(22, 40, 65, 0.08);
-    border-radius: 1.75rem;
-    background: rgba(255, 255, 255, 0.9);
-    -webkit-backdrop-filter: blur(18px) saturate(1.6);
-    backdrop-filter: blur(18px) saturate(1.6);
-    box-shadow: 0 14px 34px rgba(22, 40, 65, 0.2), 0 2px 6px rgba(22, 40, 65, 0.08);
-  }
-
-  .app .app-nav__onde {
-    border-radius: inherit;
-  }
-
-  .app .app-nav__list {
-    max-width: none;
-  }
-
-  .app .app-nav__link.is-premuto .icon {
-    transform: scale(0.86);
-  }
-
-  .app .app-nav__link[href="segnala.html"].is-premuto .icon {
-    transform: scale(0.9);
-  }
-}
-
-@media (max-width: 63.99em) and (prefers-reduced-transparency: reduce) {
-  .app .app-nav {
-    background: var(--color-white);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-
-@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
-  .app .app-nav {
-    background: var(--color-white);
-  }
-}
-
-.app-nav__link {
-  position: relative;
-}
-
-.app-nav__badge {
-  position: absolute;
-  top: 0;
-  left: calc(50% + 0.55rem);
-  z-index: 2;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.3rem;
-  border: 2px solid var(--color-white);
-  border-radius: var(--radius-pill);
-  background: var(--color-error);
-  color: var(--color-white);
-  font-size: 0.75rem;
-  font-weight: 700;
-  line-height: 1;
-  display: grid;
-  place-items: center;
-  box-sizing: content-box;
-}
-
-@media (min-width: 64em) {
-  .app-nav__badge {
-    top: 0.1rem;
-    left: auto;
-    right: 0.1rem;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .app-nav__badge {
-    animation: oa-spunta 0.45s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
-  }
-}
-
-@media (forced-colors: active) {
-  .app .app-nav {
-    border: 2px solid CanvasText;
-  }
-
-  .app-nav__badge {
-    border-color: Canvas;
-    background: Highlight;
-    color: HighlightText;
-  }
-}
-
-/* 28. Prima apertura: «Come ti muovi?» (dialog, app.js initBenvenuto) e «Ci sei stato?» nella scheda (initVeloce) */
 .benvenuto {
   width: min(28rem, calc(100% - 2rem));
   max-height: calc(100dvh - 2rem);
@@ -2820,39 +2839,3 @@ html:has(> body.app) {
     transform: scale(0.97);
   }
 }
-
-.veloce {
-  border: 2px dashed var(--color-brand);
-  background: var(--color-sky);
-}
-
-.veloce .field--short .input {
-  max-width: 10rem;
-}
-
-/* Foto della scheda in alto, come striscia che scorre di lato (si ferma su ogni foto) */
-.detail__photos {
-  margin-bottom: var(--space-md);
-}
-
-.photos--striscia {
-  display: flex;
-  gap: var(--space-xs);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom: var(--space-xs);
-}
-
-.photos--striscia > li {
-  flex: 0 0 min(78%, 18rem);
-  scroll-snap-align: start;
-}
-
-.photos--striscia .photo img {
-  border-radius: var(--radius-md);
-}
-
-#summary-visitors .review-summary {
-  margin-top: var(--space-md);
-}
-
