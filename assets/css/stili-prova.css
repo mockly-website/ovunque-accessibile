@@ -1,0 +1,367 @@
+/* Ovunque Accessibile – stili di prova (29 ottobre), per scegliere con il cliente.
+   A è lo stile normale (sito.css); B e C cambiano solo l'aspetto, sulla stessa struttura, con <html data-stile="b|c">
+   messo da assets/js/stili-prova.js (si attiva con ?stile=a|b|c nell'indirizzo). Quando si sceglie, lo stile vincente
+   va portato in sito.css e questi due file si tolgono. */
+
+/* ---------- Selettore A / B / C (solo durante la prova) ---------- */
+.stili-prova {
+  position: fixed;
+  left: var(--space-sm);
+  bottom: var(--space-sm);
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.3rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-navy);
+  box-shadow: 0 8px 24px rgba(22, 40, 65, 0.3);
+  color: var(--color-white);
+  font-size: 0.875rem;
+  font-weight: 700;
+}
+
+.stili-prova__label {
+  padding-inline: 0.6rem 0.2rem;
+}
+
+.stili-prova button {
+  min-width: var(--target-min);
+  min-height: var(--target-min);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-white);
+  font: inherit;
+  cursor: pointer;
+}
+
+.stili-prova button[aria-pressed="true"] {
+  background: var(--color-white);
+  color: var(--color-navy);
+}
+
+.stili-prova button:focus-visible {
+  outline: 3px solid var(--color-beige);
+  outline-offset: 2px;
+}
+
+/* =====================================================================
+   B · Cartografica: carta con la griglia, bordi netti, sentieri tratteggiati
+   ===================================================================== */
+[data-stile="b"] body {
+  background-color: #f7f4ec;
+  background-image:
+    linear-gradient(rgba(47, 91, 156, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(47, 91, 156, 0.07) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+}
+
+[data-stile="b"] .site-header {
+  border-bottom: 2px solid var(--color-navy);
+  background: #f7f4ec;
+}
+
+[data-stile="b"] h1,
+[data-stile="b"] h2,
+[data-stile="b"] h3 {
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+[data-stile="b"] .hero__title {
+  font-size: clamp(2.4rem, 1.4rem + 4vw, 4.6rem);
+  line-height: 1;
+}
+
+[data-stile="b"] .hero__accent {
+  text-decoration: underline dashed var(--color-path);
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.14em;
+}
+
+[data-stile="b"] .hero__photo {
+  border: 2px solid var(--color-navy);
+  border-radius: 0.4rem;
+  box-shadow: 0.5rem 0.5rem 0 var(--color-brand);
+}
+
+[data-stile="b"] .hero__caption {
+  margin-top: var(--space-sm);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[data-stile="b"] .search,
+[data-stile="b"] .hero .search {
+  border-width: 2px;
+  border-radius: 0.5rem;
+  box-shadow: 0.25rem 0.25rem 0 var(--color-navy);
+}
+
+[data-stile="b"] .search .btn {
+  border-radius: 0.35rem;
+}
+
+[data-stile="b"] .btn {
+  border-radius: 0.4rem;
+}
+
+[data-stile="b"] .btn--primary {
+  box-shadow: 0.2rem 0.2rem 0 var(--color-navy);
+}
+
+[data-stile="b"] .quick__link {
+  border: 2px solid var(--color-navy);
+  border-radius: 0.4rem;
+  font-weight: 700;
+}
+
+[data-stile="b"] .hero .quick__link--near,
+[data-stile="b"] .hero .quick__link--near:hover {
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+/* sezioni separate da un sentiero tratteggiato e numerate come una legenda */
+[data-stile="b"] main {
+  counter-reset: sezione;
+}
+
+[data-stile="b"] main > .section {
+  border-top: 2px dashed var(--color-path);
+}
+
+[data-stile="b"] main > .section h2 {
+  counter-increment: sezione;
+}
+
+[data-stile="b"] main > .section h2::before {
+  content: counter(sezione, decimal-leading-zero);
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--color-brand);
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+}
+
+[data-stile="b"] .apps h2::before {
+  color: var(--color-beige);
+}
+
+[data-stile="b"] .needs-home__list,
+[data-stile="b"] .how__list,
+[data-stile="b"] .facts-home__list {
+  border-top: 2px solid var(--color-navy);
+}
+
+[data-stile="b"] .how__list > li::before {
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
+[data-stile="b"] .hero__map {
+  border: 2px solid var(--color-navy);
+  border-radius: 0.4rem;
+}
+
+[data-stile="b"] .apps {
+  border-radius: 0.4rem;
+  background-color: var(--color-navy);
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+  background-size: 2rem 2rem;
+  box-shadow: 0.5rem 0.5rem 0 var(--color-brand);
+}
+
+[data-stile="b"] .about__motto {
+  border-left: 4px dashed var(--color-path);
+}
+
+[data-stile="b"] .about__motto p {
+  font-family: var(--font-body);
+  font-weight: 700;
+}
+
+[data-stile="b"] .place {
+  border: 2px solid var(--color-navy);
+  border-radius: 0.4rem;
+  box-shadow: none;
+}
+
+[data-stile="b"] .site-footer {
+  border-radius: 0;
+}
+
+/* =====================================================================
+   C · Colori pieni: fasce a tutta larghezza, titoli grandi, forme morbide
+   ===================================================================== */
+[data-stile="c"] h1,
+[data-stile="c"] h2 {
+  letter-spacing: -0.02em;
+}
+
+[data-stile="c"] h2 {
+  font-size: clamp(1.9rem, 1.4rem + 2vw, 3rem);
+  line-height: 1.05;
+}
+
+[data-stile="c"] main > .section {
+  border-top: 0;
+  padding-block: var(--space-3xl);
+}
+
+[data-stile="c"] .hero {
+  background: var(--color-navy);
+  color: var(--color-white);
+  --color-focus: var(--color-white);
+  border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+}
+
+[data-stile="c"] .hero__title {
+  color: var(--color-white);
+  font-size: clamp(2.6rem, 1.4rem + 4.6vw, 5rem);
+  line-height: 0.98;
+}
+
+[data-stile="c"] .hero__accent {
+  color: var(--color-beige);
+}
+
+[data-stile="c"] .hero__lead,
+[data-stile="c"] .hero .field__label {
+  color: var(--color-white);
+}
+
+[data-stile="c"] .hero .search {
+  border-color: transparent;
+}
+
+[data-stile="c"] .hero .quick__link {
+  border-color: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-white);
+}
+
+[data-stile="c"] .hero .quick__link:hover {
+  border-color: var(--color-white);
+  background: rgba(255, 255, 255, 0.2);
+  color: var(--color-white);
+}
+
+[data-stile="c"] .hero .quick__link .icon {
+  color: var(--color-beige);
+}
+
+[data-stile="c"] .hero .quick__link--near,
+[data-stile="c"] .hero .quick__link--near:hover {
+  border-color: var(--color-beige);
+  background: var(--color-beige);
+  color: var(--color-navy);
+}
+
+[data-stile="c"] .hero .quick__link--near .icon {
+  color: var(--color-navy);
+}
+
+[data-stile="c"] .hero__photo {
+  border-radius: var(--radius-xl);
+}
+
+[data-stile="c"] .hero__caption {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+[data-stile="c"] .needs-home {
+  background: var(--color-sky);
+}
+
+[data-stile="c"] .how,
+[data-stile="c"] .business-home {
+  background: var(--color-beige);
+}
+
+[data-stile="c"] .facts-home,
+[data-stile="c"] .map-preview {
+  background: var(--color-white);
+}
+
+[data-stile="c"] .about {
+  background: var(--color-sky);
+}
+
+[data-stile="c"] .needs-home__list,
+[data-stile="c"] .how__list,
+[data-stile="c"] .facts-home__list {
+  border-top: 0;
+}
+
+[data-stile="c"] .needs-home__list {
+  gap: var(--space-xs);
+}
+
+[data-stile="c"] .needs-home__list a {
+  min-height: 4rem;
+  padding-inline: var(--space-xs) var(--space-md);
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+}
+
+[data-stile="c"] .needs-home__list .icon {
+  box-sizing: content-box;
+  padding: 0.55rem;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+[data-stile="c"] .how__list > li {
+  border-bottom-color: rgba(22, 40, 65, 0.2);
+}
+
+[data-stile="c"] .how__list > li::before {
+  color: var(--color-navy);
+  font-size: 3rem;
+}
+
+[data-stile="c"] .hero__map {
+  border-radius: var(--radius-xl);
+}
+
+[data-stile="c"] .apps {
+  border-radius: var(--radius-xl);
+  background: var(--color-brand);
+}
+
+[data-stile="c"] .about__motto {
+  border-left: 0;
+  padding: 0;
+}
+
+[data-stile="c"] .about__motto p {
+  font-size: clamp(1.7rem, 1.3rem + 1.8vw, 2.6rem);
+}
+
+[data-stile="c"] .about__motto p::before {
+  content: "«";
+  color: var(--color-brand);
+}
+
+[data-stile="c"] .about__motto p::after {
+  content: "»";
+  color: var(--color-brand);
+}
+
+[data-stile="c"] .btn,
+[data-stile="c"] .quick__link {
+  min-height: 3rem;
+}
+
+[data-stile="c"] .place {
+  border-radius: var(--radius-xl);
+}

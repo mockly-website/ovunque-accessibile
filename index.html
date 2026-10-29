@@ -17,7 +17,9 @@
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=i7"></script>
   <script src="assets/js/menu.js?v=m3" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p42">
+  <link rel="stylesheet" href="assets/css/sito.css?v=p43">
+  <link rel="stylesheet" href="assets/css/stili-prova.css?v=2">
+  <script src="assets/js/stili-prova.js?v=2"></script>
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="app/assets/js/config.js?v=a24" defer></script>
@@ -83,8 +85,7 @@
   <main id="main" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
       <div class="container hero__inner">
-        <div class="hero__text reveal">
-          <p class="eyebrow"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pin"/></svg>Il progetto di Angelo e Lorenzo</p>
+        <div class="hero__text">
           <h1 id="hero-title" class="hero__title">Trova luoghi <span class="hero__accent">davvero accessibili</span></h1>
           <p class="hero__lead">Ingresso, bagno, parcheggio e spazi interni: informazioni concrete, raccolte da chi ci è stato. In tutta Italia.</p>
 
@@ -112,46 +113,39 @@
 
         <figure class="hero__media">
           <picture class="hero__photo">
-            <source type="image/webp" srcset="assets/img/hero-800.webp 800w, assets/img/hero-1200.webp 1200w" sizes="(min-width: 60em) 30rem, 90vw">
-            <img src="assets/img/hero-1200.jpg" srcset="assets/img/hero-800.jpg 800w, assets/img/hero-1200.jpg 1200w" sizes="(min-width: 60em) 30rem, 90vw"
+            <source type="image/webp" srcset="assets/img/hero-800.webp 800w, assets/img/hero-1200.webp 1200w" sizes="(min-width: 60em) 30rem, 92vw">
+            <img src="assets/img/hero-1200.jpg" srcset="assets/img/hero-800.jpg 800w, assets/img/hero-1200.jpg 1200w" sizes="(min-width: 60em) 30rem, 92vw"
                  width="1200" height="1600" fetchpriority="high"
                  alt="Angelo e Lorenzo in carrozzina elettrica su un belvedere in Sardegna, con il paese e le colline alle spalle.">
           </picture>
-          <figcaption class="hero__quote">
-            <span class="hero__quote-text">«L'accessibilità non dovrebbe essere un privilegio, ma la normalità»</span>
-            <span class="hero__quote-by">Angelo e Lorenzo</span>
-          </figcaption>
-          <svg class="hero__path" aria-hidden="true" focusable="false" viewBox="0 0 200 120"><path d="M6 110 C50 112 52 52 98 58 S150 92 194 12"/></svg>
+          <figcaption class="hero__caption">Angelo e Lorenzo, che hanno avviato il progetto.</figcaption>
         </figure>
       </div>
     </section>
 
     <section class="section needs-home" aria-labelledby="needs-home-title">
-      <div class="container">
-        <div class="section__head">
-          <p class="eyebrow">Per chi è</p>
-          <h2 id="needs-home-title">Ogni scheda, letta per la tua esigenza</h2>
-          <p>Scegli come ti muovi: la mappa ti dice se un luogo va bene per te, non in generale.</p>
+      <div class="container needs-home__inner">
+        <div class="needs-home__head">
+          <h2 id="needs-home-title">Ogni scheda, letta per come ti muovi</h2>
+          <p>Lo stesso gradino è un ostacolo per una carrozzina e un dettaglio per chi cammina con il bastone. Scegli la tua esigenza: la mappa ti dice se un luogo va bene per te.</p>
         </div>
         <ul class="needs-home__list" role="list">
-          <li><a class="need-tile" href="mappa.html?per=manuale"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg></span>Carrozzina manuale<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
-          <li><a class="need-tile" href="mappa.html?per=elettrica"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg></span>Carrozzina elettrica<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
-          <li><a class="need-tile" href="mappa.html?per=cammino"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg></span>Difficoltà a camminare<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
-          <li><a class="need-tile" href="mappa.html?per=anziani"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg></span>Persona anziana<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
-          <li><a class="need-tile" href="mappa.html?per=vista"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg></span>Disabilità visiva<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
-          <li><a class="need-tile" href="mappa.html?per=udito"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-ear"/></svg></span>Disabilità uditiva<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a href="mappa.html?per=manuale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</a></li>
+          <li><a href="mappa.html?per=elettrica"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</a></li>
+          <li><a href="mappa.html?per=cammino"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</a></li>
+          <li><a href="mappa.html?per=anziani"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg>Persona anziana</a></li>
+          <li><a href="mappa.html?per=vista"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>Disabilità visiva</a></li>
+          <li><a href="mappa.html?per=udito"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-ear"/></svg>Disabilità uditiva</a></li>
         </ul>
-        <p class="needs-home__note">Utile anche a chi spinge un passeggino e a chi accompagna.</p>
       </div>
     </section>
 
-    <section class="section section--band map-preview" aria-labelledby="map-preview-title">
+    <section class="section map-preview" aria-labelledby="map-preview-title">
       <div class="container map-preview__inner">
-        <div class="section__head map-preview__head">
-          <p class="eyebrow">La mappa</p>
+        <div class="map-preview__head">
           <h2 id="map-preview-title">I luoghi sulla mappa</h2>
           <p>Ogni segnaposto è un luogo con le sue misure: verde se è accessibile, marrone se lo è solo in parte.</p>
-          <a class="btn btn--primary" href="mappa.html">Apri la mappa completa<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a>
+          <p><a class="link-arrow" href="mappa.html">Apri la mappa completa<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></p>
         </div>
         <div>
           <div id="home-map" class="hero__map" role="region" aria-label="Anteprima della mappa dei luoghi">
@@ -161,17 +155,15 @@
             <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
             <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
           </ul>
-          <p class="map__note">Nella mappa completa cerchi, filtri e trovi anche l'elenco dei luoghi.</p>
         </div>
       </div>
     </section>
 
     <section class="section" aria-labelledby="latest-title">
       <div class="container">
-        <div class="section__head">
-          <p class="eyebrow">Novità</p>
+        <div class="section__head section__head--row">
           <h2 id="latest-title">Ultimi luoghi verificati</h2>
-          <p>Le schede aggiornate più di recente. <a href="mappa.html">Vedi tutti i luoghi</a></p>
+          <a class="link-arrow" href="mappa.html">Tutti i luoghi<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a>
         </div>
         <ul id="latest-list" class="latest" role="list">
           <li class="place js-only"><p class="place__meta">Caricamento…</p></li>
@@ -180,106 +172,77 @@
       </div>
     </section>
 
-    <section id="come-funziona" class="section" aria-labelledby="how-title">
-      <div class="container">
-        <div class="section__head">
-          <p class="eyebrow">In tre passi</p>
-          <h2 id="how-title">Come funziona</h2>
-          <p>Tre passi per sapere prima se un posto fa per te.</p>
-        </div>
-        <ol class="grid grid--3 steps" role="list">
-          <li class="card">
-            <span class="step__num" aria-hidden="true">1</span>
+    <section id="come-funziona" class="section how" aria-labelledby="how-title">
+      <div class="container how__inner">
+        <h2 id="how-title">Come funziona</h2>
+        <ol class="how__list" role="list">
+          <li>
             <h3>Cerca</h3>
             <p>Scrivi una città o il nome di un posto e scegli cosa ti serve: ingresso senza gradini, bagno, parcheggio.</p>
           </li>
-          <li class="card">
-            <span class="step__num" aria-hidden="true">2</span>
-            <h3>Controlla la scheda</h3>
-            <p>Ogni luogo ha una scheda con misure e dettagli, e la data dell'ultima verifica.</p>
+          <li>
+            <h3>Leggi la scheda</h3>
+            <p>Misure e dettagli del luogo, con la data dell'ultima verifica e chi l'ha fatta.</p>
           </li>
-          <li class="card">
-            <span class="step__num" aria-hidden="true">3</span>
-            <h3>Racconta la tua esperienza</h3>
-            <p>Con la <a href="app/">web-app</a> segnali nuovi luoghi e aggiorni quelli che conosci. Ogni segnalazione viene controllata prima di essere pubblicata.</p>
+          <li>
+            <h3>Racconta com'è andata</h3>
+            <p>Con la <a href="app/">web-app</a> segnali luoghi nuovi e correggi quelli che conosci. Controlliamo ogni segnalazione prima di pubblicarla.</p>
           </li>
         </ol>
       </div>
     </section>
 
-    <section class="section section--band" aria-labelledby="facts-title">
-      <div class="container">
-        <div class="section__head">
-          <p class="eyebrow">Le schede</p>
-          <h2 id="facts-title">Cosa trovi in ogni scheda</h2>
-          <p>Niente simboli generici: per ogni luogo scriviamo cosa trovi davvero, con le misure quando ci sono.</p>
+    <section class="section facts-home" aria-labelledby="facts-title">
+      <div class="container facts-home__inner">
+        <div class="facts-home__head">
+          <h2 id="facts-title">Cosa c'è in ogni scheda</h2>
+          <p>Niente simboli generici: scriviamo cosa trovi, con le misure quando ci sono.</p>
         </div>
-        <ul class="check-list" role="list">
-          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg></span><span><strong>Ingresso e porte</strong>Gradini, rampe e larghezza della porta in centimetri.</span></li>
-          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg></span><span><strong>Bagno</strong>Se c'è un bagno accessibile e com'è attrezzato.</span></li>
-          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg></span><span><strong>Parcheggio</strong>Posti riservati vicini all'ingresso.</span></li>
-          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg></span><span><strong>Spazi interni e piani</strong>Percorsi, ascensori e zone raggiungibili.</span></li>
-          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg></span><span><strong>Vista e udito</strong>Cane guida, orientarsi, informazioni da leggere, lingua dei segni e contatti senza telefono.</span></li>
-          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span><strong>Quanto è affidabile</strong>Se è verificato sul posto, segnalato dalla community o preso da OpenStreetMap, con la data dell'ultimo controllo.</span></li>
-        </ul>
+        <dl class="facts-home__list">
+          <div><dt><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg>Ingresso e porte</dt><dd>Gradini, rampe e larghezza della porta in centimetri.</dd></div>
+          <div><dt><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg>Bagno</dt><dd>Se c'è un bagno accessibile e com'è attrezzato.</dd></div>
+          <div><dt><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg>Parcheggio</dt><dd>Posti riservati vicini all'ingresso.</dd></div>
+          <div><dt><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg>Spazi interni e piani</dt><dd>Percorsi, ascensori e zone raggiungibili.</dd></div>
+          <div><dt><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg>Vista e udito</dt><dd>Cane guida, orientarsi, informazioni da leggere, lingua dei segni e contatti senza telefono.</dd></div>
+          <div><dt><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg>Quanto è affidabile</dt><dd>Verificato sul posto, segnalato dalla community o preso da OpenStreetMap, con la data dell'ultimo controllo.</dd></div>
+        </dl>
       </div>
     </section>
 
     <section id="app" class="section" aria-labelledby="app-title" tabindex="-1">
       <div class="container">
         <div class="apps">
-          <h2 id="app-title">Porta Ovunque Accessibile con te</h2>
-          <p>Con la web-app accedi con il tuo account, salvi i luoghi preferiti e segnali quelli che conosci.</p>
-          <div class="apps__grid">
-            <div class="app-card">
-              <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-globe"/></svg>Web-app</h3>
-              <p>Usala dal browser, su telefono e computer. Puoi aggiungerla alla schermata Home.</p>
-              <a class="btn btn--primary" href="app/">Apri la web-app</a>
-            </div>
-            <!-- SEGNAPOSTO: quando l'APK è pronto, sostituire la pill con
-                 <a class="btn btn--primary" href="download/ovunque-accessibile.apk" download>Scarica l'APK (XX MB)</a> -->
-            <div class="app-card">
-              <h3><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-android"/></svg>App per Android</h3>
-              <p>Scarica il file APK e installalo sul telefono. Per ora solo per Android.</p>
-              <span class="pill">In arrivo</span>
-              <p class="app-card__note">Android ti chiederà di consentire l'installazione da questa fonte: è normale per le app scaricate fuori dal Play Store.</p>
-            </div>
+          <div class="apps__text">
+            <h2 id="app-title">Porta Ovunque Accessibile con te</h2>
+            <p>La web-app si apre dal browser, su telefono e computer, e si può aggiungere alla schermata Home. Con un account salvi i luoghi preferiti e segnali quelli che conosci.</p>
+          </div>
+          <div class="apps__actions">
+            <a class="btn btn--light" href="app/"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-globe"/></svg>Apri la web-app</a>
+            <!-- SEGNAPOSTO: quando l'APK è pronto, sostituire la riga con
+                 <a class="btn btn--outline-light" href="download/ovunque-accessibile.apk" download>Scarica l'APK per Android (XX MB)</a> -->
+            <p class="apps__note"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-android"/></svg>App per Android: in arrivo.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="per-i-locali" class="section" aria-labelledby="business-title">
-      <div class="container">
-        <div class="card business">
-          <h2 id="business-title">Hai un locale o un negozio?</h2>
-          <p>Gestisci la scheda del tuo locale, chiedi che veniamo a verificarlo di persona e metti in vetrina il bollino «Verificato sul posto», con il codice QR che apre la scheda.</p>
-          <a class="btn btn--primary" href="locali.html">Scopri come funziona</a>
-        </div>
+    <section id="per-i-locali" class="section business-home" aria-labelledby="business-title">
+      <div class="container business-home__inner">
+        <h2 id="business-title">Hai un locale o un negozio?</h2>
+        <p>Gestisci la scheda del tuo locale, chiedi che veniamo a verificarlo di persona e metti in vetrina il bollino «Verificato sul posto», con il codice QR che apre la scheda.</p>
+        <p><a class="link-arrow" href="locali.html">Come funziona per i locali<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></p>
       </div>
     </section>
 
-    <section id="chi-siamo" class="section" aria-labelledby="about-title">
-      <div class="container about">
-        <div class="about__text">
-          <p class="eyebrow">Chi siamo</p>
-          <h2 id="about-title">Siamo Angelo e Lorenzo</h2>
-          <p class="about__lead">Ci muoviamo in carrozzina e sappiamo quanto conta sapere prima se un posto è davvero accessibile.</p>
+    <section id="chi-siamo" class="section about" aria-labelledby="about-title">
+      <div class="container about__inner">
+        <h2 id="about-title">Chi siamo</h2>
+        <div class="about__body">
+          <p class="about__lead">Siamo Angelo e Lorenzo. Ci muoviamo in carrozzina e sappiamo quanto conta sapere prima se un posto è davvero accessibile.</p>
           <p>Spesso «accessibile» non vuol dire niente: un gradino all'ingresso, un bagno non attrezzato, informazioni vecchie. Per questo abbiamo creato Ovunque Accessibile: schede con dati concreti, cioè rampe, ascensori, parcheggi, bagni, larghezza delle porte e gradini, scritte da chi ci è stato.</p>
           <p>È pensato per chi si muove in carrozzina, per le persone anziane, per chi ha difficoltà motorie, per le famiglie con il passeggino e per chi accompagna. Ristoranti, hotel, spiagge, bagni pubblici e tutto il resto: più persone raccontano i luoghi che conoscono, più la mappa diventa utile per tutti.</p>
-          <ul class="about__contacts" role="list">
-            <li><a class="btn btn--primary" href="mailto:ovunqueaccessibile@gmail.com"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mail"/></svg>Scrivici</a></li>
-            <li><a class="btn btn--secondary" href="https://www.instagram.com/ovunque_accessibile"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>Seguici su Instagram<span class="visually-hidden"> (sito esterno)</span></a></li>
-          </ul>
-        </div>
-        <div class="about__card">
-          <img class="about__logo" src="assets/img/logo.webp" alt="" width="180" height="225" loading="lazy">
-          <p class="about__motto">L'accessibilità non dovrebbe essere un privilegio, ma la normalità</p>
-          <ul class="about__values" role="list">
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Misure vere al posto dei simboli</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Scritto da chi ci è stato</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Ogni segnalazione controllata prima di uscire</li>
-          </ul>
+          <blockquote class="about__motto"><p>L'accessibilità non dovrebbe essere un privilegio, ma la normalità.</p></blockquote>
+          <p>Scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o seguici su <a href="https://www.instagram.com/ovunque_accessibile">Instagram<span class="visually-hidden"> (sito esterno)</span></a>.</p>
         </div>
       </div>
     </section>

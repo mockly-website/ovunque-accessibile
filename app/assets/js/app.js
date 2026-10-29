@@ -219,13 +219,78 @@
     var ease = 'cubic-bezier(.2, .8, .2, 1)';
     var pill = links[cur].querySelector('.app-nav__pill');
     if (pill && getComputedStyle(pill).display !== 'none') {
-      pill.animate([{ transform: 'translateX(' + dx + 'px) scaleX(.7)', opacity: 0.5 }, { transform: 'none', opacity: 1 }],
-        { duration: 450, easing: ease });
+      /* come un elastico: si allunga mentre parte, supera di poco l'arrivo e si assesta */
+      pill.animate([
+        { transform: 'translateX(' + dx + 'px) scaleX(1)', opacity: 0.6 },
+        { transform: 'translateX(' + (dx * 0.45) + 'px) scaleX(1.55)', offset: 0.35 },
+        { transform: 'translateX(' + (-dx * 0.06) + 'px) scaleX(0.94)', offset: 0.75 },
+        { transform: 'none', opacity: 1 }
+      ], { duration: 520, easing: 'cubic-bezier(.3, .7, .2, 1)' });
     }
     var ic = links[cur].querySelector('.icon');
     if (ic) {
       ic.animate([{ transform: 'translateY(4px) scale(.8)' }, { transform: 'translateY(-3px) scale(1.08)', offset: 0.6 }, { transform: 'none' }],
         { duration: 480, easing: ease });
+    }
+  }
+
+  /* Onda al tocco sulla barra delle schede (telefono e tablet): parte dal punto toccato e si allarga su tutta la barra.
+     Se il tocco porta a un'altra pagina, sulla pagina nuova l'onda riprende dallo stesso punto (sessionStorage),
+     così non si interrompe a metà. Con la tastiera parte dal centro della voce. Con «riduci movimento» niente onda. */
+  function initOnda() {
+    var nav = document.querySelector('.app-nav');
+    if (!nav || CALMO || !Element.prototype.animate) return;
+    var barra = matchMedia('(max-width: 63.99em)');
+    var strato = document.createElement('span');
+    strato.className = 'app-nav__onde';
+    strato.setAttribute('aria-hidden', 'true');
+    nav.insertBefore(strato, nav.firstChild);
+
+    function onda(x, y, da) {
+      var r = strato.getBoundingClientRect();
+      var raggio = Math.sqrt(Math.pow(Math.max(x, r.width - x), 2) + Math.pow(Math.max(y, r.height - y), 2));
+      var o = document.createElement('span');
+      o.className = 'app-nav__onda';
+      o.style.left = x + 'px';
+      o.style.top = y + 'px';
+      o.style.width = o.style.height = (raggio * 2) + 'px';
+      strato.appendChild(o);
+      o.animate([
+        { transform: 'translate(-50%, -50%) scale(' + (da || 0.02) + ')', opacity: 1 },
+        { opacity: 0.85, offset: 0.55 },
+        { transform: 'translate(-50%, -50%) scale(1)', opacity: 0 }
+      ], { duration: 700, easing: 'cubic-bezier(.2, .7, .3, 1)' }).onfinish = function () { o.remove(); };
+    }
+
+    var ultimo = null;
+    nav.addEventListener('pointerdown', function (ev) {
+      if (!barra.matches) return;
+      var r = strato.getBoundingClientRect();
+      ultimo = { x: ev.clientX - r.left, y: ev.clientY - r.top };
+      onda(ultimo.x, ultimo.y);
+    });
+    nav.addEventListener('click', function (ev) {
+      var a = ev.target.closest('.app-nav__link');
+      if (!a || !barra.matches) return;
+      var r = strato.getBoundingClientRect();
+      var p = ultimo;
+      if (ev.detail === 0) {   /* tastiera: dal centro della voce */
+        var ra = a.getBoundingClientRect();
+        p = { x: ra.left - r.left + ra.width / 2, y: ra.top - r.top + ra.height / 2 };
+        onda(p.x, p.y);
+      }
+      ultimo = null;
+      if (!p || a.getAttribute('aria-current') === 'page') return;
+      try { sessionStorage.setItem('oa-onda', JSON.stringify({ x: p.x / r.width, y: p.y, t: Date.now() })); } catch (e) { /* niente */ }
+    });
+
+    var prima = null;
+    try {
+      prima = JSON.parse(sessionStorage.getItem('oa-onda') || 'null');
+      sessionStorage.removeItem('oa-onda');
+    } catch (e) { /* niente */ }
+    if (prima && Date.now() - prima.t < 1500 && barra.matches) {
+      onda(prima.x * strato.getBoundingClientRect().width, prima.y, 0.3);
     }
   }
 
@@ -248,6 +313,7 @@
   }
 
   initTabBar();
+  initOnda();
   initPageLine();
 
   api.ready.then(syncNeeds).then(function () {

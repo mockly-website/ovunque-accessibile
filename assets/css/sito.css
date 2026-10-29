@@ -946,20 +946,16 @@ html:not(.js) .js-only {
   min-height: var(--target-min);
 }
 
-/* 7. Home
-   Hero (29 ottobre): fondo azzurrino che sfuma nel beige della pagina; a sinistra titolo, ricerca e scorciatoie,
-   a destra la foto di Angelo e Lorenzo in una cornice ad arco, con il motto in un cartoncino. Dietro la foto un cerchio
-   beige e il sentiero a puntini del logo (solo decorazione). Sul telefono la foto viene dopo la ricerca. */
+/* 7. Home (29 ottobre, riscritta): impaginazione asciutta, senza etichette sopra i titoli né riquadri ripetuti.
+   Le sezioni sono separate da una riga sottile; da 960 px titolo a sinistra e contenuto a destra. Gli stili di prova
+   B e C (assets/css/stili-prova.css) partono da questa struttura. */
 .hero {
-  position: relative;
-  overflow: hidden;
-  padding-block: var(--space-xl) var(--space-3xl);
-  background: linear-gradient(180deg, var(--color-sky) 0, var(--color-sky) 55%, var(--color-card) 100%);
+  padding-block: var(--space-xl) var(--space-2xl);
 }
 
 .hero__inner {
   display: grid;
-  gap: var(--space-2xl);
+  gap: var(--space-xl);
   align-items: center;
 }
 
@@ -969,33 +965,9 @@ html:not(.js) .js-only {
   }
 
   .hero__inner {
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
     gap: var(--space-3xl);
   }
-}
-
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  margin: 0 0 var(--space-sm);
-  padding: 0.25rem 0.8rem;
-  border-radius: var(--radius-pill);
-  background: var(--color-white);
-  color: var(--color-brand);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-.eyebrow .icon {
-  width: 1.1rem;
-  height: 1.1rem;
-}
-
-.section--band .eyebrow,
-.about .eyebrow {
-  background: var(--color-sky);
 }
 
 .hero__title {
@@ -1008,9 +980,6 @@ html:not(.js) .js-only {
 
 .hero__accent {
   color: var(--color-brand);
-  background: linear-gradient(transparent 68%, var(--color-beige) 68%, var(--color-beige) 92%, transparent 92%);
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
 }
 
 .hero__lead {
@@ -1025,7 +994,6 @@ html:not(.js) .js-only {
 
 .hero .search {
   background: var(--color-white);
-  box-shadow: 0 12px 32px rgba(22, 40, 65, 0.12);
 }
 
 .quick {
@@ -1060,40 +1028,22 @@ html:not(.js) .js-only {
   color: var(--color-success);
 }
 
-/* Foto ad arco con il motto */
 .hero__media {
-  position: relative;
-  isolation: isolate;
-  justify-self: center;
-  width: min(100%, 22rem);
-  margin: 0 0 var(--space-xl);
-}
-
-@media (min-width: 60em) {
-  .hero__media {
-    width: min(100%, 28rem);
-    margin: 0;
-  }
-}
-
-.hero__media::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  inset: 12% -14% 4% -14%;
-  border-radius: 50%;
-  background: var(--color-beige);
-  opacity: 0.6;
+  margin: 0;
 }
 
 .hero__photo {
   display: block;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 4 / 3;
   overflow: hidden;
-  border: 0.4rem solid var(--color-white);
-  border-radius: 14rem 14rem var(--radius-xl) var(--radius-xl);
+  border-radius: var(--radius-md);
   background: var(--color-sky);
-  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 60em) {
+  .hero__photo {
+    aspect-ratio: 4 / 5;
+  }
 }
 
 .hero__photo img {
@@ -1104,167 +1054,19 @@ html:not(.js) .js-only {
   object-position: 50% 62%;
 }
 
-.hero__quote {
-  position: absolute;
-  left: -0.75rem;
-  right: 2.5rem;
-  bottom: -1.75rem;
-  display: grid;
-  gap: 0.2rem;
-  padding: var(--space-sm) var(--space-md);
-  border-radius: var(--radius-lg);
-  background: var(--color-white);
-  box-shadow: var(--shadow-md);
-}
-
-@media (min-width: 60em) {
-  .hero__quote {
-    left: -3rem;
-    right: auto;
-    bottom: 2rem;
-    max-width: 17rem;
-  }
-}
-
-.hero__quote-text {
-  font-family: var(--font-heading);
-  font-size: 1.15rem;
-  line-height: 1.25;
-}
-
-.hero__quote-by {
-  color: var(--color-muted);
-  font-size: 0.9375rem;
-}
-
-.hero__quote-by::before {
-  content: "— ";
-}
-
-.hero__path {
-  display: none;
-}
-
-@media (min-width: 60em) {
-  .hero__path {
-    display: block;
-    position: absolute;
-    z-index: -1;
-    top: -1.5rem;
-    left: -7rem;
-    width: 10rem;
-    fill: none;
-    stroke: var(--color-path);
-    stroke-width: 5;
-    stroke-linecap: round;
-    stroke-dasharray: 0 12;
-  }
-}
-
-/* Per chi è: sei esigenze che aprono la mappa già impostata (mappa.html?per=…) */
-.needs-home__list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
-  gap: var(--space-sm);
-}
-
-.need-tile {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  min-height: 4.5rem;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--color-line);
-  border-radius: var(--radius-lg);
-  background: var(--color-white);
-  color: var(--color-navy);
-  font-weight: 700;
-  text-decoration: none;
-  box-shadow: var(--shadow-sm);
-}
-
-.need-tile:hover {
-  border-color: var(--color-navy);
-  color: var(--color-navy);
-}
-
-.need-tile__icon {
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: 50%;
-  background: var(--color-sky);
-  color: var(--color-brand);
-}
-
-.need-tile__icon .icon {
-  width: 1.5rem;
-  height: 1.5rem;
-}
-
-.need-tile__arrow {
-  margin-left: auto;
-  color: var(--color-brand);
-}
-
-.needs-home__note {
-  margin: var(--space-md) 0 0;
-  color: var(--color-muted);
-}
-
-/* Fasce bianche a tutta larghezza per alternare il ritmo della pagina */
-.section--band {
-  margin-block: var(--space-xl);
-  background: var(--color-white);
-  border-block: 1px solid var(--color-line);
-}
-
-.map-preview .btn {
+.hero__caption {
   margin-top: var(--space-xs);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
 }
 
-.map-preview .btn .icon,
-.about .btn .icon {
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-/* Anteprima della mappa, subito sotto il hero */
-.map-preview__inner {
-  display: grid;
-  gap: var(--space-lg);
-  align-items: start;
-}
-
-@media (min-width: 60em) {
-  .map-preview__inner {
-    grid-template-columns: 0.7fr 1.3fr;
-    gap: var(--space-2xl);
-  }
-
-  .map-preview__head {
-    position: sticky;
-    top: var(--space-xl);
-  }
-}
-
-.hero__map {
-  height: 22rem;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  box-shadow: var(--shadow-md);
-}
-
-@media (min-width: 60em) {
-  .hero__map {
-    height: 30rem;
-  }
-}
-
+/* Sezioni: una riga sottile tra l'una e l'altra */
 .section {
   padding-block: var(--space-2xl);
+}
+
+main > .section {
+  border-top: 1px solid var(--color-line);
 }
 
 .section__head {
@@ -1274,6 +1076,120 @@ html:not(.js) .js-only {
 
 .section__head p {
   font-size: var(--text-lg);
+}
+
+.section__head--row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-lg);
+  max-width: none;
+}
+
+.section__head--row h2 {
+  margin: 0;
+}
+
+/* Titolo a sinistra, contenuto a destra (da 960 px) */
+.needs-home__inner,
+.map-preview__inner,
+.how__inner,
+.facts-home__inner,
+.about__inner {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: start;
+}
+
+@media (min-width: 60em) {
+  .needs-home__inner,
+  .map-preview__inner,
+  .how__inner,
+  .facts-home__inner,
+  .about__inner {
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: var(--space-3xl);
+  }
+}
+
+.needs-home__head p,
+.map-preview__head p,
+.facts-home__head p {
+  max-width: 40ch;
+}
+
+.link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: var(--target-min);
+  font-weight: 700;
+}
+
+.link-arrow .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .link-arrow .icon {
+    transition: transform 0.2s var(--ease-out);
+  }
+
+  .link-arrow:hover .icon {
+    transform: translateX(3px);
+  }
+}
+
+/* Per chi è: elenco di link, due colonne */
+.needs-home__list {
+  display: grid;
+  border-top: 1px solid var(--color-line);
+}
+
+@media (min-width: 40em) {
+  .needs-home__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-xl);
+  }
+}
+
+.needs-home__list a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 3.5rem;
+  border-bottom: 1px solid var(--color-line);
+  color: var(--color-navy);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.needs-home__list a:hover {
+  color: var(--color-brand);
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+.needs-home__list .icon {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--color-brand);
+}
+
+/* Anteprima della mappa */
+.hero__map {
+  height: 22rem;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+@media (min-width: 60em) {
+  .hero__map {
+    height: 28rem;
+  }
 }
 
 .grid {
@@ -1290,95 +1206,88 @@ html:not(.js) .js-only {
   .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
-/* Come funziona: i tre passi uniti dal sentiero a puntini (da 960 px) */
-.steps {
-  position: relative;
+/* Come funziona: tre righe numerate */
+.how__list {
+  counter-reset: passo;
+  border-top: 1px solid var(--color-line);
 }
 
-@media (min-width: 60em) {
-  .steps::before {
-    content: "";
-    position: absolute;
-    z-index: 0;
-    top: calc(var(--space-lg) + 1.75rem);
-    left: 10%;
-    right: 10%;
-    border-top: 4px dotted var(--color-path);
-  }
-
-  .steps > li {
-    position: relative;
-  }
-}
-
-.step__num {
-  display: inline-grid;
-  place-items: center;
-  width: 3.5rem;
-  height: 3.5rem;
-  margin-bottom: var(--space-sm);
-  border: 0.3rem solid var(--color-white);
-  border-radius: 50%;
-  background: var(--color-brand);
-  box-shadow: 0 0 0 1px var(--color-line);
-  color: var(--color-white);
-  font-family: var(--font-heading);
-  font-size: var(--text-lg);
-}
-
-.check-list {
+.how__list > li {
+  counter-increment: passo;
   display: grid;
-  gap: var(--space-sm);
+  grid-template-columns: 3rem minmax(0, 1fr);
+  column-gap: var(--space-md);
+  padding-block: var(--space-md);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.how__list > li::before {
+  content: counter(passo);
+  grid-row: span 2;
+  color: var(--color-brand);
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  line-height: 1;
+}
+
+.how__list h3 {
+  margin: 0 0 var(--space-2xs);
+}
+
+.how__list p {
+  margin: 0;
+}
+
+/* Cosa c'è in ogni scheda */
+.facts-home__list {
+  display: grid;
+  margin: 0;
+  border-top: 1px solid var(--color-line);
 }
 
 @media (min-width: 40em) {
-  .check-list {
+  .facts-home__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--space-xl);
   }
 }
 
-.check-list li {
-  display: flex;
-  gap: var(--space-md);
-  align-items: flex-start;
-  padding: var(--space-md) var(--space-lg);
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-  border: 1px solid var(--color-line);
+.facts-home__list > div {
+  padding-block: var(--space-md);
+  border-bottom: 1px solid var(--color-line);
 }
 
-.check-list__icon {
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 2.75rem;
-  height: 2.75rem;
-  border-radius: var(--radius-md);
-  background: var(--color-sky);
+.facts-home__list dt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 700;
+}
+
+.facts-home__list dt .icon {
   color: var(--color-brand);
 }
 
-@media (min-width: 60em) {
-  .check-list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.facts-home__list dd {
+  margin: var(--space-2xs) 0 0 calc(1.5rem + var(--space-xs));
 }
 
-.check-list strong {
-  display: block;
-}
-
-/* Blocco app: web-app e APK Android */
+/* Blocco app: una fascia blu con testo e pulsante */
 .apps {
+  display: grid;
+  gap: var(--space-lg);
+  align-items: center;
+  padding: var(--space-xl) var(--space-lg);
+  border-radius: var(--radius-lg);
   background: var(--color-navy);
   color: var(--color-white);
-  border-radius: var(--radius-xl);
-  padding: var(--space-xl) var(--space-lg);
   --color-focus: var(--color-white);
 }
 
-@media (min-width: 40em) {
+@media (min-width: 48em) {
   .apps {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2xl);
     padding: var(--space-2xl);
   }
 }
@@ -1388,64 +1297,52 @@ html:not(.js) .js-only {
   color: var(--color-white);
 }
 
-.apps__grid {
+.apps__text p {
+  max-width: 52ch;
+  margin: 0;
+}
+
+.apps__actions {
   display: grid;
-  gap: var(--space-md);
-  margin-top: var(--space-lg);
+  justify-items: start;
+  gap: var(--space-xs);
 }
 
-@media (min-width: 48em) {
-  .apps__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.app-card {
-  display: grid;
-  gap: var(--space-sm);
-  align-content: start;
-  padding: var(--space-lg);
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.app-card h3 {
+.apps__note {
   display: flex;
   align-items: center;
   gap: var(--space-xs);
   margin: 0;
-}
-
-.app-card p {
-  margin: 0;
-}
-
-.app-card .pill {
-  justify-self: start;
-  background: var(--color-beige);
-  color: var(--color-navy);
-}
-
-.app-card__note {
   font-size: var(--text-sm);
 }
 
-/* Chi siamo (29 ottobre): racconto a sinistra, a destra un cartoncino blu con il logo, il motto e tre impegni */
-.about {
-  display: grid;
-  gap: var(--space-xl);
-  align-items: center;
+.apps__note .icon {
+  color: var(--color-beige);
 }
 
-@media (min-width: 60em) {
-  .about {
-    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-    gap: var(--space-3xl);
-  }
+.btn--light {
+  background: var(--color-white);
+  border-color: var(--color-white);
+  color: var(--color-navy);
 }
 
-.about__text > p {
+.btn--light:hover {
+  background: var(--color-beige);
+  border-color: var(--color-beige);
+  color: var(--color-navy);
+}
+
+/* Per i locali */
+.business-home__inner > * {
+  max-width: 48rem;
+}
+
+.business-home__inner p {
+  margin-bottom: var(--space-xs);
+}
+
+/* Chi siamo */
+.about__body > p {
   max-width: var(--measure);
 }
 
@@ -1454,71 +1351,17 @@ html:not(.js) .js-only {
   font-weight: 700;
 }
 
-.about__contacts {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-sm);
-  margin-top: var(--space-lg);
-}
-
-.about__card {
-  position: relative;
-  padding: var(--space-xl) var(--space-lg);
-  border-radius: var(--radius-xl);
-  background: var(--color-navy);
-  color: var(--color-white);
-  box-shadow: var(--shadow-md);
-}
-
-@media (min-width: 40em) {
-  .about__card {
-    padding: var(--space-2xl) var(--space-xl);
-  }
-}
-
-.about__logo {
-  display: block;
-  width: 4.5rem;
-  margin-bottom: var(--space-md);
-  padding: 0.5rem;
-  border-radius: var(--radius-lg);
-  background: var(--color-card);
-}
-
 .about__motto {
-  margin: 0 0 var(--space-lg);
+  margin: var(--space-xl) 0;
+  padding-left: var(--space-lg);
+  border-left: 4px solid var(--color-path);
+}
+
+.about__motto p {
+  margin: 0;
   font-family: var(--font-heading);
   font-size: var(--text-xl);
   line-height: 1.25;
-}
-
-.about__motto::before {
-  content: "«";
-  color: var(--color-beige);
-}
-
-.about__motto::after {
-  content: "»";
-  color: var(--color-beige);
-}
-
-.about__values {
-  display: grid;
-  gap: var(--space-sm);
-  padding-top: var(--space-lg);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.about__values li {
-  display: flex;
-  gap: var(--space-xs);
-  align-items: flex-start;
-}
-
-.about__values .icon {
-  flex: none;
-  margin-top: 0.2rem;
-  color: var(--color-beige);
 }
 
 /* 8. Pagina mappa */

@@ -2576,3 +2576,31 @@ html:has(> body.app) {
 #mod-panel {
   margin-top: var(--space-lg);
 }
+
+/* 23. Onda al tocco sulla barra delle schede (app.js, initOnda), 29 ottobre: un anello azzurro che parte dal punto
+   toccato e si allarga su tutta la barra, sotto le voci. Solo dove la barra sta in basso (telefono e tablet). */
+.app-nav__onde {
+  display: none;
+}
+
+@media (max-width: 63.99em) {
+  .app .app-nav__onde {
+    display: block;
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+
+  .app .app-nav__onda {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle closest-side,
+      rgba(47, 91, 156, 0.12) 0, rgba(47, 91, 156, 0.16) 70%,
+      rgba(47, 91, 156, 0.5) 86%, rgba(47, 91, 156, 0) 100%);
+  }
+
+  .app .app-nav__list {
+    position: relative;
+  }
+}
