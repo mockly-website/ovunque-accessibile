@@ -1,6 +1,7 @@
 /* Ovunque Accessibile – codice comune a sito e web-app (window.OA).
    Il sito lo avvia con sito.js, l'app con app/assets/js/app.js: le regole e i giudizi sono gli stessi.
-   Dati: da Supabase (sito.js e api.js impostano OA.config.loadPlaces e loadPlace).
+   Dati: da Supabase (sito.js e api.js impostano OA.config.areaPlaces, searchPlaces, loadPlace e, per la home,
+   latestPlaces e stats). Mappa ed elenco chiedono solo i luoghi dell'area visibile (sezione 6b).
    Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni.
    Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta «La tua esigenza»
            4. Utilità DOM · 5. Componenti · 6. Mappa · 7. Home · 8. Pagina mappa
@@ -18,7 +19,8 @@
   var SCADENZA_MESI = 24;          /* dopo questo tempo: "Informazioni da ricontrollare" */
   var STORAGE_KEY = 'oa-esigenza';
 
-  /* Punti di aggancio per l'app: loadPlaces() → Promise di luoghi, reportHref(p), onDetail(p) */
+  /* Punti di aggancio per sito e app: areaPlaces(riquadro) → Promise di { totale, luoghi } o { totale, zone },
+     searchPlaces(testo) → Promise di { totale, luoghi }, latestPlaces(), stats(), loadPlace(id), reportHref(p), onDetail(p) */
   var config = {};
 
   var CATEGORIE = {
@@ -442,9 +444,6 @@
     return config.loadPlace ? config.loadPlace(id) : Promise.reject(new Error('dati'));
   }
 
-  function loadPlaces() {
-    return config.loadPlaces ? config.loadPlaces() : Promise.reject(new Error('dati'));
-  }
 
   /* Le tre cose che chi passa di lì sa dire in pochi secondi e che spesso mancano: gradini, porta, bagno */
   function mancanti(p) {
@@ -615,8 +614,19 @@
     });
   }
 
-  /* Gruppi di luoghi vicini: cerchio con il numero, si apre zoomando */
-  function clusterLayer() {
+  /* Cerchio con il numero dei luoghi (gruppi di segnaposto e zone) */
+  function iconaGruppo(n) {
+    var t = n.toLocaleString('it-IT');
+    return L.divIcon({
+      className: 'cluster' + (n > 999 ? ' cluster--tanti' : ''),
+      iconSize: L.point(48, 48),
+      html: '<span aria-hidden="true">' + t + '</span><span class="visually-hidden">' + t + ' luoghi in questa zona: premi per avvicinarti</span>'
+    });
+  }
+
+  /* Gruppi di luoghi vicini: cerchio con il numero, si apre zoomando.
+     zone: il gruppo raccoglie zone (sezione 6b) e somma i loro luoghi, così due zone vicine non si sovrappongono */
+  function clusterLayer(zone) {
     if (!L.markerClusterGroup) return L.layerGroup();
     /* Mappe con elenco accanto: gruppi e segnaposto fuori dall'ordine di tabulazione.
        Con la tastiera si usa l'elenco ("Mostra sulla mappa"), che ha le stesse informazioni. */
@@ -626,12 +636,9 @@
       maxClusterRadius: 48,
       spiderfyDistanceMultiplier: 1.6,
       iconCreateFunction: function (cluster) {
-        var n = cluster.getChildCount();
-        return L.divIcon({
-          className: 'cluster',
-          iconSize: L.point(48, 48),
-          html: '<span aria-hidden="true">' + n + '</span><span class="visually-hidden">' + n + ' luoghi in questa zona: premi per avvicinarti</span>'
-        });
+        return iconaGruppo(zone
+          ? cluster.getAllChildMarkers().reduce(function (s, m) { return s + m.options.n; }, 0)
+          : cluster.getChildCount());
       }
     });
   }
@@ -651,17 +658,161 @@
     ]);
   }
 
-  function addMarker(layer, p, onSelect, focusable) {
+  function segnaposto(p, onSelect, focusable) {
     var g = giudizio(p, esigenza());
     var marker = L.marker([p.lat, p.lng], {
       icon: pinIcon(g),
       title: p.nome + ', ' + p.citta + ': ' + GIUDIZIO[g].toLowerCase(),
       keyboard: !!focusable,
       riseOnHover: true
-    }).addTo(layer);
+    });
+    marker._oaG = g;
     marker.bindPopup(function () { return popupContent(p); }, { maxWidth: 280, minWidth: 220 });
     if (onSelect) marker.on('click', function () { onSelect(p.id); });
     return marker;
+  }
+
+  function addMarker(layer, p, onSelect, focusable) {
+    return segnaposto(p, onSelect, focusable).addTo(layer);
+  }
+
+  /* Segnaposto aggiornati senza rifarli tutti, così un riquadro aperto resta aperto quando la mappa si sposta:
+     toglie quelli che non servono più, aggiunge i nuovi, rifà quelli con un giudizio diverso (altra esigenza).
+     markers: { id → segnaposto }, aggiornato qui */
+  function aggiornaSegnaposto(layer, markers, found, onSelect) {
+    var e = esigenza();
+    var resta = {};
+    var via = [];
+    var nuovi = [];
+    found.forEach(function (p) { resta[p.id] = giudizio(p, e); });
+    Object.keys(markers).forEach(function (id) {
+      if (resta[id] === markers[id]._oaG) return;
+      via.push(markers[id]);
+      delete markers[id];
+    });
+    found.forEach(function (p) {
+      if (!markers[p.id]) nuovi.push(markers[p.id] = segnaposto(p, onSelect));
+    });
+    if (layer.removeLayers) {
+      layer.removeLayers(via);
+      layer.addLayers(nuovi);
+    } else {
+      via.forEach(function (m) { layer.removeLayer(m); });
+      nuovi.forEach(function (m) { layer.addLayer(m); });
+    }
+  }
+
+  /* ---------- 6b. Luoghi per area ----------
+     Le mappe chiedono al database solo il riquadro che si vede, un po' più largo e allineato a una griglia, così i
+     piccoli spostamenti non rifanno la richiesta. Se nel riquadro ci sono più di MAX_AREA luoghi arrivano le «zone»
+     (quanti luoghi in ogni cella, con il comune più frequente): si avvicina la mappa per vederli uno per uno.
+     Le risposte restano in memoria per 5 minuti (al massimo 24 riquadri); un riquadro arrivato per intero serve
+     anche per tutti quelli che contiene, quindi avvicinarsi non rifà la richiesta. */
+  var MAX_AREA = 800;
+  var AREA_MS = 5 * 60 * 1000;
+  var aree = [];
+
+  /* Area visibile; con la mappa nascosta (telefono, vista «Elenco») si stima dalla misura della finestra */
+  function areaVisibile(map) {
+    var s = map.getSize();
+    if (s.x && s.y) return map.getBounds();
+    var c = map.project(map.getCenter());
+    var m = L.point(window.innerWidth / 2, window.innerHeight / 2);
+    return L.latLngBounds(map.unproject(c.subtract(m)), map.unproject(c.add(m)));
+  }
+
+  /* Riquadro da chiedere: l'area visibile allargata a mezza «piastrella» di mappa (256 pixel) per lato.
+     passo: lato delle celle delle zone, circa 64 pixel */
+  function riquadro(map) {
+    var b = areaVisibile(map);
+    var z = map.getZoom();
+    var g = 180 / Math.pow(2, z);
+    function giu(v) { return Math.floor(v / g) * g; }
+    function su(v) { return Math.ceil(v / g) * g; }
+    return {
+      sud: Math.max(-90, giu(b.getSouth())), ovest: Math.max(-180, giu(b.getWest())),
+      nord: Math.min(90, su(b.getNorth())), est: Math.min(180, su(b.getEast())),
+      passo: g / 2
+    };
+  }
+
+  function contiene(a, b) {
+    return a.sud <= b.sud && a.ovest <= b.ovest && a.nord >= b.nord && a.est >= b.est;
+  }
+
+  function nelRiquadro(p, r) {
+    return p.lat >= r.sud && p.lat <= r.nord && p.lng >= r.ovest && p.lng <= r.est;
+  }
+
+  /* → Promise di { luoghi } oppure { totale, zone } */
+  function luoghiArea(r, cat, sensi) {
+    var adesso = Date.now();
+    aree = aree.filter(function (a) { return adesso - a.t < AREA_MS; });
+    var chiave = [r.sud, r.ovest, r.nord, r.est, r.passo, cat || '', sensi ? 1 : 0].join('|');
+    var a = aree.filter(function (x) { return x.chiave === chiave; })[0];
+    if (a) return a.promessa;
+    var largo = aree.filter(function (x) {
+      return x.luoghi && (!x.cat || x.cat === cat) && (!x.sensi || sensi) && contiene(x, r);
+    })[0];
+    if (largo) {
+      return Promise.resolve({ luoghi: largo.luoghi.filter(function (p) { return nelRiquadro(p, r) && (!cat || p.categoria === cat); }) });
+    }
+    a = { chiave: chiave, sud: r.sud, ovest: r.ovest, nord: r.nord, est: r.est, cat: cat || '', sensi: !!sensi, t: adesso };
+    a.promessa = config.areaPlaces({
+      sud: r.sud, ovest: r.ovest, nord: r.nord, est: r.est, categoria: cat || null, sensi: !!sensi, max: MAX_AREA, passo: r.passo
+    }).then(function (x) {
+      if (x.luoghi) a.luoghi = x.luoghi;
+      return x;
+    });
+    a.promessa.catch(function () { aree = aree.filter(function (x) { return x !== a; }); });
+    aree.unshift(a);
+    aree.length = Math.min(aree.length, 24);
+    return a.promessa;
+  }
+
+  /* Ricerca per testo sul server; le ricerche già fatte restano in memoria finché la pagina è aperta */
+  var ricerche = {};
+  function cercaLuoghi(q) {
+    var k = normalize(q).replace(/\s+/g, ' ');
+    if (!ricerche[k]) {
+      ricerche[k] = config.searchPlaces(q);
+      ricerche[k].catch(function () { delete ricerche[k]; });
+    }
+    return ricerche[k];
+  }
+
+  /* fn() alla fine di ogni spostamento della mappa (una volta sola se se ne fanno tanti di fila) */
+  function dopoOgniSpostamento(map, fn) {
+    var timer = null;
+    map.on('moveend', function () {
+      clearTimeout(timer);
+      timer = setTimeout(fn, 200);
+    });
+  }
+
+  function nomeZona(z) {
+    return z.citta ? 'Intorno a ' + z.citta : 'In questa zona';
+  }
+
+  function quantiLuoghi(n) {
+    return n === 1 ? '1 luogo' : n.toLocaleString('it-IT') + ' luoghi';
+  }
+
+  /* Porta la mappa sulla zona: i luoghi arrivano uno per uno, o zone più piccole */
+  function avvicinaZona(map, z) {
+    if (z.nord - z.sud < 0.002 && z.est - z.ovest < 0.002) map.setView([z.lat, z.lng], Math.max(map.getZoom() + 3, 15));
+    else map.fitBounds([[z.sud, z.ovest], [z.nord, z.est]], { padding: [32, 32], maxZoom: 16 });
+  }
+
+  /* Zone sulla mappa: cerchio con il numero, come i gruppi di segnaposto; premendolo la mappa si avvicina */
+  function disegnaZone(layer, map, zone) {
+    layer.clearLayers();
+    var mm = zone.map(function (z) {
+      return L.marker([z.lat, z.lng], { keyboard: false, n: z.n, icon: iconaGruppo(z.n) })
+        .on('click', function () { avvicinaZona(map, z); });
+    });
+    if (layer.addLayers) layer.addLayers(mm);
+    else mm.forEach(function (m) { layer.addLayer(m); });
   }
 
   /* Pulsanti sulla mappa: "Vicino a me" (posizione solo nel browser, mai inviata) e "Tutta Italia".
@@ -723,42 +874,58 @@
   function initHome() {
     var box = document.getElementById('home-map');
     var latest = document.getElementById('latest-list');
-    if (!box && !latest) return;
-    loadPlaces().then(function (places) {
-      var map = box && createMap(box, { zoomControl: true, dueDita: true });
-      var group = null;
-      if (map) {
-        map.setView(ITALY.center, ITALY.zoom);
-        group = clusterLayer().addTo(map);
-      }
-      function render() {
-        if (latest) {
+    if (latest && config.latestPlaces) {
+      config.latestPlaces().then(function (places) {
+        function render() {
           latest.textContent = '';
           places
-            .filter(function (p) { return p.verifica && p.verifica.data && p.verifica.livello !== 'osm' && visibile(p, esigenza()); })
-            .sort(function (a, b) { return a.verifica.data < b.verifica.data ? 1 : -1; })
+            .filter(function (p) { return visibile(p, esigenza()); })
             .slice(0, 3)
             .forEach(function (p) { latest.appendChild(placeCard(p)); });
         }
-        if (group) {
-          group.clearLayers();
-          places.forEach(function (p) { if (visibile(p, esigenza())) addMarker(group, p); });
-        }
+        render();
+        onEsigenza(render);
+      }).catch(function () {});
+    }
+    if (document.getElementById('home-stats') && config.stats) config.stats().then(statistiche).catch(function () {});
+
+    var map = box && config.areaPlaces && createMap(box, { zoomControl: true, dueDita: true });
+    if (!map) return;
+    map.setView(ITALY.center, ITALY.zoom);
+    var group = clusterLayer().addTo(map);
+    var zoneLayer = clusterLayer(true).addTo(map);
+    var markers = {};
+    var area = null;
+    var giro = 0;
+    function disegna() {
+      if (!area) return;
+      if (area.zone) {
+        group.clearLayers();
+        markers = {};
+        disegnaZone(zoneLayer, map, area.zone);
+      } else {
+        zoneLayer.clearLayers();
+        aggiornaSegnaposto(group, markers, area.luoghi.filter(function (p) { return visibile(p, esigenza()); }));
       }
-      render();
-      onEsigenza(render);
-      statistiche(places);
-    }).catch(function () {});
+    }
+    function carica() {
+      var mio = ++giro;
+      luoghiArea(riquadro(map), '', ESIGENZE[esigenza()].sensi).then(function (x) {
+        if (mio !== giro) return;
+        area = x;
+        disegna();
+      }).catch(function () {});
+    }
+    carica();
+    dopoOgniSpostamento(map, carica);
+    onEsigenza(function () { disegna(); carica(); });
   }
 
-  /* Home: quanti luoghi e in quanti comuni (dai dati veri). Il numero sale fino al valore quando si vede;
+  /* Home: quanti luoghi e in quanti comuni (contati dal database). Il numero sale fino al valore quando si vede;
      per gli screen reader c'è subito il valore finale (il numero che si muove è nascosto). */
-  function statistiche(places) {
+  function statistiche(valori) {
     var box = document.getElementById('home-stats');
     if (!box) return;
-    var comuni = {};
-    places.forEach(function (p) { if (p.citta) comuni[p.citta.trim().toLowerCase()] = 1; });
-    var valori = { luoghi: places.length, comuni: Object.keys(comuni).length };
     var calmo = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
     var dd = [].slice.call(box.querySelectorAll('[data-conta]'));
     dd.forEach(function (d) {
@@ -790,7 +957,9 @@
     io.observe(box);
   }
 
-  /* ---------- 8. Pagina mappa: ricerca, filtri, elenco e mappa ---------- */
+  /* ---------- 8. Pagina mappa: ricerca, filtri, elenco e mappa ----------
+     Senza testo da cercare, mappa ed elenco mostrano i luoghi dell'area visibile (sezione 6b) e l'elenco segue la
+     mappa. Con un testo, i luoghi arrivano dalla ricerca sul server e la mappa si adatta ai risultati. */
   function initExplore() {
     var form = document.getElementById('filters');
     var list = document.getElementById('results-list');
@@ -810,10 +979,14 @@
     var more = document.getElementById('filters-more');
     if (more && window.matchMedia('(min-width: 64em)').matches) more.open = true;
 
-    var places = [];
+    var area = null;              /* luoghi (o zone) dell'area della mappa */
+    var ricerca = null;           /* { totale, luoghi } quando si cerca per testo */
+    var giro = 0;                 /* conta solo l'ultima richiesta: le risposte arrivate tardi si ignorano */
+    var firma = '';               /* cosa c'è nell'elenco: se non cambia, l'elenco non si rifà */
     var map = null;
     var markers = {};
     var layer = null;
+    var zoneLayer = null;
     var origin = null;            /* posizione di chi cerca, dopo «Vicino a me»: elenco in ordine di distanza */
     var tools = null;
     var view = viewSwitch();
@@ -841,22 +1014,20 @@
         a.addEventListener('click', function () { set('list'); });
       });
       if (location.hash === '#results') set('list'); else set('map');
-      return { set: set, count: function (n) { num.textContent = ' (' + n + ')'; } };
+      return { set: set, count: function (n) { num.textContent = ' (' + n.toLocaleString('it-IT') + ')'; } };
     }
 
     function selected() {
       return [].slice.call(form.querySelectorAll('input[name="f"]:checked')).map(function (i) { return i.value; });
     }
 
-    function matches(p, q, cat, filters, e) {
+    function matches(p, cat, filters, e) {
       if (!visibile(p, e)) return false;
       if (cat && p.categoria !== cat) return false;
       for (var i = 0; i < filters.length; i++) {
         if (FILTRI[filters[i]] && !FILTRI[filters[i]](p, e)) return false;
       }
-      if (!q) return true;
-      var hay = normalize([p.nome, p.citta, p.provincia, p.regione, p.indirizzo, CATEGORIE[p.categoria], ESEMPI_CATEGORIE[p.categoria]].filter(Boolean).join(' '));
-      return normalize(q).split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
+      return true;
     }
 
     function highlight(id) {
@@ -883,56 +1054,84 @@
       else { map.setView(m.getLatLng(), 15); open(); }
     }
 
+    /* Elenco rifatto senza perdere il punto in cui si era con la tastiera: stesso luogo e stesso comando,
+       oppure il conteggio se quel luogo non c'è più */
+    function rifaiElenco(items) {
+      var a = document.activeElement;
+      var dentro = !!a && a !== list && list.contains(a);
+      var li = dentro ? a.closest('li[data-id]') : null;
+      var cls = dentro && a.classList.length ? a.classList[0] : null;
+      list.textContent = '';
+      items.forEach(function (n) { list.appendChild(n); });
+      if (!dentro) return;
+      var stesso = li && list.querySelector('li[data-id="' + CSS.escape(li.getAttribute('data-id')) + '"]');
+      var t = stesso && cls ? stesso.querySelector('.' + cls) : null;
+      (t || count).focus();
+    }
+
+    function testo(node, t) {
+      if (node.textContent !== t) node.textContent = t;
+    }
+
+    function vuoto(e) {
+      return el('li', { className: 'empty vuoto vuoto--elenco' }, [
+        el('span', { className: 'vuoto__icona' }, [icon('#icon-search')]),
+        el('p', { text: ricerca ? 'Nessun luogo accessibile corrisponde alla ricerca.' : 'In quest\'area della mappa non c\'è nessun luogo accessibile che corrisponde ai filtri.' }),
+        el('p', { text: ESIGENZE[e].sensi
+          ? 'Per chi non vede o non sente bene abbiamo ancora poche informazioni: se conosci un luogo con Braille, LIS, percorsi tattili o anello magnetico, segnalalo dall\'app.'
+          : ricerca ? 'Prova a togliere qualche filtro o a cercare un\'altra città.' : 'Prova ad allontanare la mappa, a togliere qualche filtro o a cercare una città.' })
+      ]);
+    }
+
+    /* Zona dell'elenco (quando nell'area i luoghi sono troppi): porta la mappa lì */
+    function zonaItem(z, i) {
+      var btn = el('button', { type: 'button', className: 'place__show' }, [
+        icon('#icon-pin'),
+        el('span', {}, [
+          document.createTextNode('Avvicina la mappa'),
+          el('span', { className: 'visually-hidden', text: ': ' + nomeZona(z).toLowerCase() })
+        ])
+      ]);
+      btn.addEventListener('click', function () {
+        if (view) view.set('map');
+        if (!list.offsetParent) map.getContainer().focus();
+        setTimeout(function () { avvicinaZona(map, z); }, 0);
+      });
+      return el('li', { className: 'place place--zona', 'data-id': 'zona-' + i }, [
+        el('h3', { className: 'place__title', text: nomeZona(z) }),
+        el('p', { className: 'place__meta', text: quantiLuoghi(z.n) }),
+        map ? btn : null
+      ]);
+    }
+
+    function renderZone(attivi) {
+      var vista = map ? areaVisibile(map) : null;
+      var zone = area.zone.filter(function (z) { return !vista || vista.contains([z.lat, z.lng]); });
+      var n = zone.reduce(function (s, z) { return s + z.n; }, 0);
+      var nuova = 'zone|' + zone.map(function (z) { return z.lat + ',' + z.lng + ',' + z.n; }).join('|');
+      if (nuova !== firma) {
+        firma = nuova;
+        rifaiElenco(zone.map(zonaItem));
+      }
+      if (view) view.count(n);
+      testo(count, quantiLuoghi(n) + ' in quest\'area della mappa: avvicina la mappa, scegli una zona o cerca una città per vederli uno per uno' +
+        (attivi ? ' (i filtri valgono quando li vedi uno per uno)' : '') + '.');
+      if (map) {
+        layer.clearLayers();
+        markers = {};
+        disegnaZone(zoneLayer, map, area.zone);
+      }
+    }
+
     function render(updateUrl, keepView) {
       var e = esigenza();
       var q = form.elements.q.value.trim();
       var cat = form.elements.cat.value;
       var filters = selected();
-      var found = places.filter(function (p) { return matches(p, q, cat, filters, e); });
-      var km = {};
-      if (origin) {
-        found.forEach(function (p) { km[p.id] = distanceKm(origin, p); });
-        found.sort(function (a, b) { return km[a.id] - km[b.id]; });
-      }
-
-      list.textContent = '';
-      if (!found.length) {
-        list.appendChild(el('li', { className: 'empty vuoto vuoto--elenco' }, [
-          el('span', { className: 'vuoto__icona' }, [icon('#icon-search')]),
-          el('p', { text: 'Nessun luogo accessibile corrisponde alla ricerca.' }),
-          el('p', { text: ESIGENZE[e].sensi
-            ? 'Per chi non vede o non sente bene abbiamo ancora poche informazioni: se conosci un luogo con Braille, LIS, percorsi tattili o anello magnetico, segnalalo dall\'app.'
-            : 'Prova a togliere qualche filtro o a cercare un\'altra città.' })
-        ]));
-      } else {
-        found.forEach(function (p) { list.appendChild(placeCard(p, 'h3', map ? showOnMap : null, origin ? km[p.id] : null)); });
-      }
-      if (view) view.count(found.length);
       /* «Filtri e tipo di luogo» (tendina): quanti sono attivi */
       var attivi = filters.length + (cat ? 1 : 0);
       var badge = document.getElementById('filters-active');
       if (badge) badge.textContent = attivi ? '(' + attivi + (attivi === 1 ? ' attivo)' : ' attivi)') : '';
-      count.textContent = (found.length === 1 ? '1 luogo trovato' : found.length + ' luoghi trovati') +
-        (origin ? ', dal più vicino' : '') + ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase();
-
-      if (map) {
-        layer.clearLayers();
-        markers = {};
-        found.forEach(function (p) {
-          markers[p.id] = addMarker(layer, p, highlight);
-        });
-        if (!keepView) {
-          if (found.length) {
-            /* Nell'app la barra in basso copre il fondo della mappa: i luoghi restano sopra la barra */
-            var nav = document.querySelector('.app-nav');
-            var sotto = nav && getComputedStyle(nav).position === 'fixed' ? nav.offsetHeight + 16 : 0;
-            map.fitBounds(L.latLngBounds(found.map(function (p) { return [p.lat, p.lng]; })),
-              { paddingTopLeft: [40, 40], paddingBottomRight: [40, 40 + sotto], maxZoom: 14 });
-          } else {
-            map.setView(ITALY.center, ITALY.zoom);
-          }
-        }
-      }
 
       if (updateUrl) {
         var next = new URLSearchParams();
@@ -943,54 +1142,148 @@
         var qs = next.toString();
         history.replaceState(null, '', qs ? '?' + qs : location.pathname);
       }
+
+      if (!ricerca && !area) return;              /* i luoghi non sono ancora arrivati */
+      list.removeAttribute('aria-busy');
+      if (!ricerca && area.zone) return renderZone(attivi);
+
+      /* Sulla mappa tutti i luoghi arrivati (anche appena fuori dai bordi); nell'elenco quelli che si vedono */
+      var tutti = (ricerca || area).luoghi.filter(function (p) { return matches(p, cat, filters, e); });
+      var vista = !ricerca && map ? areaVisibile(map) : null;
+      var found = vista ? tutti.filter(function (p) { return vista.contains([p.lat, p.lng]); }) : tutti.slice();
+      var km = {};
+      if (origin) {
+        found.forEach(function (p) { km[p.id] = distanceKm(origin, p); });
+        found.sort(function (a, b) { return km[a.id] - km[b.id]; });
+      }
+
+      var nuova = [e, origin ? origin.lat + ',' + origin.lng : ''].concat(found.map(function (p) { return p.id; })).join('|');
+      if (nuova !== firma) {
+        firma = nuova;
+        rifaiElenco(found.length
+          ? found.map(function (p) { return placeCard(p, 'h3', map ? showOnMap : null, origin ? km[p.id] : null); })
+          : [vuoto(e)]);
+      }
+      if (view) view.count(found.length);
+      var piu = ricerca && ricerca.totale > ricerca.luoghi.length;
+      testo(count, (ricerca
+        ? (found.length === 1 ? '1 luogo trovato' : found.length.toLocaleString('it-IT') + ' luoghi trovati') +
+          (piu ? ' tra i primi ' + ricerca.luoghi.length + ' risultati: aggiungi una parola per restringere la ricerca' : '')
+        : quantiLuoghi(found.length) + ' in quest\'area della mappa') +
+        (origin ? ', dal più vicino' : '') + ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase());
+
+      if (map) {
+        zoneLayer.clearLayers();
+        aggiornaSegnaposto(layer, markers, tutti, highlight);
+        if (ricerca && !keepView) {
+          if (tutti.length) {
+            /* Nell'app la barra in basso copre il fondo della mappa: i luoghi restano sopra la barra */
+            var nav = document.querySelector('.app-nav');
+            var sotto = nav && getComputedStyle(nav).position === 'fixed' ? nav.offsetHeight + 16 : 0;
+            map.fitBounds(L.latLngBounds(tutti.map(function (p) { return [p.lat, p.lng]; })),
+              { paddingTopLeft: [40, 40], paddingBottomRight: [40, 40 + sotto], maxZoom: 14 });
+          } else {
+            map.setView(ITALY.center, ITALY.zoom);
+          }
+        }
+      }
+    }
+
+    function errore() {
+      list.removeAttribute('aria-busy');
+      testo(count, 'Non siamo riusciti a caricare i luoghi. Riprova tra poco.');
+    }
+
+    /* Luoghi dell'area della mappa (senza testo da cercare) */
+    function caricaArea() {
+      if (ricerca || form.elements.q.value.trim()) return;
+      var r = map ? riquadro(map) : { sud: 35, ovest: 6, nord: 48, est: 19, passo: 0.5 };
+      var mio = ++giro;
+      list.setAttribute('aria-busy', 'true');
+      luoghiArea(r, form.elements.cat.value, ESIGENZE[esigenza()].sensi).then(function (x) {
+        if (mio !== giro) return;
+        area = x;
+        render(false, true);
+      }).catch(function () { if (mio === giro) errore(); });
+    }
+
+    /* Ricerca per testo sul server; adatta: la mappa si sposta sui risultati */
+    function cerca(adatta) {
+      var q = form.elements.q.value.trim();
+      var mio = ++giro;
+      if (!q) {
+        ricerca = null;
+        firma = '';
+        render(true, true);
+        caricaArea();
+        return;
+      }
+      list.setAttribute('aria-busy', 'true');
+      cercaLuoghi(q).then(function (x) {
+        if (mio !== giro) return;
+        ricerca = x;
+        firma = '';
+        render(true, !adatta);
+      }).catch(function () { if (mio === giro) errore(); });
     }
 
     var timer = null;
     form.addEventListener('input', function (ev) {
-      if (ev.target.name === 'esigenza') return;      /* gestito da onEsigenza */
+      var n = ev.target.name;
+      if (n === 'esigenza') return;      /* gestito da onEsigenza */
       clearTimeout(timer);
-      timer = setTimeout(function () { render(true); }, ev.target.name === 'q' ? 250 : 0);
+      if (n === 'q') {
+        timer = setTimeout(function () { cerca(true); }, 300);
+      } else {
+        render(true, !ricerca);
+        if (n === 'cat') caricaArea();
+      }
     });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      render(true);
+      clearTimeout(timer);
+      cerca(true);
       count.focus();
     });
     form.addEventListener('reset', function () {
-      setTimeout(function () { render(true); }, 0);
+      setTimeout(function () { cerca(true); }, 0);
     });
 
-    loadPlaces().then(function (data) {
-      places = data;
-      if (mapBox) {
-        map = createMap(mapBox);
-        if (map) {
-          layer = clusterLayer().addTo(map);
-          map.setView(ITALY.center, ITALY.zoom);
-          tools = addMapButtons(map, document.getElementById('map-status'), function (lat, lng) {
-            origin = { lat: lat, lng: lng };
-            render(false, true);
-          });
-          /* Link «… vicino a me» (es. bagni accessibili): la posizione si chiede perché l'ha scelto chi usa il sito */
-          if (params.get('vicino') === '1') tools.locate();
-        }
-      }
-      render(false);
-      onEsigenza(function () { render(true, true); });
-      /* «Bagni accessibili vicino a me» nella stessa pagina: filtro, posizione, elenco (senza ricaricare) */
-      [].forEach.call(document.querySelectorAll('a.quick__link--near'), function (a) {
-        a.addEventListener('click', function (ev) {
-          if (!tools || new URL(a.href).pathname !== location.pathname) return;
-          ev.preventDefault();
-          var box = form.querySelector('input[name="f"][value="bagno"]');
-          if (box) box.checked = true;
-          render(true);
-          if (view) view.set('list');
-          tools.locate();
+    if (!config.areaPlaces) {
+      errore();
+      return;
+    }
+    if (mapBox) {
+      map = createMap(mapBox);
+      if (map) {
+        layer = clusterLayer().addTo(map);
+        zoneLayer = clusterLayer(true).addTo(map);
+        map.setView(ITALY.center, ITALY.zoom);
+        tools = addMapButtons(map, document.getElementById('map-status'), function (lat, lng) {
+          origin = { lat: lat, lng: lng };
+          render(false, true);
         });
+        dopoOgniSpostamento(map, caricaArea);
+      }
+    }
+    cerca(true);
+    /* Link «… vicino a me» (es. bagni accessibili): la posizione si chiede perché l'ha scelto chi usa il sito */
+    if (tools && params.get('vicino') === '1') tools.locate();
+    onEsigenza(function () {
+      render(true, true);
+      caricaArea();
+    });
+    /* «Bagni accessibili vicino a me» nella stessa pagina: filtro, posizione, elenco (senza ricaricare) */
+    [].forEach.call(document.querySelectorAll('a.quick__link--near'), function (a) {
+      a.addEventListener('click', function (ev) {
+        if (!tools || new URL(a.href).pathname !== location.pathname) return;
+        ev.preventDefault();
+        var box = form.querySelector('input[name="f"][value="bagno"]');
+        if (box) box.checked = true;
+        render(true, !ricerca);
+        if (view) view.set('list');
+        tools.locate();
       });
-    }).catch(function () {
-      count.textContent = 'Non siamo riusciti a caricare i luoghi. Ricarica la pagina tra poco.';
     });
   }
 
@@ -1380,6 +1673,8 @@
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, placeCard: placeCard,
-    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY
+    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY,
+    /* dopo una modifica (avviso aggiunto o chiuso): i riquadri e le ricerche si richiedono al database */
+    svuotaLuoghi: function () { aree = []; ricerche = {}; }
   };
 })();

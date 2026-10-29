@@ -119,32 +119,32 @@
       return new URL(page, location.href).href;
     }
 
-    /* Supabase restituisce al massimo 1000 righe per richiesta: si leggono a pagine finché non finiscono
-       (allRows); per l'elenco dei luoghi la prima pagina dice quante sono e le altre arrivano insieme (allRowsParallel). */
+    /* Supabase restituisce al massimo 1000 righe per richiesta: si leggono a pagine finché non finiscono (allRows) */
     var PAGINA = 1000;
-    function allRowsParallel(query) {
-      return query(0, PAGINA - 1, true).then(function (res) {
-        var first = check(res);
-        var altre = [];
-        for (var from = PAGINA; from < Math.min(res.count || 0, 20000); from += PAGINA) altre.push(query(from, from + PAGINA - 1, false).then(check));
-        return Promise.all(altre).then(function (pp) { return pp.reduce(function (a, r) { return a.concat(r); }, first); });
-      });
-    }
 
-    /* I luoghi restano in memoria 3 minuti (sessionStorage): passando da una pagina all'altra non si riscaricano.
-       Si svuota quando un moderatore cambia qualcosa. */
-    var CACHE = 'oa-luoghi-app-v1';
-    var CACHE_MS = 3 * 60 * 1000;
-    var memo = null;
-    function dallaCache() {
-      try {
-        var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
-        return c && Date.now() - c.t < CACHE_MS ? c : null;
-      } catch (e) { return null; }
+    /* Mappa ed elenco chiedono solo l'area visibile (luoghi_area) e la ricerca la fa il database (cerca_luoghi):
+       la memoria dei riquadri già visti è in oa-core.js. Gli avvisi attivi sono pochi: si leggono una volta ogni
+       3 minuti e si attaccano ai luoghi che arrivano. Si svuota tutto quando qualcuno aggiunge o chiude un avviso. */
+    var AVVISI_MS = 3 * 60 * 1000;
+    var avvisi = null;
+    function avvisiAttivi() {
+      if (!avvisi || Date.now() - avvisi.t > AVVISI_MS) {
+        avvisi = { t: Date.now(), p: activeAlerts().catch(function () { return []; }) };
+      }
+      return avvisi.p;
     }
     function svuota() {
-      memo = null;
-      try { sessionStorage.removeItem(CACHE); } catch (e) { /* niente */ }
+      avvisi = null;
+      if (window.OA && window.OA.svuotaLuoghi) window.OA.svuotaLuoghi();
+    }
+
+    /* { totale, luoghi } dal database → luoghi nella forma di oa-core.js, con i loro avvisi (le zone passano così) */
+    function conLuoghi(x) {
+      if (!x.luoghi) return x;
+      return avvisiAttivi().then(function (alerts) {
+        x.luoghi = withAlerts(x.luoghi.map(toPlace), alerts);
+        return x;
+      });
     }
 
     function allRows(query, from, acc) {
@@ -203,23 +203,27 @@
           .then(check).then(function (p) { profileCache = p; return p; });
       },
 
-      listPlaces: function () {
-        if (memo) return memo;
-        var c = dallaCache();
-        memo = (c ? Promise.resolve(c) : Promise.all([
-          allRowsParallel(function (from, to, conta) {
-            /* solo le schede pubbliche: anche per i moderatori, i luoghi «da approvare» stanno nel pannello */
-            return sb.from('places').select(COLONNE_ELENCO, conta ? { count: 'exact' } : undefined)
-              .in('stato', ['pubblicato', 'in-revisione']).order('nome').order('id').range(from, to);
-          }),
-          activeAlerts().catch(function () { return []; })
-        ]).then(function (r) {
-          var x = { t: Date.now(), rows: r[0], alerts: r[1] };
-          try { sessionStorage.setItem(CACHE, JSON.stringify(x)); } catch (e) { /* spazio finito: va bene lo stesso */ }
-          return x;
-        })).then(function (x) { return withAlerts(x.rows.map(toPlace), x.alerts); });
-        memo.catch(function () { memo = null; });
-        return memo;
+      /* solo le schede pubbliche: anche per i moderatori, i luoghi «da approvare» stanno nel pannello */
+      areaPlaces: function (q) {
+        return sb.rpc('luoghi_area', {
+          p_sud: q.sud, p_ovest: q.ovest, p_nord: q.nord, p_est: q.est,
+          p_categoria: q.categoria, p_sensi: q.sensi, p_max: q.max, p_passo: q.passo
+        }).then(check).then(conLuoghi);
+      },
+      searchPlaces: function (testo, max) {
+        return sb.rpc('cerca_luoghi', { p_testo: testo, p_max: max || 200 }).then(check).then(conLuoghi);
+      },
+      /* Luoghi pubblici scelti per id (preferiti, locali gestiti): 100 per richiesta, così l'indirizzo resta corto */
+      placesByIds: function (ids) {
+        ids = (ids || []).filter(function (id) { return /^[0-9a-f-]{36}$/.test(id); });
+        var gruppi = [];
+        for (var i = 0; i < ids.length; i += 100) {
+          gruppi.push(sb.from('places').select(COLONNE_ELENCO).in('id', ids.slice(i, i + 100))
+            .in('stato', ['pubblicato', 'in-revisione']).then(check));
+        }
+        return Promise.all(gruppi).then(function (pp) {
+          return conLuoghi({ luoghi: [].concat.apply([], pp) });
+        }).then(function (x) { return x.luoghi; });
       },
       allPlacesForModeration: function () {
         return allRows(function (from, to) {

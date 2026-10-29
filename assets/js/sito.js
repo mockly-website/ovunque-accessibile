@@ -1,17 +1,14 @@
 /* Ovunque Accessibile – sito: avvia il codice comune (oa-core.js) con i luoghi reali del database (Supabase).
    Legge solo le schede pubbliche, con la chiave pubblica dell'app (app/assets/js/config.js): niente account, niente scritture.
-   Supabase restituisce al massimo 1000 righe per richiesta: la prima pagina dice quante sono, le altre arrivano insieme.
-   I luoghi restano in memoria per 5 minuti (sessionStorage), così passando da una pagina all'altra non si riscaricano. */
+   Mappa ed elenco chiedono solo l'area visibile (luoghi_area), la ricerca per testo la fa il database (cerca_luoghi),
+   i contatori della home arrivano già contati (statistiche_luoghi). La memoria dei riquadri già visti è in oa-core.js. */
 (function () {
   'use strict';
 
   var CFG = window.OA_CONFIG || {};
   var COLONNE = 'id,slug,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,descrizione,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,esempio,osm';
-  /* Per mappa ed elenchi basta meno (niente descrizione): un terzo di dati in meno da scaricare */
+  /* Per mappa ed elenchi basta meno (niente descrizione): le stesse colonne le restituiscono luoghi_area e cerca_luoghi */
   var COLONNE_ELENCO = 'id,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,osm';
-  var PAGINA = 1000;
-  var CACHE = 'oa-luoghi-sito-v1';
-  var CACHE_MS = 5 * 60 * 1000;
 
   function toPlace(r) {
     return {
@@ -24,50 +21,46 @@
 
   var HEAD = { apikey: CFG.supabaseKey, Authorization: 'Bearer ' + CFG.supabaseKey };
 
-  function pagina(from, conta) {
-    var url = CFG.supabaseUrl + '/rest/v1/places?select=' + COLONNE_ELENCO + '&stato=in.(pubblicato,in-revisione)&order=nome,id' +
-      '&limit=' + PAGINA + '&offset=' + from;
-    return fetch(url, { credentials: 'omit', headers: conta ? Object.assign({ Prefer: 'count=exact' }, HEAD) : HEAD })
-      .then(function (r) {
-        if (!r.ok) throw new Error('dati');
-        var tot = Number(((r.headers.get('content-range') || '').split('/')[1]) || 0);
-        return r.json().then(function (rows) { return { rows: rows, tot: tot }; });
-      });
+  function leggi(percorso) {
+    return fetch(CFG.supabaseUrl + '/rest/v1/' + percorso, { credentials: 'omit', headers: HEAD })
+      .then(function (r) { if (!r.ok) throw new Error('dati'); return r.json(); });
   }
 
-  function tutti() {
-    return pagina(0, true).then(function (first) {
-      var altre = [];
-      for (var from = PAGINA; from < Math.min(first.tot, 20000); from += PAGINA) altre.push(pagina(from, false));
-      return Promise.all(altre).then(function (pp) {
-        return pp.reduce(function (acc, x) { return acc.concat(x.rows); }, first.rows);
-      });
-    });
+  function rpc(nome, args) {
+    return fetch(CFG.supabaseUrl + '/rest/v1/rpc/' + nome, {
+      method: 'POST', credentials: 'omit',
+      headers: Object.assign({ 'Content-Type': 'application/json' }, HEAD),
+      body: JSON.stringify(args || {})
+    }).then(function (r) { if (!r.ok) throw new Error('dati'); return r.json(); });
   }
 
-  function dallaCache() {
-    try {
-      var c = JSON.parse(sessionStorage.getItem(CACHE) || 'null');
-      return c && Date.now() - c.t < CACHE_MS ? c.rows : null;
-    } catch (e) { return null; }
+  /* { totale, luoghi } → luoghi nella forma di oa-core.js (le zone passano così come sono) */
+  function conLuoghi(x) {
+    if (x.luoghi) x.luoghi = x.luoghi.map(toPlace);
+    return x;
   }
 
-  var cache = null;
   if (CFG.supabaseUrl && CFG.supabaseKey) {
-    window.OA.config.loadPlaces = function () {
-      if (cache) return cache;
-      var rows = dallaCache();
-      cache = rows ? Promise.resolve(rows.map(toPlace)) : tutti().then(function (r) {
-        try { sessionStorage.setItem(CACHE, JSON.stringify({ t: Date.now(), rows: r })); } catch (e) { /* spazio finito: va bene lo stesso */ }
-        return r.map(toPlace);
-      });
-      return cache;
+    window.OA.config.areaPlaces = function (q) {
+      return rpc('luoghi_area', {
+        p_sud: q.sud, p_ovest: q.ovest, p_nord: q.nord, p_est: q.est,
+        p_categoria: q.categoria, p_sensi: q.sensi, p_max: q.max, p_passo: q.passo
+      }).then(conLuoghi);
+    };
+    window.OA.config.searchPlaces = function (testo) {
+      return rpc('cerca_luoghi', { p_testo: testo }).then(conLuoghi);
+    };
+    /* Home: le ultime schede verificate (non quelle importate da OpenStreetMap); oa-core ne mostra 3 per l'esigenza scelta */
+    window.OA.config.latestPlaces = function () {
+      return leggi('places?select=' + COLONNE_ELENCO + '&stato=in.(pubblicato,in-revisione)&verifica_livello=neq.osm' +
+        '&verifica_data=not.is.null&order=verifica_data.desc,nome&limit=24').then(function (rows) { return rows.map(toPlace); });
+    };
+    window.OA.config.stats = function () {
+      return rpc('statistiche_luoghi');
     };
     window.OA.config.loadPlace = function (id) {
       if (!/^[0-9a-f-]{36}$/.test(id || '')) return Promise.resolve(null);
-      var url = CFG.supabaseUrl + '/rest/v1/places?select=' + COLONNE + '&id=eq.' + id + '&stato=in.(pubblicato,in-revisione)';
-      return fetch(url, { credentials: 'omit', headers: HEAD })
-        .then(function (r) { if (!r.ok) throw new Error('dati'); return r.json(); })
+      return leggi('places?select=' + COLONNE + '&id=eq.' + id + '&stato=in.(pubblicato,in-revisione)')
         .then(function (rows) { return rows[0] ? toPlace(rows[0]) : null; });
     };
     /* Le correzioni si propongono dall'app (con le misure), non per email */

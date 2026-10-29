@@ -149,7 +149,8 @@
   }
 
   /* ---------- 3. Avvio comune ---------- */
-  OA.config.loadPlaces = api.listPlaces;
+  OA.config.areaPlaces = api.areaPlaces;
+  OA.config.searchPlaces = api.searchPlaces;
   OA.config.loadPlace = api.getPlace;
   OA.config.reportHref = function (p) { return 'segnala.html?id=' + encodeURIComponent(p.id); };
   OA.config.onDetail = initDetailExtras;
@@ -1067,17 +1068,10 @@
     var out = $('find-list');
     var status = $('find-status');
     if (!input) return;
-    var places = null;
     var timer = null;
-    function render() {
-      var q = OA.normalize(input.value.trim());
+    var giro = 0;
+    function render(found) {
       out.textContent = '';
-      if (q.length < 2) { status.textContent = ''; return; }
-      var words = q.split(/\s+/);
-      var found = (places || []).filter(function (p) {
-        var hay = OA.normalize([p.nome, p.citta, p.indirizzo].join(' '));
-        return words.every(function (w) { return hay.indexOf(w) !== -1; });
-      }).slice(0, 8);
       status.textContent = found.length ? (found.length === 1 ? '1 locale trovato.' : found.length + ' locali trovati (al massimo 8: scrivi anche la città per restringere).') : 'Nessun locale trovato con questo nome.';
       found.forEach(function (p) {
         out.appendChild(el('li', { className: 'find-list__item' }, [
@@ -1091,12 +1085,21 @@
         ]));
       });
     }
+    /* La ricerca la fa il database (nome, città, indirizzo…), come nella pagina mappa */
     input.addEventListener('input', function () {
       clearTimeout(timer);
+      var mio = ++giro;
+      var q = input.value.trim();
+      if (q.length < 2) {
+        out.textContent = '';
+        status.textContent = '';
+        return;
+      }
       timer = setTimeout(function () {
-        if (places) return render();
-        status.textContent = 'Carico i locali…';
-        api.listPlaces().then(function (rows) { places = rows; render(); }).catch(function (err) { status.textContent = err.message; });
+        status.textContent = 'Cerco i locali…';
+        api.searchPlaces(q, 8).then(function (x) {
+          if (mio === giro) render(x.luoghi);
+        }).catch(function (err) { if (mio === giro) status.textContent = err.message; });
       }, 250);
     });
   }
@@ -1224,7 +1227,10 @@
     }
 
     function load() {
-      Promise.all([api.myOwnerships(), api.myVerifications(), api.listPlaces().catch(function () { return []; })]).then(function (r) {
+      Promise.all([api.myOwnerships(), api.myVerifications()]).then(function (r) {
+        return api.placesByIds(r[0].map(function (g) { return g.place_id; })).catch(function () { return []; })
+          .then(function (places) { return r.concat([places]); });
+      }).then(function (r) {
         byId = {};
         r[2].forEach(function (x) { byId[x.id] = x; });
         list.textContent = '';
@@ -2654,11 +2660,15 @@
   }
 
   function loadActivity() {
-    Promise.all([api.myData(), api.listPlaces(), api.favorites()]).then(function (r) {
+    /* Solo i luoghi che servono: preferiti e luoghi delle mie recensioni */
+    Promise.all([api.myData(), api.favorites()]).then(function (r) {
+      var ids = r[1].concat(((r[0] || {}).recensioni || []).map(function (rv) { return rv.place_id; }));
+      return api.placesByIds(ids.filter(function (id, i) { return ids.indexOf(id) === i; }))
+        .then(function (places) { return [r[0], places, r[1]]; });
+    }).then(function (r) {
       var data = r[0] || {};
-      var places = r[1];
       var byId = {};
-      places.forEach(function (p) { byId[p.id] = p; });
+      r[1].forEach(function (p) { byId[p.id] = p; });
 
       var favList = $('fav-list');
       favList.textContent = '';

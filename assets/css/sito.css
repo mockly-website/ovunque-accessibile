@@ -1543,6 +1543,11 @@ main > .section {
   box-shadow: 0 0 0 6px rgba(22, 40, 65, 0.18), 0 4px 10px rgba(22, 40, 65, 0.3);
 }
 
+/* Zone con più di mille luoghi (mappa lontana): il numero resta dentro il cerchio */
+.cluster--tanti {
+  font-size: 0.9rem;
+}
+
 .cluster:focus-visible {
   outline: var(--focus-width) solid var(--color-brand);
   outline-offset: 4px;
