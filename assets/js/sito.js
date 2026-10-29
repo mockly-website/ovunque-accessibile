@@ -47,8 +47,8 @@
         p_categoria: q.categoria, p_sensi: q.sensi, p_max: q.max, p_passo: q.passo
       }).then(conLuoghi);
     };
-    window.OA.config.searchPlaces = function (testo) {
-      return rpc('cerca_luoghi', { p_testo: testo }).then(conLuoghi);
+    window.OA.config.searchPlaces = function (testo, categoria) {
+      return rpc('cerca_luoghi', { p_testo: testo, p_categoria: categoria || null }).then(conLuoghi);
     };
     /* Home: le ultime schede verificate (non quelle importate da OpenStreetMap); oa-core ne mostra 3 per l'esigenza scelta */
     window.OA.config.latestPlaces = function () {

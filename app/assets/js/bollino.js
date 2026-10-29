@@ -88,6 +88,8 @@
     $('badge-help').textContent = sulPosto
       ? 'Si stampa su un foglio A4 (meglio carta adesiva), da tagliare lungo il bordo. L\'immagine va bene anche per i social e il sito del locale. Il codice apre sempre la scheda aggiornata.'
       : 'Mettilo in vetrina, alla cassa o sui social: chi lo inquadra apre la scheda del locale, sempre aggiornata. Quando verifichiamo il locale sul posto diventa il bollino «Verificato sul posto».';
+    /* Il titolo nascosto serve solo quando c'è un avviso al posto del bollino: il bollino ha il suo */
+    show($('badge-page-title'), false);
     show($('badge'), true);
     show($('badge-actions'), true);
     $('badge-print').addEventListener('click', function () { window.print(); });

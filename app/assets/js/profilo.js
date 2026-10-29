@@ -232,7 +232,7 @@
       }
       timer = setTimeout(function () {
         status.textContent = 'Cerco i locali…';
-        api.searchPlaces(q, 8).then(function (x) {
+        api.searchPlaces(q, null, 8).then(function (x) {
           if (mio === giro) render(x.luoghi);
         }).catch(function (err) { if (mio === giro) status.textContent = err.message; });
       }, 250);

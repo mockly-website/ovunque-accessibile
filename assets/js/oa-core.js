@@ -20,7 +20,7 @@
   var STORAGE_KEY = 'oa-esigenza';
 
   /* Punti di aggancio per sito e app: areaPlaces(riquadro) → Promise di { totale, luoghi } o { totale, zone },
-     searchPlaces(testo) → Promise di { totale, luoghi }, latestPlaces(), stats(), loadPlace(id), reportHref(p), onDetail(p) */
+     searchPlaces(testo, tipo) → Promise di { totale, luoghi }, latestPlaces(), stats(), loadPlace(id), reportHref(p), onDetail(p) */
   var config = {};
 
   var CATEGORIE = {
@@ -770,12 +770,13 @@
     return a.promessa;
   }
 
-  /* Ricerca per testo sul server; le ricerche già fatte restano in memoria finché la pagina è aperta */
+  /* Ricerca per testo sul server (con il tipo di luogo, se scelto); le ricerche già fatte restano in memoria
+     finché la pagina è aperta */
   var ricerche = {};
-  function cercaLuoghi(q) {
-    var k = normalize(q).replace(/\s+/g, ' ');
+  function cercaLuoghi(q, cat) {
+    var k = normalize(q).replace(/\s+/g, ' ') + '|' + (cat || '');
     if (!ricerche[k]) {
-      ricerche[k] = config.searchPlaces(q);
+      ricerche[k] = config.searchPlaces(q, cat || null);
       ricerche[k].catch(function () { delete ricerche[k]; });
     }
     return ricerche[k];
@@ -1114,8 +1115,8 @@
         rifaiElenco(zone.map(zonaItem));
       }
       if (view) view.count(n);
-      testo(count, quantiLuoghi(n) + ' in quest\'area della mappa: avvicina la mappa, scegli una zona o cerca una città per vederli uno per uno' +
-        (attivi ? ' (i filtri valgono quando li vedi uno per uno)' : '') + '.');
+      testo(count, quantiLuoghi(n) + ' in quest\'area: scegli una zona o avvicina la mappa per vederli uno per uno' +
+        (attivi ? '; i filtri valgono sui singoli luoghi' : '') + '.');
       if (map) {
         layer.clearLayers();
         markers = {};
@@ -1166,9 +1167,13 @@
       }
       if (view) view.count(found.length);
       var piu = ricerca && ricerca.totale > ricerca.luoghi.length;
+      /* Oltre i primi risultati: «I primi 200 dei 306 luoghi trovati», o quanti ne restano con i filtri */
+      var primi = piu && 'i primi ' + ricerca.luoghi.length + ' dei ' + ricerca.totale.toLocaleString('it-IT') + ' luoghi trovati';
       testo(count, (ricerca
-        ? (found.length === 1 ? '1 luogo trovato' : found.length.toLocaleString('it-IT') + ' luoghi trovati') +
-          (piu ? ' tra i primi ' + ricerca.luoghi.length + ' risultati: aggiungi una parola per restringere la ricerca' : '')
+        ? (piu
+          ? (found.length === ricerca.luoghi.length ? 'I' + primi.slice(1) : quantiLuoghi(found.length) + ' tra ' + primi) +
+            ': aggiungi una parola per restringere la ricerca'
+          : (found.length === 1 ? '1 luogo trovato' : found.length.toLocaleString('it-IT') + ' luoghi trovati'))
         : quantiLuoghi(found.length) + ' in quest\'area della mappa') +
         (origin ? ', dal più vicino' : '') + ' · giudizi per ' + ESIGENZE[e].nome.toLowerCase());
 
@@ -1219,7 +1224,7 @@
         return;
       }
       list.setAttribute('aria-busy', 'true');
-      cercaLuoghi(q).then(function (x) {
+      cercaLuoghi(q, form.elements.cat.value).then(function (x) {
         if (mio !== giro) return;
         ricerca = x;
         firma = '';
@@ -1234,6 +1239,8 @@
       clearTimeout(timer);
       if (n === 'q') {
         timer = setTimeout(function () { cerca(true); }, 300);
+      } else if (n === 'cat' && ricerca) {
+        cerca(true);
       } else {
         render(true, !ricerca);
         if (n === 'cat') caricaArea();

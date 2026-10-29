@@ -16,7 +16,7 @@
     authListeners.forEach(function (fn) { fn(user); });
   }
 
-  /* Riga del database → forma usata da oa-core.js (come luoghi.json) */
+  /* Riga del database → forma usata da oa-core.js */
   function toPlace(r) {
     return {
       id: r.id, slug: r.slug, nome: r.nome, categoria: r.categoria, indirizzo: r.indirizzo, cap: r.cap,
@@ -210,8 +210,8 @@
           p_categoria: q.categoria, p_sensi: q.sensi, p_max: q.max, p_passo: q.passo
         }).then(check).then(conLuoghi);
       },
-      searchPlaces: function (testo, max) {
-        return sb.rpc('cerca_luoghi', { p_testo: testo, p_max: max || 200 }).then(check).then(conLuoghi);
+      searchPlaces: function (testo, categoria, max) {
+        return sb.rpc('cerca_luoghi', { p_testo: testo, p_categoria: categoria || null, p_max: max || 200 }).then(check).then(conLuoghi);
       },
       /* Luoghi pubblici scelti per id (preferiti, locali gestiti): 100 per richiesta, così l'indirizzo resta corto */
       placesByIds: function (ids) {

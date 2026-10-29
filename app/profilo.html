@@ -18,13 +18,13 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=42f1553d">
-  <link rel="stylesheet" href="assets/css/app.css?v=0ddfb083">
+  <link rel="stylesheet" href="assets/css/app.css?v=6f1e25a0">
   <script src="assets/js/config.js?v=2dce3a73" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
-  <script src="../assets/js/oa-core.js?v=9ffb7c2a" defer></script>
-  <script src="assets/js/api.js?v=ce6fe99a" defer></script>
+  <script src="../assets/js/oa-core.js?v=347bf0d9" defer></script>
+  <script src="assets/js/api.js?v=52554153" defer></script>
   <script src="assets/js/app.js?v=68aa1a57" defer></script>
-  <script src="assets/js/profilo.js?v=7bfa150d" defer></script>
+  <script src="assets/js/profilo.js?v=f47f2603" defer></script>
 </head>
 <body class="app" data-page="profilo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -105,7 +105,7 @@
       <section id="profile-guest" class="card" aria-labelledby="guest-title" hidden>
         <h1 id="guest-title">Il tuo profilo</h1>
         <p>Accedi per salvare i preferiti, scrivere recensioni e segnalare luoghi. Per guardare la mappa non serve un account.</p>
-        <div class="demo__actions">
+        <div class="btn-row">
           <a class="btn btn--primary" href="accedi.html">Accedi</a>
           <a class="btn btn--secondary" href="registrati.html">Registrati</a>
         </div>
@@ -192,7 +192,7 @@
             <button class="btn btn--secondary btn--small" type="submit">Salva la password</button>
           </form>
           <h4 class="card__subtitle">I tuoi dati</h4>
-          <div class="demo__actions">
+          <div class="btn-row">
             <button id="export-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-download"/></svg>Scarica i miei dati</button>
             <button id="logout-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-logout"/></svg>Esci</button>
             <button id="delete-btn" class="btn btn--danger btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-trash"/></svg>Elimina l'account</button>
@@ -219,7 +219,7 @@
             <label class="field__label" for="conferma">Per confermare scrivi ELIMINA</label>
             <input class="input" type="text" id="conferma" name="conferma" autocomplete="off" required>
           </div>
-          <div class="demo__actions">
+          <div class="btn-row">
             <button class="btn btn--danger" type="submit">Elimina definitivamente</button>
             <button id="delete-cancel" class="btn btn--secondary" type="button">Annulla</button>
           </div>

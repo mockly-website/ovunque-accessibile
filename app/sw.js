@@ -3,15 +3,15 @@
    - File statici (CSS, JS, font, icone): dalla copia salvata, aggiornata in sottofondo.
    - Mai in cache: dati e accesso (Supabase), immagini della mappa, altri siti.
    Cambiare VERSION a ogni rilascio per buttare le copie vecchie. */
-var VERSION = 'oa-app-8f5c2d5e';
+var VERSION = 'oa-app-93c8d0ea';
 var SHELL = [
   './', 'index.html', 'luogo.html', 'accedi.html', 'registrati.html', 'password.html', 'segnala.html',
   'profilo.html', 'moderazione.html', 'privacy.html', 'bollino.html', 'locali.html', 'manifest.webmanifest',
-  'assets/css/app.css?v=0ddfb083', 'assets/js/config.js?v=2dce3a73', 'assets/js/api.js?v=ce6fe99a', 'assets/js/app.js?v=68aa1a57',
-  'assets/js/accesso.js?v=8ece6a4f', 'assets/js/scheda.js?v=c87897c4', 'assets/js/segnala.js?v=4394e269', 'assets/js/profilo.js?v=7bfa150d',
-  'assets/js/moderazione.js?v=3e25ad6f', 'assets/js/bollino.js?v=e85768f0',
+  'assets/css/app.css?v=6f1e25a0', 'assets/js/config.js?v=2dce3a73', 'assets/js/api.js?v=52554153', 'assets/js/app.js?v=68aa1a57',
+  'assets/js/accesso.js?v=8ece6a4f', 'assets/js/scheda.js?v=c87897c4', 'assets/js/segnala.js?v=4394e269', 'assets/js/profilo.js?v=f47f2603',
+  'assets/js/moderazione.js?v=3e25ad6f', 'assets/js/bollino.js?v=9e6d94a4',
   'assets/vendor/supabase/supabase.js?v=2.117.3', 'assets/img/icon-192.png',
-  '../assets/css/sito.css?v=42f1553d', '../assets/js/oa-core.js?v=9ffb7c2a',
+  '../assets/css/sito.css?v=42f1553d', '../assets/js/oa-core.js?v=347bf0d9',
   '../assets/vendor/leaflet/leaflet.js', '../assets/vendor/leaflet/leaflet.css',
   '../assets/vendor/markercluster/leaflet.markercluster.js', '../assets/vendor/markercluster/MarkerCluster.css',
   '../assets/fonts/atkinson-hyperlegible-400-latin.woff2', '../assets/fonts/atkinson-hyperlegible-700-latin.woff2',
@@ -32,7 +32,6 @@ self.addEventListener('fetch', function (event) {
   var req = event.request;
   var url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== self.location.origin) return;
-  if (/\.json$/.test(url.pathname)) return;          /* luoghi di esempio: sempre dalla rete */
 
   if (req.mode === 'navigate') {
     event.respondWith(fetch(req).then(function (res) {

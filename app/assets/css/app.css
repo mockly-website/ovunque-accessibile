@@ -1349,7 +1349,7 @@ textarea.input {
   color: var(--color-white);
 }
 
-.demo__actions {
+.btn-row {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
@@ -1404,12 +1404,12 @@ textarea.input {
 }
 
 @media (max-width: 47.99em) {
-  .app .demo__actions {
+  .app .btn-row {
     display: grid;
     gap: var(--space-xs);
   }
 
-  .app .demo__actions > .btn {
+  .app .btn-row > .btn {
     width: 100%;
     justify-content: center;
   }
