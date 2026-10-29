@@ -1,37 +1,82 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" width="320" height="240">
-  <!-- Ovunque Accessibile: schermata di caricamento del sito. Il sentiero marrone del logo si disegna a puntini
-       fino al segnaposto blu con il simbolo dell'accessibilità, che cade sul punto, rimbalza e lascia un'onda. -->
+  <!-- Ovunque Accessibile: schermata di caricamento del sito. Una persona in carrozzina elettrica (ruota motrice che gira,
+       batteria con il fulmine) percorre il sentiero marrone del logo, che si disegna a puntini dietro di lei, fino al
+       segnaposto blu; quando arriva il segnaposto fa un saltello e lascia un'onda. Giro di 2,2 s, arrivo a circa 1 s. -->
   <defs>
     <mask id="traccia" maskUnits="userSpaceOnUse">
-      <path d="M34 214 C74 216 86 180 120 184 S150 190 158 188" fill="none" stroke="#fff" stroke-width="14"
-            stroke-linecap="round" stroke-dasharray="200" stroke-dashoffset="200">
-        <animate attributeName="stroke-dashoffset" values="200;0;0;200" keyTimes="0;0.45;0.88;1" dur="2.4s" repeatCount="indefinite"/>
-      </path>
+      <rect x="0" y="190" width="10" height="30" fill="#fff">
+        <animate attributeName="width" values="10;148;148" keyTimes="0;0.45;1" calcMode="spline" keySplines=".3 .1 .3 1;0 0 1 1" dur="2.2s" repeatCount="indefinite"/>
+      </rect>
     </mask>
   </defs>
-  <circle cx="160" cy="132" r="96" fill="#e6f4fd"/>
-  <!-- sentiero a puntini -->
-  <path d="M34 214 C74 216 86 180 120 184 S150 190 158 188" fill="none" stroke="#8b7d6b" stroke-width="8"
-        stroke-linecap="round" stroke-dasharray="0 15" mask="url(#traccia)"/>
-  <!-- onda dove cade il segnaposto -->
-  <ellipse cx="160" cy="188" rx="6" ry="2.4" fill="none" stroke="#2f5b9c" stroke-width="3" opacity="0">
-    <animate attributeName="rx" values="6;6;40" keyTimes="0;0.5;1" dur="2.4s" repeatCount="indefinite"/>
-    <animate attributeName="ry" values="2.4;2.4;12" keyTimes="0;0.5;1" dur="2.4s" repeatCount="indefinite"/>
-    <animate attributeName="opacity" values="0;0.6;0" keyTimes="0;0.5;1" dur="2.4s" repeatCount="indefinite"/>
+  <circle cx="156" cy="152" r="86" fill="#e6f4fd"/>
+
+  <!-- sentiero a puntini, scoperto man mano che la carrozzina avanza -->
+  <path d="M22 210 H234" fill="none" stroke="#8b7d6b" stroke-width="7" stroke-linecap="round" stroke-dasharray="0 14" mask="url(#traccia)"/>
+
+  <!-- segnaposto all'arrivo -->
+  <ellipse cx="262" cy="210" rx="5" ry="2" fill="none" stroke="#2f5b9c" stroke-width="2.5" opacity="0">
+    <animate attributeName="rx" values="5;5;26" keyTimes="0;0.5;1" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="ry" values="2;2;8" keyTimes="0;0.5;1" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;0.6;0" keyTimes="0;0.5;1" dur="2.2s" repeatCount="indefinite"/>
   </ellipse>
-  <ellipse cx="160" cy="189" rx="16" ry="5" fill="#162841" opacity=".16">
-    <animate attributeName="rx" values="6;16;13;16;16" keyTimes="0;0.4;0.48;0.55;1" dur="2.4s" repeatCount="indefinite"/>
-  </ellipse>
-  <!-- segnaposto con il simbolo dell'accessibilità -->
+  <ellipse cx="262" cy="210" rx="11" ry="3.5" fill="#162841" opacity=".16"/>
   <g>
-    <animateTransform attributeName="transform" type="translate" values="0 -60;0 -60;0 0;0 -12;0 0;0 0"
-                      keyTimes="0;0.2;0.4;0.47;0.54;1" calcMode="spline"
-                      keySplines="0 0 1 1;.5 0 1 1;0 0 .4 1;.5 0 1 1;0 0 1 1" dur="2.4s" repeatCount="indefinite"/>
-    <path d="M160 72c-26 0-47 20.6-47 46.2C113 152 160 188 160 188s47-36 47-69.8C207 92.6 186 72 160 72z" fill="#2f5b9c"/>
-    <circle cx="160" cy="118" r="30" fill="#fff"/>
-    <g transform="translate(137.5 95.5) scale(1.875)" fill="#162841">
-      <circle cx="12" cy="4" r="2"/>
-      <path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/>
+    <animateTransform attributeName="transform" type="translate" values="0 0;0 0;0 -14;0 0;0 -4;0 0;0 0"
+                      keyTimes="0;0.46;0.54;0.62;0.67;0.72;1" dur="2.2s" repeatCount="indefinite"/>
+    <g transform="translate(262 210) scale(0.6) translate(-160 -188)">
+      <path d="M160 72c-26 0-47 20.6-47 46.2C113 152 160 188 160 188s47-36 47-69.8C207 92.6 186 72 160 72z" fill="#2f5b9c"/>
+      <circle cx="160" cy="118" r="30" fill="#fff"/>
+      <g transform="translate(137.5 95.5) scale(1.875)" fill="#162841">
+        <circle cx="12" cy="4" r="2"/>
+        <path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43c-.17-.19-.38-.34-.61-.45-.01 0-.01-.01-.02-.01H13c-.35-.2-.75-.3-1.19-.26C10.76 7.11 10 8.04 10 9.09V15c0 1.1.9 2 2 2h5v5h2v-5.5c0-1.1-.9-2-2-2h-3v-3.45c1.29 1.07 3.25 1.94 5 1.95zm-6.17 5c-.41 1.16-1.52 2-2.83 2-1.66 0-3-1.34-3-3 0-1.31.84-2.41 2-2.83V12.1c-2.28.46-4 2.48-4 4.9 0 2.76 2.24 5 5 5 2.42 0 4.44-1.72 4.9-4h-2.07z"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- carrozzina elettrica con la persona, vista di lato, rivolta verso destra (0,0 = punto a terra della ruota motrice) -->
+  <g>
+    <animateTransform attributeName="transform" type="translate" values="40 210;178 210;178 210"
+                      keyTimes="0;0.45;1" calcMode="spline" keySplines=".3 .1 .3 1;0 0 1 1" dur="2.2s" repeatCount="indefinite"/>
+    <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.06;0.86;1" dur="2.2s" repeatCount="indefinite"/>
+    <!-- leggero sobbalzo mentre avanza -->
+    <g>
+      <animateTransform attributeName="transform" type="translate" values="0 0;0 -1.5;0 0;0 -1.5;0 0;0 -1.5;0 0;0 0"
+                        keyTimes="0;0.07;0.14;0.21;0.28;0.35;0.42;1" dur="2.2s" repeatCount="indefinite"/>
+      <!-- schienale e poggiatesta -->
+      <rect x="-30" y="-80" width="9" height="44" rx="4" fill="#2f5b9c"/>
+      <rect x="-31" y="-91" width="11" height="10" rx="4" fill="#2f5b9c"/>
+      <!-- sedile su colonna -->
+      <rect x="-7" y="-31" width="9" height="8" fill="#2f5b9c"/>
+      <rect x="-24" y="-39" width="42" height="9" rx="4" fill="#2f5b9c"/>
+      <!-- persona -->
+      <g fill="none" stroke="#162841" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M-17 -73 L-15 -45 L14 -43 L21 -19" stroke-width="10"/>
+        <path d="M21 -16 H30" stroke-width="7"/>
+      </g>
+      <circle cx="-13" cy="-88" r="9" fill="#162841"/>
+      <!-- bracciolo con il joystick -->
+      <rect x="-17" y="-55" width="31" height="5" rx="2.5" fill="#2f5b9c"/>
+      <rect x="-14" y="-51" width="4" height="12" fill="#2f5b9c"/>
+      <path d="M12 -55 L14 -62" stroke="#162841" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="14.5" cy="-63" r="2.8" fill="#162841"/>
+      <path d="M-15 -69 L-5 -58 L10 -59" fill="none" stroke="#162841" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+      <!-- pedana -->
+      <path d="M15 -31 L23 -13 M19 -11 H33" fill="none" stroke="#2f5b9c" stroke-width="4" stroke-linecap="round"/>
+      <!-- base con la batteria (fulmine) -->
+      <rect x="-31" y="-26" width="59" height="14" rx="5" fill="#162841"/>
+      <path d="M22 -25 l-5 7 h4 l-3 6 l8 -9 h-4 l3 -4z" fill="#e7d6b9"/>
+      <!-- ruotine davanti e dietro -->
+      <circle cx="-27" cy="-5" r="5" fill="#162841"/>
+      <circle cx="25" cy="-5" r="5" fill="#162841"/>
+      <!-- ruota motrice che gira -->
+      <g>
+        <animateTransform attributeName="transform" type="rotate" values="0 0 -13;600 0 -13;600 0 -13"
+                          keyTimes="0;0.45;1" calcMode="spline" keySplines=".3 .1 .3 1;0 0 1 1" dur="2.2s" repeatCount="indefinite"/>
+        <circle cx="0" cy="-13" r="13" fill="#162841"/>
+        <path d="M0 -21 V-5 M-8 -13 H8 M-5.7 -18.7 L5.7 -7.3 M5.7 -18.7 L-5.7 -7.3" stroke="#e6f4fd" stroke-width="1.6" stroke-linecap="round"/>
+        <circle cx="0" cy="-13" r="3" fill="#e6f4fd"/>
+      </g>
     </g>
   </g>
 </svg>

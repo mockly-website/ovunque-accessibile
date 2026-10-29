@@ -2366,13 +2366,13 @@ html:not(.js) .js-only {
   }
 }
 
-/* 13. Schermata di caricamento (assets/js/intro.js), 29 ottobre: sul chiaro del sito, il sentiero marrone del logo si
-   disegna a puntini e il segnaposto blu ci cade sopra (assets/img/intro.svg); sotto, il nome. All'uscita la schermata
-   sale come un sipario e scopre la pagina. Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori
-   dall'albero di accessibilità. */
+/* 13. Schermata di caricamento (assets/js/intro.js), 29 ottobre: sul chiaro del sito una persona in carrozzina elettrica
+   percorre il sentiero marrone del logo, che si disegna a puntini, fino al segnaposto blu (assets/img/intro.svg);
+   sotto, il nome. All'uscita la schermata sale come un sipario e scopre la pagina. Pseudo-elementi di <html>: compaiono
+   prima del contenuto e restano fuori dall'albero di accessibilità. */
 .oa-intro,
 .oa-intro-out {
-  --intro-size: min(17rem, 72vw);
+  --intro-size: min(19rem, 86vw);
 }
 
 .oa-intro::before,
@@ -2392,7 +2392,7 @@ html:not(.js) .js-only {
   top: 0;
   bottom: 0;
   background:
-    url("../img/intro.svg?v=4") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
+    url("../img/intro.svg?v=5") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
     radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
 }
 
@@ -2432,7 +2432,7 @@ html:not(.js) .js-only {
 
 @media (prefers-reduced-motion: reduce) {
   .oa-intro::before {
-    background-image: url("../img/intro-fermo.svg?v=3"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
+    background-image: url("../img/intro-fermo.svg?v=4"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
   }
 
   .oa-intro::after {
