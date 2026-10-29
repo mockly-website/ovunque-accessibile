@@ -15,9 +15,9 @@
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
-  <script src="assets/js/intro.js?v=i4"></script>
-  <script src="assets/js/menu.js?v=m1" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=p38">
+  <script src="assets/js/intro.js?v=i5"></script>
+  <script src="assets/js/menu.js?v=m2" defer></script>
+  <link rel="stylesheet" href="assets/css/sito.css?v=p39">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="app/assets/js/config.js?v=a24" defer></script>
@@ -53,6 +53,7 @@
     <symbol id="icon-na" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9A7.9 7.9 0 0 1 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1A7.9 7.9 0 0 1 20 12c0 4.42-3.58 8-8 8z"/></symbol>
     <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></symbol>
     <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></symbol>
     <symbol id="icon-people" viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></symbol>
   </svg>
 
@@ -82,14 +83,9 @@
 
   <main id="main" tabindex="-1">
     <section class="hero" aria-labelledby="hero-title">
-      <picture class="hero__photo">
-        <source type="image/webp" srcset="assets/img/hero-800.webp 800w, assets/img/hero-1200.webp 1200w" sizes="(min-width: 60em) 50vw, 100vw">
-        <img src="assets/img/hero-1200.jpg" srcset="assets/img/hero-800.jpg 800w, assets/img/hero-1200.jpg 1200w" sizes="(min-width: 60em) 50vw, 100vw"
-             width="1200" height="1600" fetchpriority="high"
-             alt="Angelo e Lorenzo in carrozzina elettrica su un belvedere in Sardegna, con il paese e le colline alle spalle.">
-      </picture>
       <div class="container hero__inner">
         <div class="hero__text reveal">
+          <p class="eyebrow"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pin"/></svg>Il progetto di Angelo e Lorenzo</p>
           <h1 id="hero-title" class="hero__title">Trova luoghi <span class="hero__accent">davvero accessibili</span></h1>
           <p class="hero__lead">Ingresso, bagno, parcheggio e spazi interni: informazioni concrete, raccolte da chi ci è stato. In tutta Italia.</p>
 
@@ -114,14 +110,49 @@
             <li><a class="quick__link" href="mappa.html?f=parcheggio"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Parcheggio riservato</a></li>
           </ul>
         </div>
+
+        <figure class="hero__media">
+          <picture class="hero__photo">
+            <source type="image/webp" srcset="assets/img/hero-800.webp 800w, assets/img/hero-1200.webp 1200w" sizes="(min-width: 60em) 30rem, 90vw">
+            <img src="assets/img/hero-1200.jpg" srcset="assets/img/hero-800.jpg 800w, assets/img/hero-1200.jpg 1200w" sizes="(min-width: 60em) 30rem, 90vw"
+                 width="1200" height="1600" fetchpriority="high"
+                 alt="Angelo e Lorenzo in carrozzina elettrica su un belvedere in Sardegna, con il paese e le colline alle spalle.">
+          </picture>
+          <figcaption class="hero__quote">
+            <span class="hero__quote-text">«L'accessibilità non dovrebbe essere un privilegio, ma la normalità»</span>
+            <span class="hero__quote-by">Angelo e Lorenzo</span>
+          </figcaption>
+          <svg class="hero__path" aria-hidden="true" focusable="false" viewBox="0 0 200 120"><path d="M6 110 C50 112 52 52 98 58 S150 92 194 12"/></svg>
+        </figure>
       </div>
     </section>
 
-    <section class="section map-preview" aria-labelledby="map-preview-title">
+    <section class="section needs-home" aria-labelledby="needs-home-title">
+      <div class="container">
+        <div class="section__head">
+          <p class="eyebrow">Per chi è</p>
+          <h2 id="needs-home-title">Ogni scheda, letta per la tua esigenza</h2>
+          <p>Scegli come ti muovi: la mappa ti dice se un luogo va bene per te, non in generale.</p>
+        </div>
+        <ul class="needs-home__list" role="list">
+          <li><a class="need-tile" href="mappa.html?per=manuale"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg></span>Carrozzina manuale<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a class="need-tile" href="mappa.html?per=elettrica"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg></span>Carrozzina elettrica<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a class="need-tile" href="mappa.html?per=cammino"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg></span>Difficoltà a camminare<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a class="need-tile" href="mappa.html?per=anziani"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg></span>Persona anziana<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a class="need-tile" href="mappa.html?per=vista"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg></span>Disabilità visiva<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a class="need-tile" href="mappa.html?per=udito"><span class="need-tile__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-ear"/></svg></span>Disabilità uditiva<svg class="icon need-tile__arrow" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+        </ul>
+        <p class="needs-home__note">Utile anche a chi spinge un passeggino e a chi accompagna.</p>
+      </div>
+    </section>
+
+    <section class="section section--band map-preview" aria-labelledby="map-preview-title">
       <div class="container map-preview__inner">
         <div class="section__head map-preview__head">
+          <p class="eyebrow">La mappa</p>
           <h2 id="map-preview-title">I luoghi sulla mappa</h2>
           <p>Ogni segnaposto è un luogo con le sue misure: verde se è accessibile, marrone se lo è solo in parte.</p>
+          <a class="btn btn--primary" href="mappa.html">Apri la mappa completa<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a>
         </div>
         <div>
           <div id="home-map" class="hero__map" role="region" aria-label="Anteprima della mappa dei luoghi">
@@ -131,7 +162,7 @@
             <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
             <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
           </ul>
-          <p class="map__note">Apri la <a href="mappa.html">mappa completa</a> per cercare e filtrare: lì trovi anche l'elenco dei luoghi.</p>
+          <p class="map__note">Nella mappa completa cerchi, filtri e trovi anche l'elenco dei luoghi.</p>
         </div>
       </div>
     </section>
@@ -139,6 +170,7 @@
     <section class="section" aria-labelledby="latest-title">
       <div class="container">
         <div class="section__head">
+          <p class="eyebrow">Novità</p>
           <h2 id="latest-title">Ultimi luoghi verificati</h2>
           <p>Le schede aggiornate più di recente. <a href="mappa.html">Vedi tutti i luoghi</a></p>
         </div>
@@ -152,10 +184,11 @@
     <section id="come-funziona" class="section" aria-labelledby="how-title">
       <div class="container">
         <div class="section__head">
+          <p class="eyebrow">In tre passi</p>
           <h2 id="how-title">Come funziona</h2>
-          <p>Niente simboli generici: per ogni luogo diciamo cosa trovi davvero.</p>
+          <p>Tre passi per sapere prima se un posto fa per te.</p>
         </div>
-        <ol class="grid grid--3" role="list">
+        <ol class="grid grid--3 steps" role="list">
           <li class="card">
             <span class="step__num" aria-hidden="true">1</span>
             <h3>Cerca</h3>
@@ -175,16 +208,20 @@
       </div>
     </section>
 
-    <section class="section" aria-labelledby="facts-title">
+    <section class="section section--band" aria-labelledby="facts-title">
       <div class="container">
         <div class="section__head">
+          <p class="eyebrow">Le schede</p>
           <h2 id="facts-title">Cosa trovi in ogni scheda</h2>
+          <p>Niente simboli generici: per ogni luogo scriviamo cosa trovi davvero, con le misure quando ci sono.</p>
         </div>
         <ul class="check-list" role="list">
-          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg><span><strong>Ingresso e porte</strong>Gradini, rampe e larghezza della porta in centimetri.</span></li>
-          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg><span><strong>Bagno</strong>Se c'è un bagno accessibile e com'è attrezzato.</span></li>
-          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg><span><strong>Parcheggio</strong>Posti riservati vicini all'ingresso.</span></li>
-          <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg><span><strong>Spazi interni e piani</strong>Percorsi, ascensori e zone raggiungibili.</span></li>
+          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg></span><span><strong>Ingresso e porte</strong>Gradini, rampe e larghezza della porta in centimetri.</span></li>
+          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg></span><span><strong>Bagno</strong>Se c'è un bagno accessibile e com'è attrezzato.</span></li>
+          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg></span><span><strong>Parcheggio</strong>Posti riservati vicini all'ingresso.</span></li>
+          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg></span><span><strong>Spazi interni e piani</strong>Percorsi, ascensori e zone raggiungibili.</span></li>
+          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg></span><span><strong>Vista e udito</strong>Cane guida, orientarsi, informazioni da leggere, lingua dei segni e contatti senza telefono.</span></li>
+          <li><span class="check-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span><strong>Quanto è affidabile</strong>Se è verificato sul posto, segnalato dalla community o preso da OpenStreetMap, con la data dell'ultimo controllo.</span></li>
         </ul>
       </div>
     </section>
@@ -224,14 +261,26 @@
     </section>
 
     <section id="chi-siamo" class="section" aria-labelledby="about-title">
-      <div class="container">
-        <div class="about card">
-          <img class="about__logo" src="assets/img/logo.webp" alt="" width="180" height="225">
-          <div>
-            <h2 id="about-title">Chi siamo</h2>
-            <p>Siamo Angelo e Lorenzo. Ci muoviamo in carrozzina e sappiamo quanto conta sapere prima se un posto è davvero accessibile. Per questo abbiamo creato Ovunque Accessibile.</p>
-            <p>Scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o seguici su <a href="https://www.instagram.com/ovunque_accessibile">Instagram<span class="visually-hidden"> (sito esterno)</span></a>.</p>
-          </div>
+      <div class="container about">
+        <div class="about__text">
+          <p class="eyebrow">Chi siamo</p>
+          <h2 id="about-title">Siamo Angelo e Lorenzo</h2>
+          <p class="about__lead">Ci muoviamo in carrozzina e sappiamo quanto conta sapere prima se un posto è davvero accessibile.</p>
+          <p>Spesso «accessibile» non vuol dire niente: un gradino all'ingresso, un bagno non attrezzato, informazioni vecchie. Per questo abbiamo creato Ovunque Accessibile: schede con dati concreti, cioè rampe, ascensori, parcheggi, bagni, larghezza delle porte e gradini, scritte da chi ci è stato.</p>
+          <p>È pensato per chi si muove in carrozzina, per le persone anziane, per chi ha difficoltà motorie, per le famiglie con il passeggino e per chi accompagna. Ristoranti, hotel, spiagge, bagni pubblici e tutto il resto: più persone raccontano i luoghi che conoscono, più la mappa diventa utile per tutti.</p>
+          <ul class="about__contacts" role="list">
+            <li><a class="btn btn--primary" href="mailto:ovunqueaccessibile@gmail.com"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mail"/></svg>Scrivici</a></li>
+            <li><a class="btn btn--secondary" href="https://www.instagram.com/ovunque_accessibile"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg>Seguici su Instagram<span class="visually-hidden"> (sito esterno)</span></a></li>
+          </ul>
+        </div>
+        <div class="about__card">
+          <img class="about__logo" src="assets/img/logo.webp" alt="" width="180" height="225" loading="lazy">
+          <p class="about__motto">L'accessibilità non dovrebbe essere un privilegio, ma la normalità</p>
+          <ul class="about__values" role="list">
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Misure vere al posto dei simboli</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Scritto da chi ci è stato</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg>Ogni segnalazione controllata prima di uscire</li>
+          </ul>
         </div>
       </div>
     </section>

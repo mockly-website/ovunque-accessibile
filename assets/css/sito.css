@@ -947,99 +947,74 @@ html:not(.js) .js-only {
 }
 
 /* 7. Home
-   Hero con la foto (assets/img/hero-*.jpg|webp): sul telefono la foto sta in alto e sfuma nel blu, dove c'è il testo;
-   da 960 px la foto occupa la metà destra e sfuma verso sinistra. Il testo sta sempre sul blu pieno (contrasto sicuro). */
+   Hero (29 ottobre): fondo azzurrino che sfuma nel beige della pagina; a sinistra titolo, ricerca e scorciatoie,
+   a destra la foto di Angelo e Lorenzo in una cornice ad arco, con il motto in un cartoncino. Dietro la foto un cerchio
+   beige e il sentiero a puntini del logo (solo decorazione). Sul telefono la foto viene dopo la ricerca. */
 .hero {
   position: relative;
-  isolation: isolate;
   overflow: hidden;
-  padding-bottom: var(--space-2xl);
-  background: var(--color-navy);
-  color: var(--color-white);
-  --color-focus: var(--color-white);
-}
-
-.hero__photo {
-  position: relative;
-  display: block;
-  height: clamp(18rem, 88vw, 30rem);
-}
-
-.hero__photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 55%;
-}
-
-.hero__photo::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, rgba(22, 40, 65, 0) 40%, rgba(22, 40, 65, 0.7) 78%, var(--color-navy) 100%);
+  padding-block: var(--space-xl) var(--space-3xl);
+  background: linear-gradient(180deg, var(--color-sky) 0, var(--color-sky) 55%, var(--color-card) 100%);
 }
 
 .hero__inner {
-  position: relative;
-  margin-top: -3.5rem;
-}
-
-.hero__text {
-  max-width: 36rem;
+  display: grid;
+  gap: var(--space-2xl);
+  align-items: center;
 }
 
 @media (min-width: 60em) {
   .hero {
-    display: flex;
-    align-items: center;
-    min-height: min(40rem, 82vh);
-    padding-block: var(--space-2xl);
-  }
-
-  .hero__photo {
-    position: absolute;
-    inset: 0 0 0 auto;
-    z-index: -1;
-    width: 58%;
-    height: auto;
-  }
-
-  .hero__photo img {
-    object-position: 50% 55%;
-  }
-
-  .hero__photo::after {
-    background:
-      linear-gradient(to right, var(--color-navy) 0, var(--color-navy) 2px, rgba(22, 40, 65, 0.55) 9%, rgba(22, 40, 65, 0) 24%),
-      linear-gradient(to top, rgba(22, 40, 65, 0.35), rgba(22, 40, 65, 0) 30%);
+    padding-block: var(--space-2xl) var(--space-3xl);
   }
 
   .hero__inner {
-    width: 100%;
-    margin-top: 0;
-  }
-
-  .hero__text {
-    max-width: min(34rem, 40%);
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: var(--space-3xl);
   }
 }
 
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 var(--space-sm);
+  padding: 0.25rem 0.8rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-brand);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.eyebrow .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
+.section--band .eyebrow,
+.about .eyebrow {
+  background: var(--color-sky);
+}
+
 .hero__title {
-  max-width: 16ch;
-  color: var(--color-white);
+  max-width: 15ch;
+  color: var(--color-navy);
   font-size: var(--text-3xl);
   line-height: 1.04;
   letter-spacing: -0.02em;
 }
 
 .hero__accent {
-  color: var(--color-beige);
+  color: var(--color-brand);
+  background: linear-gradient(transparent 68%, var(--color-beige) 68%, var(--color-beige) 92%, transparent 92%);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 
 .hero__lead {
   max-width: 44ch;
-  color: rgba(255, 255, 255, 0.92);
   font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3rem);
 }
 
@@ -1048,13 +1023,9 @@ html:not(.js) .js-only {
   margin-top: var(--space-lg);
 }
 
-.hero .field__label {
-  color: var(--color-white);
-}
-
-.hero .input {
-  border-color: transparent;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+.hero .search {
+  background: var(--color-white);
+  box-shadow: 0 12px 32px rgba(22, 40, 65, 0.12);
 }
 
 .quick {
@@ -1089,31 +1060,175 @@ html:not(.js) .js-only {
   color: var(--color-success);
 }
 
-@media (min-width: 60em) and (max-width: 74.99em) {
-  .hero__photo {
-    width: 52%;
+/* Foto ad arco con il motto */
+.hero__media {
+  position: relative;
+  isolation: isolate;
+  justify-self: center;
+  width: min(100%, 22rem);
+  margin: 0 0 var(--space-xl);
+}
+
+@media (min-width: 60em) {
+  .hero__media {
+    width: min(100%, 28rem);
+    margin: 0;
   }
+}
 
-  .hero__text {
-    max-width: 46%;
+.hero__media::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 12% -14% 4% -14%;
+  border-radius: 50%;
+  background: var(--color-beige);
+  opacity: 0.6;
+}
+
+.hero__photo {
+  display: block;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border: 0.4rem solid var(--color-white);
+  border-radius: 14rem 14rem var(--radius-xl) var(--radius-xl);
+  background: var(--color-sky);
+  box-shadow: var(--shadow-md);
+}
+
+.hero__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 62%;
+}
+
+.hero__quote {
+  position: absolute;
+  left: -0.75rem;
+  right: 2.5rem;
+  bottom: -1.75rem;
+  display: grid;
+  gap: 0.2rem;
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 60em) {
+  .hero__quote {
+    left: -3rem;
+    right: auto;
+    bottom: 2rem;
+    max-width: 17rem;
   }
 }
 
-/* Sul blu del hero le scorciatoie sono chiare con il bordo bianco */
-.hero .quick__link {
-  border-color: rgba(255, 255, 255, 0.55);
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--color-white);
+.hero__quote-text {
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  line-height: 1.25;
 }
 
-.hero .quick__link:hover {
-  border-color: var(--color-white);
-  background: rgba(255, 255, 255, 0.2);
-  color: var(--color-white);
+.hero__quote-by {
+  color: var(--color-muted);
+  font-size: 0.9375rem;
 }
 
-.hero .quick__link .icon {
-  color: var(--color-beige);
+.hero__quote-by::before {
+  content: "— ";
+}
+
+.hero__path {
+  display: none;
+}
+
+@media (min-width: 60em) {
+  .hero__path {
+    display: block;
+    position: absolute;
+    z-index: -1;
+    top: -1.5rem;
+    left: -7rem;
+    width: 10rem;
+    fill: none;
+    stroke: var(--color-path);
+    stroke-width: 5;
+    stroke-linecap: round;
+    stroke-dasharray: 0 12;
+  }
+}
+
+/* Per chi è: sei esigenze che aprono la mappa già impostata (mappa.html?per=…) */
+.needs-home__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: var(--space-sm);
+}
+
+.need-tile {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  min-height: 4.5rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  color: var(--color-navy);
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.need-tile:hover {
+  border-color: var(--color-navy);
+  color: var(--color-navy);
+}
+
+.need-tile__icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: var(--color-sky);
+  color: var(--color-brand);
+}
+
+.need-tile__icon .icon {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.need-tile__arrow {
+  margin-left: auto;
+  color: var(--color-brand);
+}
+
+.needs-home__note {
+  margin: var(--space-md) 0 0;
+  color: var(--color-muted);
+}
+
+/* Fasce bianche a tutta larghezza per alternare il ritmo della pagina */
+.section--band {
+  margin-block: var(--space-xl);
+  background: var(--color-white);
+  border-block: 1px solid var(--color-line);
+}
+
+.map-preview .btn {
+  margin-top: var(--space-xs);
+}
+
+.map-preview .btn .icon,
+.about .btn .icon {
+  width: 1.2rem;
+  height: 1.2rem;
 }
 
 /* Anteprima della mappa, subito sotto il hero */
@@ -1175,14 +1290,37 @@ html:not(.js) .js-only {
   .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
+/* Come funziona: i tre passi uniti dal sentiero a puntini (da 960 px) */
+.steps {
+  position: relative;
+}
+
+@media (min-width: 60em) {
+  .steps::before {
+    content: "";
+    position: absolute;
+    z-index: 0;
+    top: calc(var(--space-lg) + 1.75rem);
+    left: 10%;
+    right: 10%;
+    border-top: 4px dotted var(--color-path);
+  }
+
+  .steps > li {
+    position: relative;
+  }
+}
+
 .step__num {
   display: inline-grid;
   place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 3.5rem;
+  height: 3.5rem;
   margin-bottom: var(--space-sm);
+  border: 0.3rem solid var(--color-white);
   border-radius: 50%;
   background: var(--color-brand);
+  box-shadow: 0 0 0 1px var(--color-line);
   color: var(--color-white);
   font-family: var(--font-heading);
   font-size: var(--text-lg);
@@ -1201,17 +1339,29 @@ html:not(.js) .js-only {
 
 .check-list li {
   display: flex;
-  gap: var(--space-sm);
+  gap: var(--space-md);
   align-items: flex-start;
-  padding: var(--space-md);
-  border-radius: var(--radius-md);
-  background: var(--color-white);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
   border: 1px solid var(--color-line);
 }
 
-.check-list .icon {
-  margin-top: 0.1rem;
+.check-list__icon {
+  display: inline-grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
   color: var(--color-brand);
+}
+
+@media (min-width: 60em) {
+  .check-list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .check-list strong {
@@ -1281,20 +1431,94 @@ html:not(.js) .js-only {
   font-size: var(--text-sm);
 }
 
+/* Chi siamo (29 ottobre): racconto a sinistra, a destra un cartoncino blu con il logo, il motto e tre impegni */
 .about {
   display: grid;
-  gap: var(--space-lg);
+  gap: var(--space-xl);
   align-items: center;
 }
 
-@media (min-width: 48em) {
+@media (min-width: 60em) {
   .about {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+    gap: var(--space-3xl);
+  }
+}
+
+.about__text > p {
+  max-width: var(--measure);
+}
+
+.about__lead {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.about__contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-top: var(--space-lg);
+}
+
+.about__card {
+  position: relative;
+  padding: var(--space-xl) var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--color-navy);
+  color: var(--color-white);
+  box-shadow: var(--shadow-md);
+}
+
+@media (min-width: 40em) {
+  .about__card {
+    padding: var(--space-2xl) var(--space-xl);
   }
 }
 
 .about__logo {
-  width: 7rem;
+  display: block;
+  width: 4.5rem;
+  margin-bottom: var(--space-md);
+  padding: 0.5rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+
+.about__motto {
+  margin: 0 0 var(--space-lg);
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  line-height: 1.25;
+}
+
+.about__motto::before {
+  content: "«";
+  color: var(--color-beige);
+}
+
+.about__motto::after {
+  content: "»";
+  color: var(--color-beige);
+}
+
+.about__values {
+  display: grid;
+  gap: var(--space-sm);
+  padding-top: var(--space-lg);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.about__values li {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-start;
+}
+
+.about__values .icon {
+  flex: none;
+  margin-top: 0.2rem;
+  color: var(--color-beige);
 }
 
 /* 8. Pagina mappa */
@@ -2142,14 +2366,13 @@ html:not(.js) .js-only {
   }
 }
 
-/* 13. Schermata di caricamento (assets/js/intro.js): sul blu del marchio, un pezzo di mappa come l'icona dell'app,
-   il percorso si disegna e il segnaposto con il simbolo dell'accessibilità cade sul punto (assets/img/intro.svg).
-   Sotto, il nome e una barra che si riempie; all'uscita tutto si allarga un poco e svanisce, come all'apertura di un'app.
-   Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori dall'albero di accessibilità. */
+/* 13. Schermata di caricamento (assets/js/intro.js), 29 ottobre: sul chiaro del sito, il sentiero marrone del logo si
+   disegna a puntini e il segnaposto blu ci cade sopra (assets/img/intro.svg); sotto, il nome. All'uscita la schermata
+   sale come un sipario e scopre la pagina. Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori
+   dall'albero di accessibilità. */
 .oa-intro,
 .oa-intro-out {
-  --intro-size: min(13rem, 56vw);
-  --intro-bar: min(10rem, 44vw);
+  --intro-size: min(17rem, 72vw);
 }
 
 .oa-intro::before,
@@ -2169,61 +2392,58 @@ html:not(.js) .js-only {
   top: 0;
   bottom: 0;
   background:
-    url("../img/intro.svg?v=3") center calc(50% - 1.5rem) / var(--intro-size) no-repeat,
-    radial-gradient(50rem 36rem at 50% 38%, #24436f, var(--color-navy, #162841) 72%);
-  animation: oa-intro-in 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    url("../img/intro.svg?v=4") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
+    radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
 }
 
 .oa-intro::after,
 .oa-intro-out::after {
   content: "Ovunque Accessibile";
-  top: calc(50% - 1.5rem + var(--intro-size) / 2 + 0.25rem);
-  padding-bottom: 1.4rem;
-  color: var(--color-white, #fff);
+  top: calc(50% - 2rem + var(--intro-size) * 0.375 + 0.75rem);
+  color: var(--color-navy, #162841);
   font-family: var(--font-heading, sans-serif);
   font-weight: 600;
-  font-size: clamp(1.4rem, 1.1rem + 1.5vw, 2rem);
+  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.1rem);
+  letter-spacing: -0.01em;
   text-align: center;
-  background:
-    linear-gradient(var(--color-beige, #e7d6b9), var(--color-beige, #e7d6b9)) center bottom / 0 0.25rem no-repeat,
-    linear-gradient(rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.2)) center bottom / var(--intro-bar) 0.25rem no-repeat;
-  animation: oa-intro-barra 1.3s cubic-bezier(0.3, 0.6, 0.3, 1) 0.1s forwards;
+  animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
 }
 
-@keyframes oa-intro-in {
+@keyframes oa-intro-nome {
   from {
-    background-size: calc(var(--intro-size) * 0.82), auto;
-  }
-}
-
-@keyframes oa-intro-barra {
-  to {
-    background-size: var(--intro-bar) 0.25rem, var(--intro-bar) 0.25rem;
+    transform: translateY(0.6rem);
   }
 }
 
 .oa-intro-out::before,
 .oa-intro-out::after {
-  opacity: 0;
-  transform: scale(1.05);
-  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  transform: translateY(-100%);
+  transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
+}
+
+.oa-intro-out::before {
+  border-radius: 0 0 2rem 2rem;
+  box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.18);
+}
+
+.oa-intro-out::after {
+  transform: translateY(-100vh);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .oa-intro::before {
-    background-image: url("../img/intro-fermo.svg?v=2"), radial-gradient(50rem 36rem at 50% 38%, #24436f, #162841 72%);
-    animation: none;
+    background-image: url("../img/intro-fermo.svg?v=3"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
   }
 
   .oa-intro::after {
-    background: none;
     animation: none;
   }
 
   .oa-intro-out::before,
   .oa-intro-out::after {
+    opacity: 0;
     transform: none;
-    transition: none;
+    transition: opacity 0.3s ease;
   }
 }
 
@@ -2525,13 +2745,13 @@ html:not(.js) .js-only {
 
 .hero .quick__link--near,
 .hero .quick__link--near:hover {
-  border-color: var(--color-white);
-  background: var(--color-white);
-  color: var(--color-navy);
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
 }
 
 .hero .quick__link--near .icon {
-  color: var(--color-brand);
+  color: var(--color-beige);
 }
 
 .filters__near {
@@ -2993,23 +3213,65 @@ html:not(.js) .js-only {
   .site-header--open .menu-toggle__bars::before { top: 0; transform: rotate(45deg); }
   .site-header--open .menu-toggle__bars::after { top: 0; transform: rotate(-45deg); }
 
-  .site-header .nav {
+  /* Pannello del menu (menu.js): scende sotto la barra, il resto della pagina è sfocato dal velo */
+  .site-header {
+    position: relative;
+    z-index: 1001;
+  }
+
+  .site-header__panel {
     order: 4;
+    width: 100%;
+  }
+
+  .js .site-header__panel {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    max-height: calc(100vh - 5rem);
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    padding: var(--space-sm) var(--space-md) var(--space-lg);
+    border-radius: 0 0 var(--radius-xl) var(--radius-xl);
+    background: var(--color-card);
+    box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.22);
+  }
+
+  .site-header .nav {
     width: 100%;
     margin: 0;
     border-top: 0;
   }
 
   .site-header .site-header__app {
-    order: 5;
     width: 100%;
     justify-content: center;
-    margin-block: var(--space-xs) var(--space-sm);
+    margin-block: var(--space-sm) var(--space-xs);
   }
 
-  .js .site-header:not(.site-header--open) .nav,
-  .js .site-header:not(.site-header--open) .site-header__app {
+  .js .site-header:not(.site-header--open) .site-header__panel {
     display: none;
+  }
+
+  .menu-velo {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(22, 40, 65, 0.4);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .menu-aperto .menu-velo {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .menu-aperto {
+    overflow: hidden;
   }
 
   .site-header .nav__list {
@@ -3026,6 +3288,45 @@ html:not(.js) .js-only {
     padding: 0.6rem var(--space-md);
     border-radius: var(--radius-md);
     font-size: var(--text-base);
+  }
+}
+
+.site-header__panel {
+  display: contents;
+}
+
+.menu-velo {
+  display: none;
+}
+
+@media (max-width: 47.99em) {
+  .site-header__panel {
+    display: block;
+  }
+
+  .menu-velo {
+    display: block;
+  }
+}
+
+@media (max-width: 47.99em) and (prefers-reduced-motion: no-preference) {
+  .menu-velo {
+    transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+  }
+
+  .menu-aperto .menu-velo {
+    transition: opacity 0.25s ease;
+  }
+
+  .site-header--open .site-header__panel {
+    animation: menu-scende 0.28s var(--ease-out) both;
+  }
+
+  @keyframes menu-scende {
+    from {
+      opacity: 0;
+      transform: translateY(-0.75rem);
+    }
   }
 }
 
