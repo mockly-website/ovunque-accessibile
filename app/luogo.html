@@ -20,14 +20,14 @@
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
   <script src="../assets/js/intro.js?v=i7"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=p47">
-  <link rel="stylesheet" href="assets/css/app.css?v=a38">
+  <link rel="stylesheet" href="assets/css/app.css?v=a39">
   <script src="assets/js/config.js?v=a24" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="../assets/js/oa-core.js?v=p34" defer></script>
-  <script src="assets/js/api.js?v=a24" defer></script>
-  <script src="assets/js/app.js?v=a37" defer></script>
+  <script src="assets/js/api.js?v=a25" defer></script>
+  <script src="assets/js/app.js?v=a38" defer></script>
 </head>
 <body class="app" data-page="luogo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -297,15 +297,30 @@
           </section>
           <section id="owner-card" class="card" aria-labelledby="owner-title">
             <h2 id="owner-title" class="h3">Sei il titolare?</h2>
-            <p id="owner-intro" class="place__meta">Lasciaci il telefono o l'email del locale: ti chiamiamo per confermare. Poi rispondi alle recensioni e puoi chiedere la verifica sul posto e il bollino. <a href="locali.html">Come funziona</a></p>
+            <p id="owner-intro" class="place__meta">Chiedi di gestire la scheda: ti chiediamo nome e cognome, telefono, email e una foto dell'ingresso, e dopo il nostro controllo scarichi il codice QR per la vetrina e rispondi alle recensioni. <a href="locali.html">Come funziona</a></p>
             <p id="owner-note" class="notice" role="status" tabindex="-1" hidden></p>
             <details id="owner-new" class="more" hidden>
               <summary class="more__toggle">Gestisci la scheda di questo locale</summary>
               <form id="owner-form" class="more__body stack" novalidate>
+                <p class="field__help">Ci servono per confermare che gestisci davvero il locale: li vedono solo i moderatori. <a href="privacy.html">Come trattiamo questi dati</a></p>
                 <div class="field">
-                  <label class="field__label" for="o-contatto">Telefono o email del locale</label>
-                  <p class="field__help" id="o-contatto-aiuto">Quello pubblico (sito, insegna): ti chiamiamo lì. Lo vedono solo i moderatori.</p>
-                  <input class="input" type="text" id="o-contatto" name="contatto" maxlength="200" autocomplete="off" aria-describedby="o-contatto-aiuto">
+                  <label class="field__label" for="o-titolare">Nome e cognome del titolare</label>
+                  <input class="input" type="text" id="o-titolare" name="titolare" maxlength="120" autocomplete="name" required>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="o-telefono">Telefono</label>
+                  <p class="field__help" id="o-telefono-aiuto">Ti chiamiamo a questo numero per confermare.</p>
+                  <input class="input" type="tel" id="o-telefono" name="telefono" maxlength="25" autocomplete="tel" inputmode="tel" aria-describedby="o-telefono-aiuto" required>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="o-email">Email</label>
+                  <input class="input" type="email" id="o-email" name="email" maxlength="200" autocomplete="email" required>
+                </div>
+                <div class="field">
+                  <label class="field__label" for="o-foto">Foto dell'ingresso del locale</label>
+                  <p class="field__help" id="o-foto-aiuto">Dalla strada, con l'insegna se c'è. La ricomprimiamo e togliamo la posizione GPS.</p>
+                  <input class="photo-input" type="file" id="o-foto" name="foto" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" aria-describedby="o-foto-aiuto" required>
+                  <img id="o-foto-anteprima" class="owner-photo-preview" alt="Anteprima della foto dell'ingresso" hidden>
                 </div>
                 <fieldset class="group group--inline">
                   <legend class="field__label">Sei</legend>
@@ -313,7 +328,7 @@
                   <div class="radio"><input type="radio" id="o-ruolo-2" name="ruolo" value="dipendente"><label for="o-ruolo-2">Lavoro qui</label></div>
                   <div class="radio"><input type="radio" id="o-ruolo-3" name="ruolo" value="altro"><label for="o-ruolo-3">Altro</label></div>
                 </fieldset>
-                <button class="btn btn--primary" type="submit">Invia</button>
+                <button class="btn btn--primary" type="submit">Invia la richiesta</button>
               </form>
             </details>
             <p id="owner-login" hidden><a id="owner-login-link" href="accedi.html">Accedi</a> per chiedere di gestire la scheda.</p>

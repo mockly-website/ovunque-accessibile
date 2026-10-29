@@ -2694,3 +2694,34 @@ html:has(> body.app) {
   display: none;
 }
 
+/* 26. Richiesta del gestore (29 ottobre): anteprima della foto dell'ingresso nel modulo; nel pannello di moderazione
+   titolare, telefono, email e la foto */
+.owner-photo-preview {
+  display: block;
+  width: 100%;
+  max-width: 20rem;
+  margin-top: var(--space-xs);
+  border-radius: var(--radius-md);
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.owner-photo-preview[hidden] {
+  display: none;
+}
+
+.mod-owner {
+  margin-block: var(--space-xs);
+}
+
+.mod-owner__photo {
+  margin: var(--space-sm) 0;
+}
+
+.mod-owner__photo img {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  border-radius: var(--radius-md);
+}
+

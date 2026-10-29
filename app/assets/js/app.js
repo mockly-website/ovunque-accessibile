@@ -829,7 +829,7 @@
       var form = $('owner-new');
       if (!form.hidden) form.open = true;
       card.scrollIntoView({ block: 'start', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
-      var target = !form.hidden ? $('o-contatto') : (!$('owner-login').hidden ? $('owner-login-link') : $('owner-title'));
+      var target = !form.hidden ? $('o-titolare') : (!$('owner-login').hidden ? $('owner-login-link') : $('owner-title'));
       if (target === $('owner-title') && !target.hasAttribute('tabindex')) target.setAttribute('tabindex', '-1');
       target.focus({ preventScroll: true });
     }
@@ -862,23 +862,43 @@
       message(note, 'La richiesta non è stata approvata.' + (g.motivo ? ' Motivo: ' + g.motivo : '') + ' Per chiarimenti scrivi a ovunqueaccessibile@gmail.com.', 'error');
     }
 
+    /* Richiesta: nome e cognome del titolare, telefono, email e foto dell'ingresso (ricompressa: niente GPS) */
     var form = $('owner-form');
+    var fotoIn = $('o-foto');
+    var anteprima = $('o-foto-anteprima');
+    if (api.user() && api.user().email && !form.elements.email.value) form.elements.email.value = api.user().email;
+    fotoIn.addEventListener('change', function () {
+      var file = fotoIn.files && fotoIn.files[0];
+      if (anteprima.src) URL.revokeObjectURL(anteprima.src);
+      if (!file) { show(anteprima, false); anteprima.removeAttribute('src'); return; }
+      anteprima.src = URL.createObjectURL(file);
+      show(anteprima, true);
+    });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (isBusy(form)) return;
       var f = form.elements;
-      var contatto = f.contatto.value.trim();
+      var titolare = f.titolare.value.trim().replace(/\s+/g, ' ');
+      var telefono = f.telefono.value.trim();
+      var email = f.email.value.trim();
+      var file = fotoIn.files && fotoIn.files[0];
       var errors = [];
-      if (contatto.length < 5) errors.push({ input: f.contatto, text: 'Scrivi il telefono o l\'email del locale, così possiamo verificare.' });
+      if (titolare.length < 3 || titolare.indexOf(' ') < 0) errors.push({ input: f.titolare, text: 'Scrivi nome e cognome del titolare.' });
+      if (!/^\+?[0-9 .\/()-]{6,25}$/.test(telefono) || telefono.replace(/[^0-9]/g, '').length < 6) errors.push({ input: f.telefono, text: 'Scrivi un numero di telefono valido, per esempio 070 123 4567.' });
+      if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) errors.push({ input: f.email, text: 'Scrivi un indirizzo email valido, per esempio nome@esempio.it.' });
+      if (!file) errors.push({ input: fotoIn, text: 'Aggiungi una foto dell\'ingresso del locale.' });
+      else if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) errors.push({ input: fotoIn, text: 'Il file deve essere una foto (JPEG, PNG, WebP o HEIC).' });
       if (showErrors(form, errors)) return;
       busy(form, true, 'Invio…');
-      api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, contatto: contatto, nota: null }).then(function () {
+      preparePhoto(file, api.mode === 'prova' ? 800 : 1600).then(function (blob) {
+        return api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, titolare: titolare, telefono: telefono, email: email, nota: null }, blob);
+      }).then(function () {
         show($('owner-new'), false);
-        message(note, 'Richiesta inviata. Ti contatteremo al recapito che hai indicato per confermare che gestisci il luogo.', 'ok');
+        message(note, 'Richiesta inviata. La controlliamo e ti chiamiamo al ' + telefono + ' per confermare. Appena la approviamo, qui trovi il codice QR per la vetrina.', 'ok');
         note.focus();
       }).catch(function (err) {
         busy(form, false);
-        showErrors(form, [{ input: f.contatto, text: err.message }]);
+        showErrors(form, [{ input: file ? f.titolare : fotoIn, text: err.message }]);
       });
     });
   }
@@ -2805,7 +2825,15 @@
         listG.appendChild(el('li', {}, [el('article', { className: 'card mod-item', 'aria-labelledby': 'mod-g-' + g.id }, [
           el('h3', { id: 'mod-g-' + g.id, text: 'Gestore: ' + place }),
           el('p', { className: 'place__meta', text: 'Chiesto da ' + (g.nome || 'utente') + ' · ' + (RUOLI[g.ruolo] || g.ruolo) + ' · il ' + dateIt(g.created_at) }),
-          el('p', {}, [el('strong', { text: 'Contatto da verificare: ' }), document.createTextNode(g.contatto)]),
+          g.titolare ? el('dl', { className: 'facts mod-owner' }, [
+            el('div', { className: 'facts__row' }, [el('dt', { text: 'Titolare' }), el('dd', { text: g.titolare })]),
+            el('div', { className: 'facts__row' }, [el('dt', { text: 'Telefono' }), el('dd', {}, [el('a', { href: 'tel:' + g.telefono.replace(/[^0-9+]/g, ''), text: g.telefono })])]),
+            el('div', { className: 'facts__row' }, [el('dt', { text: 'Email' }), el('dd', {}, [el('a', { href: 'mailto:' + g.email, text: g.email })])])
+          ]) : el('p', {}, [el('strong', { text: 'Contatto da verificare: ' }), document.createTextNode(g.contatto)]),
+          g.foto_url ? el('figure', { className: 'mod-owner__photo' }, [
+            el('img', { src: g.foto_url, alt: 'Foto dell\'ingresso di ' + place + ', inviata da chi chiede di gestirlo', loading: 'lazy' }),
+            el('figcaption', { className: 'place__meta', text: 'Foto dell\'ingresso: confrontala con la scheda e con le foto pubbliche del locale.' })
+          ]) : (g.titolare ? el('p', { className: 'place__meta', text: 'Foto dell\'ingresso non disponibile.' }) : null),
           g.nota ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: g.nota })]) : null,
           el('p', {}, [el('a', { href: 'luogo.html?id=' + encodeURIComponent(g.place_id), text: 'Apri la scheda' })]),
           decisionForm('gestore', g, function () { counts.g--; update(); })

@@ -264,8 +264,16 @@
         if (!current) return Promise.resolve(null);
         return sb.from('gestori').select('id,stato,motivo,created_at').eq('place_id', placeId).maybeSingle().then(check);
       },
-      requestOwner: function (g) {
-        return sb.from('gestori').insert(g).then(check);
+      /* Prima la foto dell'ingresso nella cartella dell'utente, poi la richiesta (se fallisce, il file si cancella) */
+      requestOwner: function (g, foto) {
+        var path = uid() + '/ingresso-' + crypto.randomUUID() + '.jpg';
+        var bucket = sb.storage.from('foto');
+        return bucket.upload(path, foto, { contentType: 'image/jpeg', upsert: false }).then(check).then(function () {
+          return sb.from('gestori').insert(Object.assign({}, g, { foto_ingresso: path })).then(function (res) {
+            if (res.error) return bucket.remove([path]).then(function () { throw friendly(res.error); });
+            return null;
+          });
+        });
       },
       replyReview: function (id, testo) {
         return sb.rpc('rispondi_recensione', { p_id: id, p_testo: testo }).then(check);
@@ -407,9 +415,18 @@
         return Promise.all([
           sb.from('proposte').select('id,tipo,place_id,autore_nome,dati,nota,created_at').eq('stato', 'in-attesa').order('created_at').limit(200),
           sb.from('recensioni').select('id,place_id,autore_nome,esigenza,data_visita,testo,risposte,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200),
-          sb.from('gestori').select('id,place_id,nome,ruolo,contatto,nota,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200)
+          sb.from('gestori').select('id,place_id,nome,ruolo,contatto,titolare,telefono,email,foto_ingresso,nota,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200)
         ]).then(function (r) {
-          return { proposte: check(r[0]), recensioni: check(r[1]), gestori: check(r[2]) };
+          var gestori = check(r[2]);
+          /* foto dell'ingresso: link firmati, validi un'ora */
+          var paths = gestori.map(function (g) { return g.foto_ingresso; }).filter(Boolean);
+          var firme = paths.length ? sb.storage.from('foto').createSignedUrls(paths, 3600).then(check) : Promise.resolve([]);
+          return firme.then(function (urls) {
+            var byPath = {};
+            urls.forEach(function (u) { if (u.signedUrl) byPath[u.path] = u.signedUrl; });
+            gestori.forEach(function (g) { g.foto_url = g.foto_ingresso ? byPath[g.foto_ingresso] || null : null; });
+            return { proposte: check(r[0]), recensioni: check(r[1]), gestori: gestori };
+          });
         });
       },
       approve: function (id, livello) {
@@ -683,13 +700,22 @@
         var g = load().gestori.filter(function (x) { return x.place_id === placeId && x.user_id === u.id; })[0];
         return wait(g ? { id: g.id, stato: g.stato, motivo: g.motivo || null, created_at: g.created_at } : null);
       },
-      requestOwner: function (g) {
+      requestOwner: function (g, foto) {
         var u = needUser();
         var db = load();
         if (db.gestori.some(function (x) { return x.place_id === g.place_id && x.user_id === u.id; })) return fail('Hai già chiesto di gestire questo luogo');
-        db.gestori.push(Object.assign({ id: rid(), user_id: u.id, nome: db.profiles[u.id].nome_pubblico, stato: 'in-attesa', created_at: now() }, g));
-        save();
-        return wait();
+        return new Promise(function (ok) {
+          if (!foto) return ok(null);
+          var r = new FileReader();
+          r.onload = function () { ok(r.result); };
+          r.onerror = function () { ok(null); };
+          r.readAsDataURL(foto);
+        }).then(function (url) {
+          db.gestori.push(Object.assign({ id: rid(), user_id: u.id, nome: db.profiles[u.id].nome_pubblico, stato: 'in-attesa', created_at: now(),
+            contatto: g.telefono + ' · ' + g.email, foto_url: url }, g));
+          save();
+          return wait();
+        });
       },
       replyReview: function (id, testo) {
         var u = needUser();
