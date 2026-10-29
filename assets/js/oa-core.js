@@ -76,7 +76,13 @@
     vista: { nome: 'Disabilità visiva', breve: 'Vista', icona: '#icon-eye', voci: ['cane', 'orientamento', 'leggere', 'ostacoli'], card: ['cane', 'orientamento', 'leggere'], sensi: true },
     udito: { nome: 'Disabilità uditiva', breve: 'Udito', icona: '#icon-ear', voci: ['comunicare', 'contatti', 'ascolto'], card: ['comunicare', 'contatti', 'ascolto'], sensi: true }
   };
-  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino', 'anziani', 'vista', 'udito'];
+  /* Vista e udito sono spente per ora (29 ottobre 2026): non si scelgono e non hanno giudizio né sezione nella scheda,
+     ma le definizioni qui sopra e i dati già raccolti restano (e il modulo «Segnala» li conserva nelle correzioni).
+     Per riaccenderle: rimetterle in fondo a questo elenco e riportare le parti tolte dalle pagine (DOCUMENTAZIONE.md). */
+  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino', 'anziani'];
+  function esigenzaAttiva(e) {
+    return ORDINE_ESIGENZE.indexOf(e) !== -1;
+  }
 
   /* Chi cammina con fatica (difficoltà a camminare, persone anziane): gradini con corrimano e scale si possono fare */
   function aPiedi(e) {
@@ -302,11 +308,14 @@
      → { note, totale, mancano: [nomi delle voci «da verificare»] }. Serve ai gestori («Per i locali»). */
   function completezza(p) {
     var mancano = [];
+    var totale = 0;
     VOCI.forEach(function (v) {
       var e = ORDINE_ESIGENZE.filter(function (k) { return ESIGENZE[k].voci.indexOf(v.key) !== -1; })[0];
+      if (!e) return;                  /* voce di un'esigenza spenta (vista, udito) */
+      totale++;
       if (v.valuta(p, e)[0] === 'nv') mancano.push(v.nome);
     });
-    return { note: VOCI.length - mancano.length, totale: VOCI.length, mancano: mancano };
+    return { note: totale - mancano.length, totale: totale, mancano: mancano };
   }
 
   /* Ovunque Accessibile mostra su mappa ed elenchi solo luoghi accessibili o accessibili in parte per l'esigenza
@@ -347,10 +356,10 @@
 
   function esigenzaSalvata() {
     var fromUrl = new URLSearchParams(location.search).get('per');
-    if (ESIGENZE[fromUrl]) return fromUrl;
+    if (esigenzaAttiva(fromUrl)) return fromUrl;
     try {
       var v = localStorage.getItem(STORAGE_KEY);
-      return ESIGENZE[v] ? v : null;
+      return esigenzaAttiva(v) ? v : null;
     } catch (err) {
       return null;
     }
@@ -363,7 +372,7 @@
   }
 
   function setEsigenza(e) {
-    if (!ESIGENZE[e]) return;
+    if (!esigenzaAttiva(e)) return;
     esigenzaCorrente = e;
     try { localStorage.setItem(STORAGE_KEY, e); } catch (err) { /* navigazione privata: resta solo per questa pagina */ }
     var params = new URLSearchParams(location.search);
@@ -1674,7 +1683,7 @@
       initExplore();
       initDetail();
     },
-    CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE,
+    CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, esigenzaAttiva: esigenzaAttiva,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
     giudizio: giudizio, distanceKm: distanceKm, completezza: completezza, mancanti: mancanti,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,

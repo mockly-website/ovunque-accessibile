@@ -625,19 +625,20 @@ html:not(.js) .js-only {
 }
 
 @media (min-width: 30em) {
+  /* Quattro esigenze: due per riga */
   .needs__options {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 63.99em) {
-  /* Telefono, esigenza già scelta: le tre opzioni affiancate e compatte */
+  /* Telefono, esigenza già scelta: le opzioni due per riga e compatte */
   .needs:not(.needs--ask) {
     padding: var(--space-sm) var(--space-md);
   }
 
   .needs:not(.needs--ask) .needs__options {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .needs:not(.needs--ask) .needs__option label {
@@ -701,13 +702,13 @@ html:not(.js) .js-only {
 }
 
 @media (max-width: 47.99em) {
-  /* «Come ti muovi?» sempre su una riga di tre, anche alla prima visita */
+  /* «Come ti muovi?» sempre due per riga, anche alla prima visita */
   .needs {
     padding: var(--space-sm) var(--space-md) var(--space-md);
   }
 
   .needs .needs__options {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .needs .needs__option label {
@@ -725,14 +726,6 @@ html:not(.js) .js-only {
 
   .needs__help {
     margin-bottom: var(--space-xs);
-  }
-}
-
-@media (max-width: 22em) {
-  /* Telefono molto stretto: due colonne, così «Difficoltà a camminare» non si spezza a ogni sillaba */
-  .needs .needs__options,
-  .needs:not(.needs--ask) .needs__options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 

@@ -83,7 +83,9 @@
       { path: 'facoltativi.assistenza.valore', label: 'Il personale offre assistenza?', type: 'tri' },
       { path: 'facoltativi.assistenza.nota', label: 'Note sull\'assistenza', type: 'textarea', max: 500 }
     ] },
-    { id: 'sensi', title: 'Vista e udito', optional: true, intro: 'Per chi non vede o non sente bene. Rispondi solo a quello che sai.', fields: [
+    /* Vista e udito spente per ora (vedi ORDINE_ESIGENZE in oa-core.js): la sezione resta nel modulo ma nascosta, così
+       le risposte già date si conservano quando qualcuno corregge una scheda */
+    { id: 'sensi', title: 'Vista e udito', optional: true, spenta: true, intro: 'Per chi non vede o non sente bene. Rispondi solo a quello che sai.', fields: [
       { path: 'facoltativi.vista.cane_guida', label: 'I cani guida sono ammessi?', type: 'tri' },
       { path: 'facoltativi.vista.percorso_tattile', label: 'C\'è un percorso tattile (strisce in rilievo sul pavimento)?', type: 'tri' },
       { path: 'facoltativi.vista.mappa_tattile', label: 'C\'è una mappa tattile o un plastico?', type: 'tri' },
@@ -613,6 +615,7 @@
       el('h2', { id: 'sec-descrizione-title', text: 'Descrizione del luogo' }),
       el('div', { className: 'form-grid' }, SCHEMA[0].fields.filter(function (f) { return f.own; }).map(fieldNode))
     ]));
+    SCHEMA.forEach(function (sec) { if (sec.spenta) $('sec-' + sec.id).hidden = true; });
     var photosUi = photoSection(box);
     var wizard = initWizard(form, box, !!id);
     function stepErrors(f, errors, title) {

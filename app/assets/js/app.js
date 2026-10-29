@@ -234,8 +234,10 @@
 
   function syncNeeds() {
     return api.profile().catch(function () { return null; }).then(function (prof) {
-      if (prof && prof.esigenza && !params.get('per') && prof.esigenza !== OA.scelta()) OA.setEsigenza(prof.esigenza);
-      else if (prof && !prof.esigenza && OA.scelta()) api.updateProfile({ esigenza: OA.scelta() }).catch(function () {});
+      /* Un'esigenza spenta salvata nel profilo (vista, udito) conta come non scelta */
+      var salvata = prof && OA.esigenzaAttiva(prof.esigenza) ? prof.esigenza : null;
+      if (salvata && !params.get('per') && salvata !== OA.scelta()) OA.setEsigenza(salvata);
+      else if (prof && !salvata && OA.scelta()) api.updateProfile({ esigenza: OA.scelta() }).catch(function () {});
       /* Da qui in poi la scelta «La tua esigenza» viene salvata anche nel profilo */
       OA.onEsigenza(function (e) {
         if (api.user()) api.updateProfile({ esigenza: e }).catch(function () {});

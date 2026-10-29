@@ -19,15 +19,15 @@
   <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
   <script src="../assets/js/intro.js?v=85d27344"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=42f1553d">
+  <link rel="stylesheet" href="../assets/css/sito.css?v=61e6f8bb">
   <link rel="stylesheet" href="assets/css/app.css?v=6f1e25a0">
   <script src="assets/js/config.js?v=2dce3a73" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="../assets/js/oa-core.js?v=347bf0d9" defer></script>
+  <script src="../assets/js/oa-core.js?v=f6d763a5" defer></script>
   <script src="assets/js/api.js?v=52554153" defer></script>
-  <script src="assets/js/app.js?v=68aa1a57" defer></script>
+  <script src="assets/js/app.js?v=7d67e0d5" defer></script>
   <script src="assets/js/scheda.js?v=c87897c4" defer></script>
 </head>
 <body class="app" data-page="luogo">
@@ -203,7 +203,7 @@
                 <h2 id="summary-title" class="summary__title">In breve</h2>
                 <div class="summary__per">
                   <label class="summary__per-label" for="per-chi">Valuto per</label>
-                  <select class="select summary__select" id="per-chi" aria-describedby="per-chi-aiuto"><option value="manuale">Carrozzina manuale</option><option value="elettrica">Carrozzina elettrica</option><option value="cammino">Difficoltà a camminare</option><option value="anziani">Persona anziana</option><option value="vista">Disabilità visiva</option><option value="udito">Disabilità uditiva</option></select>
+                  <select class="select summary__select" id="per-chi" aria-describedby="per-chi-aiuto"><option value="manuale">Carrozzina manuale</option><option value="elettrica">Carrozzina elettrica</option><option value="cammino">Difficoltà a camminare</option><option value="anziani">Persona anziana</option></select>
                 </div>
               </div>
               <p id="summary-verdict" class="summary__verdict"></p>
@@ -236,11 +236,6 @@
             <section class="detail__section detail__group" aria-labelledby="arrivare-title">
               <h2 id="arrivare-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg></span>Arrivare</h2>
               <dl id="detail-arrivare" class="facts"></dl>
-            </section>
-            <section class="detail__section detail__group" aria-labelledby="senses-title">
-              <h2 id="senses-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-eye"/></svg></span>Vista e udito</h2>
-              <p id="detail-senses-empty" class="place__meta" hidden>Ancora nessuna informazione per chi non vede o non sente bene (cane guida, Braille, LIS, anello magnetico…). Se le conosci, proponi una correzione.</p>
-              <dl id="detail-senses" class="facts"></dl>
             </section>
             <section id="detail-specific" class="detail__section detail__group" aria-labelledby="detail-specific-title" hidden>
               <h2 id="detail-specific-title" class="detail__h"><span class="detail__h-icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-list"/></svg></span>Dettagli</h2>
@@ -284,8 +279,6 @@
                   <option value="elettrica">Carrozzina elettrica</option>
                   <option value="cammino">Difficoltà a camminare</option>
                   <option value="anziani">Persona anziana</option>
-                  <option value="vista">Disabilità visiva</option>
-                  <option value="udito">Disabilità uditiva</option>
                 </select>
               </div>
               <div id="review-questions" class="review-questions"></div>
