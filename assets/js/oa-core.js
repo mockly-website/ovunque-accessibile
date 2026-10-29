@@ -742,7 +742,47 @@
       }
       render();
       onEsigenza(render);
+      statistiche(places);
     }).catch(function () {});
+  }
+
+  /* Home: quanti luoghi e in quanti comuni (dai dati veri). Il numero sale fino al valore quando si vede;
+     per gli screen reader c'è subito il valore finale (il numero che si muove è nascosto). */
+  function statistiche(places) {
+    var box = document.getElementById('home-stats');
+    if (!box) return;
+    var comuni = {};
+    places.forEach(function (p) { if (p.citta) comuni[p.citta.trim().toLowerCase()] = 1; });
+    var valori = { luoghi: places.length, comuni: Object.keys(comuni).length };
+    var calmo = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var dd = [].slice.call(box.querySelectorAll('[data-conta]'));
+    dd.forEach(function (d) {
+      var n = valori[d.getAttribute('data-conta')] || 0;
+      d.textContent = '';
+      d.appendChild(el('span', { className: 'stats__num', text: calmo ? n.toLocaleString('it-IT') : '0' }));
+      d.lastChild.setAttribute('aria-hidden', 'true');
+      d.appendChild(el('span', { className: 'visually-hidden', text: n.toLocaleString('it-IT') }));
+      d._n = n;
+    });
+    box.hidden = false;
+    if (calmo || !('IntersectionObserver' in window)) {
+      dd.forEach(function (d) { d.firstChild.textContent = d._n.toLocaleString('it-IT'); });
+      return;
+    }
+    var io = new IntersectionObserver(function (voci) {
+      if (!voci.some(function (v) { return v.isIntersecting; })) return;
+      io.disconnect();
+      var t0 = null;
+      function passo(t) {
+        if (t0 === null) t0 = t;
+        var k = Math.min(1, (t - t0) / 1400);
+        var e = 1 - Math.pow(1 - k, 3);
+        dd.forEach(function (d) { d.firstChild.textContent = Math.round(d._n * e).toLocaleString('it-IT'); });
+        if (k < 1) requestAnimationFrame(passo);
+      }
+      requestAnimationFrame(passo);
+    }, { threshold: 0.6 });
+    io.observe(box);
   }
 
   /* ---------- 8. Pagina mappa: ricerca, filtri, elenco e mappa ---------- */

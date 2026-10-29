@@ -182,11 +182,15 @@
     segnala: initSegnala, profilo: initProfilo, moderazione: initModerazione, bollino: initBollino, locali: initLocali
   };
 
-  /* Barra delle schede: la pillola scivola dalla scheda di prima a questa e l'icona fa un piccolo salto.
-     Tra una pagina e l'altra il contenuto entra dal lato giusto (a destra se si va verso Profilo, a sinistra verso
-     Mappa: classi vt-avanti / vt-indietro su <html>, vedi intro.js e app.css sezione 22) e sotto la barra in alto
-     scorre una linea finché la pagina nuova non arriva. Con «riduci movimento» niente di tutto questo. */
+  /* Barra delle schede (telefono e tablet): un indicatore solo, che viaggia da una scheda all'altra.
+     Al tocco parte subito, già sulla pagina che si sta lasciando, allungandosi come un elastico; sulla pagina nuova si
+     assesta (sessionStorage «oa-viaggio»). Verso «Segnala» entra nel cerchio blu e il «+» fa un giro. L'icona della
+     scheda nuova si disegna da sola, tratto per tratto (classe is-arriva). Se si arriva senza tocco (tasto indietro),
+     il viaggio si fa tutto sulla pagina nuova. Il contenuto entra dal lato giusto (classi vt-avanti / vt-indietro su
+     <html>, vedi intro.js e app.css sezione 22). Con «riduci movimento» niente di tutto questo. */
   var CALMO = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var BARRA = matchMedia('(max-width: 63.99em)');
+  var ELASTICO = 'cubic-bezier(.3, .7, .2, 1)';
 
   function tabIndex(links) {
     for (var i = 0; i < links.length; i++) {
@@ -196,41 +200,82 @@
   }
 
   function initTabBar() {
+    var list = document.querySelector('.app-nav__list');
     var links = [].slice.call(document.querySelectorAll('.app-nav__link'));
+    if (!list || !links.length) return;
     var cur = tabIndex(links);
     var prev = -1;
     try {
       prev = Number(sessionStorage.getItem('oa-scheda') || -1);
       sessionStorage.setItem('oa-scheda', String(cur));
-    } catch (e) { /* senza sessionStorage niente animazione */ }
+    } catch (e) { /* senza sessionStorage niente viaggio */ }
+
+    var ind = document.createElement('span');
+    ind.className = 'app-nav__indice';
+    ind.setAttribute('aria-hidden', 'true');
+    list.appendChild(ind);
+
+    function centro(i) {
+      var r = links[i].getBoundingClientRect();
+      return r.left - list.getBoundingClientRect().left + r.width / 2;
+    }
+    function segnala(i) { return links[i] && links[i].getAttribute('href') === 'segnala.html'; }
+    function posa(i) {
+      ind.hidden = i < 0 || segnala(i);
+      if (i >= 0) ind.style.transform = 'translateX(' + centro(i) + 'px)';
+    }
+    posa(cur);
+    window.addEventListener('resize', function () { posa(cur); });
+
+    var anima = !CALMO && !!Element.prototype.animate;
+    function viaggio(da, a, durata) {
+      var x0 = centro(da), x1 = centro(a), d = x1 - x0;
+      var verso = segnala(a) ? 'translateX(' + x1 + 'px) scale(0.2)' : 'translateX(' + x1 + 'px)';
+      var parte = segnala(da) ? 'translateX(' + x0 + 'px) scale(0.2)' : 'translateX(' + x0 + 'px)';
+      ind.hidden = false;
+      return ind.animate([
+        { transform: parte, opacity: segnala(da) ? 0 : 1 },
+        { transform: 'translateX(' + (x0 + d * 0.5) + 'px) scaleX(1.7) scaleY(0.8)', opacity: 1, offset: 0.4 },
+        { transform: 'translateX(' + (x1 + d * 0.06) + 'px) scaleX(0.9) scaleY(1.08)', opacity: segnala(a) ? 0.4 : 1, offset: 0.78 },
+        { transform: verso, opacity: segnala(a) ? 0 : 1 }
+      ], { duration: durata, easing: ELASTICO, fill: 'forwards' });
+    }
+    function arriva(i) {
+      if (!anima || i < 0) return;
+      links[i].classList.add('is-arriva');
+      setTimeout(function () { links[i].classList.remove('is-arriva'); }, 900);
+    }
 
     links.forEach(function (a, i) {
-      a.addEventListener('click', function () {
-        if (i === cur || cur < 0) return;
-        try { sessionStorage.setItem('oa-verso', i > cur ? 'avanti' : 'indietro'); } catch (e) { /* niente */ }
+      a.addEventListener('click', function (ev) {
+        if (i === cur || cur < 0 || ev.defaultPrevented) return;
+        try {
+          sessionStorage.setItem('oa-verso', i > cur ? 'avanti' : 'indietro');
+          sessionStorage.setItem('oa-viaggio', JSON.stringify({ a: i, t: Date.now() }));
+        } catch (e) { /* niente */ }
+        if (anima && BARRA.matches) viaggio(cur, i, 420);
       });
     });
 
-    if (CALMO || cur < 0 || prev < 0 || prev === cur || !links[prev] || !Element.prototype.animate ||
-        !matchMedia('(max-width: 63.99em)').matches) return;
-    var from = links[prev].getBoundingClientRect();
-    var to = links[cur].getBoundingClientRect();
-    var dx = (from.left + from.width / 2) - (to.left + to.width / 2);
-    var ease = 'cubic-bezier(.2, .8, .2, 1)';
-    var pill = links[cur].querySelector('.app-nav__pill');
-    if (pill && getComputedStyle(pill).display !== 'none') {
-      /* come un elastico: si allunga mentre parte, supera di poco l'arrivo e si assesta */
-      pill.animate([
-        { transform: 'translateX(' + dx + 'px) scaleX(1)', opacity: 0.6 },
-        { transform: 'translateX(' + (dx * 0.45) + 'px) scaleX(1.55)', offset: 0.35 },
-        { transform: 'translateX(' + (-dx * 0.06) + 'px) scaleX(0.94)', offset: 0.75 },
-        { transform: 'none', opacity: 1 }
-      ], { duration: 520, easing: 'cubic-bezier(.3, .7, .2, 1)' });
-    }
-    var ic = links[cur].querySelector('.icon');
-    if (ic) {
-      ic.animate([{ transform: 'translateY(4px) scale(.8)' }, { transform: 'translateY(-3px) scale(1.08)', offset: 0.6 }, { transform: 'none' }],
-        { duration: 480, easing: ease });
+    if (!anima || cur < 0 || !BARRA.matches) return;
+    var giro = null;
+    try {
+      giro = JSON.parse(sessionStorage.getItem('oa-viaggio') || 'null');
+      sessionStorage.removeItem('oa-viaggio');
+    } catch (e) { /* niente */ }
+    if (giro && giro.a === cur && Date.now() - giro.t < 2500) {
+      /* il viaggio è già fatto sulla pagina di prima: qui l'indicatore si assesta */
+      if (!segnala(cur)) {
+        ind.animate([
+          { transform: 'translateX(' + centro(cur) + 'px) scaleX(1.25) scaleY(0.85)' },
+          { transform: 'translateX(' + centro(cur) + 'px) scaleX(0.95) scaleY(1.06)', offset: 0.5 },
+          { transform: 'translateX(' + centro(cur) + 'px)' }
+        ], { duration: 380, easing: 'ease-out' });
+      }
+      arriva(cur);
+    } else if (prev >= 0 && prev !== cur && links[prev]) {
+      viaggio(prev, cur, 560).onfinish = function () { posa(cur); this.cancel(); };
+      arriva(cur);
     }
   }
 

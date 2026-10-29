@@ -75,3 +75,45 @@
   }
   window.OA.start();
 })();
+
+/* Movimento allo scorrimento (29 ottobre): titoli, voci degli elenchi e schede della home entrano in sequenza quando
+   arrivano sullo schermo (classe «svela», poi «is-visto»); la mappa della home fa spuntare i segnaposto quando si vede.
+   Solo con JavaScript e se non si è chiesto di ridurre il movimento: altrimenti tutto è già al suo posto. */
+(function () {
+  'use strict';
+  if (!('IntersectionObserver' in window) || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  var gruppi = [
+    'main > .section h2', '.needs-home__head p, .map-preview__head > *:not(h2), .facts-home__head p',
+    '.needs-home__list > li', '.how__list > li', '.facts-home__list > div', '.apps', '.business-home__inner > *:not(h2)',
+    '.about__body > *', '#home-map'
+  ];
+  var io = new IntersectionObserver(function (voci) {
+    voci.forEach(function (v) {
+      if (!v.isIntersecting) return;
+      v.target.classList.add('is-visto');
+      io.unobserve(v.target);
+    });
+  }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+  gruppi.forEach(function (sel) {
+    [].forEach.call(document.querySelectorAll(sel), function (el, i, tutti) {
+      el.classList.add('svela');
+      /* sfasati dentro lo stesso elenco: fratelli in ordine */
+      var idx = el.parentNode ? [].indexOf.call(el.parentNode.children, el) : 0;
+      el.style.setProperty('--i', String(Math.min(idx, 8)));
+      io.observe(el);
+    });
+  });
+  /* L'elenco «Ultimi luoghi verificati» arriva dopo i dati: le schede entrano quando ci sono */
+  var latest = document.getElementById('latest-list');
+  if (latest) {
+    new MutationObserver(function () {
+      [].forEach.call(latest.children, function (li, i) {
+        if (li.classList.contains('svela')) return;
+        li.classList.add('svela');
+        li.style.setProperty('--i', String(i));
+        io.observe(li);
+      });
+    }).observe(latest, { childList: true });
+  }
+})();
+
