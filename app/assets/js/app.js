@@ -154,15 +154,31 @@
   OA.config.reportHref = function (p) { return 'segnala.html?id=' + encodeURIComponent(p.id); };
   OA.config.onDetail = initDetailExtras;
 
+  /* Pallino sulla scheda «Profilo» per i moderatori: quante cose aspettano una decisione (segnalazioni, recensioni,
+     richieste dei gestori, verifiche sul posto). Il numero resta in memoria 90 secondi per non contare a ogni pagina;
+     nel pannello di moderazione si ricalcola sempre. Per gli screen reader è nel nome della voce («Profilo, 3 da moderare»). */
   function updateChrome() {
-    var user = api.user();
-    var banner = $('mode-banner');
-    if (banner) {
-      /* Etichetta accanto al logo solo in modalità prova (dati finti): la versione normale non ha etichette */
-      banner.hidden = api.mode !== 'prova';
-      banner.title = 'Luoghi di esempio e account finti, salvati solo in questo browser';
-    }
-    /* La scheda «Profilo» resta sempre «Profilo», come nelle app: senza accesso mostra «Accedi / Registrati» e le informazioni */
+    var link = document.querySelector('.app-nav__link[data-account-link]');
+    if (!link) return;
+    var vecchio = link.querySelector('.app-nav__badge');
+    if (vecchio) vecchio.remove();
+    var sr = link.querySelector('.app-nav__badge-sr');
+    if (sr) sr.remove();
+    if (!api.user() || !api.pendingCount) return;
+    api.profile().then(function (prof) {
+      if (!prof || prof.ruolo === 'utente') return null;
+      var c = null;
+      try { c = JSON.parse(sessionStorage.getItem('oa-da-moderare') || 'null'); } catch (e) { /* niente */ }
+      if (c && Date.now() - c.t < 90000 && page !== 'moderazione') return c.n;
+      return api.pendingCount().then(function (n) {
+        try { sessionStorage.setItem('oa-da-moderare', JSON.stringify({ n: n, t: Date.now() })); } catch (e) { /* niente */ }
+        return n;
+      });
+    }).then(function (n) {
+      if (!n) return;
+      link.appendChild(el('span', { className: 'app-nav__badge', 'aria-hidden': 'true', text: n > 99 ? '99+' : String(n) }));
+      link.appendChild(el('span', { className: 'visually-hidden app-nav__badge-sr', text: ', ' + n + ' da moderare' }));
+    }).catch(function () { /* senza numero va bene lo stesso */ });
   }
 
   function syncNeeds() {
@@ -245,6 +261,17 @@
       links[i].classList.add('is-arriva');
       setTimeout(function () { links[i].classList.remove('is-arriva'); }, 900);
     }
+
+    /* Al tocco l'icona si schiaccia subito (non al rilascio); sui telefoni che lo permettono, una vibrazione minima */
+    links.forEach(function (a) {
+      a.addEventListener('pointerdown', function (ev) {
+        a.classList.add('is-premuto');
+        if (anima && ev.pointerType === 'touch' && navigator.vibrate) { try { navigator.vibrate(8); } catch (e) { /* niente */ } }
+      });
+      ['pointerup', 'pointercancel', 'pointerleave'].forEach(function (t) {
+        a.addEventListener(t, function () { a.classList.remove('is-premuto'); });
+      });
+    });
 
     links.forEach(function (a, i) {
       a.addEventListener('click', function (ev) {
@@ -388,12 +415,6 @@
 
     var reg = $('signup-link');
     if (reg && params.get('torna')) reg.href = 'registrati.html?torna=' + encodeURIComponent(params.get('torna'));
-
-    if (api.mode === 'prova') {
-      show($('demo-login'), true);
-      $('demo-user').addEventListener('click', function () { api.signInDemo(false).then(afterLogin); });
-      $('demo-mod').addEventListener('click', function () { api.signInDemo(true).then(afterLogin); });
-    }
 
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
@@ -890,7 +911,7 @@
       else if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) errors.push({ input: fotoIn, text: 'Il file deve essere una foto (JPEG, PNG, WebP o HEIC).' });
       if (showErrors(form, errors)) return;
       busy(form, true, 'Invio…');
-      preparePhoto(file, api.mode === 'prova' ? 800 : 1600).then(function (blob) {
+      preparePhoto(file, 1600).then(function (blob) {
         return api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, titolare: titolare, telefono: telefono, email: email, nota: null }, blob);
       }).then(function () {
         show($('owner-new'), false);
@@ -1687,7 +1708,7 @@
       if (files.length > room) status.textContent = 'Puoi aggiungere al massimo ' + MAX_FOTO + ' foto: ne ho prese ' + room + '.';
       files.slice(0, room).reduce(function (prev, file) {
         return prev.then(function () {
-          return preparePhoto(file, api.mode === 'prova' ? 800 : 1600).then(function (blob) {
+          return preparePhoto(file, 1600).then(function (blob) {
             var id = 'photo-' + (++count);
             var url = URL.createObjectURL(blob);
             var alt = el('input', { type: 'text', className: 'input', id: id, maxlength: '200', 'aria-describedby': id + '-aiuto' });

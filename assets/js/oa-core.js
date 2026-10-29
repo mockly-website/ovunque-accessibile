@@ -1,7 +1,6 @@
 /* Ovunque Accessibile – codice comune a sito e web-app (window.OA).
    Il sito lo avvia con sito.js, l'app con app/assets/js/app.js: le regole e i giudizi sono gli stessi.
-   Dati: da Supabase (sito.js e api.js impostano OA.config.loadPlaces); assets/data/luoghi.json (esempi inventati) resta
-   solo per la modalità prova dell'app e come ripiego senza configurazione.
+   Dati: da Supabase (sito.js e api.js impostano OA.config.loadPlaces e loadPlace).
    Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni.
    Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta «La tua esigenza»
            4. Utilità DOM · 5. Componenti · 6. Mappa · 7. Home · 8. Pagina mappa
@@ -13,7 +12,6 @@
   document.documentElement.classList.add('js');
 
   /* ---------- 1. Configurazione ---------- */
-  var DATA_URL = 'assets/data/luoghi.json';
   var TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
   var ATTRIBUTION = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
   var ITALY = { center: [42.5, 12.5], zoom: 5 };
@@ -441,15 +439,11 @@
 
   /* Un solo luogo (scheda): se sito o app sanno chiederlo al database, non si scaricano tutti */
   function loadPlace(id) {
-    if (config.loadPlace) return config.loadPlace(id);
-    return loadPlaces().then(function (places) { return places.filter(function (x) { return x.id === id; })[0] || null; });
+    return config.loadPlace ? config.loadPlace(id) : Promise.reject(new Error('dati'));
   }
 
   function loadPlaces() {
-    if (config.loadPlaces) return config.loadPlaces();
-    return fetch(DATA_URL, { credentials: 'omit' })
-      .then(function (r) { if (!r.ok) throw new Error('dati'); return r.json(); })
-      .then(function (data) { return data.luoghi || []; });
+    return config.loadPlaces ? config.loadPlaces() : Promise.reject(new Error('dati'));
   }
 
   /* ---------- 5. Componenti ---------- */
@@ -1362,12 +1356,12 @@
       initExplore();
       initDetail();
     },
-    CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, SOGLIE: SOGLIE,
-    GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, DETTAGLI: DETTAGLI, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
-    giudizio: giudizio, visibile: visibile, verifica: verifica, distanceKm: distanceKm, completezza: completezza,
+    CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE,
+    GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
+    giudizio: giudizio, distanceKm: distanceKm, completezza: completezza,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
-    statusNode: statusNode, verdictNode: verdictNode, verificaNode: verificaNode, placeCard: placeCard,
-    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY, TOUCH: TOUCH
+    statusNode: statusNode, verdictNode: verdictNode, placeCard: placeCard,
+    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY
   };
 })();

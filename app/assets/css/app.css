@@ -304,10 +304,6 @@ textarea.input {
   margin-top: var(--space-md);
 }
 
-.pick__title {
-  font-size: var(--text-base);
-}
-
 .pick__actions {
   display: flex;
   flex-wrap: wrap;
@@ -477,11 +473,6 @@ textarea.input {
 .btn--danger:hover {
   background: var(--color-error);
   color: var(--color-white);
-}
-
-.card--accent {
-  border: 2px solid var(--color-brand);
-  background: var(--color-sky);
 }
 
 .demo {
@@ -815,12 +806,6 @@ textarea.input {
    Fondo caldo, barra in alto bianca e leggera, schede arrotondate, barra di navigazione che galleggia in basso. */
 .app {
   background: linear-gradient(180deg, var(--color-sky) 0, var(--color-card) 22rem) no-repeat, var(--color-card);
-}
-
-.app .proto-banner {
-  padding: 0.3rem var(--space-md);
-  font-size: 0.875rem;
-  line-height: 1.35;
 }
 
 .app .site-header {
@@ -1526,11 +1511,6 @@ textarea.input {
   margin-left: auto;
 }
 
-.app .site-header .beta {
-  order: 0;
-  margin: 0;
-}
-
 @media (max-width: 47.99em) {
   .app .site-header__inner {
     flex-wrap: nowrap;
@@ -1605,10 +1585,6 @@ html:has(> body.app) {
   border-radius: 1.25rem;
   background: var(--color-white);
   box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
-}
-
-.app .card--accent {
-  background: var(--color-sky);
 }
 
 .app .needs,
@@ -1890,30 +1866,9 @@ html:has(> body.app) {
     transition: transform 0.15s var(--ease-out);
   }
 
-  /* La pillola dietro l'icona attiva: un elemento a parte, così si anima senza toccare l'icona */
-  .app .app-nav__link::before {
-    content: "";
-    position: absolute;
-    top: 0.2rem;
-    left: 50%;
-    width: 3.5rem;
-    height: 1.9rem;
-    margin-left: -1.75rem;
-    border-radius: var(--radius-pill);
-    background: var(--color-sky);
-    opacity: 0;
-    transform: scaleX(0.4);
-  }
-
   .app .app-nav__link[aria-current="page"] {
     background: none;
     color: var(--color-navy);
-  }
-
-  .app .app-nav__link[aria-current="page"]::before {
-    opacity: 1;
-    transform: none;
-    animation: oa-pillola 0.35s var(--ease-out);
   }
 
   .app .app-nav__link[aria-current="page"] .icon {
@@ -2027,13 +1982,6 @@ html:has(> body.app) {
   }
 }
 
-@keyframes oa-pillola {
-  from {
-    opacity: 0;
-    transform: scaleX(0.4);
-  }
-}
-
 /* Passaggio tra le pagine dell'app */
 @view-transition {
   navigation: auto;
@@ -2093,7 +2041,6 @@ html:has(> body.app) {
     navigation: none;
   }
 
-  .app .app-nav__link[aria-current="page"]::before,
   .app details[open] > :not(summary) {
     animation: none;
   }
@@ -2113,9 +2060,6 @@ html:has(> body.app) {
 }
 
 @media (forced-colors: active) {
-  .app .app-nav__link[aria-current="page"]::before {
-    background: Highlight;
-  }
 
   .app .app-nav__link[href="segnala.html"] .icon {
     border-color: Canvas;
@@ -2395,10 +2339,9 @@ html:has(> body.app) {
   }
 }
 
-/* 22. Icone della barra e movimento tra le schede (28 ottobre, notte).
-   Icone a contorno; la scheda attiva ha l'icona piena (riempimento leggero) sopra la pillola azzurra.
+/* 22. Icone della barra (28 ottobre, notte): a contorno; la scheda attiva ha l'icona con un riempimento leggero.
    «is-section»: la scheda di cui fa parte la pagina (scheda di un luogo → Mappa; Per i locali e privacy → Profilo).
-   La pillola è un elemento vero (.app-nav__pill) perché app.js la fa scivolare dalla scheda di prima. */
+   L'indicatore che passa da una scheda all'altra è nella sezione 24. */
 .app .app-nav .icon--tab {
   fill: none;
   stroke: currentColor;
@@ -2407,35 +2350,7 @@ html:has(> body.app) {
   stroke-linejoin: round;
 }
 
-.app-nav__pill {
-  display: none;
-}
-
 @media (max-width: 63.99em) {
-  .app .app-nav__link::before {
-    display: none;
-  }
-
-  .app .app-nav__pill {
-    display: block;
-    position: absolute;
-    top: 0.15rem;
-    left: 50%;
-    width: 3.75rem;
-    height: 2rem;
-    margin-left: -1.875rem;
-    border-radius: var(--radius-pill);
-    background: var(--color-sky);
-    opacity: 0;
-    transform: scale(0.6);
-    transition: opacity 0.2s ease, transform 0.3s var(--ease-out);
-  }
-
-  .app .app-nav__link[aria-current="page"] .app-nav__pill,
-  .app .app-nav__link.is-section .app-nav__pill {
-    opacity: 1;
-    transform: none;
-  }
 
   .app .app-nav__link.is-section {
     color: var(--color-navy);
@@ -2447,11 +2362,6 @@ html:has(> body.app) {
     fill-opacity: 0.2;
     stroke: var(--color-brand);
     stroke-width: 2.1;
-  }
-
-  /* «Segnala»: il «+» bianco nel cerchio blu */
-  .app .app-nav__link[href="segnala.html"] .app-nav__pill {
-    display: none;
   }
 
   .app .app-nav__link[href="segnala.html"] .icon--tab,
@@ -2534,9 +2444,6 @@ html:has(> body.app) {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app .app-nav__pill {
-    transition: none;
-  }
 
   .oa-va .app .site-header::after {
     animation: none;
@@ -2553,10 +2460,6 @@ html:has(> body.app) {
 }
 
 @media (forced-colors: active) {
-  .app .app-nav__link[aria-current="page"] .app-nav__pill,
-  .app .app-nav__link.is-section .app-nav__pill {
-    background: Highlight;
-  }
 
   .app .app-nav .icon--tab {
     stroke: CanvasText;
@@ -2609,9 +2512,6 @@ html:has(> body.app) {
 }
 
 @media (max-width: 63.99em) {
-  .app .app-nav__pill {
-    display: none;
-  }
 
   .app .app-nav__indice {
     display: block;
@@ -2723,5 +2623,113 @@ html:has(> body.app) {
   width: 100%;
   max-width: 28rem;
   border-radius: var(--radius-md);
+}
+
+/* 27. Barra in basso sospesa (29 ottobre): staccata dai bordi, angoli tondi, «vetro» che lascia intravedere sfocato
+   quello che scorre sotto; l'icona si schiaccia appena il dito appoggia (is-premuto, app.js); pallino rosso con il
+   numero di cose da moderare sulla scheda «Profilo» (solo moderatori). Con «riduci trasparenza» la barra è bianca. */
+@media (max-width: 63.99em) {
+  .app {
+    padding-bottom: calc(6.75rem + env(safe-area-inset-bottom));
+  }
+
+  html:has(> body.app) {
+    scroll-padding-bottom: 8rem;
+  }
+
+  .app .app-nav {
+    left: var(--space-sm);
+    right: var(--space-sm);
+    bottom: calc(var(--space-sm) + env(safe-area-inset-bottom));
+    max-width: 30rem;
+    margin-inline: auto;
+    padding: 0.35rem var(--space-xs);
+    border: 1px solid rgba(22, 40, 65, 0.08);
+    border-radius: 1.75rem;
+    background: rgba(255, 255, 255, 0.9);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow: 0 14px 34px rgba(22, 40, 65, 0.2), 0 2px 6px rgba(22, 40, 65, 0.08);
+  }
+
+  .app .app-nav__onde {
+    border-radius: inherit;
+  }
+
+  .app .app-nav__list {
+    max-width: none;
+  }
+
+  .app .app-nav__link.is-premuto .icon {
+    transform: scale(0.86);
+  }
+
+  .app .app-nav__link[href="segnala.html"].is-premuto .icon {
+    transform: scale(0.9);
+  }
+}
+
+@media (max-width: 63.99em) and (prefers-reduced-transparency: reduce) {
+  .app .app-nav {
+    background: var(--color-white);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@supports not ((-webkit-backdrop-filter: blur(1px)) or (backdrop-filter: blur(1px))) {
+  .app .app-nav {
+    background: var(--color-white);
+  }
+}
+
+.app-nav__link {
+  position: relative;
+}
+
+.app-nav__badge {
+  position: absolute;
+  top: 0;
+  left: calc(50% + 0.55rem);
+  z-index: 2;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  padding: 0 0.3rem;
+  border: 2px solid var(--color-white);
+  border-radius: var(--radius-pill);
+  background: var(--color-error);
+  color: var(--color-white);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  display: grid;
+  place-items: center;
+  box-sizing: content-box;
+}
+
+@media (min-width: 64em) {
+  .app-nav__badge {
+    top: 0.1rem;
+    left: auto;
+    right: 0.1rem;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-nav__badge {
+    animation: oa-spunta 0.45s cubic-bezier(0.3, 0.7, 0.2, 1.4) both;
+  }
+}
+
+@media (forced-colors: active) {
+  .app .app-nav {
+    border: 2px solid CanvasText;
+  }
+
+  .app-nav__badge {
+    border-color: Canvas;
+    background: Highlight;
+    color: HighlightText;
+  }
 }
 

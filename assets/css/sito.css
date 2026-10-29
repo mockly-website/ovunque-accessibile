@@ -223,14 +223,6 @@ html:not(.js) .js-only {
   stroke-linejoin: round;
 }
 
-.icon--inline {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  margin-left: 0.2em;
-  vertical-align: -0.1em;
-}
-
 .container {
   width: 100%;
   max-width: var(--container);
@@ -345,16 +337,6 @@ html:not(.js) .js-only {
 
 .pill--soon {
   background: var(--color-beige);
-}
-
-/* Avviso del prototipo: sempre visibile, mai scambiabile per dati reali */
-.proto-banner {
-  margin: 0;
-  padding: var(--space-xs) var(--space-md);
-  background: var(--color-navy);
-  color: var(--color-white);
-  font-size: var(--text-sm);
-  text-align: center;
 }
 
 /* Campi */
@@ -579,11 +561,6 @@ html:not(.js) .js-only {
 
 .trust--old {
   color: var(--color-warning);
-}
-
-.facts__desc {
-  margin: 0;
-  font-weight: 700;
 }
 
 .detail__trust {
@@ -1082,20 +1059,6 @@ main > .section {
   .hero__map {
     height: 28rem;
   }
-}
-
-.grid {
-  display: grid;
-  gap: var(--space-md);
-}
-
-@media (min-width: 40em) {
-  .grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .grid--3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-@media (min-width: 60em) {
-  .grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 /* Come funziona: tre righe numerate */
@@ -2332,7 +2295,6 @@ main > .section {
   min-height: 3rem;
 }
 
-
 /* Telefono (sito e app): etichette ovvie nascoste a vista, «Come ti muovi?» su una riga, ricerca con la sola lente */
 @media (max-width: 47.99em) {
   /* Etichette che sul telefono si capiscono già dal campo: restano per gli screen reader */
@@ -2798,25 +2760,8 @@ main > .section {
   }
 }
 
-/* 21. Intestazione e navigazione (28 ottobre): voci a pillola; l'etichetta .beta resta solo nell'app, in modalità prova,
-   sul telefono un pulsante «Menu» (assets/js/menu.js) invece di due righe di link */
-.beta {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.15rem 0.6rem;
-  border: 1px solid rgba(47, 91, 156, 0.3);
-  border-radius: var(--radius-pill);
-  background: var(--color-sky);
-  color: var(--color-brand);
-  font-size: 0.8125rem;
-  font-weight: 700;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-
-.beta[hidden] {
-  display: none;
-}
+/* 21. Intestazione e navigazione (28 ottobre): voci a pillola; sul telefono un pulsante «Menu» (assets/js/menu.js)
+   che apre un pannello (sezione più sotto) invece di due righe di link */
 
 .site-header__inner {
   justify-content: flex-start;
@@ -2856,14 +2801,6 @@ main > .section {
     flex-wrap: wrap;
     gap: 0 var(--space-xs);
     padding-block: var(--space-xs);
-  }
-
-  .site-header .beta {
-    order: 3;
-    width: max-content;
-    margin: 0 0 var(--space-2xs) calc(2rem + var(--space-xs));
-    padding-block: 0;
-    font-size: 0.75rem;
   }
 
   .menu-toggle {
