@@ -2681,3 +2681,16 @@ html:has(> body.app) {
   }
 }
 
+/* 25. Codice QR per la vetrina (bollino.html, 29 ottobre): due pulsanti, scarica l'immagine e stampa */
+.badge-page__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-xs);
+}
+
+.badge__verdicts[hidden] {
+  display: none;
+}
+
