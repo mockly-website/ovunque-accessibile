@@ -947,8 +947,8 @@ html:not(.js) .js-only {
 }
 
 /* 7. Home (29 ottobre, riscritta): impaginazione asciutta, senza etichette sopra i titoli né riquadri ripetuti.
-   Le sezioni sono separate da una riga sottile; da 960 px titolo a sinistra e contenuto a destra. Gli stili di prova
-   B e C (assets/css/stili-prova.css) partono da questa struttura. */
+   Le sezioni sono separate da una riga sottile; da 960 px titolo a sinistra e contenuto a destra (stile A, scelto dal
+   cliente il 29 ottobre tra tre proposte). */
 .hero {
   padding-block: var(--space-xl) var(--space-2xl);
 }
