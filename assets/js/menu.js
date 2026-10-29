@@ -20,7 +20,7 @@
   btn.setAttribute('aria-expanded', 'false');
   btn.setAttribute('aria-controls', nav.id);
   btn.innerHTML = '<span class="menu-toggle__bars" aria-hidden="true"></span><span class="menu-toggle__label">Menu</span>';
-  (header.querySelector('.beta') || brand).after(btn);
+  brand.after(btn);
 
   /* Voci e pulsante dell'app nello stesso pannello */
   var panel = document.createElement('div');

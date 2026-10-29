@@ -1522,7 +1522,7 @@ textarea.input {
   font-size: var(--text-sm);
 }
 
-/* 16. Intestazione dell'app (28 ottobre): etichetta «Versione di prova» accanto al logo, voci a destra sul computer;
+/* 16. Intestazione dell'app (28 ottobre): etichetta «Modalità prova» accanto al logo (solo con i dati finti), voci a destra sul computer;
    sul telefono la barra in basso ha tre voci (Mappa, Segnala, Profilo: i locali stanno nel profilo) */
 .app .app-nav {
   margin-left: auto;

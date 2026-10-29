@@ -158,11 +158,9 @@
     var user = api.user();
     var banner = $('mode-banner');
     if (banner) {
-      /* Etichetta breve accanto al logo; la spiegazione completa è nel tooltip e nella pagina «Per i locali» / privacy */
-      banner.textContent = api.mode === 'prova' ? 'Modalità prova' : 'Versione di prova';
-      banner.title = api.mode === 'prova'
-        ? 'Luoghi di esempio e account finti, salvati solo in questo browser'
-        : 'Molti luoghi arrivano da OpenStreetMap e non sono ancora stati misurati';
+      /* Etichetta accanto al logo solo in modalità prova (dati finti): la versione normale non ha etichette */
+      banner.hidden = api.mode !== 'prova';
+      banner.title = 'Luoghi di esempio e account finti, salvati solo in questo browser';
     }
     /* La scheda «Profilo» resta sempre «Profilo», come nelle app: senza accesso mostra «Accedi / Registrati» e le informazioni */
   }
