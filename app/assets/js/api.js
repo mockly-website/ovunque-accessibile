@@ -181,6 +181,25 @@
       signIn: function (email, password) {
         return sb.auth.signInWithPassword({ email: email, password: password }).then(check);
       },
+      /* L'accesso con Google compare solo se è acceso su Supabase: lo dice il server, così basta attivarlo là */
+      googleDisponibile: function () {
+        return fetch(CFG.supabaseUrl + '/auth/v1/settings', { credentials: 'omit', headers: { apikey: CFG.supabaseKey } })
+          .then(function (r) { return r.ok ? r.json() : {}; })
+          .then(function (s) { return !!(s.external && s.external.google); })
+          .catch(function () { return false; });
+      },
+      signInGoogle: function (torna) {
+        return sb.auth.signInWithOAuth({
+          provider: 'google',
+          options: { redirectTo: redirect('accedi.html' + (torna ? '?torna=' + encodeURIComponent(torna) : '')) }
+        }).then(check);
+      },
+      /* Primo accesso con Google: nome pubblico, 14 anni e privacy si confermano qui (migrazione accesso_google) */
+      completeProfile: function (nome) {
+        return sb.rpc('completa_profilo', { p_nome: nome, p_privacy: PRIVACY, p_eta: true }).then(check).then(function () {
+          profileCache = null;
+        });
+      },
       signOut: function () {
         profileCache = null;
         return sb.auth.signOut({ scope: 'local' }).then(function () { current = null; notify(null); });
@@ -195,7 +214,7 @@
       profile: function () {
         if (!current) return Promise.resolve(null);
         if (profileCache) return Promise.resolve(profileCache);
-        return sb.from('profiles').select('nome_pubblico,esigenza,ruolo').eq('id', uid()).maybeSingle()
+        return sb.from('profiles').select('*').eq('id', uid()).maybeSingle()
           .then(check).then(function (p) { profileCache = p; return p; });
       },
       updateProfile: function (patch) {

@@ -477,7 +477,13 @@
     else document.addEventListener('DOMContentLoaded', ok);
   });
 
-  Promise.all([api.ready.then(syncNeeds), domPronto]).then(function () {
+  Promise.all([api.ready.then(syncNeeds), domPronto]).then(function (r) {
+    /* Primo accesso con Google: prima di tutto il resto si completa il profilo (la privacy resta leggibile) */
+    if (r[0] && r[0].completo === false && page !== 'registrati' && page !== 'privacy') {
+      var torna = page === 'accedi' ? safeReturn(params.get('torna')) : safeReturn(here());
+      location.replace('registrati.html?completa=1' + (torna ? '&torna=' + encodeURIComponent(torna) : ''));
+      return;
+    }
     updateChrome();
     api.onAuth(updateChrome);
     initPasswordToggles();

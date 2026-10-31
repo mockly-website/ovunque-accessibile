@@ -18,13 +18,13 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=61e6f8bb">
-  <link rel="stylesheet" href="assets/css/app.css?v=6f1e25a0">
-  <script src="assets/js/config.js?v=2dce3a73" defer></script>
+  <link rel="stylesheet" href="assets/css/app.css?v=dbf12bf5">
+  <script src="assets/js/config.js?v=7cfd9f15" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=f6d763a5" defer></script>
-  <script src="assets/js/api.js?v=52554153" defer></script>
-  <script src="assets/js/app.js?v=7d67e0d5" defer></script>
-  <script src="assets/js/accesso.js?v=8ece6a4f" defer></script>
+  <script src="assets/js/api.js?v=0e654d7a" defer></script>
+  <script src="assets/js/app.js?v=329c17ca" defer></script>
+  <script src="assets/js/accesso.js?v=903b64a4" defer></script>
 </head>
 <body class="app" data-page="accedi">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -104,6 +104,10 @@
     <div class="container container--narrow">
       <h1>Accedi</h1>
       <p id="login-note" class="notice" role="status" tabindex="-1" hidden></p>
+      <div id="google-box" class="accesso-google" hidden>
+        <button id="google-btn" class="btn btn--secondary" type="button"><img src="../assets/img/google-g.svg" alt="" width="18" height="18">Continua con Google</button>
+        <p class="accesso-google__oppure"><span>oppure</span></p>
+      </div>
       <form id="login-form" class="card stack" novalidate>
         <div class="field">
           <label class="field__label" for="email">Email</label>

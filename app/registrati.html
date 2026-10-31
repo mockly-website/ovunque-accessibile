@@ -18,13 +18,13 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=61e6f8bb">
-  <link rel="stylesheet" href="assets/css/app.css?v=6f1e25a0">
-  <script src="assets/js/config.js?v=2dce3a73" defer></script>
+  <link rel="stylesheet" href="assets/css/app.css?v=dbf12bf5">
+  <script src="assets/js/config.js?v=7cfd9f15" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=f6d763a5" defer></script>
-  <script src="assets/js/api.js?v=52554153" defer></script>
-  <script src="assets/js/app.js?v=7d67e0d5" defer></script>
-  <script src="assets/js/accesso.js?v=8ece6a4f" defer></script>
+  <script src="assets/js/api.js?v=0e654d7a" defer></script>
+  <script src="assets/js/app.js?v=329c17ca" defer></script>
+  <script src="assets/js/accesso.js?v=903b64a4" defer></script>
 </head>
 <body class="app" data-page="registrati">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -102,8 +102,13 @@
   <main id="main" tabindex="-1">
     <noscript><div class="container"><p class="empty">L'app ha bisogno di JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p></div></noscript>
     <div class="container container--narrow">
-      <h1>Crea un account</h1>
-      <p>Con un account puoi salvare i luoghi preferiti, scrivere recensioni e segnalare luoghi nuovi o correzioni. Per guardare la mappa non serve.</p>
+      <h1 id="signup-title">Crea un account</h1>
+      <p id="signup-intro">Con un account puoi salvare i luoghi preferiti, scrivere recensioni e segnalare luoghi nuovi o correzioni. Per guardare la mappa non serve.</p>
+      <p id="signup-note" class="notice" role="status" tabindex="-1" hidden></p>
+      <div id="google-box" class="accesso-google" hidden>
+        <button id="google-btn" class="btn btn--secondary" type="button"><img src="../assets/img/google-g.svg" alt="" width="18" height="18">Continua con Google</button>
+        <p class="accesso-google__oppure"><span>oppure</span></p>
+      </div>
       <form id="signup-form" class="card stack" novalidate>
         <div class="field">
           <label class="field__label" for="nome">Nome pubblico</label>
@@ -137,8 +142,9 @@
           <label for="privacy">Ho letto la <a href="privacy.html">privacy dell'app</a></label>
         </div>
         <button class="btn btn--primary" type="submit">Crea l'account</button>
+        <button id="signup-cancel" class="btn btn--secondary" type="button" hidden>Annulla ed elimina questo accesso</button>
       </form>
-      <p class="center">Hai già un account? <a href="accedi.html">Accedi</a></p>
+      <p id="signin-link" class="center">Hai già un account? <a href="accedi.html">Accedi</a></p>
 
       <section id="signup-done" class="card" aria-labelledby="signup-done-title" hidden>
         <h2 id="signup-done-title">Controlla la tua email</h2>

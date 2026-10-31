@@ -25,12 +25,32 @@
     location.replace(safeReturn(params.get('torna')) || 'profilo.html');
   }
 
+  /* Pulsante «Continua con Google»: dopo Google si torna ad accedi.html, poi app.js porta dove serve */
+  function initGoogle(note, destinazione) {
+    var box = $('google-box');
+    var btn = $('google-btn');
+    api.googleDisponibile().then(function (si) { show(box, si); });
+    btn.addEventListener('click', function () {
+      btn.disabled = true;
+      api.signInGoogle(destinazione()).catch(function (err) {
+        btn.disabled = false;
+        message(note, err.message, 'error');
+      });
+    });
+  }
+
   function initAccedi() {
     var form = $('login-form');
     var note = $('login-note');
     if (api.user()) return afterLogin();
-    if (params.get('confermata')) message(note, 'Email confermata. Ora puoi accedere.', 'ok');
-    if (params.get('eliminato')) message(note, 'Il tuo account è stato eliminato, insieme a profilo, recensioni e preferiti.', 'ok');
+    initGoogle(note, function () { return safeReturn(params.get('torna')); });
+    if (params.get('error')) {
+      message(note, params.get('error') === 'access_denied'
+        ? 'Accesso con Google annullato. Puoi riprovare o usare email e password.'
+        : 'L\'accesso con Google non è riuscito. Riprova tra poco o usa email e password.', 'error');
+    }
+    else if (params.get('confermata')) message(note, 'Email confermata. Ora puoi accedere.', 'ok');
+    else if (params.get('eliminato')) message(note, 'Il tuo account è stato eliminato, insieme a profilo, recensioni e preferiti.', 'ok');
     else if (params.get('torna')) message(note, 'Per continuare accedi al tuo account.');
 
     var reg = $('signup-link');
@@ -55,7 +75,11 @@
 
   function initRegistrati() {
     var form = $('signup-form');
+    if (api.user() && params.get('completa')) return initCompleta(form);
     if (api.user()) return afterLogin();
+    initGoogle($('signup-note'), function () {
+      return form.elements.locale.checked ? 'locali.html' : safeReturn(params.get('torna'));
+    });
     form.addEventListener('submit', function (ev) {
       ev.preventDefault();
       if (isBusy(form)) return;
@@ -81,6 +105,52 @@
       }).catch(function (err) {
         busy(form, false);
         showErrors(form, [{ input: f.email, text: err.message }]);
+      });
+    });
+  }
+
+  /* Primo accesso con Google: stessa pagina, senza email e password. Il nome di Google è solo un suggerimento */
+  function initCompleta(form) {
+    var f = form.elements;
+    var note = $('signup-note');
+    api.profile().then(function (prof) {
+      if (!prof || prof.completo !== false) return afterLogin();
+      $('signup-title').textContent = 'Ancora un passo';
+      $('signup-intro').textContent = 'Hai effettuato l\'accesso con Google. Scegli il nome che comparirà accanto alle tue recensioni e conferma i due punti qui sotto.';
+      show(f.email.closest('.field'), false);
+      show(f.password.closest('.field'), false);
+      show($('signin-link'), false);
+      show($('signup-cancel'), true);
+      form.querySelector('[type="submit"]').textContent = 'Conferma';
+      var meta = api.user().user_metadata || {};
+      f.nome.value = String(meta.name || '').trim().split(/\s+/)[0].slice(0, 40);
+    });
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (isBusy(form)) return;
+      var nome = f.nome.value.trim();
+      var errors = [];
+      if (nome.length < 2 || nome.length > 40) errors.push({ input: f.nome, text: 'Il nome pubblico deve avere da 2 a 40 caratteri.' });
+      if (!f.eta.checked) errors.push({ input: f.eta, text: 'Per usare un account devi avere almeno 14 anni.' });
+      if (!f.privacy.checked) errors.push({ input: f.privacy, text: 'Per continuare devi aver letto la privacy dell\'app.' });
+      if (showErrors(form, errors)) return;
+      busy(form, true, 'Salvataggio…');
+      api.completeProfile(nome).then(function () {
+        location.replace(f.locale.checked ? 'locali.html' : safeReturn(params.get('torna')) || 'profilo.html');
+      }).catch(function (err) {
+        busy(form, false);
+        showErrors(form, [{ input: f.nome, text: err.message }]);
+      });
+    });
+    /* Chi non vuole confermare non resta con un account a metà: finché è incompleto non contiene niente */
+    $('signup-cancel').addEventListener('click', function () {
+      this.disabled = true;
+      var bottone = this;
+      api.deleteAccount().then(function () {
+        location.replace('accedi.html?eliminato=1');
+      }).catch(function (err) {
+        bottone.disabled = false;
+        message(note, err.message, 'error');
       });
     });
   }

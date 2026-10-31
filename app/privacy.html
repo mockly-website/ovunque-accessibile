@@ -18,12 +18,12 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=61e6f8bb">
-  <link rel="stylesheet" href="assets/css/app.css?v=6f1e25a0">
-  <script src="assets/js/config.js?v=2dce3a73" defer></script>
+  <link rel="stylesheet" href="assets/css/app.css?v=dbf12bf5">
+  <script src="assets/js/config.js?v=7cfd9f15" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=f6d763a5" defer></script>
-  <script src="assets/js/api.js?v=52554153" defer></script>
-  <script src="assets/js/app.js?v=7d67e0d5" defer></script>
+  <script src="assets/js/api.js?v=0e654d7a" defer></script>
+  <script src="assets/js/app.js?v=329c17ca" defer></script>
 </head>
 <body class="app" data-page="privacy">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -102,15 +102,15 @@
     <noscript><div class="container"><p class="empty">L'app ha bisogno di JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p></div></noscript>
     <!--
       BOZZA preparata da Mockly: non costituisce consulenza legale. Da rileggere con il consulente del cliente.
-      Da completare: cognomi e città dei titolari, fornitore SMTP definitivo, DPA dei fornitori, tempi di conservazione
-      degli account inattivi. La versione (app-2026-10-v1) è salvata con ogni registrazione: se cambia, aggiornare
+      Da completare: cognomi e città dei titolari, DPA dei fornitori, tempi di conservazione
+      degli account inattivi. La versione (app-2026-10-v2) è salvata con ogni registrazione: se cambia, aggiornare
       privacyVersion in assets/js/config.js.
     -->
     <div class="container">
       <article class="card prose legal">
         <h1>Privacy dell'app</h1>
         <p>Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (“GDPR”) per chi usa l'app di Ovunque Accessibile.</p>
-        <p>Versione bozza app-2026-10-v1 · Ultimo aggiornamento: 24 ottobre 2026</p>
+        <p>Versione bozza app-2026-10-v2 · Ultimo aggiornamento: 31 ottobre 2026</p>
 
         <h2>In breve</h2>
         <ul>
@@ -126,7 +126,7 @@
 
         <h2>2. Quali dati trattiamo</h2>
         <ul>
-          <li><strong>Account:</strong> email, password (salvata solo in forma cifrata, nemmeno noi possiamo leggerla), nome pubblico, la tua esigenza («La tua esigenza») se la scegli, la conferma di avere almeno 14 anni, la data e la versione dell'informativa che hai accettato.</li>
+          <li><strong>Account:</strong> email, password (salvata solo in forma cifrata, nemmeno noi possiamo leggerla), nome pubblico, la tua esigenza («La tua esigenza») se la scegli, la conferma di avere almeno 14 anni, la data e la versione dell'informativa che hai accettato. Se accedi con Google non crei una password: Google ci comunica email, nome e immagine del profilo; usiamo l'email per l'account e il nome solo per suggerirti un nome pubblico, che scegli tu. L'immagine resta nei dati dell'account e non viene mostrata.</li>
           <li><strong>Quello che scrivi:</strong> segnalazioni di luoghi e correzioni, con la nota per i moderatori; recensioni (testo e risposte alle domande); avvisi temporanei; luoghi salvati nei preferiti.</li>
           <li><strong>Se gestisci un luogo:</strong> il ruolo che indichi, nome e cognome del titolare, un telefono, un'email e una foto dell'ingresso del luogo (ricompressa nel browser, senza la posizione GPS). Questi dati li vedono solo i moderatori, per verificare che gestisci davvero il luogo: ti chiamiamo o ti scriviamo lì; la foto resta nel nostro archivio privato finché non elimini l'account; le tue risposte alle recensioni sono pubbliche con la dicitura «Risposta del gestore». Se chiedi la verifica sul posto, trattiamo anche quando possiamo passare e le note che scrivi, per organizzare il sopralluogo: le vedono solo i moderatori.</li>
           <li><strong>Dati tecnici:</strong> il fornitore del database registra nei propri log l'indirizzo IP e il tipo di browser delle richieste, per sicurezza e per bloccare gli abusi. Noi non li usiamo per altri scopi.</li>
@@ -149,7 +149,8 @@
         <ul>
           <li>i moderatori del progetto (Angelo, Lorenzo e i verificatori che nominano), per controllare segnalazioni e recensioni;</li>
           <li>Supabase, che fornisce database e accesso con server nell'Unione europea, come responsabile del trattamento;</li>
-          <li>il fornitore che invia le email dell'app, come responsabile del trattamento;</li>
+          <li>Google (Gmail), che invia le email dell'app (conferma dell'account e nuova password), come responsabile del trattamento: riceve il tuo indirizzo e il testo dell'email;</li>
+          <li>Google, solo se scegli «Continua con Google», come titolare autonomo: sa che hai usato il tuo account Google per accedere a Ovunque Accessibile;</li>
           <li>il servizio che ospita le pagine dell'app (oggi Altervista), come responsabile del trattamento;</li>
           <li>OpenStreetMap Foundation (Regno Unito), che fornisce le immagini della mappa e la ricerca degli indirizzi (Nominatim) come titolare autonomo: il tuo browser si collega ai suoi server. Quando segnali un luogo e premi «Trova l'indirizzo sulla mappa», o quando invii la segnalazione, inviamo a Nominatim solo indirizzo, città e CAP del luogo, per trovarlo sulla mappa e controllare che il punto sia giusto; quando tocchi la mappa o sposti il segnaposto, gli inviamo il punto del luogo per trovarne indirizzo, CAP e provincia;</li>
           <li>komoot GmbH (Germania), che con il servizio Photon suggerisce gli indirizzi mentre scrivi la via del luogo che segnali, come titolare autonomo: riceve solo il testo che scrivi nel campo «Indirizzo» (e la città, se l'hai scritta), dalle 3 lettere in su;</li>

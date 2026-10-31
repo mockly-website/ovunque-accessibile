@@ -5,5 +5,5 @@
 window.OA_CONFIG = {
   supabaseUrl: 'https://fzqibkvdpywgvlejzeks.supabase.co',
   supabaseKey: 'sb_publishable_FvMVyUSlV8Oiprwh-Tqy1w_K7P0xCIo',
-  privacyVersion: 'app-2026-10-v1'
+  privacyVersion: 'app-2026-10-v2'
 };

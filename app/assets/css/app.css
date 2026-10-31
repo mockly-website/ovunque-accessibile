@@ -1355,6 +1355,27 @@ textarea.input {
   gap: var(--space-sm);
 }
 
+/* Accesso con Google: il logo a colori è quello richiesto dalle regole di Google, non viene dalla libreria di icone */
+.accesso-google .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.accesso-google__oppure {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin: var(--space-md) 0;
+  color: var(--color-muted, inherit);
+}
+
+.accesso-google__oppure::before,
+.accesso-google__oppure::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid var(--color-line);
+}
+
 .state-pill {
   font-weight: 700;
 }
