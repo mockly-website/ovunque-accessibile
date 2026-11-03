@@ -444,7 +444,7 @@
       },
       pending: function () {
         return Promise.all([
-          sb.from('proposte').select('id,tipo,place_id,autore_nome,dati,nota,created_at').eq('stato', 'in-attesa').order('created_at').limit(200),
+          sb.from('proposte').select('id,tipo,place_id,autore_nome,dati,nota,fonte,created_at').eq('stato', 'in-attesa').order('created_at').limit(200),
           sb.from('recensioni').select('id,place_id,autore_nome,esigenza,data_visita,testo,risposte,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200),
           sb.from('gestori').select('id,place_id,nome,ruolo,contatto,titolare,telefono,email,foto_ingresso,nota,created_at,places(nome,citta)').eq('stato', 'in-attesa').order('created_at').limit(200)
         ]).then(function (r) {

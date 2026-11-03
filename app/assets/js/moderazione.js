@@ -3,6 +3,8 @@
 (function () {
   'use strict';
 
+  var FONTI = { visita: 'ci è stato di persona', misurato: 'ci è stato e ha misurato', gestore: 'è il suo locale o ci lavora', racconto: 'gliel\'ha detto chi ci è stato', online: 'l\'ha visto in foto o su internet' };
+
   var OA = window.OA;
   var api = window.OAApi;
   var el = OA.el;
@@ -191,6 +193,8 @@
         var title = (x.tipo === 'nuovo' ? 'Nuovo luogo: ' : 'Correzione: ') + (x.dati.nome || '') + ', ' + (x.dati.citta || '');
         article.appendChild(el('h3', { id: 'mod-p-' + x.id, text: title }));
         article.appendChild(el('p', { className: 'place__meta', text: 'Inviata da ' + (x.autore_nome || 'utente') + ' il ' + dateIt(x.created_at) }));
+        /* «Come lo sai?» scelto da chi segnala (proposte.fonte) */
+        if (x.fonte && FONTI[x.fonte]) article.appendChild(el('p', { className: 'mod-item__fonte' }, [el('strong', { text: 'Come lo sa: ' }), document.createTextNode(FONTI[x.fonte])]));
         if (x.nota) article.appendChild(el('blockquote', { className: 'mod-item__note' }, [el('p', { text: x.nota })]));
         article.appendChild(el('h4', { text: 'Giudizi con questi dati' }));
         article.appendChild(verdictPreview(x.dati, x.id));

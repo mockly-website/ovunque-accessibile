@@ -3378,13 +3378,39 @@ main > .how + .section {
 }
 
 .summary__help[hidden],
-.detail__vuoto[hidden],
+.detail__group[hidden],
 .detail__group .facts[hidden] {
   display: none;
 }
 
-.detail__vuoto {
-  margin: var(--space-xs) 0 0;
+/* Riquadri ancora vuoti, raccolti in uno solo: i loro nomi come etichette */
+.detail__mancano {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: var(--space-sm) 0;
+  padding: 0;
+  list-style: none;
+}
+
+.detail__mancano li {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-sky);
+  font-weight: 700;
+}
+
+.detail__mancano .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--color-brand);
+}
+
+.detail__raccogliere .place__meta {
+  margin: 0 0 var(--space-sm);
 }
 
 /* Da dove arrivano le informazioni: più discreto, senza fondo bianco */

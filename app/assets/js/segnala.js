@@ -62,14 +62,16 @@
     ] },
     { id: 'piani', title: 'Piani e ascensore', fields: [
       { path: 'misure.piani.valore', label: 'Come si raggiungono i piani?', type: 'choice', options: [['uno', 'È tutto su un piano'], ['ascensore', 'C\'è un ascensore'], ['scale', 'Solo con le scale']] },
-      { path: 'x.ascensore_l', label: 'Larghezza della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina larga meno di 70 cm è molto piccola'] },
-      { path: 'x.ascensore_p', label: 'Profondità della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina profonda meno di 70 cm è molto piccola'] },
+      { path: 'misure.piani.ascensore_persone', label: 'Quante persone porta l\'ascensore?', help: 'È scritto sulla targhetta dentro la cabina, per esempio «6 persone – 450 kg».', type: 'choice', options: [['fino-5', 'Fino a 5 persone'], ['6-7', '6 o 7 persone'], ['8-piu', '8 persone o più']], showIf: ['misure.piani.valore', 'ascensore'] },
+      { path: 'x.ascensore_l', label: 'Se l\'hai misurata: larghezza della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina larga meno di 70 cm è molto piccola'] },
+      { path: 'x.ascensore_p', label: 'Se l\'hai misurata: profondità della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina profonda meno di 70 cm è molto piccola'] },
       { path: 'misure.piani.corrimano_scale', label: 'Le scale hanno il corrimano?', type: 'tri', showIf: ['misure.piani.valore', 'scale'] },
       { path: 'misure.piani.nota', label: 'Note su piani e ascensore', type: 'textarea', max: 500, more: true }
     ] },
     { id: 'bagno', title: 'Bagno', fields: [
       { path: 'misure.bagno.valore', label: 'C\'è un bagno accessibile?', type: 'choice', options: [['attrezzato', 'Sì, attrezzato per persone con disabilità'], ['non-attrezzato', 'C\'è, ma non è attrezzato'], ['assente', 'No, nessun bagno accessibile'], ['non-previsto', 'In questo luogo non è previsto un bagno']] },
-      { path: 'misure.bagno.rotazione_cm', label: 'Spazio per girarsi con la carrozzina', help: 'Il diametro del cerchio libero davanti al WC.', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.bagno.valore', 'attrezzato'] },
+      { path: 'misure.bagno.rotazione', label: 'In carrozzina ci si gira davanti al WC?', help: 'Serve uno spazio libero tondo di circa 150 cm: quanto una carrozzina che gira su sé stessa.', type: 'choice', options: [['si', 'Sì, senza fare manovre'], ['manovra', 'Sì, ma con qualche manovra'], ['no', 'No, lo spazio non basta']], showIf: ['misure.bagno.valore', 'attrezzato'] },
+      { path: 'misure.bagno.rotazione_cm', label: 'Se l\'hai misurato: spazio libero davanti al WC', help: 'Il diametro del cerchio libero, da un lato all\'altro.', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.bagno.valore', 'attrezzato'] },
       { path: 'misure.bagno.maniglioni', label: 'Ci sono i maniglioni?', type: 'tri', showIf: ['misure.bagno.valore', 'attrezzato'] },
       { path: 'misure.bagno.nota', label: 'Note sul bagno', type: 'textarea', max: 500, more: true }
     ] },
@@ -164,8 +166,11 @@
 
     if (f.type === 'tri' || f.type === 'choice') {
       var opts = f.type === 'tri' ? [['true', 'Sì'], ['false', 'No'], ['', 'Non so']] : f.options.concat([['', 'Non so']]);
-      wrap = el('fieldset', { className: 'group' + (f.type === 'tri' ? ' group--inline' : ''), id: id }, [
-        el('legend', { className: 'field__label', text: f.label })
+      var fsAttrs = { className: 'group' + (f.type === 'tri' ? ' group--inline' : ''), id: id };
+      if (helpId) fsAttrs['aria-describedby'] = helpId;
+      wrap = el('fieldset', fsAttrs, [
+        el('legend', { className: 'field__label', text: f.label }),
+        helpId ? el('p', { className: 'field__help', id: helpId, text: f.help }) : null
       ].concat(opts.map(function (o, i) {
         var oid = id + '-' + i;
         var input = el('input', { type: 'radio', id: oid, name: f.path, value: o[0] });
@@ -402,7 +407,8 @@
     var chosen = [];
     var list = el('ul', { className: 'photo-picks', role: 'list' });
     var status = el('p', { className: 'visually-hidden', role: 'status' });
-    var input = el('input', { type: 'file', id: 'photo-input', className: 'photo-input', accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif', multiple: '', 'aria-describedby': 'photo-help' });
+    var input = el('input', { type: 'file', id: 'photo-input', className: 'photo-input', accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif', multiple: '', 'aria-describedby': 'photo-help photo-count' });
+    var counter = el('p', { className: 'photo-count', id: 'photo-count' });
     var count = 0;
 
     function renumber() {
@@ -412,6 +418,7 @@
         li.querySelector('button .visually-hidden').textContent = ' la foto ' + (i + 1);
       });
       input.disabled = chosen.length >= MAX_FOTO;
+      counter.textContent = chosen.length ? chosen.length + ' di ' + MAX_FOTO + ' foto' : 'Nessuna foto scelta';
     }
 
     input.addEventListener('change', function () {
@@ -460,11 +467,18 @@
     box.appendChild(el('section', { className: 'card form-section', id: 'sec-foto', 'aria-labelledby': 'sec-foto-title' }, [
       el('h2', { id: 'sec-foto-title', text: 'Foto (facoltative)' }),
       el('p', { className: 'field__help', id: 'photo-help', text: 'Fino a ' + MAX_FOTO + ' foto: ingresso, porta, rampa, bagno. Togliamo noi la posizione GPS dalle foto. Non fotografare persone riconoscibili né targhe. Le foto si vedono solo dopo il controllo dei moderatori.' }),
-      el('div', { className: 'field' }, [el('label', { className: 'field__label', 'for': 'photo-input', text: 'Aggiungi foto' }), input]),
+      /* Il campo file del browser è nascosto alla vista ma resta raggiungibile con tastiera e screen reader: si vede
+         il pulsante (la sua etichetta), che prende il bordo di focus quando il campo è attivo */
+      el('div', { className: 'photo-add' }, [
+        input,
+        el('label', { className: 'btn btn--secondary photo-add__btn', 'for': 'photo-input' }, [icon('#icon-camera'), document.createTextNode('Scegli le foto')]),
+        counter
+      ]),
       list,
       status
     ]));
 
+    renumber();
     return {
       errors: function () {
         return chosen.filter(function (c) {
@@ -675,6 +689,7 @@
         return;
       }
       var nota = form.elements.nota_moderatori.value.trim() || null;
+      var fonteScelta = form.querySelector('input[name="fonte"]:checked');
       busy(form, true, 'Controllo la posizione…');
       var items = photosUi.items();
       var failed = 0;
@@ -691,7 +706,9 @@
         }
         form.querySelector('[type="submit"]').textContent = 'Invio…';
         return ready.then(function () {
-          return api.propose({ tipo: place ? 'correzione' : 'nuovo', place_id: place ? place.id : null, dati: res.dati, nota: nota });
+          var proposta = { tipo: place ? 'correzione' : 'nuovo', place_id: place ? place.id : null, dati: res.dati, nota: nota };
+          if (fonteScelta) proposta.fonte = fonteScelta.value;
+          return api.propose(proposta);
         });
       }).then(function (propostaId) {
         if (stop) return;
@@ -707,6 +724,8 @@
         show(form, false);
         if (failed) message($('proposal-photo-note'), failed === 1 ? 'Una foto non è stata caricata. La segnalazione è arrivata: se vuoi, rimandaci la foto con una correzione.' : failed + ' foto non sono state caricate. La segnalazione è arrivata: se vuoi, rimandaci le foto con una correzione.', 'error');
         show($('proposal-done'), true);
+        $('proposal-done').classList.add('is-arrivato');
+        if (navigator.vibrate) navigator.vibrate([12, 60, 18]);
         focusHeading($('proposal-done-title'));
       }).catch(function (err) {
         busy(form, false);

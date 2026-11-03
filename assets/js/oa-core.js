@@ -96,6 +96,7 @@
       rampaOk: 8, rampaInParte: 12, /* % di pendenza */
       portaOk: 80, portaInParte: 75, /* cm */
       ascensore: [80, 120],        /* cm: larghezza × profondità minime della cabina */
+      ascensorePersone: ['6-7', '8-piu'],   /* portata sulla targhetta: da 6 persone (450 kg) la cabina è di 100 × 125 cm */
       rotazioneBagno: 150          /* cm: spazio per girarsi */
     },
     elettrica: {
@@ -104,6 +105,7 @@
       rampaOk: 8, rampaInParte: 12,
       portaOk: 90, portaInParte: 80,
       ascensore: [110, 140],
+      ascensorePersone: ['8-piu'],          /* da 8 persone (630 kg) la cabina è di 110 × 140 cm */
       rotazioneBagno: 150,
       rotazioneObbligatoria: true
     },
@@ -178,6 +180,9 @@
     }[m.valore] || ['nv', 'Da verificare'];
   }
 
+  /* Portata scritta sulla targhetta dell'ascensore (modulo «Segnala»), quando la cabina non è misurata */
+  var PERSONE_ASCENSORE = { 'fino-5': 'fino a 5 persone', '6-7': '6–7 persone', '8-piu': '8 persone o più' };
+
   function valutaPiani(m, e) {
     var s = SOGLIE[e];
     if (m.valore === 'uno') return ['si', 'Tutto su un piano'];
@@ -185,6 +190,10 @@
       var d = m.ascensore_cm;
       var misure = d ? d[0] + ' × ' + d[1] + ' cm' : '';
       if (aPiedi(e)) return ['si', 'Ascensore' + (misure ? ' ' + misure : '')];
+      if (!d && m.ascensore_persone) {
+        var portata = 'Ascensore da ' + PERSONE_ASCENSORE[m.ascensore_persone];
+        return s.ascensorePersone.indexOf(m.ascensore_persone) !== -1 ? ['si', portata] : ['parziale', portata + ': cabina forse piccola'];
+      }
       if (!d) return ['parziale', 'Ascensore (cabina non misurata)'];
       if (d[0] >= s.ascensore[0] && d[1] >= s.ascensore[1]) return ['si', 'Ascensore ' + misure];
       return ['parziale', 'Ascensore piccolo: ' + misure];
@@ -206,6 +215,10 @@
       case 'attrezzato':
         if (aPiedi(e)) return m.maniglioni === false ? ['parziale', 'Bagno senza maniglioni'] : ['si', 'Bagno con maniglioni'];
         if (m.maniglioni === false) return ['parziale', 'Bagno senza maniglioni'];
+        /* Spazio per girarsi detto a parole: «sì», «con qualche manovra», «no» */
+        if (r == null && m.rotazione === 'si') return ['si', 'Bagno attrezzato, ci si gira senza manovre'];
+        if (r == null && m.rotazione === 'manovra') return [s.rotazioneObbligatoria ? 'parziale' : 'si', 'Bagno attrezzato, per girarsi serve qualche manovra'];
+        if (r == null && m.rotazione === 'no') return [s.rotazioneObbligatoria ? 'no' : 'parziale', 'Bagno attrezzato, ma non ci si gira'];
         if (r == null) return s.rotazioneObbligatoria ? ['parziale', 'Spazio per girarsi non misurato'] : ['si', 'Bagno attrezzato'];
         if (r >= s.rotazioneBagno) return ['si', 'Bagno attrezzato, spazio per girarsi ' + r + ' cm'];
         return [s.rotazioneObbligatoria ? 'no' : 'parziale', 'Spazio per girarsi solo ' + r + ' cm'];
@@ -1544,19 +1557,43 @@
       box.arrivare.appendChild(infoRow('Assistenza del personale', ass.valore === true ? ['si', 'Disponibile'] : ass.valore === false ? ['no', 'Non disponibile'] : ['nv', 'Da verificare'], ass.nota));
     }
 
-    /* Un riquadro in cui non si sa ancora niente: una riga sola invece di tanti «Da verificare» */
+    /* Riquadri in cui non si sa ancora niente: invece di tanti riquadri uguali e vuoti, uno solo
+       «Ancora da raccogliere» con i loro nomi e il link per proporre una correzione */
+    var vuoti = [];
+    var primo = null;
     Object.keys(box).forEach(function (k) {
       var dl = box[k];
       if (!dl) return;
+      var sezione = dl.closest('.detail__group') || dl.parentNode;
+      primo = primo || sezione;
       var vuoto = !dl.querySelector('.status:not(.status--nv)');
-      var msg = dl.parentNode.querySelector('.detail__vuoto');
-      if (!msg) {
-        msg = el('p', { className: 'place__meta detail__vuoto', text: 'Nessuno ha ancora raccolto queste informazioni. Ci sei stato? Proponi una correzione.' });
-        dl.parentNode.insertBefore(msg, dl);
-      }
-      msg.hidden = !vuoto;
-      dl.hidden = vuoto;
+      sezione.hidden = vuoto;
+      if (vuoto) vuoti.push(sezione);
     });
+    var raccogliere = document.getElementById('detail-raccogliere');
+    if (primo && !raccogliere) {
+      raccogliere = el('section', { id: 'detail-raccogliere', className: 'detail__section detail__group detail__raccogliere', 'aria-labelledby': 'detail-raccogliere-title' });
+      primo.parentNode.insertBefore(raccogliere, primo);
+    }
+    if (raccogliere) {
+      raccogliere.textContent = '';
+      raccogliere.hidden = !vuoti.length;
+      if (vuoti.length) {
+        raccogliere.appendChild(el('h2', { id: 'detail-raccogliere-title', className: 'detail__h' }, [
+          el('span', { className: 'detail__h-icon' }, [icon('#icon-unknown')]), document.createTextNode('Ancora da raccogliere')
+        ]));
+        raccogliere.appendChild(el('ul', { className: 'detail__mancano', role: 'list' }, vuoti.map(function (s) {
+          var h = s.querySelector('.detail__h');
+          var ic = h && h.querySelector('.detail__h-icon svg');
+          return el('li', {}, [ic ? ic.cloneNode(true) : null, el('span', { text: h ? h.textContent.trim() : '' })]);
+        })));
+        raccogliere.appendChild(el('p', { className: 'place__meta', text: 'Nessuno ci ha ancora detto com\'è. Ci sei stato? Bastano le cose che ricordi.' }));
+        raccogliere.appendChild(el('a', {
+          className: 'btn btn--secondary btn--small',
+          href: config.reportHref ? config.reportHref(p) : 'mailto:ovunqueaccessibile@gmail.com?subject=' + encodeURIComponent('Correzione scheda: ' + p.nome + ', ' + p.citta + ' (' + p.id + ')')
+        }, [icon('#icon-edit'), document.createTextNode('Proponi una correzione')]));
+      }
+    }
 
     /* Luoghi importati da OpenStreetMap: cosa dice la mappa, nella parte sulla provenienza dei dati */
     var osmBox = document.getElementById('detail-osm');
