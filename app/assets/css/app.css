@@ -70,7 +70,10 @@
 
 .app {
   --app-bg: #f3eee5;            /* testo blu 13:1, grigio del testo secondario 6,6:1 */
-  background: var(--app-bg);
+  /* un velo azzurro in alto dà profondità senza cambiare i contrasti del testo */
+  background:
+    radial-gradient(42rem 22rem at 100% -4rem, rgba(127, 178, 229, 0.22), transparent 70%) no-repeat,
+    var(--app-bg);
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -89,7 +92,7 @@ html:has(> body.app) {
 }
 
 .app .card {
-  border: 0;
+  border: 1px solid rgba(22, 40, 65, 0.05);
   border-radius: 1.25rem;
   background: var(--color-white);
   box-shadow: 0 1px 2px rgba(22, 40, 65, 0.06), 0 4px 16px rgba(22, 40, 65, 0.05);
@@ -2375,54 +2378,20 @@ textarea.input {
   font-weight: 400;
 }
 
+/* Frase sotto il titolo di una pagina dell'app */
+.page-lead {
+  max-width: 46ch;
+  margin: calc(-1 * var(--space-xs)) 0 var(--space-sm);
+  color: var(--color-muted);
+  font-size: var(--text-lg);
+  line-height: 1.45;
+}
+
 /* ==========================================================================
    11. Per i locali
-   Passi numerati, ricerca del proprio locale, locali gestiti, completezza della scheda, consigli,
+   I passi in alto sono .passi--app (sito.css, sezione 15). Ricerca del proprio locale, locali gestiti, completezza della scheda, consigli,
    anteprima della foto dell'ingresso nella richiesta del gestore.
    ========================================================================== */
-
-.steps-list {
-  display: grid;
-  gap: var(--space-md);
-  margin: var(--space-md) 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: passo;
-}
-
-.steps-list > li {
-  position: relative;
-  padding-left: 3rem;
-  counter-increment: passo;
-}
-
-.steps-list > li::before {
-  content: counter(passo);
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: grid;
-  place-items: center;
-  width: 2.2rem;
-  height: 2.2rem;
-  border-radius: 50%;
-  background: var(--color-navy);
-  color: var(--color-white);
-  font-family: var(--font-heading);
-  font-weight: 700;
-}
-
-.steps-list h2,
-.steps-list p {
-  margin: 0 0 var(--space-2xs);
-}
-
-.steps-list__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-xs);
-  margin-top: var(--space-xs);
-}
 
 .owned {
   display: grid;
@@ -2438,12 +2407,6 @@ textarea.input {
 
 .owned__form {
   margin-top: var(--space-xs);
-}
-
-@media (forced-colors: active) {
-  .steps-list > li::before {
-    border: 2px solid CanvasText;
-  }
 }
 
 .owned__item {

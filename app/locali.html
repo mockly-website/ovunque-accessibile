@@ -17,11 +17,11 @@
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=b015d431">
-  <link rel="stylesheet" href="assets/css/app.css?v=baabb7cb">
+  <link rel="stylesheet" href="../assets/css/sito.css?v=ec165d59">
+  <link rel="stylesheet" href="assets/css/app.css?v=74ec005b">
   <script src="assets/js/config.js?v=7cfd9f15" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
-  <script src="../assets/js/oa-core.js?v=878037bd" defer></script>
+  <script src="../assets/js/oa-core.js?v=214328f3" defer></script>
   <script src="assets/js/api.js?v=f7ca887d" defer></script>
   <script src="assets/js/app.js?v=329c17ca" defer></script>
   <script src="assets/js/profilo.js?v=f47f2603" defer></script>
@@ -104,40 +104,16 @@
     <noscript><div class="container"><p class="empty">L'app ha bisogno di JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p></div></noscript>
     <div class="container container--form stack">
       <h1 id="locali-title">Per i locali</h1>
-      <section class="card" aria-labelledby="locali-title">
-        <p>Hai un locale, un negozio o un altro luogo aperto al pubblico? Gestisci la sua scheda, rispondi alle recensioni e metti in vetrina il bollino «Verificato sul posto».</p>
-        <details class="info-group">
-          <summary class="info-group__toggle"><h2 class="info-group__title">Come funziona, in 4 passi</h2></summary>
-          <div class="info-group__body">
-            <ol class="steps-list">
-              <li>
-                <h3 class="h3">Trova il tuo locale</h3>
-                <p>Cercalo sulla mappa. Se non c'è, segnalalo tu: lo controlliamo e lo pubblichiamo.</p>
-                <p class="steps-list__actions">
-                  <a class="btn btn--secondary btn--small" href="./"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg>Cerca sulla mappa</a>
-                  <a class="btn btn--secondary btn--small" href="segnala.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-plus"/></svg>Segnala il tuo locale</a>
-                </p>
-              </li>
-              <li>
-                <h3 class="h3">Chiedi di gestire la scheda</h3>
-                <p>Nella scheda del locale premi «Sei il titolare?» e lasciaci nome e cognome del titolare, telefono, email e una foto dell'ingresso: controlliamo e ti chiamiamo per confermare. Appena ti confermiamo, scarichi il codice QR con il logo di Ovunque Accessibile, da mettere in vetrina o sui social. Da gestore rispondi anche alle recensioni e proponi le correzioni.</p>
-              </li>
-              <li>
-                <h3 class="h3">Chiedi la verifica sul posto</h3>
-                <p>Quando sei riconosciuto, il pulsante compare qui sotto, in «I tuoi locali». Dicci quando possiamo passare: veniamo a misurare ingresso, porta, spazi, piani e bagno, e ti scriviamo qui la data.</p>
-              </li>
-              <li>
-                <h3 class="h3">Dopo la verifica, il bollino</h3>
-                <p>Dopo la verifica la scheda diventa «Verificato sul posto» e il tuo codice QR diventa il bollino: chi lo inquadra vede la scheda sempre aggiornata.</p>
-              </li>
-            </ol>
-            <p class="place__meta">Il bollino non è una certificazione di legge: dice che abbiamo misurato il locale di persona, in quella data. Dopo 24 mesi la scheda torna «da ricontrollare».</p>
-          </div>
-        </details>
-      </section>
+      <p class="page-lead">Gestisci la scheda del tuo locale, metti in vetrina il codice QR e chiedi la verifica sul posto. È gratis.</p>
+      <ol class="passi passi--app" role="list" aria-label="Come funziona">
+        <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg></span><h2 class="h3">Trova il locale</h2><p>Qui sotto o sulla mappa.</p></li>
+        <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><h2 class="h3">Chiedi di gestirlo</h2><p>Ti chiamiamo per confermare.</p></li>
+        <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-qr"/></svg></span><h2 class="h3">Scarica il QR</h2><p>Per vetrina, cassa e social.</p></li>
+        <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><h2 class="h3">Chiedi la verifica</h2><p>Il QR diventa il bollino.</p></li>
+      </ol>
 
       <section class="card" aria-labelledby="find-title">
-        <h2 id="find-title">1. Trova il tuo locale</h2>
+        <h2 id="find-title">Trova il tuo locale</h2>
         <div class="field">
           <label class="field__label" for="find-q">Scrivi il nome del locale (e la città)</label>
           <input class="input" type="search" id="find-q" autocomplete="off" aria-describedby="find-status">
@@ -148,7 +124,7 @@
       </section>
 
       <section id="owned" class="card" aria-labelledby="owned-title">
-        <h2 id="owned-title">2. I tuoi locali</h2>
+        <h2 id="owned-title">I tuoi locali</h2>
         <p id="owned-note" class="notice" role="status" tabindex="-1" hidden></p>
         <p id="owned-login" hidden><a id="owned-login-link" href="accedi.html?torna=locali.html">Accedi</a> per vedere i locali che gestisci e chiedere la verifica sul posto.</p>
         <p id="owned-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span>Non gestisci ancora nessun locale. Cercalo qui sopra e premi «Gestisci».</span></p>

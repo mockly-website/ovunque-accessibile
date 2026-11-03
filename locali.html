@@ -15,10 +15,62 @@
   <link rel="preload" href="assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="assets/js/intro.js?v=85d27344"></script>
-  <script src="assets/js/menu.js?v=3f8e1ffc" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=b015d431">
+  <script src="assets/js/menu.js?v=1a7f68a1" defer></script>
+  <link rel="stylesheet" href="assets/css/sito.css?v=ec165d59">
 </head>
 <body>
+  <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+    <!-- Icone: Tabler Icons 3.19 (tabler.io/icons), licenza MIT © 2020-2024 Paweł Kuna -->
+    <symbol id="icon-alert" viewBox="0 0 24 24"><path d="M12 9v4" pathLength="1"/><path d="M10.363 3.591l-8.106 13.534a1.914 1.914 0 0 0 1.636 2.871h16.214a1.914 1.914 0 0 0 1.636 -2.87l-8.106 -13.536a1.914 1.914 0 0 0 -3.274 0z" pathLength="1"/><path d="M12 16h.01" pathLength="1"/></symbol>
+    <symbol id="icon-android" viewBox="0 0 24 24"><path d="M4 10l0 6" pathLength="1"/><path d="M20 10l0 6" pathLength="1"/><path d="M7 9h10v8a1 1 0 0 1 -1 1h-8a1 1 0 0 1 -1 -1v-8a5 5 0 0 1 10 0" pathLength="1"/><path d="M8 3l1 2" pathLength="1"/><path d="M16 3l-1 2" pathLength="1"/><path d="M9 18l0 3" pathLength="1"/><path d="M15 18l0 3" pathLength="1"/></symbol>
+    <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12l14 0" pathLength="1"/><path d="M13 18l6 -6" pathLength="1"/><path d="M13 6l6 6" pathLength="1"/></symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" pathLength="1"/><path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" pathLength="1"/></symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" pathLength="1"/></symbol>
+    <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="M6 9l6 6l6 -6" pathLength="1"/></symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" pathLength="1"/><path d="M12 7v5l3 3" pathLength="1"/></symbol>
+    <symbol id="icon-door" viewBox="0 0 24 24"><path d="M14 12v.01" pathLength="1"/><path d="M3 21h18" pathLength="1"/><path d="M6 21v-16a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v16" pathLength="1"/></symbol>
+    <symbol id="icon-download" viewBox="0 0 24 24"><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" pathLength="1"/><path d="M7 11l5 5l5 -5" pathLength="1"/><path d="M12 4l0 12" pathLength="1"/></symbol>
+    <symbol id="icon-ear" viewBox="0 0 24 24"><path d="M6 10a7 7 0 1 1 13 3.6a10 10 0 0 1 -2 2a8 8 0 0 0 -2 3a4.5 4.5 0 0 1 -6.8 1.4" pathLength="1"/><path d="M10 10a3 3 0 1 1 5 2.2" pathLength="1"/></symbol>
+    <symbol id="icon-edit" viewBox="0 0 24 24"><path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" pathLength="1"/><path d="M13.5 6.5l4 4" pathLength="1"/></symbol>
+    <symbol id="icon-elder" viewBox="0 0 24 24"><path d="M11 21l-1 -4l-2 -3v-6" pathLength="1"/><path d="M5 14l-1 -3l4 -3l3 2l3 .5" pathLength="1"/><path d="M8 4m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" pathLength="1"/><path d="M7 17l-2 4" pathLength="1"/><path d="M16 21v-8.5a1.5 1.5 0 0 1 3 0v.5" pathLength="1"/></symbol>
+    <symbol id="icon-external" viewBox="0 0 24 24"><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" pathLength="1"/><path d="M11 13l9 -9" pathLength="1"/><path d="M15 4h5v5" pathLength="1"/></symbol>
+    <symbol id="icon-eye" viewBox="0 0 24 24"><path d="M10 12a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" pathLength="1"/><path d="M21 12c-2.4 4 -5.4 6 -9 6c-3.6 0 -6.6 -2 -9 -6c2.4 -4 5.4 -6 9 -6c3.6 0 6.6 2 9 6" pathLength="1"/></symbol>
+    <symbol id="icon-globe" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 18 0a9 9 0 0 0 -18 0" pathLength="1"/><path d="M3.6 9h16.8" pathLength="1"/><path d="M3.6 15h16.8" pathLength="1"/><path d="M11.5 3a17 17 0 0 0 0 18" pathLength="1"/><path d="M12.5 3a17 17 0 0 1 0 18" pathLength="1"/></symbol>
+    <symbol id="icon-heart" viewBox="0 0 24 24"><path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" pathLength="1"/></symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24"><path d="M5 12l-2 0l9 -9l9 9l-2 0" pathLength="1"/><path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" pathLength="1"/><path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" pathLength="1"/></symbol>
+    <symbol id="icon-instagram" viewBox="0 0 24 24"><path d="M4 4m0 4a4 4 0 0 1 4 -4h8a4 4 0 0 1 4 4v8a4 4 0 0 1 -4 4h-8a4 4 0 0 1 -4 -4z" pathLength="1"/><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" pathLength="1"/><path d="M16.5 7.5l0 .01" pathLength="1"/></symbol>
+    <symbol id="icon-italy" viewBox="0 0 24 24"><path d="M12 18.5l-3 -1.5l-6 3v-13l6 -3l6 3l6 -3v7.5" pathLength="1"/><path d="M9 4v13" pathLength="1"/><path d="M15 7v5.5" pathLength="1"/><path d="M21.121 20.121a3 3 0 1 0 -4.242 0c.418 .419 1.125 1.045 2.121 1.879c1.051 -.89 1.759 -1.516 2.121 -1.879z" pathLength="1"/><path d="M19 18v.01" pathLength="1"/></symbol>
+    <symbol id="icon-lift" viewBox="0 0 24 24"><path d="M5 4m0 1a1 1 0 0 1 1 -1h12a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-12a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M10 10l2 -2l2 2" pathLength="1"/><path d="M10 14l2 2l2 -2" pathLength="1"/></symbol>
+    <symbol id="icon-list" viewBox="0 0 24 24"><path d="M9 6l11 0" pathLength="1"/><path d="M9 12l11 0" pathLength="1"/><path d="M9 18l11 0" pathLength="1"/><path d="M5 6l0 .01" pathLength="1"/><path d="M5 12l0 .01" pathLength="1"/><path d="M5 18l0 .01" pathLength="1"/></symbol>
+    <symbol id="icon-locate" viewBox="0 0 24 24"><path d="M12 12m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" pathLength="1"/><path d="M12 12m-8 0a8 8 0 1 0 16 0a8 8 0 1 0 -16 0" pathLength="1"/><path d="M12 2l0 2" pathLength="1"/><path d="M12 20l0 2" pathLength="1"/><path d="M20 12l2 0" pathLength="1"/><path d="M2 12l2 0" pathLength="1"/></symbol>
+    <symbol id="icon-lock" viewBox="0 0 24 24"><path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" pathLength="1"/><path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" pathLength="1"/><path d="M8 11v-4a4 4 0 1 1 8 0v4" pathLength="1"/></symbol>
+    <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M14 8v-2a2 2 0 0 0 -2 -2h-7a2 2 0 0 0 -2 2v12a2 2 0 0 0 2 2h7a2 2 0 0 0 2 -2v-2" pathLength="1"/><path d="M9 12h12l-3 -3" pathLength="1"/><path d="M18 15l3 -3" pathLength="1"/></symbol>
+    <symbol id="icon-mail" viewBox="0 0 24 24"><path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" pathLength="1"/><path d="M3 7l9 6l9 -6" pathLength="1"/></symbol>
+    <symbol id="icon-map" viewBox="0 0 24 24"><path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13" pathLength="1"/><path d="M9 4v13" pathLength="1"/><path d="M15 7v13" pathLength="1"/></symbol>
+    <symbol id="icon-na" viewBox="0 0 24 24"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" pathLength="1"/><path d="M5.7 5.7l12.6 12.6" pathLength="1"/></symbol>
+    <symbol id="icon-no" viewBox="0 0 24 24"><path d="M18 6l-12 12" pathLength="1"/><path d="M6 6l12 12" pathLength="1"/></symbol>
+    <symbol id="icon-parking" viewBox="0 0 24 24"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-14z" pathLength="1"/><path d="M10 16v-8h2.667c.736 0 1.333 .895 1.333 2s-.597 2 -1.333 2h-2.667" pathLength="1"/></symbol>
+    <symbol id="icon-partial" viewBox="0 0 24 24"><path d="M5 12l14 0" pathLength="1"/></symbol>
+    <symbol id="icon-people" viewBox="0 0 24 24"><path d="M9 7m-4 0a4 4 0 1 0 8 0a4 4 0 1 0 -8 0" pathLength="1"/><path d="M3 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" pathLength="1"/><path d="M16 3.13a4 4 0 0 1 0 7.75" pathLength="1"/><path d="M21 21v-2a4 4 0 0 0 -3 -3.85" pathLength="1"/></symbol>
+    <symbol id="icon-pin" viewBox="0 0 24 24"><path d="M9 11a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" pathLength="1"/><path d="M17.657 16.657l-4.243 4.243a2 2 0 0 1 -2.827 0l-4.244 -4.243a8 8 0 1 1 11.314 0z" pathLength="1"/></symbol>
+    <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5l0 14" pathLength="1"/><path d="M5 12l14 0" pathLength="1"/></symbol>
+    <symbol id="icon-qr" viewBox="0 0 24 24"><path d="M4 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M7 17l0 .01" pathLength="1"/><path d="M14 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M7 7l0 .01" pathLength="1"/><path d="M4 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" pathLength="1"/><path d="M17 7l0 .01" pathLength="1"/><path d="M14 14l3 0" pathLength="1"/><path d="M20 14l0 .01" pathLength="1"/><path d="M14 14l0 3" pathLength="1"/><path d="M14 20l3 0" pathLength="1"/><path d="M17 17l3 0" pathLength="1"/><path d="M20 17l0 3" pathLength="1"/></symbol>
+    <symbol id="icon-route" viewBox="0 0 24 24"><path d="M3 19a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" pathLength="1"/><path d="M19 7a2 2 0 1 0 0 -4a2 2 0 0 0 0 4z" pathLength="1"/><path d="M11 19h5.5a3.5 3.5 0 0 0 0 -7h-8a3.5 3.5 0 0 1 0 -7h4.5" pathLength="1"/></symbol>
+    <symbol id="icon-search" viewBox="0 0 24 24"><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" pathLength="1"/><path d="M21 21l-6 -6" pathLength="1"/></symbol>
+    <symbol id="icon-shield" viewBox="0 0 24 24"><path d="M11.46 20.846a12 12 0 0 1 -7.96 -14.846a12 12 0 0 0 8.5 -3a12 12 0 0 0 8.5 3a12 12 0 0 1 -.09 7.06" pathLength="1"/><path d="M15 19l2 2l4 -4" pathLength="1"/></symbol>
+    <symbol id="icon-store" viewBox="0 0 24 24"><path d="M3 21l18 0" pathLength="1"/><path d="M3 7v1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1m0 1a3 3 0 0 0 6 0v-1h-18l2 -4h14l2 4" pathLength="1"/><path d="M5 21l0 -10.15" pathLength="1"/><path d="M19 21l0 -10.15" pathLength="1"/><path d="M9 21v-4a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v4" pathLength="1"/></symbol>
+    <symbol id="icon-tab-map" viewBox="0 0 24 24"><path d="M3 7l6 -3l6 3l6 -3v13l-6 3l-6 -3l-6 3v-13" pathLength="1"/><path d="M9 4v13" pathLength="1"/><path d="M15 7v13" pathLength="1"/></symbol>
+    <symbol id="icon-tab-plus" viewBox="0 0 24 24"><path d="M12 5l0 14" pathLength="1"/><path d="M5 12l14 0" pathLength="1"/></symbol>
+    <symbol id="icon-tab-user" viewBox="0 0 24 24"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" pathLength="1"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" pathLength="1"/></symbol>
+    <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7l16 0" pathLength="1"/><path d="M10 11l0 6" pathLength="1"/><path d="M14 11l0 6" pathLength="1"/><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" pathLength="1"/><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" pathLength="1"/></symbol>
+    <symbol id="icon-unknown" viewBox="0 0 24 24"><path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" pathLength="1"/><path d="M12 17l0 .01" pathLength="1"/><path d="M12 13.5a1.5 1.5 0 0 1 1 -1.5a2.6 2.6 0 1 0 -3 -4" pathLength="1"/></symbol>
+    <symbol id="icon-user" viewBox="0 0 24 24"><path d="M8 7a4 4 0 1 0 8 0a4 4 0 0 0 -8 0" pathLength="1"/><path d="M6 21v-2a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4v2" pathLength="1"/></symbol>
+    <symbol id="icon-walk" viewBox="0 0 24 24"><path d="M13 4m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" pathLength="1"/><path d="M7 21l3 -4" pathLength="1"/><path d="M16 21l-2 -4l-3 -3l1 -6" pathLength="1"/><path d="M6 12l2 -3l4 -1l3 3l3 1" pathLength="1"/></symbol>
+    <symbol id="icon-wc" viewBox="0 0 24 24"><path d="M6 10m-3 0a3 7 0 1 0 6 0a3 7 0 1 0 -6 0" pathLength="1"/><path d="M21 10c0 -3.866 -1.343 -7 -3 -7" pathLength="1"/><path d="M6 3h12" pathLength="1"/><path d="M21 10v10l-3 -1l-3 2l-3 -3l-3 2v-10" pathLength="1"/><path d="M6 10h.01" pathLength="1"/></symbol>
+    <symbol id="icon-wheelchair" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/></symbol>
+    <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" pathLength="1"/></symbol>
+    <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/><path d="M8.7 12.8l-1.9 3.4h2.4l-1.9 3.2" stroke-width="1.6" pathLength="1"/></symbol>
+  </svg>
   <ul class="skip-links">
     <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
   </ul>
@@ -42,52 +94,90 @@
   </header>
 
   <main id="main" tabindex="-1">
-    <div class="container">
-      <article class="card prose locali">
-        <h1>Per i locali</h1>
-        <p class="lead">Ristoranti, bar, negozi, musei, hotel, palestre, uffici: chi si muove in carrozzina o cammina con fatica cerca prima dove può entrare davvero. Fatevi trovare.</p>
+    <section class="locali-hero" aria-labelledby="locali-title">
+      <div class="container locali-hero__inner">
+        <div>
+          <h1 id="locali-title">Fatevi trovare da chi cerca dove entrare davvero</h1>
+          <p class="locali-hero__lead">Ristoranti, negozi, musei, hotel: chi si muove in carrozzina o cammina con fatica sceglie prima di partire. La scheda del vostro locale è gratis.</p>
+          <p class="locali__azioni">
+            <a class="btn btn--primary" href="app/locali.html">Gestisci il tuo locale</a>
+            <a class="btn btn--secondary" href="mappa.html">Cercalo sulla mappa</a>
+          </p>
+        </div>
+        <div class="bollino-anteprima" aria-hidden="true">
+          <img src="assets/img/logo.webp" alt="" width="180" height="225">
+          <p class="bollino-anteprima__kicker">Verificato sul posto da</p>
+          <p class="bollino-anteprima__nome">Ovunque Accessibile</p>
+          <span class="bollino-anteprima__qr"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-qr"/></svg></span>
+          <p class="bollino-anteprima__cta">Inquadra: misure, foto e recensioni</p>
+        </div>
+      </div>
+    </section>
 
-        <h2>Come funziona</h2>
-        <ol class="locali__passi">
-          <li><strong>Trovate il vostro locale</strong> sulla mappa. Se non c'è, segnalatelo dall'app: lo controlliamo e lo pubblichiamo.</li>
-          <li><strong>Chiedete di gestire la scheda</strong>: nella scheda del locale, nell'app, premete «Sei il titolare?», oppure cercatelo nella pagina «Locali» dell'app. Ci lasciate nome e cognome del titolare, telefono, email e una foto dell'ingresso: controlliamo e vi chiamiamo per confermare. Appena confermato, scaricate il <strong>codice QR</strong> con il nostro logo, da mettere in vetrina, alla cassa o sui social. Da gestori rispondete anche alle recensioni e proponete le correzioni.</li>
-          <li><strong>Chiedete la verifica sul posto</strong> dalla pagina «Per i locali» dell'app, dicendoci quando possiamo passare. Veniamo a misurare ingresso, porta, spazi, piani e bagno.</li>
-          <li><strong>Dopo la verifica il codice diventa il bollino «Verificato sul posto»</strong>: lo stampate per la vetrina e apre la scheda, sempre aggiornata.</li>
+    <section class="section section--bianca" aria-labelledby="passi-title">
+      <div class="container">
+        <h2 id="passi-title">Come funziona</h2>
+        <ol class="passi" role="list">
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg></span><h3>Trovate il locale</h3><p>Sulla mappa. Se non c'è, segnalatelo dall'app.</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><h3>Chiedete di gestirlo</h3><p>«Sei il titolare?»: nome, telefono, email e una foto dell'ingresso. Vi chiamiamo per confermare.</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-qr"/></svg></span><h3>Mettete il QR in vetrina</h3><p>Appena confermati lo scaricate, con il nostro logo: vetrina, cassa o social.</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><h3>Chiedete la verifica</h3><p>Veniamo a misurare: il QR diventa il bollino «Verificato sul posto».</p></li>
         </ol>
-        <p class="locali__azioni">
-          <a class="btn btn--primary" href="app/locali.html">Gestisci il tuo locale nell'app</a>
-          <a class="btn btn--secondary" href="mappa.html">Cerca il tuo locale sulla mappa</a>
-        </p>
+      </div>
+    </section>
 
-        <h2>Cosa guardiamo</h2>
-        <ul>
-          <li>Ingresso: gradini, altezza, rampa e pendenza, corrimano.</li>
-          <li>Porta: larghezza e com'è da aprire.</li>
-          <li>Spazi interni e piani: percorsi, ascensore e misure della cabina.</li>
-          <li>Bagno: spazio per girarsi in carrozzina, maniglioni.</li>
-          <li>In più, se ci sono: parcheggio riservato e sedute.</li>
+    <section class="section" aria-labelledby="guardiamo-title">
+      <div class="container locali-due">
+        <div>
+          <h2 id="guardiamo-title">Cosa guardiamo</h2>
+          <ul class="etichette" role="list">
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg>Ingresso e porta</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg>Spazi e piani</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg>Bagno</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg>Parcheggio e sedute</li>
+          </ul>
+        </div>
+        <div>
+          <h2 id="esigenze-title">Un giudizio per ogni esigenza</h2>
+          <ul class="etichette etichette--chiare" role="list">
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</li>
+            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg>Persona anziana</li>
+          </ul>
+          <p class="locali-nota">Non serve essere perfetti: anche «accessibile in parte» aiuta chi deve decidere se partire.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--bianca" aria-labelledby="consigli-title">
+      <div class="container">
+        <h2 id="consigli-title">Piccoli interventi che fanno la differenza</h2>
+        <p class="locali-intro">Spesso bastano attenzioni che costano poco.</p>
+        <ul class="consigli" role="list">
+          <li><h3>Un campanello all'ingresso</h3><p>A 80–90 cm da terra, con un numero da chiamare se ci sono gradini.</p></li>
+          <li><h3>Una rampa mobile</h3><p>Per uno o due gradini, pronta vicino alla porta, con un cartello.</p></li>
+          <li><h3>Passaggi di almeno 90 cm</h3><p>Tra tavoli, espositori e scaffali, anche nelle ore piene.</p></li>
+          <li><h3>Il bagno sgombro</h3><p>Niente scatole o seggioloni nello spazio davanti al WC.</p></li>
+          <li><h3>Bordi dei gradini colorati</h3><p>Una striscia a contrasto aiuta a vederli in tempo.</p></li>
+          <li><h3>Personale pronto ad aiutare</h3><p>Chiedere prima di spingere una carrozzina; una sedia per chi aspetta.</p></li>
         </ul>
-        <p>La scheda mostra un giudizio per quattro esigenze: carrozzina manuale, carrozzina elettrica, difficoltà a camminare, persone anziane. Non serve essere perfetti: anche «accessibile in parte» aiuta chi deve decidere se partire.</p>
+        <p class="locali-nota">Per rampe fisse, bagni e ascensori le regole sono nel DM 236/1989: chiedete a un tecnico, poi aggiornate la scheda.</p>
+      </div>
+    </section>
 
-        <h2>Piccoli interventi che fanno la differenza</h2>
-        <p>Non servono sempre lavori: spesso bastano attenzioni che costano poco.</p>
-        <ul class="tips">
-          <li><strong>Un campanello all'ingresso</strong>, a 80–90 cm da terra (l'altezza di chi è seduto), con scritto un numero da chiamare se ci sono gradini.</li>
-          <li><strong>Una rampa mobile</strong> per uno o due gradini, sempre pronta vicino alla porta, e un cartello che dice che c'è.</li>
-          <li><strong>Passaggi liberi di almeno 90 cm</strong> tra tavoli, espositori e scaffali, anche nelle ore piene.</li>
-          <li><strong>Il bagno sgombro</strong>: niente scatole, scope o seggioloni nello spazio per girarsi davanti al WC.</li>
-          <li><strong>Bordi dei gradini colorati</strong> con una striscia a contrasto: aiutano chi cammina con fatica a vederli in tempo.</li>
-          <li><strong>Il personale sa come aiutare</strong>: chiedere prima di spingere una carrozzina, offrire il braccio a chi cammina con fatica, tenere una sedia a portata di mano per chi deve aspettare.</li>
-        </ul>
-        <p >Per i lavori veri e propri (rampe fisse, bagni, ascensori) le regole sono nel DM 236/1989: chiedete a un tecnico. Quando cambiate qualcosa, proponete una correzione della scheda.</p>
-
-        <h2>Il bollino</h2>
-        <p>Dice che abbiamo misurato il locale di persona, in quella data. Non è una certificazione di legge. Dopo 24 mesi la scheda torna «da ricontrollare» e si può chiedere una nuova verifica.</p>
-
-        <h2>Domande?</h2>
-        <p>Scriveteci a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o chiamateci al <a href="tel:+393518332819">351 833 2819</a>.</p>
-      </article>
-    </div>
+    <section class="section" aria-labelledby="bollino-title">
+      <div class="container locali-due">
+        <div class="locali-box">
+          <h2 id="bollino-title">Il bollino</h2>
+          <p>Dice che abbiamo misurato il locale di persona, in quella data. Non è una certificazione di legge: dopo 24 mesi la scheda torna «da ricontrollare».</p>
+        </div>
+        <div class="locali-box locali-box--blu">
+          <h2 id="domande-title">Domande?</h2>
+          <p>Scriveteci a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o chiamateci al <a href="tel:+393518332819">351 833 2819</a>.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="site-footer">

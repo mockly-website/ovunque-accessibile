@@ -17,12 +17,12 @@
   <link rel="stylesheet" href="assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=85d27344"></script>
-  <script src="assets/js/menu.js?v=3f8e1ffc" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=b015d431">
+  <script src="assets/js/menu.js?v=1a7f68a1" defer></script>
+  <link rel="stylesheet" href="assets/css/sito.css?v=ec165d59">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="app/assets/js/config.js?v=7cfd9f15" defer></script>
-  <script src="assets/js/oa-core.js?v=878037bd" defer></script>
+  <script src="assets/js/oa-core.js?v=214328f3" defer></script>
   <script src="assets/js/sito.js?v=186c6b07" defer></script>
 </head>
 <body>
@@ -150,15 +150,15 @@
           <p>Lo stesso gradino è un ostacolo per una carrozzina e un dettaglio per chi cammina con il bastone. Scegli la tua esigenza: la mappa ti dice se un luogo va bene per te.</p>
         </div>
         <ul class="needs-home__list" role="list">
-          <li><a href="mappa.html?per=manuale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</a></li>
-          <li><a href="mappa.html?per=elettrica"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</a></li>
-          <li><a href="mappa.html?per=cammino"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</a></li>
-          <li><a href="mappa.html?per=anziani"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg>Persona anziana</a></li>
+          <li><a href="mappa.html?per=manuale"><span class="needs-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg></span><span class="needs-home__nome">Carrozzina manuale</span><svg class="icon needs-home__freccia" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a href="mappa.html?per=elettrica"><span class="needs-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg></span><span class="needs-home__nome">Carrozzina elettrica</span><svg class="icon needs-home__freccia" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a href="mappa.html?per=cammino"><span class="needs-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg></span><span class="needs-home__nome">Difficoltà a camminare</span><svg class="icon needs-home__freccia" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
+          <li><a href="mappa.html?per=anziani"><span class="needs-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg></span><span class="needs-home__nome">Persona anziana</span><svg class="icon needs-home__freccia" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></li>
         </ul>
       </div>
     </section>
 
-    <section class="section map-preview" aria-labelledby="map-preview-title">
+    <section class="section section--bianca map-preview" aria-labelledby="map-preview-title">
       <div class="container map-preview__inner">
         <div class="map-preview__head">
           <h2 id="map-preview-title">I luoghi sulla mappa</h2>
@@ -181,7 +181,7 @@
       </div>
     </section>
 
-    <section class="section" aria-labelledby="latest-title">
+    <section class="section latest-home" aria-labelledby="latest-title">
       <div class="container">
         <div class="section__head section__head--row">
           <h2 id="latest-title">Ultimi luoghi verificati</h2>
@@ -249,16 +249,32 @@
 
     <section id="per-i-locali" class="section business-home" aria-labelledby="business-title">
       <div class="container business-home__inner">
-        <h2 id="business-title">Hai un locale o un negozio?</h2>
-        <p>Gestisci la scheda del tuo locale, chiedi che veniamo a verificarlo di persona e metti in vetrina il codice QR che apre la scheda: dopo la verifica sul posto diventa il bollino «Verificato sul posto».</p>
-        <p><a class="link-arrow" href="locali.html">Come funziona per i locali<svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg></a></p>
+        <div class="business-home__testo">
+          <h2 id="business-title">Hai un locale o un negozio?</h2>
+          <p>Fatti trovare da chi cerca posti dove entrare davvero. È gratis.</p>
+          <a class="btn btn--primary" href="locali.html">Come funziona per i locali</a>
+        </div>
+        <ol class="business-home__passi" role="list">
+          <li><span class="business-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span><strong>Gestisci la scheda</strong> del tuo locale</span></li>
+          <li><span class="business-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-qr"/></svg></span><span><strong>Metti in vetrina</strong> il codice QR</span></li>
+          <li><span class="business-home__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span><strong>Chiedi la verifica</strong>: diventa il bollino</span></li>
+        </ol>
       </div>
     </section>
 
     <section id="chi-siamo" class="section about" aria-labelledby="about-title">
       <div class="container about__inner">
-        <h2 id="about-title">Chi siamo</h2>
+        <figure class="about__foto">
+          <picture>
+            <source type="image/webp" srcset="assets/img/hero-800.webp 800w, assets/img/hero-1200.webp 1200w" sizes="(min-width: 60em) 28rem, 92vw">
+            <img src="assets/img/hero-800.jpg" srcset="assets/img/hero-800.jpg 800w, assets/img/hero-1200.jpg 1200w" sizes="(min-width: 60em) 28rem, 92vw"
+                 width="1200" height="1600" loading="lazy"
+                 alt="Angelo e Lorenzo, i fondatori di Ovunque Accessibile, nelle loro carrozzine elettriche su un belvedere in Sardegna.">
+          </picture>
+          <figcaption>Angelo e Lorenzo</figcaption>
+        </figure>
         <div class="about__body">
+          <h2 id="about-title">Chi siamo</h2>
           <p class="about__lead">Siamo Angelo e Lorenzo. Ci muoviamo in carrozzina e sappiamo quanto conta sapere prima se un posto è davvero accessibile.</p>
           <p>Spesso «accessibile» non vuol dire niente: un gradino all'ingresso, un bagno non attrezzato, informazioni vecchie. Per questo abbiamo creato Ovunque Accessibile: schede con dati concreti, cioè rampe, ascensori, parcheggi, bagni, larghezza delle porte e gradini, scritte da chi ci è stato.</p>
           <p>È pensato per chi si muove in carrozzina, per le persone anziane, per chi ha difficoltà motorie, per le famiglie con il passeggino e per chi accompagna. Ristoranti, hotel, spiagge, bagni pubblici e tutto il resto: più persone raccontano i luoghi che conoscono, più la mappa diventa utile per tutti.</p>

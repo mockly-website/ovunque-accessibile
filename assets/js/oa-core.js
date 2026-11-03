@@ -905,6 +905,9 @@
             .filter(function (p) { return visibile(p, esigenza()); })
             .slice(0, 3)
             .forEach(function (p) { latest.appendChild(placeCard(p)); });
+          /* Senza luoghi verificati la sezione non si mostra (niente titolo con l'elenco vuoto) */
+          var sezione = latest.closest('section');
+          if (sezione) sezione.hidden = !latest.children.length;
         }
         render();
         onEsigenza(render);

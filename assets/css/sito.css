@@ -781,7 +781,7 @@ html:not(.js) .js-only {
   flex: none;
 }
 
-@media (max-width: 47.99em) {
+@media (max-width: 63.99em) {
   .brand__logo {
     width: 2rem;
   }
@@ -860,7 +860,7 @@ html:not(.js) .js-only {
   display: none;
 }
 
-@media (max-width: 47.99em) {
+@media (max-width: 63.99em) {
   /* Telefono: logo e "Scarica l'app" sulla prima riga, link sotto */
   .site-header__inner {
     flex-wrap: wrap;
@@ -991,7 +991,7 @@ html:not(.js) .js-only {
   display: none;
 }
 
-@media (max-width: 47.99em) {
+@media (max-width: 63.99em) {
   .site-header__panel {
     order: 4;
     width: 100%;
@@ -1011,7 +1011,7 @@ html:not(.js) .js-only {
   }
 }
 
-@media (max-width: 47.99em) and (prefers-reduced-motion: no-preference) {
+@media (max-width: 63.99em) and (prefers-reduced-motion: no-preference) {
   .menu-velo {
     transition: opacity 0.25s ease, visibility 0s linear 0.25s;
   }
@@ -1400,8 +1400,9 @@ html:not(.js) .js-only {
 
 /* ==========================================================================
    14. Home
-   Impaginazione asciutta, senza etichette sopra i titoli né riquadri ripetuti. Le sezioni sono
-   separate da una riga sottile; da 960 px titolo a sinistra e contenuto a destra (stile scelto dal cliente).
+   Impaginazione asciutta, senza etichette sopra i titoli. Le sezioni si alternano su fondi diversi (crema,
+   bianco, blu, azzurro) invece delle righe sottili; i titoli hanno un tratto colorato sotto. Da 960 px titolo a
+   sinistra e contenuto a destra (stile scelto dal cliente); «Come funziona» e «Cosa c'è» in schede affiancate.
    Movimento: il titolo sale riga per riga, la foto si scopre dal basso con un leggero zoom, poi ricerca e
    scorciatoie; parte mentre il sipario del caricamento sale (.oa-intro tolta). Allo scorrimento gli elementi con
    .svela (messi da sito.js) entrano in sequenza; nella mappa della home i segnaposto spuntano quando si vede.
@@ -1519,13 +1520,42 @@ html:not(.js) .js-only {
   font-size: var(--text-sm);
 }
 
-/* Sezioni: una riga sottile tra l'una e l'altra */
+/* Sezioni: fondi alternati; titolo più grande con un tratto colorato sotto */
 .section {
   padding-block: var(--space-2xl);
 }
 
-main > .section {
-  border-top: 1px solid var(--color-line);
+@media (min-width: 60em) {
+  .section {
+    padding-block: var(--space-3xl);
+  }
+}
+
+.section--bianca {
+  background: var(--color-white);
+}
+
+main > .section h2 {
+  font-size: var(--text-2xl);
+}
+
+main > .section h2::after {
+  content: "";
+  display: block;
+  width: 2.75rem;
+  height: 0.3rem;
+  margin-top: 0.65rem;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-brand), #7fb2e5);
+}
+
+main > .how h2::after,
+main > .section .apps h2::after {
+  background: var(--color-beige);
+}
+
+.section__head--row h2::after {
+  display: none;
 }
 
 .section__head {
@@ -1597,34 +1627,52 @@ main > .section {
   }
 }
 
-/* Per chi è: elenco di link, due colonne */
+/* Per chi è: quattro tessere, due per riga */
 .needs-home__list {
   display: grid;
-  border-top: 1px solid var(--color-line);
+  gap: var(--space-sm);
 }
 
 @media (min-width: 40em) {
   .needs-home__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--space-xl);
   }
 }
 
 .needs-home__list a {
   display: flex;
   align-items: center;
-  gap: var(--space-sm);
-  min-height: 3.5rem;
-  border-bottom: 1px solid var(--color-line);
+  gap: var(--space-md);
+  min-height: 4.75rem;
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
   color: var(--color-navy);
   font-weight: 700;
   text-decoration: none;
 }
 
 .needs-home__list a:hover {
-  color: var(--color-brand);
-  text-decoration: underline;
-  text-underline-offset: 0.25em;
+  border-color: var(--color-brand);
+  color: var(--color-navy);
+  box-shadow: var(--shadow-md);
+}
+
+.needs-home__icona {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
+}
+
+.needs-home__nome {
+  flex: 1 1 auto;
+  line-height: 1.25;
 }
 
 .needs-home__list .icon {
@@ -1634,11 +1682,18 @@ main > .section {
   color: var(--color-brand);
 }
 
+.needs-home__list .needs-home__freccia {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
 /* Anteprima della mappa */
 .hero__map {
   height: 22rem;
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
   overflow: hidden;
+  box-shadow: var(--shadow-md);
 }
 
 @media (min-width: 60em) {
@@ -1670,38 +1725,57 @@ main > .section {
   margin: 0;
 }
 
-/* Cosa c'è in ogni scheda */
+/* Cosa c'è in ogni scheda: schede bianche, tre per riga sul computer */
 .facts-home__list {
   display: grid;
+  gap: var(--space-md);
   margin: 0;
-  border-top: 1px solid var(--color-line);
 }
 
 @media (min-width: 40em) {
   .facts-home__list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: var(--space-xl);
+  }
+}
+
+@media (min-width: 60em) {
+  .facts-home .facts-home__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+
+  .facts-home__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 .facts-home__list > div {
-  padding-block: var(--space-md);
-  border-bottom: 1px solid var(--color-line);
+  padding: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
 }
 
 .facts-home__list dt {
   display: flex;
-  align-items: center;
-  gap: var(--space-xs);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  font-size: var(--text-lg);
   font-weight: 700;
 }
 
 .facts-home__list dt .icon {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0.6rem;
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
   color: var(--color-brand);
 }
 
 .facts-home__list dd {
-  margin: var(--space-2xs) 0 0 calc(1.5rem + var(--space-xs));
+  margin: var(--space-xs) 0 0;
 }
 
 /* Blocco app: una fascia blu con testo e pulsante */
@@ -1752,16 +1826,109 @@ main > .section {
   color: var(--color-beige);
 }
 
-/* Per i locali */
-.business-home__inner > * {
-  max-width: 48rem;
+/* Per i locali: fascia azzurra, a destra i tre passi in tessere */
+main > .business-home {
+  background: var(--color-sky);
 }
 
-.business-home__inner p {
-  margin-bottom: var(--space-xs);
+.business-home__inner {
+  display: grid;
+  gap: var(--space-xl);
+  align-items: center;
 }
 
-/* Chi siamo */
+@media (min-width: 60em) {
+  .business-home__inner {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: var(--space-3xl);
+  }
+}
+
+.business-home__testo p {
+  max-width: 34ch;
+  margin: 0 0 var(--space-lg);
+  font-size: var(--text-lg);
+}
+
+.business-home__passi {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.business-home__passi li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  box-shadow: var(--shadow-sm);
+}
+
+.business-home__icona {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+/* Chi siamo: la foto di Angelo e Lorenzo con un riquadro beige spostato dietro */
+main > .about {
+  background: var(--color-white);
+}
+
+.about .about__inner {
+  align-items: center;
+}
+
+.about__foto {
+  position: relative;
+  max-width: 28rem;
+  margin: 0 0 var(--space-lg) var(--space-md);
+}
+
+.about__foto::before {
+  content: "";
+  position: absolute;
+  inset: var(--space-md) var(--space-md) calc(-1 * var(--space-md)) calc(-1 * var(--space-md));
+  border-radius: var(--radius-xl);
+  background: var(--color-beige);
+}
+
+.about__foto picture {
+  position: relative;
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-xl);
+  background: var(--color-sky);
+}
+
+.about__foto img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 52%;
+}
+
+.about__foto figcaption {
+  position: absolute;
+  left: var(--space-md);
+  bottom: var(--space-md);
+  padding: 0.3rem 0.9rem;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.94);
+  font-weight: 700;
+}
+
 .about__body > p {
   max-width: var(--measure);
 }
@@ -1772,9 +1939,22 @@ main > .section {
 }
 
 .about__motto {
+  position: relative;
   margin: var(--space-xl) 0;
-  padding-left: var(--space-lg);
-  border-left: 4px solid var(--color-path);
+  padding: var(--space-lg) var(--space-lg) var(--space-lg) 3.75rem;
+  border-radius: var(--radius-lg);
+  background: var(--color-sky);
+}
+
+.about__motto::before {
+  content: "«";
+  position: absolute;
+  top: 0.6rem;
+  left: var(--space-md);
+  color: var(--color-brand);
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  line-height: 1;
 }
 
 .about__motto p {
@@ -1854,9 +2034,39 @@ main > .section {
   font-variant-numeric: tabular-nums;
 }
 
-/* Come funziona: fascia blu a tutta larghezza, per spezzare il ritmo della pagina */
-main > .how {
+/* Come funziona: fascia blu a tutta larghezza, tre schede affiancate */
+@media (min-width: 60em) {
+  .how .how__inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-xl);
+  }
+}
+
+@media (min-width: 48em) {
+  .how .how__list {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-md);
+  }
+}
+
+.how .how__list {
+  display: grid;
+  gap: var(--space-md);
   border-top: 0;
+}
+
+.how .how__list > li {
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  row-gap: var(--space-xs);
+  padding: var(--space-lg);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+main > .how {
   background: var(--color-navy);
   color: var(--color-white);
   --color-focus: var(--color-white);
@@ -1878,15 +2088,11 @@ main > .how {
 
 .how__list > li::before {
   content: counter(passo);
-  grid-row: span 2;
+  grid-row: auto;
   font-family: var(--font-heading);
-  font-size: 2.25rem;
+  font-size: 2.75rem;
   line-height: 1;
   color: var(--color-beige);
-}
-
-main > .how + .section {
-  border-top: 0;
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1975,8 +2181,16 @@ main > .how + .section {
     transition: transform 0.25s var(--ease-out);
   }
 
-  .needs-home__list a:hover .icon {
-    transform: translateX(3px) rotate(-6deg);
+  .needs-home__list a {
+    transition: border-color 0.2s ease, box-shadow 0.25s ease, transform 0.25s var(--ease-out);
+  }
+
+  .needs-home__list a:hover {
+    transform: translateY(-2px);
+  }
+
+  .needs-home__list a:hover .needs-home__freccia {
+    transform: translateX(4px);
   }
 }
 
@@ -2016,37 +2230,374 @@ main > .how + .section {
 
 /* ==========================================================================
    15. Per i locali
-   locali.html e blocco della home.
+   locali.html: in alto titolo, due pulsanti e un'anteprima del bollino; poi i quattro passi in schede, cosa
+   guardiamo e le esigenze come etichette, i consigli in schede brevi, bollino e contatti affiancati.
+   .tips è l'elenco dei consigli nella pagina «Per i locali» dell'app.
    ========================================================================== */
 
-.locali__passi {
+.locali-hero {
+  padding-block: var(--space-xl) var(--space-2xl);
+  background:
+    radial-gradient(60rem 30rem at 85% 0%, rgba(127, 178, 229, 0.28), transparent 70%),
+    var(--color-card);
+}
+
+.locali-hero__inner {
   display: grid;
-  gap: var(--space-sm);
-  padding-left: 1.4em;
+  gap: var(--space-2xl);
+  align-items: center;
+}
+
+@media (min-width: 60em) {
+  .locali-hero {
+    padding-block: var(--space-3xl);
+  }
+
+  .locali-hero__inner {
+    grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.7fr);
+    gap: var(--space-3xl);
+  }
+}
+
+.locali-hero h1 {
+  max-width: 18ch;
+  font-size: var(--text-3xl);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.locali-hero__lead {
+  max-width: 46ch;
+  font-size: clamp(1.125rem, 1rem + 0.4vw, 1.3rem);
 }
 
 .locali__azioni {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+  margin: var(--space-lg) 0 0;
 }
 
-.business {
-  display: grid;
-  justify-items: start;
-  gap: var(--space-sm);
-  border-left: 6px solid var(--color-brand);
+/* Anteprima del bollino (decorativa): com'è il cartello per la vetrina */
+.bollino-anteprima {
+  justify-self: center;
+  width: min(100%, 17rem);
+  padding: var(--space-lg);
+  border: 3px solid var(--color-navy);
+  border-radius: var(--radius-xl);
+  background: var(--color-white);
+  box-shadow: var(--shadow-md);
+  text-align: center;
+  transform: rotate(-3deg);
 }
 
-.business h2,
-.business p {
+.bollino-anteprima img {
+  display: block;
+  width: 3.25rem;
+  height: auto;
+  margin-inline: auto;
+}
+
+@media (max-width: 39.99em) {
+  .bollino-anteprima {
+    width: 13rem;
+    padding: var(--space-md);
+  }
+
+  .bollino-anteprima__qr {
+    width: 5.5rem;
+    height: 5.5rem;
+  }
+
+  .bollino-anteprima__qr .icon {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+}
+
+.bollino-anteprima p {
   margin: 0;
+}
+
+.bollino-anteprima__kicker {
+  margin-top: var(--space-xs);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.bollino-anteprima__nome {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.bollino-anteprima__qr {
+  display: grid;
+  place-items: center;
+  width: 7.5rem;
+  height: 7.5rem;
+  margin: var(--space-md) auto;
+  border-radius: var(--radius-md);
+  background: var(--color-sky);
+  color: var(--color-navy);
+}
+
+.bollino-anteprima__qr .icon {
+  width: 5rem;
+  height: 5rem;
+  stroke-width: 1.5;
+}
+
+.bollino-anteprima__cta {
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* I quattro passi: schede numerate, quattro affiancate sul computer */
+.passi {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: passo;
+}
+
+@media (min-width: 40em) {
+  .passi {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64em) {
+  .passi {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.passi > li {
+  position: relative;
+  counter-increment: passo;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+
+.passi > li::after {
+  content: counter(passo);
+  position: absolute;
+  top: var(--space-md);
+  right: var(--space-lg);
+  color: var(--color-beige);
+  font-family: var(--font-heading);
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.passi__icona {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.passi h3 {
+  margin: 0 0 var(--space-2xs);
+}
+
+.passi p {
+  margin: 0;
+}
+
+/* Nell'app: quattro passi compatti, due per riga anche sul telefono */
+.passi--app {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
+}
+
+@media (min-width: 64em) {
+  .passi--app {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.passi--app > li {
+  padding: var(--space-md);
+  background: var(--color-white);
+}
+
+.passi--app > li::after {
+  top: var(--space-sm);
+  right: var(--space-md);
+  font-size: 1.75rem;
+}
+
+.passi--app .passi__icona {
+  width: 2.5rem;
+  height: 2.5rem;
+  margin-bottom: var(--space-sm);
+}
+
+.passi--app h2 {
+  margin: 0 0 var(--space-2xs);
+  font-size: var(--text-base);
+}
+
+.passi--app p {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  line-height: 1.4;
+}
+
+/* Due colonne sul computer (cosa guardiamo / esigenze; bollino / domande) */
+.locali-due {
+  display: grid;
+  gap: var(--space-2xl);
+}
+
+@media (min-width: 60em) {
+  .locali-due {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3xl);
+  }
+}
+
+.etichette {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.etichette li {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  padding: 0.4rem var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.etichette--chiare li {
+  border: 1px solid var(--color-line);
+  background: var(--color-white);
+  color: var(--color-navy);
+}
+
+.etichette .icon {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-beige);
+}
+
+.etichette--chiare .icon {
+  color: var(--color-brand);
+}
+
+.locali-nota {
+  max-width: var(--measure);
+  margin: var(--space-md) 0 0;
+  color: var(--color-muted);
+}
+
+.locali-intro {
+  margin: 0 0 var(--space-lg);
+  font-size: var(--text-lg);
+}
+
+/* Consigli: schede brevi */
+.consigli {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 40em) {
+  .consigli {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64em) {
+  .consigli {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.consigli > li {
+  padding: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-card);
+}
+
+.consigli h3 {
+  margin: 0 0 var(--space-2xs);
+}
+
+.consigli p {
+  margin: 0;
+}
+
+.locali-box {
+  height: 100%;
+  padding: var(--space-xl);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+}
+
+.locali-box p {
+  margin: 0;
+}
+
+.locali-box--blu {
+  border-color: transparent;
+  background: var(--color-navy);
+  color: var(--color-white);
+  --color-focus: var(--color-white);
+}
+
+.locali-box--blu h2 {
+  color: var(--color-white);
+}
+
+.locali-box--blu a {
+  color: var(--color-beige);
+}
+
+main > .section .locali-box--blu h2::after {
+  background: var(--color-beige);
 }
 
 .tips {
   display: grid;
   gap: var(--space-xs);
   padding-left: 1.2em;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bollino-anteprima {
+    transform: none;
+  }
+}
+
+@media print {
+  .bollino-anteprima {
+    display: none;
+  }
 }
 
 /* ==========================================================================
@@ -3214,11 +3765,18 @@ main > .how + .section {
   display: none;
 }
 
+/* Da sola dentro una scheda: niente secondo bordo */
+.card > .info-group:only-child {
+  margin: calc(-1 * var(--space-sm)) calc(-1 * var(--space-sm));
+  border-color: transparent;
+  background: transparent;
+}
+
 .info-group__toggle {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0 var(--space-xs);
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0 var(--space-sm);
   min-height: var(--target-min);
   padding: var(--space-sm) var(--space-md);
   cursor: pointer;
@@ -3257,6 +3815,7 @@ main > .how + .section {
 }
 
 .info-group__count {
+  grid-column: 2;
   color: var(--color-muted);
   font-size: var(--text-sm);
 }

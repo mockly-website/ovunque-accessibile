@@ -1,5 +1,5 @@
 /* Ovunque Accessibile – menu del sito sul telefono.
-   Sotto i 48em le voci e «Apri la web-app» stanno in un pannello che scende sotto la barra in alto (pulsante «Menu»,
+   Sotto i 64em (telefono e tablet) le voci e «Apri la web-app» stanno in un pannello che scende sotto la barra in alto (pulsante «Menu»,
    aria-expanded). Mentre è aperto il resto della pagina è sfocato e scurito, non scorre e non si raggiunge (inert):
    si chiude con «Chiudi», con Esc o toccando la parte sfocata. Sul computer il pannello non esiste (display: contents)
    e il pulsante è nascosto (CSS). Senza JavaScript il menu resta aperto: la classe «js» la mette intro.js. */
@@ -11,7 +11,7 @@
   var root = document.documentElement;
   var brand = header.querySelector('.brand');
   var app = header.querySelector('.site-header__app');
-  var telefono = window.matchMedia('(max-width: 47.99em)');
+  var telefono = window.matchMedia('(max-width: 63.99em)');
   nav.id = nav.id || 'menu-principale';
 
   var btn = document.createElement('button');
