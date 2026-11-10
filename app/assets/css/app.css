@@ -226,6 +226,8 @@ html:has(> body.app) {
   z-index: 1001;
   padding-top: env(safe-area-inset-top);
   background: var(--color-white);   /* opaca: il testo che scorre sotto non deve vedersi. Niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
   box-shadow: 0 1px 0 var(--color-line), 0 6px 18px rgba(22, 40, 65, 0.05);
   border-bottom: 0;
   view-transition-name: oa-testata;
@@ -724,10 +726,16 @@ html:has(> body.app) {
 }
 
 @media (min-width: 64em) {
+  /* Computer: icona e scritta affiancate; il pallino va sull'angolo dell'icona, non sulla scritta */
   .app-nav__badge {
-    top: 0.1rem;
-    left: auto;
-    right: 0.1rem;
+    top: 0;
+    left: calc(var(--space-sm) + 0.8rem);
+    right: auto;
+  }
+
+  /* con il pallino la scritta si scosta un po', così non ci finisce sotto */
+  .app-nav__link:has(.app-nav__badge) {
+    gap: 1.5rem;
   }
 }
 

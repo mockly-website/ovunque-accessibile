@@ -731,13 +731,31 @@ html:not(.js) .js-only {
 
 /* ==========================================================================
    10. Intestazione e menu
-   Intestazione non fissa (WCAG 2.4.11). Voci a pillola; sul telefono un pulsante «Menu»
+   Intestazione fissa in alto mentre si scorre (10 novembre, su richiesta); scroll-padding-top tiene il focus fuori
+   da sotto la barra (WCAG 2.4.11). Voci a pillola; sul telefono un pulsante «Menu»
    (assets/js/menu.js) apre un pannello invece di due righe di link.
    ========================================================================== */
 
 .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
   border-bottom: 1px solid var(--color-line);
-  background: var(--color-card);
+  background: rgba(251, 246, 236, 0.94);
+  -webkit-backdrop-filter: blur(12px) saturate(1.3);
+  backdrop-filter: blur(12px) saturate(1.3);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .site-header {
+    background: var(--color-card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+html:has(> body > .site-header) {
+  scroll-padding-top: 5.5rem;   /* ancore e focus non finiscono sotto la barra fissa */
 }
 
 .brand {
@@ -923,8 +941,7 @@ html:not(.js) .js-only {
 
   /* Pannello del menu (menu.js): scende sotto la barra, il resto della pagina è sfocato dal velo */
   .site-header {
-    position: relative;
-    z-index: 1001;
+    z-index: 1001;   /* resta fissa (sticky) e sopra il velo del menu */
   }
 
   .js .site-header__panel {
@@ -1001,7 +1018,7 @@ html:not(.js) .js-only {
   .menu-velo {
     position: fixed;
     inset: 0;
-    z-index: 1000;
+    z-index: 999;   /* sotto la barra in alto (fissa, 1000), che contiene il pannello del menu */
     background: rgba(22, 40, 65, 0.4);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
@@ -1180,15 +1197,16 @@ html:not(.js) .js-only {
 
 /* ==========================================================================
    12. Schermata di caricamento
-   assets/js/intro.js: sul chiaro del sito una rampa da skate in cui chi è in carrozzina, con il
-   casco, va su e giù; sul fianco il simbolo dell'accessibilità e sulla piattaforma il segnaposto
-   (assets/img/intro-skate.svg). Sotto, il nome. All'uscita la schermata sale come un sipario e scopre la pagina.
-   Pseudo-elementi di <html>: compaiono prima del contenuto e restano fuori dall'albero di accessibilità.
+   assets/js/intro.js (10 novembre 2026, versione sobria): al centro il logo dentro un anello sottile in cui un arco
+   blu gira (assets/img/intro-anello.svg), sotto il nome e la frase del progetto. All'uscita la schermata sale come
+   un sipario e scopre la pagina. Pseudo-elementi di <html> e <body>: compaiono prima del contenuto e restano fuori
+   dall'albero di accessibilità. La rampa da skate di prima è in doc/caricamenti.
    ========================================================================== */
 
 .oa-intro,
 .oa-intro-out {
-  --intro-size: min(19rem, 86vw);
+  --intro-anello: 9.5rem;
+  --intro-centro: calc(50% - 3.5rem);
 }
 
 .oa-intro::before,
@@ -1208,51 +1226,46 @@ html:not(.js) .js-only {
   top: 0;
   bottom: 0;
   background:
-    url("../img/intro-skate.svg?v=9b9ec3e1") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
-    radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
+    url("../img/logo.webp") center var(--intro-centro) / auto 5.25rem no-repeat,
+    url("../img/intro-anello.svg?v=99d379b9") center var(--intro-centro) / var(--intro-anello) auto no-repeat,
+    radial-gradient(50rem 32rem at 50% 38%, #ffffff, var(--color-card, #fbf6ec) 72%);
 }
 
+/* Il nome, sotto l'anello */
 .oa-intro::after,
 .oa-intro-out::after {
   content: "Ovunque Accessibile";
-  top: calc(50% - 2rem + var(--intro-size) * 0.375 + 0.75rem);
+  top: calc(50% - 3.5rem + var(--intro-anello) / 2 + 1.5rem);
   color: var(--color-navy, #162841);
   font-family: var(--font-heading, sans-serif);
   font-weight: 600;
-  font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2.1rem);
+  font-size: clamp(1.6rem, 1.3rem + 1.4vw, 2.2rem);
   letter-spacing: -0.01em;
   text-align: center;
-  animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s both;
+  animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.1s both;
 }
 
+/* La frase del progetto, sotto il nome (sale con il sipario) */
+.oa-intro body::after,
+.oa-intro-out body::after {
+  content: "Luoghi davvero accessibili, in tutta Italia";
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: calc(50% - 3.5rem + var(--intro-anello) / 2 + 4.6rem);
+  z-index: 2147483001;
+  color: var(--color-muted, #4a5568);
+  font-family: var(--font-body, sans-serif);
+  font-size: 1.05rem;
+  text-align: center;
+  pointer-events: none;
+  animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+}
+
+/* solo spostamento, niente opacità: con l'opacità a volte il nome restava invisibile */
 @keyframes oa-intro-nome {
   from {
-    transform: translateY(0.6rem);
-  }
-}
-
-/* Sotto il nome, una barretta che scorre: si capisce che la pagina sta arrivando */
-.oa-intro body::after {
-  content: "";
-  position: fixed;
-  left: calc(50% - 2.5rem);
-  top: calc(50% - 2rem + var(--intro-size) * 0.375 + 4rem);
-  z-index: 2147483001;
-  width: 5rem;
-  height: 0.35rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-sky, #e6f4fd) 0 30%, var(--color-brand, #2f5b9c) 30% 60%, var(--color-sky, #e6f4fd) 60%) 0 0 / 250% 100%;
-  animation: oa-intro-barra 1.1s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes oa-intro-barra {
-  from {
-    background-position: 100% 0;
-  }
-
-  to {
-    background-position: -150% 0;
+    transform: translateY(0.5rem);
   }
 }
 
@@ -1267,14 +1280,16 @@ html:not(.js) .js-only {
   box-shadow: 0 1.5rem 3rem rgba(22, 40, 65, 0.18);
 }
 
-.oa-intro-out::after {
+.oa-intro-out::after,
+.oa-intro-out body::after {
   transform: translateY(-100vh);
+  transition: transform 0.5s cubic-bezier(0.7, 0, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
   :root.oa-intro::before,
   :root.oa-intro-out::before {
-    background-image: url("../img/intro-fermo.svg?v=4c2389f2"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
+    background-image: url("../img/logo.webp"), url("../img/intro-anello-fermo.svg?v=49d1d4f6"), radial-gradient(50rem 32rem at 50% 38%, #fff, #fbf6ec 72%);
   }
 
   .oa-intro::after,
@@ -1283,7 +1298,8 @@ html:not(.js) .js-only {
   }
 
   .oa-intro-out::before,
-  .oa-intro-out::after {
+  .oa-intro-out::after,
+  .oa-intro-out body::after {
     opacity: 0;
     transform: none;
     transition: opacity 0.3s ease;
@@ -1293,7 +1309,8 @@ html:not(.js) .js-only {
 @media (forced-colors: active) {
   .oa-intro::before,
   .oa-intro::after,
-  .oa-intro body::after {
+  .oa-intro body::after,
+  .oa-intro-out body::after {
     display: none;
   }
 }

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" width="160" height="160">
+  <!-- Ovunque Accessibile: schermata di caricamento (10 novembre 2026). Un anello sottile intorno al logo (il logo lo
+       mette il CSS al centro): la traccia azzurra fissa e un arco blu che si allunga, si accorcia e gira. -->
+  <circle cx="80" cy="80" r="66" fill="#fff"/>
+  <circle cx="80" cy="80" r="74" fill="none" stroke="#e6f4fd" stroke-width="5"/>
+  <circle cx="80" cy="80" r="74" fill="none" stroke="#2f5b9c" stroke-width="5" stroke-linecap="round" stroke-dasharray="20 445">
+    <animate attributeName="stroke-dasharray" values="20 445;260 205;20 445" dur="1.6s" calcMode="spline" keySplines=".4 0 .2 1;.4 0 .2 1" repeatCount="indefinite"/>
+    <animate attributeName="stroke-dashoffset" values="0;-110;-445" dur="1.6s" calcMode="spline" keySplines=".4 0 .2 1;.4 0 .2 1" repeatCount="indefinite"/>
+    <animateTransform attributeName="transform" type="rotate" from="-90 80 80" to="270 80 80" dur="2.4s" repeatCount="indefinite"/>
+  </circle>
+</svg>

@@ -57,7 +57,10 @@
     same_password: 'La nuova password deve essere diversa da quella attuale.',
     over_email_send_rate_limit: 'Troppe email inviate: aspetta qualche minuto e riprova.',
     over_request_rate_limit: 'Troppi tentativi: aspetta qualche minuto e riprova.',
-    session_not_found: 'La sessione è scaduta: accedi di nuovo.'
+    session_not_found: 'La sessione è scaduta: accedi di nuovo.',
+    insufficient_aal: 'Il tuo account ha la verifica in due passaggi: scrivi il codice dell\'app di autenticazione.',
+    mfa_verification_failed: 'Codice non valido o scaduto: scrivi quello che vedi adesso nell\'app di autenticazione.',
+    mfa_challenge_expired: 'Il codice è scaduto: scrivi quello nuovo.'
   };
 
   function friendly(err) {
@@ -66,6 +69,7 @@
     var msg = String(err.message || '');
     if (/fetch|network|Failed to/i.test(msg)) return new Error('Connessione assente o instabile: controlla internet e riprova.');
     if (/Invalid login credentials/i.test(msg)) return new Error(AUTH_ERRORI.invalid_credentials);
+    if (/AAL2 session is required/i.test(msg)) return new Error(AUTH_ERRORI.insufficient_aal);
     if (/violates check constraint|invalid input|violates/i.test(msg)) return new Error('Alcuni dati non sono validi: controlla i campi e riprova.');
     if (/permission denied|JWT|row-level security/i.test(msg)) return new Error('Non hai i permessi per questa operazione. Prova ad accedere di nuovo.');
     /* Messaggi scritti da noi nel database (raise exception) */
@@ -206,6 +210,21 @@
       },
       requestReset: function (email) {
         return sb.auth.resetPasswordForEmail(email, { redirectTo: redirect('password.html?nuova=1') }).then(check);
+      },
+      /* Verifica in due passaggi (chi l'ha attivata, per esempio i moderatori): dopo il link di recupero la sessione è
+         al primo livello e Supabase chiede il codice dell'app di autenticazione prima di cambiare email o password.
+         → null se non serve, altrimenti l'id del fattore (TOTP) da verificare. */
+      mfaDaVerificare: function () {
+        return sb.auth.mfa.getAuthenticatorAssuranceLevel().then(check).then(function (aal) {
+          if (aal.currentLevel === 'aal2' || aal.nextLevel !== 'aal2') return null;
+          return sb.auth.mfa.listFactors().then(check).then(function (f) {
+            var totp = (f.totp || []).filter(function (x) { return x.status === 'verified'; })[0];
+            return totp ? totp.id : null;
+          });
+        });
+      },
+      verificaMfa: function (factorId, code) {
+        return sb.auth.mfa.challengeAndVerify({ factorId: factorId, code: code }).then(check);
       },
       updatePassword: function (password) {
         return sb.auth.updateUser({ password: password }).then(check);

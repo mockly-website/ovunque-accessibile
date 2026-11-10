@@ -160,11 +160,19 @@
     var newForm = $('new-password-form');
     var note = $('password-note');
 
+    var fattore = null;
     if (params.get('nuova')) {
       if (api.user()) {
         show(requestForm, false);
         show(newForm, true);
         $('password-title').textContent = 'Scegli una nuova password';
+        /* Con la verifica in due passaggi serve anche il codice: il campo compare solo in quel caso */
+        if (api.mfaDaVerificare) {
+          api.mfaDaVerificare().then(function (id) {
+            fattore = id;
+            show($('mfa-field'), !!id);
+          }).catch(function () { /* senza controllo resta il messaggio d'errore all'invio */ });
+        }
       } else {
         message(note, 'Il link non è più valido: forse è scaduto o l\'hai aperto in un altro browser. Chiedine uno nuovo qui sotto.', 'error');
       }
@@ -190,17 +198,27 @@
       ev.preventDefault();
       if (isBusy(newForm)) return;
       var pw = newForm.elements.password;
+      var codice = newForm.elements.codice;
       var problem = passwordProblem(pw.value);
-      if (showErrors(newForm, problem ? [{ input: pw, text: problem }] : [])) return;
+      var errors = problem ? [{ input: pw, text: problem }] : [];
+      if (fattore && !/^[0-9]{6}$/.test(codice.value.trim())) errors.push({ input: codice, text: 'Scrivi le 6 cifre che vedi nell\'app di autenticazione.' });
+      if (showErrors(newForm, errors)) return;
       busy(newForm, true, 'Salvataggio…');
-      api.updatePassword(pw.value).then(function () {
+      (fattore ? api.verificaMfa(fattore, codice.value.trim()).then(function () { fattore = null; }) : Promise.resolve()).then(function () {
+        return api.updatePassword(pw.value);
+      }).then(function () {
         show(newForm, false);
         message(note, 'Password cambiata. Da ora usa quella nuova per accedere.', 'ok');
         show($('password-done'), true);
         note.focus();
       }).catch(function (err) {
         busy(newForm, false);
-        showErrors(newForm, [{ input: pw, text: err.message }]);
+        /* errori del codice sul campo del codice; se il codice serviva e il campo non c'era, compare */
+        var sulCodice = /codice/i.test(err.message);
+        if (sulCodice && $('mfa-field').hidden) {
+          api.mfaDaVerificare().then(function (id) { fattore = id; show($('mfa-field'), !!id); }).catch(function () {});
+        }
+        showErrors(newForm, [{ input: sulCodice ? newForm.elements.codice : pw, text: err.message }]);
       });
     });
   }

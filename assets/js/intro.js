@@ -1,7 +1,7 @@
 /* Ovunque Accessibile – schermata di caricamento (sito e web-app).
    Si carica nel <head> senza defer: mette la classe "oa-intro" su <html> prima che la pagina si disegni,
-   così il CSS copre la pagina con una scenetta: chi è in carrozzina va su e giù in una rampa da skate
-   (assets/img/intro-skate.svg).
+   così il CSS copre la pagina con il logo dentro un anello che gira, il nome e la frase del progetto
+   (assets/img/intro-anello.svg; sito.css, sezione 12).
    Solo alla prima pagina della visita (sessionStorage, chiave diversa per sito e app): almeno 0,6 s, mai oltre 1,5 s;
    all'uscita la schermata sale come un sipario (0,5 s).
    È decorativa: per gli screen reader non esiste (pseudo-elementi di <html>). */
