@@ -483,6 +483,7 @@
     fotoIn.addEventListener('change', function () {
       var file = fotoIn.files && fotoIn.files[0];
       if (anteprima.src) URL.revokeObjectURL(anteprima.src);
+      $('o-foto-etichetta').textContent = file ? 'Cambia la foto' : 'Scegli o scatta la foto';
       if (!file) { show(anteprima, false); anteprima.removeAttribute('src'); return; }
       anteprima.src = URL.createObjectURL(file);
       show(anteprima, true);
@@ -503,7 +504,7 @@
       else if (!/^image\//.test(file.type) && !/\.(heic|heif)$/i.test(file.name)) errors.push({ input: fotoIn, text: 'Il file deve essere una foto (JPEG, PNG, WebP o HEIC).' });
       if (showErrors(form, errors)) return;
       busy(form, true, 'Invio…');
-      preparePhoto(file, 1600).then(function (blob) {
+      preparePhoto(file, 1600).catch(function (err) { err.foto = true; throw err; }).then(function (blob) {
         return api.requestOwner({ place_id: p.id, ruolo: f.ruolo.value, titolare: titolare, telefono: telefono, email: email, nota: null }, blob);
       }).then(function () {
         show($('owner-new'), false);
@@ -511,7 +512,8 @@
         note.focus();
       }).catch(function (err) {
         busy(form, false);
-        showErrors(form, [{ input: file ? f.titolare : fotoIn, text: err.message }]);
+        /* foto che non si apre (per esempio HEIC su Chrome): l'errore va sul campo della foto */
+        showErrors(form, [{ input: err.foto ? fotoIn : f.titolare, text: err.message }]);
       });
     });
   }

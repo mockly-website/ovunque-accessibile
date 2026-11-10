@@ -406,7 +406,7 @@
   function photoSection(box) {
     var chosen = [];
     var list = el('ul', { className: 'photo-picks', role: 'list' });
-    var status = el('p', { className: 'visually-hidden', role: 'status' });
+    var status = el('p', { className: 'photo-stato', role: 'status' });
     var input = el('input', { type: 'file', id: 'photo-input', className: 'photo-input', accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif', multiple: '', 'aria-describedby': 'photo-help photo-count' });
     var counter = el('p', { className: 'photo-count', id: 'photo-count' });
     /* Sul telefono «Scatta una foto» apre subito la fotocamera posteriore (capture); sul computer fa come «Scegli» */
@@ -461,8 +461,8 @@
             });
             renumber();
             status.textContent = 'Foto aggiunta. Foto scelte: ' + chosen.length + ' di ' + MAX_FOTO + '. Scrivi cosa si vede.';
-          }).catch(function () {
-            status.textContent = 'Non riesco ad aprire «' + file.name + '»: usa una foto JPG o PNG.';
+          }).catch(function (err) {
+            status.textContent = err.message;
           });
         });
       }, Promise.resolve());

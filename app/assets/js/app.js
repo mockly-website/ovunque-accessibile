@@ -196,6 +196,12 @@
       return new Promise(function (res, rej) {
         c.toBlob(function (b) { if (b) res(b); else rej(new Error('formato')); }, 'image/jpeg', 0.82);
       });
+    }).catch(function () {
+      /* Le foto HEIC dell'iPhone si aprono in Safari ma non in Chrome o Firefox: lo diciamo in chiaro */
+      var heic = /heic|heif/i.test(file.type || '') || /\.(heic|heif)$/i.test(file.name || '');
+      throw new Error(heic
+        ? 'La foto «' + file.name + '» è in formato HEIC (iPhone) e questo browser non riesce ad aprirla: salvala come JPG, apri l\'app con Safari oppure scatta la foto direttamente dall\'app.'
+        : 'Non riesco ad aprire «' + (file.name || 'la foto') + '»: usa una foto JPG o PNG.');
     });
   }
 

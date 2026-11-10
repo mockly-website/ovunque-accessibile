@@ -20,15 +20,15 @@
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
   <script src="../assets/js/intro.js?v=2f346b95"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=5df39cdd">
-  <link rel="stylesheet" href="assets/css/app.css?v=7b035fde">
+  <link rel="stylesheet" href="assets/css/app.css?v=7e35c17b">
   <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="../assets/js/oa-core.js?v=d749ee7e" defer></script>
   <script src="assets/js/api.js?v=4db84fc3" defer></script>
-  <script src="assets/js/app.js?v=8c4a1e1e" defer></script>
-  <script src="assets/js/scheda.js?v=e37e390f" defer></script>
+  <script src="assets/js/app.js?v=11208395" defer></script>
+  <script src="assets/js/scheda.js?v=320845b0" defer></script>
 </head>
 <body class="app" data-page="luogo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -325,7 +325,10 @@
                 <div class="field">
                   <label class="field__label" for="o-foto">Foto dell'ingresso del locale</label>
                   <p class="field__help" id="o-foto-aiuto">Dalla strada, con l'insegna se c'è. La ricomprimiamo e togliamo la posizione GPS.</p>
-                  <input class="photo-input" type="file" id="o-foto" name="foto" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" aria-describedby="o-foto-aiuto" required>
+                  <div class="photo-add">
+                    <input class="photo-input" type="file" id="o-foto" name="foto" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" aria-describedby="o-foto-aiuto" required>
+                    <label class="btn btn--secondary photo-add__btn" for="o-foto"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-camera"/></svg><span id="o-foto-etichetta">Scegli o scatta la foto</span></label>
+                  </div>
                   <img id="o-foto-anteprima" class="owner-photo-preview" alt="Anteprima della foto dell'ingresso" hidden>
                 </div>
                 <fieldset class="group group--inline">

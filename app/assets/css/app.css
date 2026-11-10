@@ -1983,6 +1983,16 @@ textarea.input {
   font-size: var(--text-sm);
 }
 
+/* Esito della scelta delle foto (aggiunta, tolta, o perché non si apre): visibile, non solo per gli screen reader */
+.photo-stato {
+  margin: var(--space-sm) 0 0;
+  font-size: var(--text-sm);
+}
+
+.photo-stato:empty {
+  display: none;
+}
+
 .photo-picks {
   display: grid;
   gap: var(--space-md);

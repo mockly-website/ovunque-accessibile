@@ -45,7 +45,9 @@
   /* Codice QR per la vetrina (29 ottobre): appena approviamo il gestore, lui (e i moderatori) può scaricarlo come
      immagine PNG con il logo e il nome dell'app, o stamparlo. Se il luogo è verificato sul posto è il bollino
      «Verificato sul posto», con i giudizi; altrimenti dice solo dove trovare le informazioni, senza promettere niente.
-     Per i luoghi verificati la pagina resta pubblica, come prima. */
+     Solo il gestore approvato e i moderatori lo vedono, anche per i luoghi verificati (11 novembre: prima la pagina dei
+     luoghi verificati era pubblica). Il codice porta alla scheda pubblica, quindi non c'è niente da nascondere nel
+     contenuto: il limite serve perché il cartello lo stampi solo chi gestisce davvero il locale. */
   function initBollino() {
     var id = params.get('id');
     var note = $('badge-note');
@@ -57,9 +59,14 @@
         api.profile().catch(function () { return null; }),
         api.user() && api.ownerStatus ? api.ownerStatus(p.id).catch(function () { return null; }) : null
       ]).then(function (r) {
-        var puo = sulPosto || !!(r[0] && r[0].ruolo !== 'utente') || !!(r[1] && r[1].stato === 'approvato');
+        var puo = !!(r[0] && r[0].ruolo !== 'utente') || !!(r[1] && r[1].stato === 'approvato');
         if (!puo) {
-          return message(note, 'Il codice QR per la vetrina è per chi gestisce «' + p.nome + '». Se è il tuo locale, apri la scheda e premi «Sei il titolare?»: appena confermiamo, lo scarichi da qui.', 'error');
+          var attesa = r[1] && r[1].stato === 'in-attesa';
+          return message(note, !api.user()
+            ? 'Il codice QR per la vetrina è per chi gestisce «' + p.nome + '»: accedi con il tuo account.'
+            : attesa
+              ? 'La tua richiesta di gestire «' + p.nome + '» è in attesa: appena confermiamo che sei il titolare, scarichi il codice QR da qui.'
+              : 'Il codice QR per la vetrina è per chi gestisce «' + p.nome + '». Se è il tuo locale, apri la scheda e premi «Sei il titolare?»: appena confermiamo, lo scarichi da qui.', 'error');
         }
         mostraBollino(p, sulPosto);
       });
