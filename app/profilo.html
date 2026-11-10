@@ -18,13 +18,13 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=2f346b95"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=86104764">
-  <link rel="stylesheet" href="assets/css/app.css?v=49bfb4b9">
+  <link rel="stylesheet" href="assets/css/app.css?v=7b035fde">
   <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=214328f3" defer></script>
-  <script src="assets/js/api.js?v=57c90ec3" defer></script>
-  <script src="assets/js/app.js?v=99f57d4f" defer></script>
-  <script src="assets/js/profilo.js?v=ffaf91ed" defer></script>
+  <script src="assets/js/api.js?v=4db84fc3" defer></script>
+  <script src="assets/js/app.js?v=8c4a1e1e" defer></script>
+  <script src="assets/js/profilo.js?v=1aae0990" defer></script>
 </head>
 <body class="app" data-page="profilo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -115,36 +115,36 @@
         </div>
       </section>
 
-      <div id="profile-main" class="stack" hidden>
-        <div class="profilo-testa">
-          <span id="avatar-box" class="avatar avatar--grande" aria-hidden="true"></span>
-          <div class="profilo-testa__testo">
-            <h1 id="profile-title">Il tuo profilo</h1>
-            <div class="profilo-testa__azioni">
-              <input type="file" id="avatar-input" class="photo-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
-              <label for="avatar-input" class="btn btn--secondary btn--small photo-add__btn"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-camera"/></svg><span id="avatar-label">Aggiungi una foto</span></label>
-              <button id="avatar-remove" class="btn btn--secondary btn--small" type="button" hidden>Togli la foto</button>
+      <div id="profile-main" hidden>
+        <section id="vista-profilo" class="vista stack" aria-labelledby="profile-title">
+          <div class="profilo-testa">
+            <span id="avatar-box" class="avatar avatar--grande" aria-hidden="true"></span>
+            <div class="profilo-testa__testo">
+              <h1 id="profile-title" tabindex="-1">Il tuo profilo</h1>
+              <p id="profilo-email" class="place__meta"></p>
             </div>
           </div>
-        </div>
-        <p id="avatar-note" class="place__meta" role="status"></p>
-        <p id="activity-note" class="notice" role="status" tabindex="-1" hidden></p>
+          <p id="activity-note" class="notice" role="status" tabindex="-1" hidden></p>
 
-        <section id="avvisi" class="card avvisi" aria-labelledby="avvisi-title" hidden>
-          <h2 id="avvisi-title" class="card__title">Avvisi</h2>
-          <p id="avvisi-vuoto" class="place__meta" hidden>Qui trovi l'esito delle tue segnalazioni, recensioni e richieste.</p>
-          <ul id="avvisi-list" class="avvisi__list" role="list"></ul>
-        </section>
+          <nav aria-labelledby="attivita-title">
+            <h2 id="attivita-title" class="menu-list__heading">La tua attività</h2>
+            <ul class="menu-list" role="list">
+              <li><a class="menu-list__link" href="#avvisi"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-bell"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Avvisi</span><span class="menu-list__sub" id="conta-avvisi">Esito di segnalazioni, recensioni e richieste</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+              <li><a class="menu-list__link" href="#segnalazioni"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pin"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Le tue segnalazioni</span><span class="menu-list__sub" id="conta-segnalazioni">Luoghi nuovi e correzioni</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+              <li><a class="menu-list__link" href="#preferiti"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-heart"/></svg></span><span class="menu-list__text"><span class="menu-list__title">I tuoi preferiti</span><span class="menu-list__sub" id="conta-preferiti">I luoghi che hai salvato</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+              <li><a class="menu-list__link" href="#recensioni"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-edit"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Le tue recensioni</span><span class="menu-list__sub" id="conta-recensioni">Cosa hai raccontato dei luoghi</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+            </ul>
+          </nav>
 
-        <nav aria-labelledby="shortcut-title">
-          <h2 id="shortcut-title" class="menu-list__heading">Per te</h2>
-          <ul class="menu-list" role="list">
-            <li id="mod-card" hidden><a class="menu-list__link" href="moderazione.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Moderazione</span><span class="menu-list__sub">Segnalazioni e recensioni in attesa</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
-            <li><a class="menu-list__link" href="locali.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Hai un locale o un negozio?</span><span class="menu-list__sub">Gestisci la scheda, verifica sul posto, bollino</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
-          </ul>
-        </nav>
+          <nav aria-labelledby="shortcut-title">
+            <h2 id="shortcut-title" class="menu-list__heading">Per te</h2>
+            <ul class="menu-list" role="list">
+              <li id="mod-card" hidden><a class="menu-list__link" href="moderazione.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Moderazione</span><span class="menu-list__sub">Segnalazioni e recensioni in attesa</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+              <li><a class="menu-list__link" href="locali.html"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Hai un locale o un negozio?</span><span class="menu-list__sub">Gestisci la scheda, verifica sul posto, QR</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+            </ul>
+          </nav>
 
-        <section class="card" aria-labelledby="needs-title">
+          <section class="card" aria-labelledby="needs-title">
           <h2 id="needs-title" class="visually-hidden">La tua esigenza</h2>
           <fieldset class="needs" id="come-ti-muovi">
             <legend class="needs__legend">La tua esigenza</legend>
@@ -159,66 +159,116 @@
           </fieldset>
           <p class="field__help">La scelta resta salvata nel tuo account e vale su tutti i tuoi dispositivi.</p>
         </section>
+          <nav aria-labelledby="account-menu-title">
+            <h2 id="account-menu-title" class="menu-list__heading">Account e app</h2>
+            <ul class="menu-list" role="list">
+              <li><a class="menu-list__link" href="#account"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-user"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Informazioni personali</span><span class="menu-list__sub">Nome, foto, telefono, email e password</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+              <li><a class="menu-list__link" href="#app-info"><span class="menu-list__icon"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-globe"/></svg></span><span class="menu-list__text"><span class="menu-list__title">Informazioni sull'app</span><span class="menu-list__sub">Privacy, contatti, il sito</span></span><svg class="icon menu-list__chevron" aria-hidden="true" focusable="false"><use href="#icon-chevron"/></svg></a></li>
+            </ul>
+          </nav>
 
-        <h2 class="menu-list__heading">Le tue attività</h2>
-        <section class="card" aria-labelledby="fav-title">
-          <h3 id="fav-title" class="card__title">I tuoi preferiti</h3>
-          <p id="fav-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-heart"/></svg></span><span>Non hai ancora preferiti. Nella scheda di un luogo premi «Salva nei preferiti»: li ritrovi qui.</span></p>
-          <ul id="fav-list" class="results__list" role="list"></ul>
+          <p class="profilo-esci"><button id="logout-btn" class="btn btn--secondary" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-logout"/></svg>Esci</button></p>
         </section>
 
-        <section class="card" aria-labelledby="proposals-title">
-          <h3 id="proposals-title" class="card__title">Le tue segnalazioni</h3>
+        <section id="vista-avvisi" class="vista stack" aria-labelledby="vista-avvisi-titolo" hidden>
+          <a class="indietro" href="#profilo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
+          <h1 id="vista-avvisi-titolo" tabindex="-1">Avvisi</h1>
+          <p id="avvisi-vuoto" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-bell"/></svg></span><span>Qui trovi l'esito delle tue segnalazioni, recensioni e richieste.</span></p>
+          <ul id="avvisi-list" class="avvisi__list card" role="list"></ul>
+        </section>
+        <section id="vista-segnalazioni" class="vista stack" aria-labelledby="vista-segnalazioni-titolo" hidden>
+          <a class="indietro" href="#profilo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
+          <h1 id="vista-segnalazioni-titolo" tabindex="-1">Le tue segnalazioni</h1>
           <p id="proposals-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pin"/></svg></span><span>Non hai ancora segnalato luoghi. <a href="segnala.html">Segnala un luogo</a></span></p>
           <ul id="my-proposals" class="activities" role="list"></ul>
         </section>
-
-        <section class="card" aria-labelledby="my-reviews-title">
-          <h3 id="my-reviews-title" class="card__title">Le tue recensioni</h3>
+        <section id="vista-preferiti" class="vista stack" aria-labelledby="vista-preferiti-titolo" hidden>
+          <a class="indietro" href="#profilo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
+          <h1 id="vista-preferiti-titolo" tabindex="-1">I tuoi preferiti</h1>
+          <p id="fav-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-heart"/></svg></span><span>Non hai ancora preferiti. Nella scheda di un luogo premi «Salva nei preferiti»: li ritrovi qui.</span></p>
+          <ul id="fav-list" class="results__list" role="list"></ul>
+        </section>
+        <section id="vista-recensioni" class="vista stack" aria-labelledby="vista-recensioni-titolo" hidden>
+          <a class="indietro" href="#profilo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
+          <h1 id="vista-recensioni-titolo" tabindex="-1">Le tue recensioni</h1>
           <p id="reviews-mine-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-edit"/></svg></span><span>Non hai ancora scritto recensioni. Sei stato in un posto? <a href="./">Cercalo sulla mappa</a> e racconta com'è andata.</span></p>
           <ul id="my-reviews" class="activities" role="list"></ul>
         </section>
-
-        <h2 class="menu-list__heading">Account</h2>
-        <section class="card" aria-labelledby="name-title">
-          <h3 id="name-title" class="card__title">Il tuo nome pubblico</h3>
-          <p id="name-note" class="notice" role="status" hidden></p>
-          <form id="name-form" class="stack" novalidate>
-            <div class="field">
-              <label class="field__label" for="nome">Nome pubblico</label>
-              <p class="field__help" id="nome-aiuto">Compare accanto alle tue recensioni. Da 2 a 40 caratteri.</p>
-              <input class="input" type="text" id="nome" name="nome" autocomplete="nickname" maxlength="40" aria-describedby="nome-aiuto" required>
-            </div>
-            <button class="btn btn--secondary btn--small" type="submit">Salva il nome</button>
-          </form>
-        </section>
-
-        <section class="card" aria-labelledby="account-title">
-          <h3 id="account-title" class="card__title">Email e password</h3>
-          <p>Email: <strong id="account-email"></strong></p>
-          <p id="account-note" class="notice" role="status" hidden></p>
-          <h4 class="card__subtitle">Cambia password</h4>
-          <p id="password-note" class="notice" role="status" hidden></p>
-          <form id="password-form" class="stack" novalidate>
-            <div class="field">
-              <label class="field__label" for="new-password">Nuova password</label>
-              <p class="field__help" id="new-password-aiuto">Almeno 10 caratteri, con lettere e numeri.</p>
-              <div class="password">
-                <input class="input" type="password" id="new-password" name="password" autocomplete="new-password" minlength="10" aria-describedby="new-password-aiuto" required>
-                <button class="btn btn--secondary btn--small" type="button" data-toggle-password="new-password" aria-pressed="false" aria-label="Mostra la password">Mostra</button>
+        <section id="vista-account" class="vista stack" aria-labelledby="vista-account-titolo" hidden>
+          <a class="indietro" href="#profilo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
+          <h1 id="vista-account-titolo" tabindex="-1">Informazioni personali</h1>
+          <section class="card" aria-labelledby="foto-title">
+            <h2 id="foto-title" class="card__title">Foto profilo</h2>
+            <div class="profilo-foto">
+              <span id="avatar-box-2" class="avatar avatar--grande" aria-hidden="true"></span>
+              <div class="profilo-testa__azioni">
+                <input type="file" id="avatar-input" class="photo-input" accept="image/jpeg,image/png,image/webp,image/heic,image/heif">
+                <label for="avatar-input" class="btn btn--secondary btn--small photo-add__btn"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-camera"/></svg><span id="avatar-label">Aggiungi una foto</span></label>
+                <button id="avatar-remove" class="btn btn--secondary btn--small" type="button" hidden>Togli la foto</button>
               </div>
             </div>
-            <button class="btn btn--secondary btn--small" type="submit">Salva la password</button>
-          </form>
-          <h4 class="card__subtitle">I tuoi dati</h4>
-          <div class="btn-row">
-            <button id="export-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-download"/></svg>Scarica i miei dati</button>
-            <button id="logout-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-logout"/></svg>Esci</button>
-            <button id="delete-btn" class="btn btn--danger btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-trash"/></svg>Elimina l'account</button>
-          </div>
+            <p id="avatar-note" class="place__meta" role="status"></p>
+            <p class="field__help">Si vede accanto alle tue recensioni.</p>
+          </section>
+
+          <section class="card" aria-labelledby="name-title">
+            <h2 id="name-title" class="card__title">Nome pubblico</h2>
+            <p id="name-note" class="notice" role="status" hidden></p>
+            <form id="name-form" class="stack" novalidate>
+              <div class="field">
+                <label class="field__label visually-hidden" for="nome">Nome pubblico</label>
+                <p class="field__help" id="nome-aiuto">Compare accanto alle tue recensioni. Da 2 a 40 caratteri.</p>
+                <input class="input" type="text" id="nome" name="nome" autocomplete="nickname" maxlength="40" aria-describedby="nome-aiuto" required>
+              </div>
+              <button class="btn btn--secondary btn--small" type="submit">Salva il nome</button>
+            </form>
+          </section>
+
+          <section class="card" aria-labelledby="tel-title">
+            <h2 id="tel-title" class="card__title">Telefono</h2>
+            <p id="tel-note" class="notice" role="status" hidden></p>
+            <form id="tel-form" class="stack" novalidate>
+              <div class="field">
+                <label class="field__label" for="telefono">Numero (facoltativo)</label>
+                <p class="field__help" id="telefono-aiuto">Lo vedono solo i moderatori, per contattarti se serve chiarire una segnalazione. Non è mai pubblico.</p>
+                <input class="input field--short" type="tel" id="telefono" name="telefono" autocomplete="tel" inputmode="tel" maxlength="25" aria-describedby="telefono-aiuto">
+              </div>
+              <button class="btn btn--secondary btn--small" type="submit">Salva il telefono</button>
+            </form>
+          </section>
+
+          <section class="card" aria-labelledby="account-title">
+            <h2 id="account-title" class="card__title">Email e password</h2>
+            <p>Email: <strong id="account-email"></strong></p>
+            <p id="password-note" class="notice" role="status" hidden></p>
+            <form id="password-form" class="stack" novalidate>
+              <div class="field">
+                <label class="field__label" for="new-password">Nuova password</label>
+                <p class="field__help" id="new-password-aiuto">Almeno 10 caratteri, con lettere e numeri.</p>
+                <div class="password">
+                  <input class="input" type="password" id="new-password" name="password" autocomplete="new-password" minlength="10" aria-describedby="new-password-aiuto" required>
+                  <button class="btn btn--secondary btn--small" type="button" data-toggle-password="new-password" aria-pressed="false" aria-label="Mostra la password">Mostra</button>
+                </div>
+              </div>
+              <button class="btn btn--secondary btn--small" type="submit">Salva la password</button>
+            </form>
+          </section>
+
+          <section class="card" aria-labelledby="dati-title">
+            <h2 id="dati-title" class="card__title">I tuoi dati</h2>
+            <p id="account-note" class="notice" role="status" hidden></p>
+            <div class="btn-row">
+              <button id="export-btn" class="btn btn--secondary btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-download"/></svg>Scarica i miei dati</button>
+              <button id="delete-btn" class="btn btn--danger btn--small" type="button"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-trash"/></svg>Elimina l'account</button>
+            </div>
+          </section>
+        </section>
+        <section id="vista-app-info" class="vista stack" aria-labelledby="vista-app-info-titolo" hidden>
+          <a class="indietro" href="#profilo"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
+          <h1 id="vista-app-info-titolo" tabindex="-1">Informazioni sull'app</h1>
+          <div id="app-info-posto"></div>
         </section>
       </div>
-
       <nav class="profile-info" aria-labelledby="info-title">
         <h2 id="info-title" class="menu-list__heading">Informazioni</h2>
         <ul class="menu-list" role="list">

@@ -32,13 +32,36 @@
     show($('profile-main'), true);
     var user = api.user();
     $('account-email').textContent = user.email || '';
+    $('profilo-email').textContent = user.email || '';
+    /* le informazioni sull'app (che chi non ha accesso vede sotto) vanno nella loro pagina */
+    $('app-info-posto').appendChild(document.querySelector('.profile-info'));
+    initViste();
 
     initAvatar();
     api.profile().then(function (prof) {
       if (!prof) return;
       $('profile-title').textContent = 'Ciao, ' + prof.nome_pubblico;
       $('name-form').elements.nome.value = prof.nome_pubblico;
+      $('tel-form').elements.telefono.value = prof.telefono || '';
       show($('mod-card'), prof.ruolo !== 'utente');
+    });
+
+    /* Telefono: facoltativo, lo vedono solo i moderatori (profiles.telefono, migrazione profilo_telefono) */
+    var telForm = $('tel-form');
+    telForm.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (isBusy(telForm)) return;
+      var input = telForm.elements.telefono;
+      var v = input.value.trim();
+      if (showErrors(telForm, v && !/^\+?[0-9 ./()-]{6,25}$/.test(v) ? [{ input: input, text: 'Scrivi un numero di telefono valido, per esempio 351 123 4567.' }] : [])) return;
+      busy(telForm, true, 'Salvataggio…');
+      api.updateProfile({ telefono: v || null }).then(function () {
+        busy(telForm, false);
+        message($('tel-note'), v ? 'Telefono salvato.' : 'Telefono tolto.', 'ok');
+      }).catch(function (err) {
+        busy(telForm, false);
+        showErrors(telForm, [{ input: input, text: err.message }]);
+      });
     });
 
     var nameForm = $('name-form');
@@ -118,13 +141,41 @@
     });
   }
 
+  /* Pagine del profilo (10 novembre): la pagina principale è un menu; avvisi, segnalazioni, preferiti, recensioni,
+     informazioni personali e informazioni sull'app sono «pagine» dentro profilo.html, aperte dall'indirizzo
+     (#avvisi, #account…), così funzionano la freccia indietro del telefono e i link diretti. Aprendo una pagina il
+     focus va al suo titolo; gli avvisi diventano «visti» solo quando si apre la loro pagina. */
+  var VISTE = ['profilo', 'avvisi', 'segnalazioni', 'preferiti', 'recensioni', 'account', 'app-info'];
+  function initViste() {
+    var primo = true;
+    function apri() {
+      var nome = location.hash.slice(1);
+      if (VISTE.indexOf(nome) === -1) nome = 'profilo';
+      VISTE.forEach(function (v) { show($('vista-' + v), v === nome); });
+      var h = nome === 'profilo' ? $('profile-title') : $('vista-' + nome + '-titolo');
+      document.title = (nome === 'profilo' ? 'Il tuo profilo' : h.textContent) + ' – Ovunque Accessibile';
+      if (!primo || nome !== 'profilo') { h.focus(); window.scrollTo(0, 0); }
+      primo = false;
+      if (nome === 'avvisi') A.segnaAvvisiVisti();
+    }
+    window.addEventListener('hashchange', apri);
+    apri();
+  }
+
+  function conta(id, testo) {
+    var n = $(id);
+    if (n) n.textContent = testo;
+  }
+
   /* Foto profilo: si vede accanto alle recensioni. Ricompressa nel browser a 512 px (senza GPS), poi caricata */
   function mostraAvatar(prof) {
-    var box = $('avatar-box');
-    box.textContent = '';
     var url = prof && api.avatarUrl ? api.avatarUrl(prof.avatar) : null;
-    if (url) box.appendChild(el('img', { src: url, alt: '', width: '96', height: '96' }));
-    else box.textContent = ((prof && prof.nome_pubblico) || '?').charAt(0).toUpperCase();
+    ['avatar-box', 'avatar-box-2'].forEach(function (id) {
+      var box = $(id);
+      box.textContent = '';
+      if (url) box.appendChild(el('img', { src: url, alt: '', width: '96', height: '96' }));
+      else box.textContent = ((prof && prof.nome_pubblico) || '?').charAt(0).toUpperCase();
+    });
     $('avatar-label').textContent = url ? 'Cambia la foto' : 'Aggiungi una foto';
     show($('avatar-remove'), !!url);
   }
@@ -161,12 +212,14 @@
   function mostraAvvisi(data, byId) {
     var nomi = {};
     Object.keys(byId).forEach(function (id) { nomi[id] = byId[id].nome; });
-    var lista = A.avvisi(data, nomi).slice(0, 8);
-    var box = $('avvisi');
+    var tutti = A.avvisi(data, nomi);
+    var lista = tutti.slice(0, 30);
     var ul = $('avvisi-list');
     ul.textContent = '';
-    show(box, true);
+    show(ul, lista.length > 0);
     show($('avvisi-vuoto'), !lista.length);
+    var nuovi = tutti.filter(function (a) { return a.nuovo; }).length;
+    conta('conta-avvisi', nuovi ? (nuovi === 1 ? '1 avviso nuovo' : nuovi + ' avvisi nuovi') : (tutti.length ? 'Nessun avviso nuovo' : 'Esito di segnalazioni, recensioni e richieste'));
     lista.forEach(function (a) {
       var corpo = [
         el('span', { className: 'avviso__icona avviso__icona--' + a.tipo }, [icon(ICONA_AVVISO[a.tipo])]),
@@ -180,7 +233,7 @@
         a.href ? el('a', { className: 'avviso__link', href: a.href }, corpo) : el('div', { className: 'avviso__link' }, corpo)
       ]));
     });
-    A.segnaAvvisiVisti();
+    if (location.hash === '#avvisi') A.segnaAvvisiVisti();
   }
 
   function loadActivity() {
@@ -200,17 +253,20 @@
       favList.textContent = '';
       var favs = r[2].map(function (id) { return byId[id]; }).filter(Boolean);
       show($('fav-empty'), !favs.length);
-      favs.forEach(function (p) { favList.appendChild(OA.placeCard(p, 'h3')); });
+      favs.forEach(function (p) { favList.appendChild(OA.placeCard(p, 'h2')); });
+      conta('conta-preferiti', favs.length ? (favs.length === 1 ? '1 luogo salvato' : favs.length + ' luoghi salvati') : 'I luoghi che hai salvato');
 
       var props = $('my-proposals');
       props.textContent = '';
       var ps = data.proposte || [];
       show($('proposals-empty'), !ps.length);
+      var attesa = ps.filter(function (x) { return x.stato === 'in-attesa'; }).length;
+      conta('conta-segnalazioni', ps.length ? (ps.length === 1 ? '1 inviata' : ps.length + ' inviate') + (attesa ? ' · ' + attesa + ' in attesa' : '') : 'Luoghi nuovi e correzioni');
       ps.forEach(function (x) {
         var nome = x.dati && x.dati.nome ? x.dati.nome : 'Luogo';
         var link = x.stato === 'approvata' && x.place_id ? el('a', { href: 'luogo.html?id=' + encodeURIComponent(x.place_id), text: nome }) : document.createTextNode(nome);
         var item = el('li', { className: 'activity' }, [
-          el('div', { className: 'activity__head' }, [el('h3', { className: 'activity__title' }, [link]), statePill(x.stato, STATO_PROPOSTA)]),
+          el('div', { className: 'activity__head' }, [el('h2', { className: 'activity__title' }, [link]), statePill(x.stato, STATO_PROPOSTA)]),
           el('p', { className: 'place__meta', text: (x.tipo === 'nuovo' ? 'Nuovo luogo' : 'Correzione') + (x.dati && x.dati.citta ? ' · ' + x.dati.citta : '') + ' · inviata il ' + dateIt(x.created_at) }),
           x.motivo ? el('p', { className: 'activity__reason', text: 'Motivo: ' + x.motivo }) : null
         ]);
@@ -233,6 +289,7 @@
       revs.textContent = '';
       var rs = data.recensioni || [];
       show($('reviews-mine-empty'), !rs.length);
+      conta('conta-recensioni', rs.length ? (rs.length === 1 ? '1 recensione' : rs.length + ' recensioni') : 'Cosa hai raccontato dei luoghi');
       rs.forEach(function (rv) {
         var p = byId[rv.place_id];
         var nome = p ? p.nome : 'Luogo non più disponibile';
@@ -247,7 +304,7 @@
         });
         revs.appendChild(el('li', { className: 'activity' }, [
           el('div', { className: 'activity__head' }, [
-            el('h3', { className: 'activity__title' }, [p ? el('a', { href: 'luogo.html?id=' + encodeURIComponent(p.id), text: nome }) : document.createTextNode(nome)]),
+            el('h2', { className: 'activity__title' }, [p ? el('a', { href: 'luogo.html?id=' + encodeURIComponent(p.id), text: nome }) : document.createTextNode(nome)]),
             statePill(rv.stato, STATO_RECENSIONE)
           ]),
           rv.testo ? el('p', { className: 'activity__text', text: rv.testo }) : answersNode(rv.risposte),

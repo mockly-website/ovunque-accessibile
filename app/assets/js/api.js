@@ -378,9 +378,6 @@
           });
         });
       },
-      importOsm: function (righe) {
-        return sb.rpc('importa_luoghi_osm', { p_righe: righe }).then(check);
-      },
       /* Luoghi da OpenStreetMap da approvare: città con il numero di luoghi, poi i luoghi di una città a pagine */
       osmCities: function () {
         return allRows(function (from, to) {
@@ -485,6 +482,10 @@
       },
 
       /* Quante cose aspettano i moderatori (solo il numero, senza scaricare le righe) */
+      /* solo per i moderatori: il telefono di chi ha mandato una segnalazione (se l'ha messo nel profilo) */
+      authorPhone: function (propostaId) {
+        return sb.rpc('telefono_autore', { p_proposta: propostaId }).then(check);
+      },
       pendingCount: function () {
         function conta(tabella) {
           return sb.from(tabella).select('id', { count: 'exact', head: true }).eq('stato', 'in-attesa').then(function (r) {

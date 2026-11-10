@@ -53,7 +53,10 @@
     };
   }
 
-  /* Tabella: per una correzione solo le voci cambiate, per un luogo nuovo tutte quelle compilate */
+  /* Dati proposti (10 novembre): per sezione (Il luogo, Ingresso, Bagno…), ogni voce con sotto il valore proposto e, per
+     una correzione, quello di adesso. Si legge bene anche sul telefono (prima era una tabella a due-tre colonne).
+     Per una correzione solo le voci cambiate, per un luogo nuovo tutte quelle compilate; latitudine e longitudine in
+     una riga sola. */
   function diffTable(proposed, current) {
     var a = flatten(proposed);
     var b = current ? flatten(current) : {};
@@ -62,21 +65,50 @@
       return current ? fmt(a[k]) !== fmt(b[k]) : a[k] != null && a[k] !== '';
     });
     if (!rows.length) return el('p', { className: 'place__meta', text: 'Nessuna differenza rispetto alla scheda attuale.' });
-    var head = current ? ['Voce', 'Ora', 'Proposto'] : ['Voce', 'Proposto'];
-    return el('div', { className: 'table-wrap', role: 'region', 'aria-label': current ? 'Modifiche proposte' : 'Dati proposti', tabindex: '0' }, [
-      el('table', { className: 'diff' }, [
-        el('thead', {}, [el('tr', {}, head.map(function (h) { return el('th', { scope: 'col', text: h }); }))]),
-        el('tbody', {}, rows.map(function (k) {
-          var label = LABELS[k] || k;
-          if (k === 'categoria') return el('tr', {}, [el('th', { scope: 'row', text: label })].concat(
-            (current ? [OA.CATEGORIE[b[k]] || fmt(b[k])] : []).concat([OA.CATEGORIE[a[k]] || fmt(a[k])]).map(function (t) { return el('td', { text: t }); })));
-          var names = OPTION_LABELS[k] || {};
-          var show2 = function (v) { return names[v] || fmt(v); };
-          return el('tr', {}, [el('th', { scope: 'row', text: label })].concat(
-            (current ? [show2(b[k])] : []).concat([show2(a[k])]).map(function (t) { return el('td', { text: t }); })));
+    function valore(k, v) {
+      if (k === 'categoria') return OA.CATEGORIE[v] || fmt(v);
+      return (OPTION_LABELS[k] || {})[v] || fmt(v);
+    }
+    var gruppi = [];
+    var perNome = {};
+    rows.forEach(function (k) {
+      if (k === 'lng' && rows.indexOf('lat') !== -1) return;
+      var label = k === 'lat' ? 'Il luogo – Posizione sulla mappa' : (LABELS[k] || k);
+      var parti = label.indexOf(' – ') !== -1 ? label.split(' – ') : ['Il luogo', label];
+      var g = perNome[parti[0]];
+      if (!g) { g = perNome[parti[0]] = { nome: parti[0], voci: [] }; gruppi.push(g); }
+      var prop = k === 'lat' ? fmt(a.lat) + ', ' + fmt(a.lng) : valore(k, a[k]);
+      var ora = k === 'lat' ? fmt(b.lat) + ', ' + fmt(b.lng) : valore(k, b[k]);
+      g.voci.push({ voce: parti.slice(1).join(' – '), prop: prop, ora: current ? ora : null });
+    });
+    return el('div', { className: 'diff-lista', role: 'region', 'aria-label': current ? 'Modifiche proposte' : 'Dati proposti' }, gruppi.map(function (g) {
+      return el('section', { className: 'diff-lista__gruppo' }, [
+        el('h5', { className: 'diff-lista__titolo', text: g.nome }),
+        el('dl', {}, g.voci.map(function (v) {
+          return el('div', { className: 'diff-voce' }, [
+            el('dt', { text: v.voce }),
+            el('dd', {}, [
+              el('span', { className: 'diff-voce__prop' }, [current ? el('span', { className: 'diff-voce__etichetta', text: 'Proposto: ' }) : null, document.createTextNode(v.prop)]),
+              v.ora != null ? el('span', { className: 'diff-voce__ora' }, [el('span', { className: 'diff-voce__etichetta', text: 'Ora: ' }), document.createTextNode(v.ora)]) : null
+            ])
+          ]);
         }))
-      ])
+      ]);
+    }));
+  }
+
+  /* Ogni segnalazione, recensione, richiesta o verifica è una tendina: chiusa si vedono solo titolo e riga di dettaglio,
+     così il pannello non diventa una pagina lunghissima. Il titolo (h3) resta un titolo, dentro il summary. */
+  function aTendina(article) {
+    var h = article.querySelector('h3');
+    var meta = article.querySelector('.place__meta');
+    var fonte = article.querySelector('.mod-item__fonte');
+    var corpo = el('div', { className: 'mod-tendina__corpo' });
+    var testa = el('summary', { className: 'mod-tendina__testa' }, [
+      el('span', { className: 'mod-tendina__testi' }, [h, meta, fonte])
     ]);
+    while (article.firstChild) corpo.appendChild(article.firstChild);
+    return el('details', { className: 'card mod-item mod-tendina' }, [testa, corpo]);
   }
 
   /* Giudizi che la scheda avrebbe con i dati proposti */
@@ -108,7 +140,6 @@
     initOsmQueue();
     loadChecks();
     initPlaceState();
-    initOsmImport();
   }
 
   function decisionForm(kind, item, onDone) {
@@ -232,6 +263,15 @@
         /* «Come lo sai?» scelto da chi segnala (proposte.fonte) */
         if (x.fonte && FONTI[x.fonte]) article.appendChild(el('p', { className: 'mod-item__fonte' }, [el('strong', { text: 'Come lo sa: ' }), document.createTextNode(FONTI[x.fonte])]));
         if (x.nota) article.appendChild(el('blockquote', { className: 'mod-item__note' }, [el('p', { text: x.nota })]));
+        /* telefono di chi segnala, se l'ha messo nel profilo: per chiarire una segnalazione */
+        var tel = el('p', { className: 'mod-item__tel', hidden: '' });
+        article.appendChild(tel);
+        if (api.authorPhone) api.authorPhone(x.id).then(function (n) {
+          if (!n) return;
+          tel.appendChild(el('strong', { text: 'Telefono di chi segnala: ' }));
+          tel.appendChild(el('a', { href: 'tel:' + n.replace(/[^0-9+]/g, ''), text: n }));
+          tel.hidden = false;
+        }).catch(function () { /* senza telefono va bene lo stesso */ });
         article.appendChild(el('h4', { text: 'Giudizi con questi dati' }));
         article.appendChild(verdictPreview(x.dati, x.id));
         if (nessunoPuoEntrare(x.dati)) {
@@ -290,7 +330,7 @@
           });
         }).catch(function () { photoTitle.textContent = 'Foto: non siamo riusciti a caricarle'; });
         article.appendChild(decisionForm('proposta', x, function () { counts.p--; update(); }));
-        listP.appendChild(el('li', {}, [article]));
+        listP.appendChild(el('li', {}, [aTendina(article)]));
       });
 
       res.recensioni.forEach(function (r) {
@@ -303,7 +343,7 @@
           r.testo ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: r.testo })]) : el('p', { className: 'place__meta', text: 'Solo risposte alle domande, senza testo.' }),
           decisionForm('recensione', r, function () { counts.r--; update(); })
         ]);
-        listR.appendChild(el('li', {}, [article]));
+        listR.appendChild(el('li', {}, [aTendina(article)]));
       });
 
       var listG = $('mod-owners');
@@ -315,7 +355,7 @@
       var RUOLI = { titolare: 'Titolare', dipendente: 'Lavora nel luogo', altro: 'Altro ruolo' };
       gs.forEach(function (g) {
         var place = g.places ? g.places.nome + ', ' + g.places.citta : 'Luogo';
-        listG.appendChild(el('li', {}, [el('article', { className: 'card mod-item', 'aria-labelledby': 'mod-g-' + g.id }, [
+        listG.appendChild(el('li', {}, [aTendina(el('article', { className: 'card mod-item', 'aria-labelledby': 'mod-g-' + g.id }, [
           el('h3', { id: 'mod-g-' + g.id, text: 'Gestore: ' + place }),
           el('p', { className: 'place__meta', text: 'Chiesto da ' + (g.nome || 'utente') + ' · ' + (RUOLI[g.ruolo] || g.ruolo) + ' · il ' + dateIt(g.created_at) }),
           g.titolare ? el('dl', { className: 'facts mod-owner' }, [
@@ -330,7 +370,7 @@
           g.nota ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: g.nota })]) : null,
           el('p', {}, [el('a', { href: 'luogo.html?id=' + encodeURIComponent(g.place_id), text: 'Apri la scheda' })]),
           decisionForm('gestore', g, function () { counts.g--; update(); })
-        ])]));
+        ]))]));
       });
     }).catch(function (err) {
       message($('mod-note'), err.message, 'error');
@@ -392,7 +432,7 @@
           el('div', { className: 'decision__actions' }, buttons),
           status
         ]);
-        list.appendChild(el('li', {}, [article]));
+        list.appendChild(el('li', {}, [aTendina(article)]));
       });
     }).catch(function (err) { message($('mod-note'), err.message, 'error'); });
   }
@@ -494,47 +534,6 @@
   }
 
   /* Import da OpenStreetMap (solo admin): file JSON di import_osm.py, a blocchi di 500 */
-  function initOsmImport() {
-    var card = $('osm-card');
-    if (!card) return;
-    api.profile().then(function (prof) {
-      if (!prof || prof.ruolo !== 'admin') return;
-      show(card, true);
-      var note = $('osm-note');
-      var btn = $('osm-import');
-      btn.addEventListener('click', function () {
-        var file = $('osm-file').files[0];
-        if (!file) { message(note, 'Scegli prima il file JSON.', 'error'); note.focus(); return; }
-        if (btn.getAttribute('aria-disabled') === 'true') return;
-        btn.setAttribute('aria-disabled', 'true');
-        file.text().then(function (txt) {
-          var righe = JSON.parse(txt);
-          if (!Array.isArray(righe)) throw new Error('Il file non contiene un elenco di luoghi.');
-          var fatti = 0;
-          var creati = 0;
-          message(note, 'Importo ' + righe.length + ' luoghi…', '');
-          return righe.reduce(function (prev, _, i) {
-            if (i % 500) return prev;
-            return prev.then(function () {
-              return api.importOsm(righe.slice(i, i + 500)).then(function (n) {
-                creati += n;
-                fatti = Math.min(i + 500, righe.length);
-                message(note, 'Importo… ' + fatti + ' di ' + righe.length, '');
-              });
-            });
-          }, Promise.resolve()).then(function () {
-            message(note, 'Fatto: ' + creati + ' schede nuove su ' + righe.length + ' (le altre c\'erano già).', 'ok');
-          });
-        }).catch(function (err) {
-          message(note, err instanceof SyntaxError ? 'Il file non è un JSON valido.' : err.message, 'error');
-        }).then(function () {
-          btn.removeAttribute('aria-disabled');
-          note.focus();
-        });
-      });
-    });
-  }
-
   function initPlaceState() {
     var form = $('state-form');
     var select = form.elements.luogo;

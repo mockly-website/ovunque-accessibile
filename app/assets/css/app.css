@@ -2675,34 +2675,61 @@ textarea.input {
    email e foto), luoghi da OpenStreetMap da approvare.
    ========================================================================== */
 
-/* Linguette delle sezioni: scorrono di lato sul telefono, il numero di cose in attesa accanto al nome */
+/* Sezioni: una griglia di tessere (due per riga sul telefono, tre sul computer) con icona, nome e numero in attesa */
 .mod-tabs {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-xs);
-  margin: 0 calc(-1 * var(--space-md));
-  padding: var(--space-2xs) var(--space-md) var(--space-sm);
-  overflow-x: auto;
-  scrollbar-width: none;
+  margin-bottom: var(--space-sm);
 }
 
-.mod-tabs::-webkit-scrollbar {
-  display: none;
+@media (min-width: 40em) {
+  .mod-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .mod-tabs__tab {
-  display: inline-flex;
-  flex: none;
+  display: flex;
   align-items: center;
   gap: var(--space-xs);
-  min-height: var(--target-min);
-  padding: 0 var(--space-md);
-  border: 1.5px solid rgba(22, 40, 65, 0.18);
-  border-radius: var(--radius-pill);
+  min-height: 3.25rem;
+  padding: var(--space-xs) var(--space-sm);
+  border: 1.5px solid rgba(22, 40, 65, 0.14);
+  border-radius: var(--radius-md);
   background: var(--color-white);
   color: var(--color-navy);
   font: inherit;
+  font-size: var(--text-sm);
   font-weight: 700;
+  line-height: 1.2;
+  text-align: left;
   cursor: pointer;
+}
+
+.mod-tabs__icona {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  background: var(--color-sky);
+  color: var(--color-brand);
+}
+
+.mod-tabs__icona .icon {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.mod-tabs__tab[aria-selected="true"] .mod-tabs__icona {
+  background: rgba(255, 255, 255, 0.16);
+  color: var(--color-white);
+}
+
+.mod-tabs__n {
+  margin-left: auto;
 }
 
 .mod-tabs__tab[aria-selected="true"] {
@@ -2716,7 +2743,7 @@ textarea.input {
   outline-offset: 2px;
 }
 
-.mod-tabs__n {
+.mod-tabs__tab .mod-tabs__n {
   min-width: 1.4rem;
   padding: 0.05rem 0.4rem;
   border-radius: var(--radius-pill);
@@ -2808,37 +2835,59 @@ textarea.input {
   font-weight: 700;
 }
 
-.table-wrap {
-  max-width: 100%;
-  overflow-x: auto;
+.diff-lista {
+  display: grid;
+  gap: var(--space-md);
 }
 
-.table-wrap:focus-visible {
-  outline: var(--focus-width) solid var(--color-focus);
+.diff-lista__titolo {
+  margin: 0 0 var(--space-xs);
+  color: var(--color-brand);
+  font-family: var(--font-heading);
+  font-size: var(--text-base);
 }
 
-.diff {
-  width: 100%;
-  border-collapse: collapse;
+.diff-lista dl {
+  display: grid;
+  margin: 0;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.diff-voce {
+  display: grid;
+  gap: 0.15rem;
+  padding: var(--space-xs) var(--space-sm);
+}
+
+.diff-voce + .diff-voce {
+  border-top: 1px solid var(--color-line);
+}
+
+.diff-voce dt {
+  color: var(--color-muted);
   font-size: var(--text-sm);
 }
 
-.diff th,
-.diff td {
-  padding: var(--space-xs) var(--space-sm);
-  border-bottom: 1px solid var(--color-line);
-  text-align: left;
-  vertical-align: top;
+.diff-voce dd {
+  display: grid;
+  gap: 0.1rem;
+  margin: 0;
   overflow-wrap: anywhere;
 }
 
-.diff thead th {
-  background: var(--color-card);
+.diff-voce__prop {
+  font-weight: 700;
 }
 
-.diff tbody th {
-  font-weight: 700;
-  min-width: 10rem;
+.diff-voce__ora {
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+}
+
+.diff-voce__etichetta {
+  font-weight: 400;
 }
 
 .decision {
@@ -3260,6 +3309,147 @@ a.avviso__link:hover {
 
 img.review__avatar {
   object-fit: cover;
+}
+
+#avatar-note:empty {
+  display: none;
+}
+
+/* Tendine della moderazione: chiuse mostrano titolo, chi l'ha mandata e quando */
+.mod-tendina {
+  padding: 0;
+}
+
+.mod-tendina__testa {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  cursor: pointer;
+  list-style: none;
+}
+
+.mod-tendina__testa::-webkit-details-marker {
+  display: none;
+}
+
+.mod-tendina__testa::after {
+  content: "";
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  margin: 0.45rem 0.25rem 0 auto;
+  border-right: 3px solid var(--color-brand);
+  border-bottom: 3px solid var(--color-brand);
+  transform: rotate(45deg);
+  transition: transform 0.2s ease;
+}
+
+.mod-tendina[open] > .mod-tendina__testa::after {
+  transform: rotate(-135deg);
+}
+
+.mod-tendina__testa:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: -3px;
+  border-radius: 1.25rem;
+}
+
+.mod-tendina__testi {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.mod-tendina .mod-tendina__testi h3 {
+  margin: 0;
+  font-size: var(--text-base);
+}
+
+.mod-tendina__testi .place__meta,
+.mod-tendina__testi .mod-item__fonte {
+  margin: 0;
+  font-size: var(--text-sm);
+}
+
+.mod-tendina__corpo {
+  padding: 0 var(--space-md) var(--space-md);
+}
+
+.mod-tendina[open] .mod-tendina__corpo {
+  border-top: 1px solid var(--color-line);
+  padding-top: var(--space-sm);
+}
+
+.mod-tendina .mod-list,
+.mod-sez .mod-list {
+  gap: var(--space-sm);
+}
+
+/* Freccia per tornare indietro (moderazione, pagine del profilo) */
+.indietro {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  margin-bottom: var(--space-2xs);
+  color: var(--color-brand);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.indietro .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+  transform: scaleX(-1);
+}
+
+.indietro:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mod-tendina__testa::after {
+    transition: none;
+  }
+}
+
+/* Pagine del profilo (#avvisi, #account…): una alla volta */
+.vista[hidden] {
+  display: none;
+}
+
+.vista > h1 {
+  margin-top: 0;
+}
+
+.vista > h1:focus {
+  outline: none;
+}
+
+.profilo-testa h1 {
+  margin-bottom: 0.1rem;
+}
+
+.profilo-testa .place__meta {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.profilo-foto {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profilo-esci {
+  margin: var(--space-md) 0 0;
+  text-align: center;
+}
+
+.avvisi__list.card {
+  padding: var(--space-xs);
 }
 
 #avatar-note:empty {

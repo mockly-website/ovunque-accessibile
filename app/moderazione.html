@@ -18,14 +18,14 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=2f346b95"></script>
   <link rel="stylesheet" href="../assets/css/sito.css?v=86104764">
-  <link rel="stylesheet" href="assets/css/app.css?v=49bfb4b9">
+  <link rel="stylesheet" href="assets/css/app.css?v=7b035fde">
   <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=214328f3" defer></script>
-  <script src="assets/js/api.js?v=57c90ec3" defer></script>
-  <script src="assets/js/app.js?v=99f57d4f" defer></script>
+  <script src="assets/js/api.js?v=4db84fc3" defer></script>
+  <script src="assets/js/app.js?v=8c4a1e1e" defer></script>
   <script src="assets/js/segnala.js?v=1c6ac120" defer></script>
-  <script src="assets/js/moderazione.js?v=80f07ae7" defer></script>
+  <script src="assets/js/moderazione.js?v=c88a1130" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -107,6 +107,7 @@
   <main id="main" tabindex="-1">
     <noscript><div class="container"><p class="empty">L'app ha bisogno di JavaScript attivo nel browser. Se non puoi attivarlo, scrivici a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a>.</p></div></noscript>
     <div class="container container--form">
+      <a class="indietro" href="profilo.html"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-arrow"/></svg>Profilo</a>
       <h1>Moderazione</h1>
       <p id="mod-note" class="notice" role="status" tabindex="-1" hidden></p>
 
@@ -118,12 +119,12 @@
       <div id="mod-panel" class="stack" hidden>
         <h2 id="mod-panel-title" class="visually-hidden">Pannello di moderazione</h2>
         <div class="mod-tabs" role="tablist" aria-label="Sezioni della moderazione">
-          <button class="mod-tabs__tab" type="button" role="tab" id="tab-proposals" aria-controls="sez-proposals" aria-selected="true">Segnalazioni <span class="mod-tabs__n" data-conta="mod-proposals-count" hidden></span></button>
-          <button class="mod-tabs__tab" type="button" role="tab" id="tab-reviews" aria-controls="sez-reviews" aria-selected="false" tabindex="-1">Recensioni <span class="mod-tabs__n" data-conta="mod-reviews-count" hidden></span></button>
-          <button class="mod-tabs__tab" type="button" role="tab" id="tab-owners" aria-controls="sez-owners" aria-selected="false" tabindex="-1">Gestori <span class="mod-tabs__n" data-conta="mod-owners-count" hidden></span></button>
-          <button class="mod-tabs__tab" type="button" role="tab" id="tab-checks" aria-controls="sez-checks" aria-selected="false" tabindex="-1">Verifiche <span class="mod-tabs__n" data-conta="mod-checks-count" hidden></span></button>
-          <button class="mod-tabs__tab" type="button" role="tab" id="tab-osm" aria-controls="sez-osm" aria-selected="false" tabindex="-1">OpenStreetMap <span class="mod-tabs__n" data-conta="mod-osm-count" hidden></span></button>
-          <button class="mod-tabs__tab" type="button" role="tab" id="tab-strumenti" aria-controls="sez-strumenti" aria-selected="false" tabindex="-1">Strumenti</button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-proposals" aria-controls="sez-proposals" aria-selected="true"><span class="mod-tabs__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-pin"/></svg></span>Segnalazioni <span class="mod-tabs__n" data-conta="mod-proposals-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-reviews" aria-controls="sez-reviews" aria-selected="false" tabindex="-1"><span class="mod-tabs__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-edit"/></svg></span>Recensioni <span class="mod-tabs__n" data-conta="mod-reviews-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-owners" aria-controls="sez-owners" aria-selected="false" tabindex="-1"><span class="mod-tabs__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span>Gestori <span class="mod-tabs__n" data-conta="mod-owners-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-checks" aria-controls="sez-checks" aria-selected="false" tabindex="-1"><span class="mod-tabs__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span>Verifiche <span class="mod-tabs__n" data-conta="mod-checks-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-osm" aria-controls="sez-osm" aria-selected="false" tabindex="-1"><span class="mod-tabs__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-map"/></svg></span>OpenStreetMap <span class="mod-tabs__n" data-conta="mod-osm-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-strumenti" aria-controls="sez-strumenti" aria-selected="false" tabindex="-1"><span class="mod-tabs__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-list"/></svg></span>Stato delle schede</button>
         </div>
         <section id="sez-proposals" class="mod-sez" role="tabpanel" aria-labelledby="mod-proposals-title">
           <h2 id="mod-proposals-title">Segnalazioni <span class="pill" id="mod-proposals-count"></span></h2>
@@ -167,16 +168,6 @@
           <ul id="mod-checks" class="mod-list" role="list"></ul>
         </section>
         <div id="sez-strumenti" class="mod-sez stack" role="tabpanel" aria-labelledby="tab-strumenti">
-        <section id="osm-card" class="card" aria-labelledby="osm-title" hidden>
-          <h2 id="osm-title">Importa da OpenStreetMap</h2>
-          <p>Solo per gli admin. Scegli un file <code>osm-…json</code> creato con <code>supabase/strumenti/import_osm.py</code>: i luoghi arrivano qui sopra, in «Luoghi da OpenStreetMap da approvare». Quelli già presenti si saltano.</p>
-          <div class="field">
-            <label class="field__label" for="osm-file">File JSON</label>
-            <input class="input" type="file" id="osm-file" accept="application/json,.json">
-          </div>
-          <button id="osm-import" class="btn btn--primary btn--small" type="button">Importa</button>
-          <p id="osm-note" class="notice" role="status" tabindex="-1" hidden></p>
-        </section>
         <section class="card" aria-labelledby="state-title">
           <h2 id="state-title">Stato di una scheda</h2>
           <p>«In revisione» quando arrivano segnalazioni in conflitto (la scheda resta visibile, con l'avviso); «Archiviata» se il luogo ha chiuso (sparisce dalla mappa).</p>

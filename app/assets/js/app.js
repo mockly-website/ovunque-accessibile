@@ -293,7 +293,7 @@
         return n;
       });
     }).catch(function () { return 0; });
-    var nuovi = page === 'profilo' ? Promise.resolve(0) : avvisiNuovi().catch(function () { return 0; });
+    var nuovi = avvisiNuovi().catch(function () { return 0; });
     Promise.all([nuovi, daModerare]).then(function (r) {
       var n = r[0] + r[1];
       if (!n || link.querySelector('.app-nav__badge')) return;
