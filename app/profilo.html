@@ -24,7 +24,7 @@
   <script src="../assets/js/oa-core.js?v=214328f3" defer></script>
   <script src="assets/js/api.js?v=4db84fc3" defer></script>
   <script src="assets/js/app.js?v=8c4a1e1e" defer></script>
-  <script src="assets/js/profilo.js?v=1aae0990" defer></script>
+  <script src="assets/js/profilo.js?v=d79286f4" defer></script>
 </head>
 <body class="app" data-page="profilo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -283,17 +283,40 @@
         <p class="profile-info__credits">© 2026 Ovunque Accessibile · Realizzata da <a href="https://mockly.it">Mockly<span class="visually-hidden"> (sito esterno)</span></a></p>
       </nav>
 
+      <dialog id="logout-dialog" class="dialog" aria-labelledby="logout-title" aria-describedby="logout-testo">
+        <div class="stack">
+          <h2 id="logout-title">Vuoi uscire?</h2>
+          <p id="logout-testo">Per segnalare luoghi, scrivere recensioni e vedere i preferiti dovrai accedere di nuovo.</p>
+          <div class="btn-row">
+            <button id="logout-confirm" class="btn btn--primary" type="button">Sì, esci</button>
+            <button id="logout-cancel" class="btn btn--secondary" type="button" autofocus>Annulla</button>
+          </div>
+        </div>
+      </dialog>
+
+      <!-- Eliminare l'account chiede due conferme: prima si scrive ELIMINA, poi un'ultima domanda (si può tornare indietro) -->
       <dialog id="delete-dialog" class="dialog" aria-labelledby="delete-title">
         <form id="delete-form" class="stack" novalidate>
-          <h2 id="delete-title">Eliminare l'account?</h2>
-          <p>Cancelliamo subito profilo, recensioni, preferiti e segnalazioni in attesa. Le segnalazioni già approvate restano nelle schede, senza il tuo nome. Non si può annullare.</p>
-          <div class="field">
-            <label class="field__label" for="conferma">Per confermare scrivi ELIMINA</label>
-            <input class="input" type="text" id="conferma" name="conferma" autocomplete="off" required>
+          <div id="delete-passo-1" class="stack">
+            <h2 id="delete-title" tabindex="-1">Eliminare l'account?</h2>
+            <p>Cancelliamo profilo, foto, recensioni, preferiti e segnalazioni in attesa. Le segnalazioni già approvate restano nelle schede, senza il tuo nome. Non si può annullare.</p>
+            <div class="field">
+              <label class="field__label" for="conferma">Per continuare scrivi ELIMINA</label>
+              <input class="input" type="text" id="conferma" name="conferma" autocomplete="off" required>
+            </div>
+            <div class="btn-row">
+              <button class="btn btn--danger" type="submit">Continua</button>
+              <button id="delete-cancel" class="btn btn--secondary" type="button">Annulla</button>
+            </div>
           </div>
-          <div class="btn-row">
-            <button class="btn btn--danger" type="submit">Elimina definitivamente</button>
-            <button id="delete-cancel" class="btn btn--secondary" type="button">Annulla</button>
+          <div id="delete-passo-2" class="stack" hidden>
+            <h2 id="delete-title-2" tabindex="-1">Ultima conferma</h2>
+            <p>Stai per eliminare per sempre l'account <strong id="delete-email"></strong>. Dopo non potrai più recuperarlo.</p>
+            <p id="delete-note" class="notice" role="status" hidden></p>
+            <div class="btn-row">
+              <button id="delete-final" class="btn btn--danger" type="button">Sì, elimina per sempre</button>
+              <button id="delete-back" class="btn btn--secondary" type="button">No, tieni l'account</button>
+            </div>
           </div>
         </form>
       </dialog>

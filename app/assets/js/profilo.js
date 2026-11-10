@@ -114,29 +114,49 @@
       }).catch(function (err) { message($('account-note'), err.message, 'error'); });
     });
 
-    $('logout-btn').addEventListener('click', function () {
+    /* «Esci» chiede conferma (un tocco per sbaglio non fa uscire); il focus parte da «Annulla» */
+    var logoutDialog = $('logout-dialog');
+    $('logout-btn').addEventListener('click', function () { logoutDialog.showModal(); });
+    $('logout-cancel').addEventListener('click', function () { logoutDialog.close(); });
+    $('logout-confirm').addEventListener('click', function () {
+      this.disabled = true;
       api.signOut().then(function () { location.href = 'accedi.html'; });
     });
 
+    /* «Elimina l'account»: due conferme. Passo 1 scrivere ELIMINA, passo 2 «Sì, elimina per sempre» (o tornare indietro) */
     var dialog = $('delete-dialog');
     var delForm = $('delete-form');
+    function passo(n) {
+      show($('delete-passo-1'), n === 1);
+      show($('delete-passo-2'), n === 2);
+      $(n === 1 ? 'delete-title' : 'delete-title-2').focus();
+    }
     $('delete-btn').addEventListener('click', function () {
       delForm.reset();
       clearErrors(delForm);
+      $('delete-email').textContent = user.email || '';
       dialog.showModal();
+      passo(1);
     });
     $('delete-cancel').addEventListener('click', function () { dialog.close(); });
+    $('delete-back').addEventListener('click', function () { dialog.close(); });
     delForm.addEventListener('submit', function (ev) {
       ev.preventDefault();
-      if (isBusy(delForm)) return;
       var input = delForm.elements.conferma;
-      if (showErrors(delForm, input.value.trim().toUpperCase() === 'ELIMINA' ? [] : [{ input: input, text: 'Per confermare scrivi ELIMINA.' }])) return;
-      busy(delForm, true, 'Eliminazione…');
+      if (showErrors(delForm, input.value.trim().toUpperCase() === 'ELIMINA' ? [] : [{ input: input, text: 'Per continuare scrivi ELIMINA.' }])) return;
+      passo(2);
+    });
+    $('delete-final').addEventListener('click', function () {
+      var btn = this;
+      if (btn.disabled) return;
+      btn.disabled = true;
+      btn.textContent = 'Eliminazione…';
       api.deleteAccount().then(function () {
         location.href = 'accedi.html?eliminato=1';
       }).catch(function (err) {
-        busy(delForm, false);
-        showErrors(delForm, [{ input: input, text: err.message }]);
+        btn.disabled = false;
+        btn.textContent = 'Sì, elimina per sempre';
+        message($('delete-note'), err.message, 'error');
       });
     });
   }

@@ -3,12 +3,12 @@
    - File statici (CSS, JS, font, icone): dalla copia salvata, aggiornata in sottofondo.
    - Mai in cache: dati e accesso (Supabase), immagini della mappa, altri siti.
    Cambiare VERSION a ogni rilascio per buttare le copie vecchie. */
-var VERSION = 'oa-app-2071da40';
+var VERSION = 'oa-app-3d038521';
 var SHELL = [
   './', 'index.html', 'luogo.html', 'accedi.html', 'registrati.html', 'password.html', 'segnala.html',
   'profilo.html', 'moderazione.html', 'privacy.html', 'bollino.html', 'locali.html', 'manifest.webmanifest',
   'assets/css/app.css?v=7b035fde', 'assets/js/config.js?v=90a84c77', 'assets/js/api.js?v=4db84fc3', 'assets/js/app.js?v=8c4a1e1e',
-  'assets/js/accesso.js?v=209771b2', 'assets/js/scheda.js?v=e37e390f', 'assets/js/segnala.js?v=1c6ac120', 'assets/js/profilo.js?v=1aae0990',
+  'assets/js/accesso.js?v=209771b2', 'assets/js/scheda.js?v=e37e390f', 'assets/js/segnala.js?v=1c6ac120', 'assets/js/profilo.js?v=d79286f4',
   'assets/js/moderazione.js?v=c88a1130', 'assets/js/bollino.js?v=16783352',
   'assets/vendor/supabase/supabase.js?v=2.117.3', 'assets/img/icon-192.png',
   '../assets/css/sito.css?v=86104764', '../assets/js/oa-core.js?v=214328f3',
