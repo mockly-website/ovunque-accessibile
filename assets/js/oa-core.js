@@ -1,7 +1,7 @@
 /* Ovunque Accessibile – codice comune a sito e web-app (window.OA).
    Il sito lo avvia con sito.js, l'app con app/assets/js/app.js: le regole e i giudizi sono gli stessi.
    Dati: da Supabase (sito.js e api.js impostano OA.config.areaPlaces, searchPlaces, loadPlace e, per la home,
-   latestPlaces e stats). Mappa ed elenco chiedono solo i luoghi dell'area visibile (sezione 6b).
+   stats). Mappa ed elenco chiedono solo i luoghi dell'area visibile (sezione 6b).
    Tutto il testo dei luoghi entra nel DOM con textContent: mai innerHTML con dati esterni.
    Indice: 1. Configurazione · 2. Regole per esigenza · 3. Scelta «La tua esigenza»
            4. Utilità DOM · 5. Componenti · 6. Mappa · 7. Home · 8. Pagina mappa
@@ -20,7 +20,7 @@
   var STORAGE_KEY = 'oa-esigenza';
 
   /* Punti di aggancio per sito e app: areaPlaces(riquadro) → Promise di { totale, luoghi } o { totale, zone },
-     searchPlaces(testo, tipo) → Promise di { totale, luoghi }, latestPlaces(), stats(), loadPlace(id), reportHref(p), onDetail(p) */
+     searchPlaces(testo, tipo) → Promise di { totale, luoghi }, stats(), loadPlace(id), reportHref(p), onDetail(p) */
   var config = {};
 
   var CATEGORIE = {
@@ -893,26 +893,9 @@
     return 2 * 6371 * Math.asin(Math.sqrt(h));
   }
 
-  /* ---------- 7. Home: mappa d'anteprima e ultimi luoghi ---------- */
+  /* ---------- 7. Home: mappa d'anteprima e numeri ---------- */
   function initHome() {
     var box = document.getElementById('home-map');
-    var latest = document.getElementById('latest-list');
-    if (latest && config.latestPlaces) {
-      config.latestPlaces().then(function (places) {
-        function render() {
-          latest.textContent = '';
-          places
-            .filter(function (p) { return visibile(p, esigenza()); })
-            .slice(0, 3)
-            .forEach(function (p) { latest.appendChild(placeCard(p)); });
-          /* Senza luoghi verificati la sezione non si mostra (niente titolo con l'elenco vuoto) */
-          var sezione = latest.closest('section');
-          if (sezione) sezione.hidden = !latest.children.length;
-        }
-        render();
-        onEsigenza(render);
-      }).catch(function () {});
-    }
     if (document.getElementById('home-stats') && config.stats) config.stats().then(statistiche).catch(function () {});
 
     var map = box && config.areaPlaces && createMap(box, { zoomControl: true, dueDita: true });

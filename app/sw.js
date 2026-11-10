@@ -3,7 +3,7 @@
    - File statici (CSS, JS, font, icone): dalla copia salvata, aggiornata in sottofondo.
    - Mai in cache: dati e accesso (Supabase), immagini della mappa, altri siti.
    Cambiare VERSION a ogni rilascio per buttare le copie vecchie. */
-var VERSION = 'oa-app-3d038521';
+var VERSION = 'oa-app-75ee883e';
 var SHELL = [
   './', 'index.html', 'luogo.html', 'accedi.html', 'registrati.html', 'password.html', 'segnala.html',
   'profilo.html', 'moderazione.html', 'privacy.html', 'bollino.html', 'locali.html', 'manifest.webmanifest',
@@ -11,7 +11,7 @@ var SHELL = [
   'assets/js/accesso.js?v=209771b2', 'assets/js/scheda.js?v=e37e390f', 'assets/js/segnala.js?v=1c6ac120', 'assets/js/profilo.js?v=d79286f4',
   'assets/js/moderazione.js?v=c88a1130', 'assets/js/bollino.js?v=16783352',
   'assets/vendor/supabase/supabase.js?v=2.117.3', 'assets/img/icon-192.png',
-  '../assets/css/sito.css?v=86104764', '../assets/js/oa-core.js?v=214328f3',
+  '../assets/css/sito.css?v=5df39cdd', '../assets/js/oa-core.js?v=d749ee7e',
   '../assets/vendor/leaflet/leaflet.js', '../assets/vendor/leaflet/leaflet.css',
   '../assets/vendor/markercluster/leaflet.markercluster.js', '../assets/vendor/markercluster/MarkerCluster.css',
   '../assets/fonts/atkinson-hyperlegible-400-latin.woff2', '../assets/fonts/atkinson-hyperlegible-700-latin.woff2',

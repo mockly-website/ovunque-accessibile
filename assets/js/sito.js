@@ -8,7 +8,6 @@
   var CFG = window.OA_CONFIG || {};
   var COLONNE = 'id,slug,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,descrizione,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,esempio,osm';
   /* Per mappa ed elenchi basta meno (niente descrizione): le stesse colonne le restituiscono luoghi_area e cerca_luoghi */
-  var COLONNE_ELENCO = 'id,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,osm';
 
   function toPlace(r) {
     return {
@@ -49,11 +48,6 @@
     };
     window.OA.config.searchPlaces = function (testo, categoria) {
       return rpc('cerca_luoghi', { p_testo: testo, p_categoria: categoria || null }).then(conLuoghi);
-    };
-    /* Home: le ultime schede verificate (non quelle importate da OpenStreetMap); oa-core ne mostra 3 per l'esigenza scelta */
-    window.OA.config.latestPlaces = function () {
-      return leggi('places?select=' + COLONNE_ELENCO + '&stato=in.(pubblicato,in-revisione)&verifica_livello=neq.osm' +
-        '&verifica_data=not.is.null&order=verifica_data.desc,nome&limit=24').then(function (rows) { return rows.map(toPlace); });
     };
     window.OA.config.stats = function () {
       return rpc('statistiche_luoghi');
@@ -96,17 +90,5 @@
       io.observe(el);
     });
   });
-  /* L'elenco «Ultimi luoghi verificati» arriva dopo i dati: le schede entrano quando ci sono */
-  var latest = document.getElementById('latest-list');
-  if (latest) {
-    new MutationObserver(function () {
-      [].forEach.call(latest.children, function (li, i) {
-        if (li.classList.contains('svela')) return;
-        li.classList.add('svela');
-        li.style.setProperty('--i', String(i));
-        io.observe(li);
-      });
-    }).observe(latest, { childList: true });
-  }
 })();
 
