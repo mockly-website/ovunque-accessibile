@@ -33,6 +33,7 @@
     var user = api.user();
     $('account-email').textContent = user.email || '';
 
+    initAvatar();
     api.profile().then(function (prof) {
       if (!prof) return;
       $('profile-title').textContent = 'Ciao, ' + prof.nome_pubblico;
@@ -117,16 +118,83 @@
     });
   }
 
+  /* Foto profilo: si vede accanto alle recensioni. Ricompressa nel browser a 512 px (senza GPS), poi caricata */
+  function mostraAvatar(prof) {
+    var box = $('avatar-box');
+    box.textContent = '';
+    var url = prof && api.avatarUrl ? api.avatarUrl(prof.avatar) : null;
+    if (url) box.appendChild(el('img', { src: url, alt: '', width: '96', height: '96' }));
+    else box.textContent = ((prof && prof.nome_pubblico) || '?').charAt(0).toUpperCase();
+    $('avatar-label').textContent = url ? 'Cambia la foto' : 'Aggiungi una foto';
+    show($('avatar-remove'), !!url);
+  }
+  function initAvatar() {
+    var input = $('avatar-input');
+    var note = $('avatar-note');
+    api.profile().then(mostraAvatar);
+    input.addEventListener('change', function () {
+      var file = input.files && input.files[0];
+      input.value = '';
+      if (!file) return;
+      note.textContent = 'Carico la foto…';
+      A.preparePhoto(file, 512).then(function (blob) {
+        return api.setAvatar(blob);
+      }).then(function (prof) {
+        mostraAvatar(prof);
+        note.textContent = 'Foto aggiornata. Si vede accanto alle tue recensioni.';
+      }).catch(function (err) {
+        note.textContent = 'Non sono riuscito a caricare la foto: ' + err.message;
+      });
+    });
+    $('avatar-remove').addEventListener('click', function () {
+      note.textContent = 'Tolgo la foto…';
+      api.removeAvatar().then(function (prof) {
+        mostraAvatar(prof);
+        note.textContent = 'Foto tolta.';
+        input.focus();
+      }).catch(function (err) { note.textContent = err.message; });
+    });
+  }
+
+  /* Avvisi in cima al profilo: gli ultimi 8, i nuovi evidenziati; aperti qui, diventano «visti» */
+  var ICONA_AVVISO = { ok: '#icon-yes', no: '#icon-no', info: '#icon-bell' };
+  function mostraAvvisi(data, byId) {
+    var nomi = {};
+    Object.keys(byId).forEach(function (id) { nomi[id] = byId[id].nome; });
+    var lista = A.avvisi(data, nomi).slice(0, 8);
+    var box = $('avvisi');
+    var ul = $('avvisi-list');
+    ul.textContent = '';
+    show(box, true);
+    show($('avvisi-vuoto'), !lista.length);
+    lista.forEach(function (a) {
+      var corpo = [
+        el('span', { className: 'avviso__icona avviso__icona--' + a.tipo }, [icon(ICONA_AVVISO[a.tipo])]),
+        el('span', { className: 'avviso__testo' }, [
+          el('span', { className: 'avviso__titolo' }, [document.createTextNode(a.titolo), a.nuovo ? el('span', { className: 'avviso__nuovo', text: 'Nuovo' }) : null]),
+          el('span', { className: 'avviso__dettaglio', text: a.testo }),
+          el('span', { className: 'avviso__data', text: dateIt(a.t) })
+        ])
+      ];
+      ul.appendChild(el('li', { className: 'avviso' + (a.nuovo ? ' avviso--nuovo' : '') }, [
+        a.href ? el('a', { className: 'avviso__link', href: a.href }, corpo) : el('div', { className: 'avviso__link' }, corpo)
+      ]));
+    });
+    A.segnaAvvisiVisti();
+  }
+
   function loadActivity() {
     /* Solo i luoghi che servono: preferiti e luoghi delle mie recensioni */
     Promise.all([api.myData(), api.favorites()]).then(function (r) {
-      var ids = r[1].concat(((r[0] || {}).recensioni || []).map(function (rv) { return rv.place_id; }));
+      var d = r[0] || {};
+      var ids = r[1].concat([].concat(d.recensioni || [], d.gestore || [], d.verifiche || []).map(function (x) { return x.place_id; }));
       return api.placesByIds(ids.filter(function (id, i) { return ids.indexOf(id) === i; }))
         .then(function (places) { return [r[0], places, r[1]]; });
     }).then(function (r) {
       var data = r[0] || {};
       var byId = {};
       r[1].forEach(function (p) { byId[p.id] = p; });
+      mostraAvvisi(data, byId);
 
       var favList = $('fav-list');
       favList.textContent = '';

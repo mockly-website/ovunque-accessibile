@@ -16,7 +16,7 @@
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="assets/js/intro.js?v=85d27344"></script>
   <script src="assets/js/menu.js?v=1a7f68a1" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=ec165d59">
+  <link rel="stylesheet" href="assets/css/sito.css?v=7610562c">
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -70,6 +70,9 @@
     <symbol id="icon-wheelchair" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/></symbol>
     <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" pathLength="1"/></symbol>
     <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/><path d="M8.7 12.8l-1.9 3.4h2.4l-1.9 3.2" stroke-width="1.6" pathLength="1"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" pathLength="1"/><path d="M9 17v1a3 3 0 0 0 6 0v-1" pathLength="1"/></symbol>
+    <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" pathLength="1"/></symbol>
+    <symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" pathLength="1"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" pathLength="1"/></symbol>
   </svg>
   <ul class="skip-links">
     <li><a class="skip-links__link" href="#main">Vai al contenuto</a></li>
@@ -175,6 +178,7 @@
         <div class="locali-box locali-box--blu">
           <h2 id="domande-title">Domande?</h2>
           <p>Scriveteci a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o chiamateci al <a href="tel:+393518332819">351 833 2819</a>.</p>
+          <p class="locali-box__azioni"><a class="btn btn--light" href="https://wa.me/393518332819"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-whatsapp"/></svg>Scrivici su WhatsApp</a></p>
         </div>
       </div>
     </section>
@@ -201,9 +205,11 @@
       </nav>
       <div class="site-footer__col">
         <h2 class="site-footer__title">Contatti</h2>
-        <ul role="list">
-          <li><a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a></li>
-          <li><a href="tel:+393518332819">Telefono: 351 833 2819</a></li>
+        <ul class="site-footer__contatti" role="list">
+          <li><a href="mailto:ovunqueaccessibile@gmail.com"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-mail"/></svg><span>ovunqueaccessibile@gmail.com</span></a></li>
+          <li><a href="tel:+393518332819"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-phone"/></svg><span>Telefono: 351 833 2819</span></a></li>
+          <li><a href="https://wa.me/393518332819"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-whatsapp"/></svg><span>WhatsApp<span class="visually-hidden"> (si apre WhatsApp)</span></span></a></li>
+          <li><a href="https://www.instagram.com/ovunque_accessibile"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-instagram"/></svg><span>Instagram<span class="visually-hidden"> (sito esterno)</span></span></a></li>
         </ul>
       </div>
     </div>

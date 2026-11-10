@@ -102,6 +102,7 @@
 
   function showPanel() {
     show($('mod-panel'), true);
+    initTabs();
     focusHeading($('mod-panel-title'));
     loadPending();
     initOsmQueue();
@@ -170,6 +171,41 @@
 
   function setCount(id, n, one, many) {
     $(id).textContent = n === 1 ? '1 ' + one : n + ' ' + many;
+    /* lo stesso numero sulla linguetta della sezione (nascosto se è zero) */
+    var tab = document.querySelector('[data-conta="' + id + '"]');
+    if (tab) {
+      tab.textContent = n > 99 ? '99+' : String(n);
+      tab.hidden = !n;
+    }
+  }
+
+  /* Sezioni a linguette (11 novembre): una sezione alla volta invece di una pagina lunghissima. Frecce destra/sinistra,
+     Inizio e Fine tra le linguette (ARIA tabs); l'ultima aperta resta per la sessione. */
+  function initTabs() {
+    var tabs = [].slice.call(document.querySelectorAll('.mod-tabs__tab'));
+    function apri(i, focus) {
+      tabs.forEach(function (t, j) {
+        var on = i === j;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        $(t.getAttribute('aria-controls')).hidden = !on;
+      });
+      if (focus) tabs[i].focus();
+      try { sessionStorage.setItem('oa-mod-sezione', tabs[i].id); } catch (e) { /* niente */ }
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { apri(i); });
+      t.addEventListener('keydown', function (ev) {
+        var j = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: tabs.length - 1 }[ev.key];
+        if (j == null) return;
+        ev.preventDefault();
+        apri((j + tabs.length) % tabs.length, true);
+      });
+    });
+    var salvata = null;
+    try { salvata = sessionStorage.getItem('oa-mod-sezione'); } catch (e) { /* niente */ }
+    var k = tabs.map(function (t) { return t.id; }).indexOf(salvata);
+    apri(k >= 0 ? k : 0);
   }
 
   function loadPending() {

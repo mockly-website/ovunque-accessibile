@@ -180,7 +180,9 @@
 
       var fine = qy + cella * (n + 8);
       testo('Inquadra il codice: misure, foto e recensioni di chi c\'è stato.', fine + 40, '700', 34, '"Atkinson Hyperlegible", sans-serif', NAVY, 1040);
-      testo((sulPosto ? 'Verifica del ' + OA.formatDate(p.verifica.data) + ' · ' : '') + url.replace(/^https?:\/\//, ''), fine + 96, '400', 26, '"Atkinson Hyperlegible", sans-serif', MUTED, 1060);
+      /* il nome del sito ben visibile (chi non inquadra il codice può scriverlo), la data della verifica sotto */
+      testo(new URL(url).host, fine + 100, '700', 40, '"Atkinson Hyperlegible", sans-serif', BRAND, 1040);
+      if (sulPosto) testo('Verifica del ' + OA.formatDate(p.verifica.data), fine + 142, '400', 26, '"Atkinson Hyperlegible", sans-serif', MUTED, 1060);
       return new Promise(function (ok, ko) {
         if (canvas.toBlob) canvas.toBlob(function (b) { if (b) ok(b); else ko(new Error('png')); }, 'image/png');
         else ko(new Error('png'));

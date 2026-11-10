@@ -151,8 +151,8 @@ html:has(> body.app) {
 }
 
 .app .card__title {
-  margin: 0 0 var(--space-xs);
-  font-size: 1.2rem;
+  margin: 0 0 var(--space-sm);
+  font-size: 1.25rem;
 }
 
 .app .card__subtitle {
@@ -225,8 +225,8 @@ html:has(> body.app) {
   top: 0;
   z-index: 1001;
   padding-top: env(safe-area-inset-top);
-  background: rgb(251, 246, 236);   /* opaca: il testo che scorre sotto non deve vedersi. Niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
-  box-shadow: 0 1px 0 var(--color-line);
+  background: var(--color-white);   /* opaca: il testo che scorre sotto non deve vedersi. Niente backdrop-filter: farebbe da riferimento alla barra in basso (position: fixed) */
+  box-shadow: 0 1px 0 var(--color-line), 0 6px 18px rgba(22, 40, 65, 0.05);
   border-bottom: 0;
   view-transition-name: oa-testata;
 }
@@ -602,11 +602,11 @@ html:has(> body.app) {
   }
 
   .app .app-nav__link.is-arriva .icon--tab {
-    animation: oa-disegna 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: oa-disegna 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
   }
 
   .app .app-nav__link[href="segnala.html"].is-arriva .icon {
-    animation: oa-segnala 0.6s cubic-bezier(0.3, 0.7, 0.2, 1.3) both;
+    animation: oa-segnala 0.45s cubic-bezier(0.3, 0.7, 0.2, 1.3) both;
   }
 }
 
@@ -702,19 +702,20 @@ html:has(> body.app) {
   position: relative;
 }
 
+/* Appoggiato sull'angolo in alto a destra dell'icona, dentro la barra (non sopra la scritta né fuori dal bordo) */
 .app-nav__badge {
   position: absolute;
-  top: 0;
-  left: calc(50% + 0.55rem);
+  top: 0.3rem;
+  left: calc(50% + 0.45rem);
   z-index: 2;
-  min-width: 1.25rem;
-  height: 1.25rem;
-  padding: 0 0.3rem;
+  min-width: 1rem;
+  height: 1rem;
+  padding: 0 0.25rem;
   border: 2px solid var(--color-white);
   border-radius: var(--radius-pill);
   background: var(--color-error);
   color: var(--color-white);
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   font-weight: 700;
   line-height: 1;
   display: grid;
@@ -2362,12 +2363,16 @@ textarea.input {
   }
 }
 
+/* Etichette dei gruppi del profilo: piccole e maiuscole, così il titolo della pagina e quelli delle schede
+   restano i più evidenti (gerarchia: titolo › schede › etichette) */
 .app .menu-list__heading {
-  margin: var(--space-xl) 0 var(--space-xs);
-  font-family: var(--font-heading);
-  font-size: 1.2rem;
-  font-weight: var(--font-heading-weight);
-  color: var(--color-navy);
+  margin: var(--space-xl) var(--space-2xs) var(--space-xs);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-muted);
 }
 
 #profile-main > nav:first-of-type .menu-list__heading {
@@ -2662,6 +2667,80 @@ textarea.input {
    email e foto), luoghi da OpenStreetMap da approvare.
    ========================================================================== */
 
+/* Linguette delle sezioni: scorrono di lato sul telefono, il numero di cose in attesa accanto al nome */
+.mod-tabs {
+  display: flex;
+  gap: var(--space-xs);
+  margin: 0 calc(-1 * var(--space-md));
+  padding: var(--space-2xs) var(--space-md) var(--space-sm);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mod-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.mod-tabs__tab {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: var(--target-min);
+  padding: 0 var(--space-md);
+  border: 1.5px solid rgba(22, 40, 65, 0.18);
+  border-radius: var(--radius-pill);
+  background: var(--color-white);
+  color: var(--color-navy);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.mod-tabs__tab[aria-selected="true"] {
+  border-color: var(--color-navy);
+  background: var(--color-navy);
+  color: var(--color-white);
+}
+
+.mod-tabs__tab:focus-visible {
+  outline: var(--focus-width) solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.mod-tabs__n {
+  min-width: 1.4rem;
+  padding: 0.05rem 0.4rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-error);
+  color: var(--color-white);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.mod-tabs__n[hidden] {
+  display: none;
+}
+
+.mod-sez[hidden] {
+  display: none;
+}
+
+.mod-sez > h2 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-xl);
+}
+
+@media (forced-colors: active) {
+  .mod-tabs__tab[aria-selected="true"] {
+    background: Highlight;
+    color: HighlightText;
+  }
+}
+
 .mod-list {
   display: grid;
   gap: var(--space-lg);
@@ -2676,7 +2755,12 @@ textarea.input {
 
 .mod-item h4 {
   margin: var(--space-lg) 0 var(--space-xs);
-  font-size: var(--text-base);
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--color-line);
+  color: var(--color-muted);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .mod-item__note {
@@ -2692,23 +2776,28 @@ textarea.input {
   margin: 0;
 }
 
+/* Giudizi con i dati proposti: due per riga, il nome dell'esigenza sopra il giudizio */
 .verdict-preview {
   display: grid;
-  gap: var(--space-xs);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-sm);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .verdict-preview li {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-xs);
+  display: grid;
+  justify-items: start;
+  gap: 0.2rem;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--color-card);
 }
 
 .verdict-preview__who {
-  min-width: 12rem;
+  font-size: var(--text-sm);
+  font-weight: 700;
 }
 
 .table-wrap {
@@ -3013,3 +3102,159 @@ textarea.input {
 .mod-item__fonte {
   margin: 0 0 var(--space-xs);
 }
+
+/* ==========================================================================
+   Avvisi nel profilo (11 novembre): esito di segnalazioni, recensioni, gestione e verifiche
+   ========================================================================== */
+
+.avvisi__list {
+  display: grid;
+  gap: var(--space-xs);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avviso__link {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  color: inherit;
+  text-decoration: none;
+}
+
+a.avviso__link:hover {
+  background: var(--color-sky);
+}
+
+.avviso--nuovo .avviso__link {
+  background: #f2f8fd;
+  box-shadow: inset 3px 0 0 var(--color-brand);
+}
+
+.avviso__icona {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+}
+
+.avviso__icona .icon {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.avviso__icona--ok {
+  background: #e3f1e8;
+  color: var(--color-success);
+}
+
+.avviso__icona--no {
+  background: #fbe9e9;
+  color: var(--color-error);
+}
+
+.avviso__icona--info {
+  background: var(--color-sky);
+  color: var(--color-brand);
+}
+
+.avviso__testo {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.avviso__titolo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  font-weight: 700;
+}
+
+.avviso__nuovo {
+  padding: 0.05rem 0.5rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-brand);
+  color: var(--color-white);
+  font-size: 0.8rem;
+}
+
+.avviso__dettaglio {
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+
+.avviso__data {
+  color: var(--color-muted);
+  font-weight: 400;
+  font-size: var(--text-sm);
+}
+
+@media (forced-colors: active) {
+  .avviso--nuovo .avviso__link {
+    border-left: 3px solid Highlight;
+  }
+}
+
+/* Foto profilo: in cima al profilo (grande, con i pulsanti) e accanto alle recensioni */
+.profilo-testa {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.profilo-testa__testo {
+  min-width: 0;
+}
+
+.profilo-testa h1 {
+  margin-bottom: var(--space-xs);
+}
+
+.profilo-testa__azioni {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  position: relative;
+}
+
+.avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--color-sky);
+  color: var(--color-brand);
+  font-family: var(--font-heading);
+  font-weight: 700;
+}
+
+.avatar--grande {
+  width: 5.5rem;
+  height: 5.5rem;
+  border: 3px solid var(--color-white);
+  box-shadow: var(--shadow-sm);
+  font-size: 2.25rem;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+img.review__avatar {
+  object-fit: cover;
+}
+
+#avatar-note:empty {
+  display: none;
+}
+

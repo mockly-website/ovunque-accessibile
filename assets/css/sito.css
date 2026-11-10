@@ -1147,6 +1147,18 @@ html:not(.js) .js-only {
   overflow-wrap: anywhere;
 }
 
+/* Contatti con icona: email, telefono, WhatsApp, Instagram */
+.site-footer__contatti a {
+  gap: var(--space-xs);
+}
+
+.site-footer__contatti .icon {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--color-beige);
+}
+
 .site-footer__bottom {
   display: flex;
   flex-wrap: wrap;
@@ -1196,7 +1208,7 @@ html:not(.js) .js-only {
   top: 0;
   bottom: 0;
   background:
-    url("../img/intro-skate.svg?v=c551b20c") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
+    url("../img/intro-skate.svg?v=9b9ec3e1") center calc(50% - 2rem) / var(--intro-size) auto no-repeat,
     radial-gradient(40rem 30rem at 50% 42%, var(--color-white, #fff), var(--color-card, #fbf6ec) 70%);
 }
 
@@ -1219,6 +1231,31 @@ html:not(.js) .js-only {
   }
 }
 
+/* Sotto il nome, una barretta che scorre: si capisce che la pagina sta arrivando */
+.oa-intro body::after {
+  content: "";
+  position: fixed;
+  left: calc(50% - 2.5rem);
+  top: calc(50% - 2rem + var(--intro-size) * 0.375 + 4rem);
+  z-index: 2147483001;
+  width: 5rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-sky, #e6f4fd) 0 30%, var(--color-brand, #2f5b9c) 30% 60%, var(--color-sky, #e6f4fd) 60%) 0 0 / 250% 100%;
+  animation: oa-intro-barra 1.1s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes oa-intro-barra {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -150% 0;
+  }
+}
+
 .oa-intro-out::before,
 .oa-intro-out::after {
   transform: translateY(-100%);
@@ -1237,10 +1274,11 @@ html:not(.js) .js-only {
 @media (prefers-reduced-motion: reduce) {
   :root.oa-intro::before,
   :root.oa-intro-out::before {
-    background-image: url("../img/intro-fermo.svg?v=1f242d28"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
+    background-image: url("../img/intro-fermo.svg?v=4c2389f2"), radial-gradient(40rem 30rem at 50% 42%, #fff, #fbf6ec 70%);
   }
 
-  .oa-intro::after {
+  .oa-intro::after,
+  .oa-intro body::after {
     animation: none;
   }
 
@@ -1254,7 +1292,8 @@ html:not(.js) .js-only {
 
 @media (forced-colors: active) {
   .oa-intro::before,
-  .oa-intro::after {
+  .oa-intro::after,
+  .oa-intro body::after {
     display: none;
   }
 }
@@ -1877,6 +1916,57 @@ main > .business-home {
   border-radius: var(--radius-md);
   background: var(--color-navy);
   color: var(--color-white);
+}
+
+/* Agenzie di viaggi: riquadro «in arrivo» sotto i passi per i locali */
+.agenzie {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border: 2px dashed rgba(47, 91, 156, 0.35);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+@media (min-width: 60em) {
+  .agenzie {
+    grid-column: 1 / -1;
+  }
+}
+
+.agenzie__icona {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-brand);
+}
+
+.agenzie__titolo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-2xs);
+}
+
+.agenzie__badge {
+  padding: 0.1rem 0.6rem;
+  border-radius: var(--radius-pill);
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.agenzie p {
+  max-width: 62ch;
+  margin: 0;
 }
 
 /* Chi siamo: la foto di Angelo e Lorenzo con un riquadro beige spostato dietro */
@@ -2574,8 +2664,12 @@ main > .how {
   color: var(--color-white);
 }
 
-.locali-box--blu a {
+.locali-box--blu a:not(.btn) {
   color: var(--color-beige);
+}
+
+.locali-box .locali-box__azioni {
+  margin-top: var(--space-md);
 }
 
 main > .section .locali-box--blu h2::after {

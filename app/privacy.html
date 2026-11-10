@@ -17,13 +17,13 @@
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=ec165d59">
-  <link rel="stylesheet" href="assets/css/app.css?v=74ec005b">
-  <script src="assets/js/config.js?v=7cfd9f15" defer></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=7610562c">
+  <link rel="stylesheet" href="assets/css/app.css?v=b782b6f6">
+  <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=214328f3" defer></script>
-  <script src="assets/js/api.js?v=f7ca887d" defer></script>
-  <script src="assets/js/app.js?v=329c17ca" defer></script>
+  <script src="assets/js/api.js?v=10440b0c" defer></script>
+  <script src="assets/js/app.js?v=99f57d4f" defer></script>
 </head>
 <body class="app" data-page="privacy">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -77,6 +77,9 @@
     <symbol id="icon-wheelchair" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/></symbol>
     <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" pathLength="1"/></symbol>
     <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/><path d="M8.7 12.8l-1.9 3.4h2.4l-1.9 3.2" stroke-width="1.6" pathLength="1"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" pathLength="1"/><path d="M9 17v1a3 3 0 0 0 6 0v-1" pathLength="1"/></symbol>
+    <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" pathLength="1"/></symbol>
+    <symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" pathLength="1"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" pathLength="1"/></symbol>
   </svg>
 
   <ul class="skip-links">
@@ -104,14 +107,14 @@
     <!--
       BOZZA preparata da Mockly: non costituisce consulenza legale. Da rileggere con il consulente del cliente.
       Da completare: cognomi e città dei titolari, DPA dei fornitori, tempi di conservazione
-      degli account inattivi. La versione (app-2026-10-v2) è salvata con ogni registrazione: se cambia, aggiornare
+      degli account inattivi. La versione (app-2026-11-v3) è salvata con ogni registrazione: se cambia, aggiornare
       privacyVersion in assets/js/config.js.
     -->
     <div class="container">
       <article class="card prose legal">
         <h1>Privacy dell'app</h1>
         <p>Informativa ai sensi degli articoli 13 e 14 del Regolamento (UE) 2016/679 (“GDPR”) per chi usa l'app di Ovunque Accessibile.</p>
-        <p>Versione bozza app-2026-10-v2 · Ultimo aggiornamento: 31 ottobre 2026</p>
+        <p>Versione bozza app-2026-11-v3 · Ultimo aggiornamento: 10 novembre 2026</p>
 
         <h2>In breve</h2>
         <ul>
@@ -128,6 +131,7 @@
         <h2>2. Quali dati trattiamo</h2>
         <ul>
           <li><strong>Account:</strong> email, password (salvata solo in forma cifrata, nemmeno noi possiamo leggerla), nome pubblico, la tua esigenza («La tua esigenza») se la scegli, la conferma di avere almeno 14 anni, la data e la versione dell'informativa che hai accettato. Se accedi con Google non crei una password: Google ci comunica email, nome e immagine del profilo; usiamo l'email per l'account e il nome solo per suggerirti un nome pubblico, che scegli tu. L'immagine resta nei dati dell'account e non viene mostrata.</li>
+          <li><strong>Foto profilo (facoltativa):</strong> se la metti, si vede pubblicamente accanto al tuo nome nelle recensioni. La ricomprimiamo nel browser (senza la posizione GPS); la cambi o la togli quando vuoi dal profilo e si cancella con l'account.</li>
           <li><strong>Quello che scrivi:</strong> segnalazioni di luoghi e correzioni, con la nota per i moderatori; recensioni (testo e risposte alle domande); avvisi temporanei; luoghi salvati nei preferiti.</li>
           <li><strong>Se gestisci un luogo:</strong> il ruolo che indichi, nome e cognome del titolare, un telefono, un'email e una foto dell'ingresso del luogo (ricompressa nel browser, senza la posizione GPS). Questi dati li vedono solo i moderatori, per verificare che gestisci davvero il luogo: ti chiamiamo o ti scriviamo lì; la foto resta nel nostro archivio privato finché non elimini l'account; le tue risposte alle recensioni sono pubbliche con la dicitura «Risposta del gestore». Se chiedi la verifica sul posto, trattiamo anche quando possiamo passare e le note che scrivi, per organizzare il sopralluogo: le vedono solo i moderatori.</li>
           <li><strong>Dati tecnici:</strong> il fornitore del database registra nei propri log l'indirizzo IP e il tipo di browser delle richieste, per sicurezza e per bloccare gli abusi. Noi non li usiamo per altri scopi.</li>

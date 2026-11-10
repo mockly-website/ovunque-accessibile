@@ -17,15 +17,15 @@
   <link rel="preload" href="../assets/fonts/atkinson-hyperlegible-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="../assets/js/intro.js?v=85d27344"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=ec165d59">
-  <link rel="stylesheet" href="assets/css/app.css?v=74ec005b">
-  <script src="assets/js/config.js?v=7cfd9f15" defer></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=7610562c">
+  <link rel="stylesheet" href="assets/css/app.css?v=b782b6f6">
+  <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/js/oa-core.js?v=214328f3" defer></script>
-  <script src="assets/js/api.js?v=f7ca887d" defer></script>
-  <script src="assets/js/app.js?v=329c17ca" defer></script>
-  <script src="assets/js/segnala.js?v=026c1f85" defer></script>
-  <script src="assets/js/moderazione.js?v=159a9e83" defer></script>
+  <script src="assets/js/api.js?v=10440b0c" defer></script>
+  <script src="assets/js/app.js?v=99f57d4f" defer></script>
+  <script src="assets/js/segnala.js?v=1c6ac120" defer></script>
+  <script src="assets/js/moderazione.js?v=80f07ae7" defer></script>
 </head>
 <body class="app" data-page="moderazione">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -79,6 +79,9 @@
     <symbol id="icon-wheelchair" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/></symbol>
     <symbol id="icon-yes" viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" pathLength="1"/></symbol>
     <symbol id="icon-wheelchair-e" viewBox="0 0 24 24"><path d="M8 16m-5 0a5 5 0 1 0 10 0a5 5 0 1 0 -10 0" pathLength="1"/><path d="M19 19m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" pathLength="1"/><path d="M19 17a3 3 0 0 0 -3 -3h-3.4" pathLength="1"/><path d="M3 3h1a2 2 0 0 1 2 2v6" pathLength="1"/><path d="M6 8h11" pathLength="1"/><path d="M15 8v6" pathLength="1"/><path d="M8.7 12.8l-1.9 3.4h2.4l-1.9 3.2" stroke-width="1.6" pathLength="1"/></symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24"><path d="M10 5a2 2 0 1 1 4 0a7 7 0 0 1 4 6v3a4 4 0 0 0 2 3h-16a4 4 0 0 0 2 -3v-3a7 7 0 0 1 4 -6" pathLength="1"/><path d="M9 17v1a3 3 0 0 0 6 0v-1" pathLength="1"/></symbol>
+    <symbol id="icon-phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5l-2.5 1.5a11 11 0 0 0 5 5l1.5 -2.5l5 2v4a2 2 0 0 1 -2 2a16 16 0 0 1 -15 -15a2 2 0 0 1 2 -2" pathLength="1"/></symbol>
+    <symbol id="icon-whatsapp" viewBox="0 0 24 24"><path d="M3 21l1.65 -3.8a9 9 0 1 1 3.4 2.9l-5.05 .9" pathLength="1"/><path d="M9 10a.5 .5 0 0 0 1 0v-1a.5 .5 0 0 0 -1 0v1a5 5 0 0 0 5 5h1a.5 .5 0 0 0 0 -1h-1a.5 .5 0 0 0 0 1" pathLength="1"/></symbol>
   </svg>
 
   <ul class="skip-links">
@@ -114,12 +117,20 @@
 
       <div id="mod-panel" class="stack" hidden>
         <h2 id="mod-panel-title" class="visually-hidden">Pannello di moderazione</h2>
-        <section aria-labelledby="mod-proposals-title">
+        <div class="mod-tabs" role="tablist" aria-label="Sezioni della moderazione">
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-proposals" aria-controls="sez-proposals" aria-selected="true">Segnalazioni <span class="mod-tabs__n" data-conta="mod-proposals-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-reviews" aria-controls="sez-reviews" aria-selected="false" tabindex="-1">Recensioni <span class="mod-tabs__n" data-conta="mod-reviews-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-owners" aria-controls="sez-owners" aria-selected="false" tabindex="-1">Gestori <span class="mod-tabs__n" data-conta="mod-owners-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-checks" aria-controls="sez-checks" aria-selected="false" tabindex="-1">Verifiche <span class="mod-tabs__n" data-conta="mod-checks-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-osm" aria-controls="sez-osm" aria-selected="false" tabindex="-1">OpenStreetMap <span class="mod-tabs__n" data-conta="mod-osm-count" hidden></span></button>
+          <button class="mod-tabs__tab" type="button" role="tab" id="tab-strumenti" aria-controls="sez-strumenti" aria-selected="false" tabindex="-1">Strumenti</button>
+        </div>
+        <section id="sez-proposals" class="mod-sez" role="tabpanel" aria-labelledby="mod-proposals-title">
           <h2 id="mod-proposals-title">Segnalazioni <span class="pill" id="mod-proposals-count"></span></h2>
           <p id="mod-proposals-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna segnalazione in attesa.</span></p>
           <ul id="mod-proposals" class="mod-list" role="list"></ul>
         </section>
-        <section aria-labelledby="mod-osm-title">
+        <section id="sez-osm" class="mod-sez" role="tabpanel" aria-labelledby="mod-osm-title">
           <h2 id="mod-osm-title">Luoghi da OpenStreetMap da approvare <span class="pill" id="mod-osm-count"></span></h2>
           <p class="place__meta">Sulla mappa di OpenStreetMap questi luoghi sono segnati come accessibili in carrozzina (o in parte), ma nessuno li ha misurati. Controllali (foto, Street View, se li conosci) e approva quelli credibili: compaiono sulla mappa come «accessibile» o «in parte» secondo OpenStreetMap, finché qualcuno non li misura. Quelli non approvati vengono archiviati e non tornano con un nuovo import.</p>
           <div class="osm-tools">
@@ -138,23 +149,24 @@
           <ul id="mod-osm" class="osm-list" role="list"></ul>
           <button id="osm-more" class="btn btn--secondary btn--small" type="button" hidden>Mostra altri</button>
         </section>
-        <section aria-labelledby="mod-reviews-title">
+        <section id="sez-reviews" class="mod-sez" role="tabpanel" aria-labelledby="mod-reviews-title">
           <h2 id="mod-reviews-title">Recensioni <span class="pill" id="mod-reviews-count"></span></h2>
           <p id="mod-reviews-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna recensione in attesa.</span></p>
           <ul id="mod-reviews" class="mod-list" role="list"></ul>
         </section>
-        <section aria-labelledby="mod-owners-title">
+        <section id="sez-owners" class="mod-sez" role="tabpanel" aria-labelledby="mod-owners-title">
           <h2 id="mod-owners-title">Gestori dei luoghi <span class="pill" id="mod-owners-count"></span></h2>
           <p class="place__meta">Prima di approvare, chiama o scrivi al contatto indicato e verifica che corrisponda a quello pubblico del luogo (sito, insegna, pagine gialle).</p>
           <p id="mod-owners-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna richiesta in attesa.</span></p>
           <ul id="mod-owners" class="mod-list" role="list"></ul>
         </section>
-        <section aria-labelledby="mod-checks-title">
+        <section id="sez-checks" class="mod-sez" role="tabpanel" aria-labelledby="mod-checks-title">
           <h2 id="mod-checks-title">Verifiche sul posto <span class="pill" id="mod-checks-count"></span></h2>
           <p class="place__meta">Richieste dei gestori. Accordatevi al contatto del gestore, segnate «Fissata» con la data, andate a misurare. Se le misure sono cambiate, prima correggete la scheda (Proponi una correzione, poi approvate); poi «Fatta»: la scheda diventa «Verificato sul posto» con la data di oggi.</p>
           <p id="mod-checks-empty" class="vuoto" hidden><span class="vuoto__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-check"/></svg></span><span>Tutto fatto: nessuna verifica da organizzare.</span></p>
           <ul id="mod-checks" class="mod-list" role="list"></ul>
         </section>
+        <div id="sez-strumenti" class="mod-sez stack" role="tabpanel" aria-labelledby="tab-strumenti">
         <section id="osm-card" class="card" aria-labelledby="osm-title" hidden>
           <h2 id="osm-title">Importa da OpenStreetMap</h2>
           <p>Solo per gli admin. Scegli un file <code>osm-…json</code> creato con <code>supabase/strumenti/import_osm.py</code>: i luoghi arrivano qui sopra, in «Luoghi da OpenStreetMap da approvare». Quelli già presenti si saltano.</p>
@@ -183,6 +195,7 @@
             <button class="btn btn--secondary btn--small" type="submit">Salva lo stato</button>
           </form>
         </section>
+        </div>
       </div>
     </div>
   </main>

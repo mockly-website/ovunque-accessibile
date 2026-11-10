@@ -205,9 +205,76 @@
   OA.config.loadPlace = api.getPlace;
   OA.config.reportHref = function (p) { return 'segnala.html?id=' + encodeURIComponent(p.id); };
 
-  /* Pallino sulla scheda «Profilo» per i moderatori: quante cose aspettano una decisione (segnalazioni, recensioni,
-     richieste dei gestori, verifiche sul posto). Il numero resta in memoria 90 secondi per non contare a ogni pagina;
-     nel pannello di moderazione si ricalcola sempre. Per gli screen reader è nel nome della voce («Profilo, 3 da moderare»). */
+  /* Avvisi sull'esito (11 novembre): dai dati dell'utente (i_miei_dati) le decisioni prese su segnalazioni, recensioni,
+     richieste di gestione e verifiche sul posto, più le risposte dei locali alle recensioni. Niente tabella nuova:
+     «nuovo» vuol dire più recente dell'ultima apertura degli avvisi nel profilo (localStorage, per utente).
+     nomi: id del luogo → nome (per recensioni, gestione e verifiche; le segnalazioni hanno il nome dentro). */
+  function avvisi(data, nomi) {
+    data = data || {};
+    nomi = nomi || {};
+    var out = [];
+    function nome(id) { return nomi[id] ? '«' + nomi[id] + '»' : 'il luogo'; }
+    function scheda(id) { return id ? 'luogo.html?id=' + encodeURIComponent(id) : null; }
+    function motivo(m) { return m ? ' Motivo: ' + m : ''; }
+    (data.proposte || []).forEach(function (x) {
+      if (!x.deciso_at) return;
+      var n = x.dati && x.dati.nome ? '«' + x.dati.nome + '»' : 'il luogo';
+      if (x.stato === 'approvata') out.push({ t: x.deciso_at, tipo: 'ok', titolo: 'Segnalazione pubblicata', testo: n + ' è sulla mappa. Grazie!', href: scheda(x.place_id) });
+      if (x.stato === 'respinta') out.push({ t: x.deciso_at, tipo: 'no', titolo: 'Segnalazione non pubblicata', testo: n + '.' + motivo(x.motivo) });
+    });
+    (data.recensioni || []).forEach(function (r) {
+      if (r.deciso_at && r.stato === 'pubblicata') out.push({ t: r.deciso_at, tipo: 'ok', titolo: 'Recensione pubblicata', testo: 'Su ' + nome(r.place_id) + '.', href: scheda(r.place_id) });
+      if (r.deciso_at && r.stato === 'respinta') out.push({ t: r.deciso_at, tipo: 'no', titolo: 'Recensione non pubblicata', testo: 'Su ' + nome(r.place_id) + '.' + motivo(r.motivo) });
+      if (r.risposta_at) out.push({ t: r.risposta_at, tipo: 'info', titolo: 'Il locale ti ha risposto', testo: 'Alla tua recensione su ' + nome(r.place_id) + '.', href: scheda(r.place_id) });
+    });
+    (data.gestore || []).forEach(function (g) {
+      if (!g.deciso_at) return;
+      if (g.stato === 'approvato') out.push({ t: g.deciso_at, tipo: 'ok', titolo: 'Ora gestisci ' + nome(g.place_id), testo: 'Scarica il codice QR per la vetrina.', href: 'bollino.html?id=' + encodeURIComponent(g.place_id) });
+      if (g.stato === 'respinto') out.push({ t: g.deciso_at, tipo: 'no', titolo: 'Richiesta di gestione non approvata', testo: 'Per ' + nome(g.place_id) + '.' + motivo(g.motivo) });
+    });
+    (data.verifiche || []).forEach(function (v) {
+      if (!v.deciso_at) return;
+      var r = v.risposta ? ' ' + v.risposta : '';
+      if (v.stato === 'fissata') out.push({ t: v.deciso_at, tipo: 'info', titolo: 'Verifica sul posto fissata', testo: 'Per ' + nome(v.place_id) + '.' + r, href: 'locali.html' });
+      if (v.stato === 'fatta') out.push({ t: v.deciso_at, tipo: 'ok', titolo: 'Verifica sul posto fatta', testo: nome(v.place_id).replace(/^il/, 'Il') + ' ora è «Verificato sul posto».', href: scheda(v.place_id) });
+      if (v.stato === 'respinta') out.push({ t: v.deciso_at, tipo: 'no', titolo: 'Verifica sul posto non possibile', testo: 'Per ' + nome(v.place_id) + '.' + r });
+    });
+    var visti = avvisiVisti();
+    out.forEach(function (a) { a.nuovo = a.t > visti; });
+    return out.sort(function (a, b) { return a.t < b.t ? 1 : -1; });
+  }
+
+  function chiaveVisti() {
+    return 'oa-avvisi-visti-' + (api.user() ? api.user().id : '');
+  }
+  function avvisiVisti() {
+    try { return localStorage.getItem(chiaveVisti()) || ''; } catch (e) { return ''; }
+  }
+  /* Profilo aperto: gli avvisi diventano «visti» e il pallino si aggiorna */
+  function segnaAvvisiVisti() {
+    try {
+      localStorage.setItem(chiaveVisti(), new Date().toISOString());
+      sessionStorage.removeItem('oa-avvisi-nuovi');
+    } catch (e) { /* niente */ }
+    updateChrome();
+  }
+
+  /* Quanti avvisi nuovi (in memoria 90 secondi, come il conteggio dei moderatori) */
+  function avvisiNuovi() {
+    var c = null;
+    try { c = JSON.parse(sessionStorage.getItem('oa-avvisi-nuovi') || 'null'); } catch (e) { /* niente */ }
+    if (c && Date.now() - c.t < 90000 && c.u === api.user().id) return Promise.resolve(c.n);
+    return api.myData().then(function (data) {
+      var n = avvisi(data).filter(function (a) { return a.nuovo; }).length;
+      try { sessionStorage.setItem('oa-avvisi-nuovi', JSON.stringify({ n: n, t: Date.now(), u: api.user().id })); } catch (e) { /* niente */ }
+      return n;
+    });
+  }
+
+  /* Pallino sulla scheda «Profilo»: avvisi nuovi per tutti e, per i moderatori, quante cose aspettano una decisione
+     (segnalazioni, recensioni, richieste dei gestori, verifiche sul posto). I numeri restano in memoria 90 secondi per
+     non contare a ogni pagina; nel pannello di moderazione si ricalcola sempre. Per gli screen reader è nel nome della
+     voce («Profilo, 2 avvisi nuovi, 3 da moderare»). */
   function updateChrome() {
     var link = document.querySelector('.app-nav__link[data-account-link]');
     if (!link) return;
@@ -216,8 +283,8 @@
     var sr = link.querySelector('.app-nav__badge-sr');
     if (sr) sr.remove();
     if (!api.user() || !api.pendingCount) return;
-    api.profile().then(function (prof) {
-      if (!prof || prof.ruolo === 'utente') return null;
+    var daModerare = api.profile().then(function (prof) {
+      if (!prof || prof.ruolo === 'utente') return 0;
       var c = null;
       try { c = JSON.parse(sessionStorage.getItem('oa-da-moderare') || 'null'); } catch (e) { /* niente */ }
       if (c && Date.now() - c.t < 90000 && page !== 'moderazione') return c.n;
@@ -225,11 +292,15 @@
         try { sessionStorage.setItem('oa-da-moderare', JSON.stringify({ n: n, t: Date.now() })); } catch (e) { /* niente */ }
         return n;
       });
-    }).then(function (n) {
-      if (!n) return;
+    }).catch(function () { return 0; });
+    var nuovi = page === 'profilo' ? Promise.resolve(0) : avvisiNuovi().catch(function () { return 0; });
+    Promise.all([nuovi, daModerare]).then(function (r) {
+      var n = r[0] + r[1];
+      if (!n || link.querySelector('.app-nav__badge')) return;
+      var sr = [r[0] ? (r[0] === 1 ? '1 avviso nuovo' : r[0] + ' avvisi nuovi') : '', r[1] ? r[1] + ' da moderare' : ''].filter(Boolean).join(', ');
       link.appendChild(el('span', { className: 'app-nav__badge', 'aria-hidden': 'true', text: n > 99 ? '99+' : String(n) }));
-      link.appendChild(el('span', { className: 'visually-hidden app-nav__badge-sr', text: ', ' + n + ' da moderare' }));
-    }).catch(function () { /* senza numero va bene lo stesso */ });
+      link.appendChild(el('span', { className: 'visually-hidden app-nav__badge-sr', text: ', ' + sr }));
+    });
   }
 
   function syncNeeds() {
@@ -310,7 +381,7 @@
     function arriva(i) {
       if (!anima || i < 0) return;
       links[i].classList.add('is-arriva');
-      setTimeout(function () { links[i].classList.remove('is-arriva'); }, 900);
+      setTimeout(function () { links[i].classList.remove('is-arriva'); }, 550);
     }
 
     /* Al tocco l'icona si schiaccia subito (non al rilascio); sui telefoni che lo permettono, una vibrazione minima */
@@ -331,7 +402,7 @@
           sessionStorage.setItem('oa-verso', i > cur ? 'avanti' : 'indietro');
           sessionStorage.setItem('oa-viaggio', JSON.stringify({ a: i, t: Date.now() }));
         } catch (e) { /* niente */ }
-        if (anima && BARRA.matches) viaggio(cur, i, 420);
+        if (anima && BARRA.matches) viaggio(cur, i, 320);
       });
     });
 
@@ -348,11 +419,11 @@
           { transform: 'translateX(' + centro(cur) + 'px) scaleX(1.25) scaleY(0.85)' },
           { transform: 'translateX(' + centro(cur) + 'px) scaleX(0.95) scaleY(1.06)', offset: 0.5 },
           { transform: 'translateX(' + centro(cur) + 'px)' }
-        ], { duration: 380, easing: 'ease-out' });
+        ], { duration: 280, easing: 'ease-out' });
       }
       arriva(cur);
     } else if (prev >= 0 && prev !== cur && links[prev]) {
-      viaggio(prev, cur, 560).onfinish = function () { posa(cur); this.cancel(); };
+      viaggio(prev, cur, 400).onfinish = function () { posa(cur); this.cancel(); };
       arriva(cur);
     }
   }
@@ -477,19 +548,24 @@
     else document.addEventListener('DOMContentLoaded', ok);
   });
 
-  Promise.all([api.ready.then(syncNeeds), domPronto]).then(function (r) {
+  /* La pagina parte appena c'è la sessione (salvata nel browser) e il documento è pronto: il profilo arriva dal server
+     in parallelo, senza far aspettare la pagina (prima ogni cambio di pagina attendeva questa richiesta). */
+  var profilo = api.ready.then(syncNeeds);
+  profilo.then(function (prof) {
     /* Primo accesso con Google: prima di tutto il resto si completa il profilo (la privacy resta leggibile) */
-    if (r[0] && r[0].completo === false && page !== 'registrati' && page !== 'privacy') {
+    if (prof && prof.completo === false && page !== 'registrati' && page !== 'privacy') {
       var torna = page === 'accedi' ? safeReturn(params.get('torna')) : safeReturn(here());
       location.replace('registrati.html?completa=1' + (torna ? '&torna=' + encodeURIComponent(torna) : ''));
-      return;
     }
+  });
+  Promise.all([api.ready, domPronto]).then(function () {
     updateChrome();
     api.onAuth(updateChrome);
     initPasswordToggles();
     OA.start();
     if (pagine[page]) pagine[page]();
-    initBenvenuto();
+    /* «Come ti muovi?» solo dopo il profilo: chi ha già scelto su un altro dispositivo non la vede */
+    profilo.then(initBenvenuto, initBenvenuto);
   });
 
   if ('serviceWorker' in navigator && window.isSecureContext) {
@@ -503,6 +579,8 @@
     STATO_PROPOSTA: STATO_PROPOSTA,
     STATO_RECENSIONE: STATO_RECENSIONE,
     answersNode: answersNode,
+    avvisi: avvisi,
+    segnaAvvisiVisti: segnaAvvisiVisti,
     busy: busy,
     clearErrors: clearErrors,
     dateIt: dateIt,

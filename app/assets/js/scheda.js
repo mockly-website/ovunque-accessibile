@@ -336,7 +336,9 @@
           list.appendChild(el('li', {}, [
             el('article', { className: 'review review--real' }, [
               el('div', { className: 'review__head' }, [
-                el('span', { className: 'review__avatar', 'aria-hidden': 'true', text: (r.autore_nome || '?').charAt(0).toUpperCase() }),
+                r.autore_avatar
+                  ? el('img', { className: 'review__avatar', src: api.avatarUrl(r.autore_avatar), alt: '', width: '40', height: '40', loading: 'lazy' })
+                  : el('span', { className: 'review__avatar', 'aria-hidden': 'true', text: (r.autore_nome || '?').charAt(0).toUpperCase() }),
                 el('strong', { text: r.autore_nome }),
                 el('span', { className: 'pill', text: OA.ESIGENZE[r.esigenza] ? OA.ESIGENZE[r.esigenza].nome : '' }),
                 el('span', { className: 'review__date', text: r.data_visita ? '· visita del ' + dateIt(r.data_visita) : '· ' + dateIt(r.created_at) })

@@ -409,6 +409,8 @@
     var status = el('p', { className: 'visually-hidden', role: 'status' });
     var input = el('input', { type: 'file', id: 'photo-input', className: 'photo-input', accept: 'image/jpeg,image/png,image/webp,image/heic,image/heif', multiple: '', 'aria-describedby': 'photo-help photo-count' });
     var counter = el('p', { className: 'photo-count', id: 'photo-count' });
+    /* Sul telefono «Scatta una foto» apre subito la fotocamera posteriore (capture); sul computer fa come «Scegli» */
+    var camera = el('input', { type: 'file', id: 'photo-camera', className: 'photo-input', accept: 'image/*', capture: 'environment', 'aria-describedby': 'photo-help photo-count' });
     var count = 0;
 
     function renumber() {
@@ -418,12 +420,14 @@
         li.querySelector('button .visually-hidden').textContent = ' la foto ' + (i + 1);
       });
       input.disabled = chosen.length >= MAX_FOTO;
+      camera.disabled = input.disabled;
       counter.textContent = chosen.length ? chosen.length + ' di ' + MAX_FOTO + ' foto' : 'Nessuna foto scelta';
     }
 
-    input.addEventListener('change', function () {
-      var files = [].slice.call(input.files || []);
-      input.value = '';
+    function scelte() {
+      var campo = this;
+      var files = [].slice.call(campo.files || []);
+      campo.value = '';
       var room = MAX_FOTO - chosen.length;
       if (files.length > room) status.textContent = 'Puoi aggiungere al massimo ' + MAX_FOTO + ' foto: ne ho prese ' + room + '.';
       files.slice(0, room).reduce(function (prev, file) {
@@ -462,7 +466,9 @@
           });
         });
       }, Promise.resolve());
-    });
+    }
+    input.addEventListener('change', scelte);
+    camera.addEventListener('change', scelte);
 
     box.appendChild(el('section', { className: 'card form-section', id: 'sec-foto', 'aria-labelledby': 'sec-foto-title' }, [
       el('h2', { id: 'sec-foto-title', text: 'Foto (facoltative)' }),
@@ -470,8 +476,10 @@
       /* Il campo file del browser è nascosto alla vista ma resta raggiungibile con tastiera e screen reader: si vede
          il pulsante (la sua etichetta), che prende il bordo di focus quando il campo è attivo */
       el('div', { className: 'photo-add' }, [
+        camera,
+        el('label', { className: 'btn btn--primary photo-add__btn', 'for': 'photo-camera' }, [icon('#icon-camera'), document.createTextNode('Scatta una foto')]),
         input,
-        el('label', { className: 'btn btn--secondary photo-add__btn', 'for': 'photo-input' }, [icon('#icon-camera'), document.createTextNode('Scegli le foto')]),
+        el('label', { className: 'btn btn--secondary photo-add__btn', 'for': 'photo-input' }, [icon('#icon-plus'), document.createTextNode('Scegli dalla galleria')]),
         counter
       ]),
       list,
@@ -643,6 +651,41 @@
     });
     refreshConditional(form);
     var picker = initPicker(form);
+
+    /* Luogo nuovo: in cima la ricerca per nome, che compila i campi; se il luogo c'è già, si propone di correggerlo */
+    if (!id) {
+      var cerca = el('input', { className: 'input', type: 'search', id: 'cerca-luogo', 'aria-describedby': 'cerca-luogo-aiuto' });
+      var secLuogo = $('sec-luogo');
+      var titolo = secLuogo.querySelector('h2');
+      titolo.after(el('div', { className: 'field cerca-luogo' }, [
+        el('label', { className: 'field__label', 'for': 'cerca-luogo', text: 'Cerca il luogo per nome' }),
+        el('p', { className: 'field__help', id: 'cerca-luogo-aiuto', text: 'Per esempio «Pizzeria Da Mario Cagliari». Se lo troviamo, compiliamo noi nome, indirizzo e posizione; altrimenti scrivili qui sotto.' }),
+        cerca,
+        el('p', { id: 'cerca-luogo-esito', className: 'notice', role: 'status', hidden: '' })
+      ]));
+      placeSearch(cerca, function (sug) {
+        function metti(path, v) { if (v) { var inp = $(fid(path)); inp.value = v; } }
+        cerca.value = sug.nome;
+        metti('nome', sug.nome);
+        metti('citta', sug.citta);
+        metti('indirizzo', sug.indirizzo);
+        metti('cap', sug.cap);
+        if (sug.tipo) { $(fid('categoria')).value = sug.tipo; refreshConditional(form); }
+        picker.scegli(sug.lat, sug.lng, sug.civico, 'Abbiamo messo il segnaposto su «' + sug.nome + '»: se l\'ingresso è da un\'altra parte, tocca la mappa in quel punto.');
+        var nota = $('cerca-luogo-esito');
+        message(nota, 'Abbiamo compilato nome, ' + (sug.tipo ? 'tipo, ' : '') + 'indirizzo e posizione: controllali qui sotto.', 'ok');
+        api.searchPlaces(sug.nome, null, 10).then(function (x) {
+          var gia = (x.luoghi || []).filter(function (p) { return OA.distanceKm(p, sug) < 0.25; })[0];
+          if (!gia) return;
+          nota.textContent = '';
+          nota.appendChild(document.createTextNode('«' + gia.nome + '» è già su Ovunque Accessibile. '));
+          nota.appendChild(el('a', { href: 'segnala.html?id=' + encodeURIComponent(gia.id), text: 'Proponi una correzione della sua scheda' }));
+          nota.appendChild(document.createTextNode(' oppure, se è un altro luogo, continua qui.'));
+          nota.className = 'notice';
+          nota.hidden = false;
+        }).catch(function () { /* senza controllo dei doppioni si continua */ });
+      });
+    }
 
     var place = null;
     var initial = null;
@@ -819,10 +862,12 @@
   var PHOTON_URL = 'https://photon.komoot.io/api/';
   var ITALIA_BBOX = '6.6,35.4,18.6,47.1';
 
-  function addressSuggestions(input, cityInput, onPick, bias) {
+  /* Elenco di suggerimenti sotto un campo (combobox ARIA 1.2: frecce, Invio, Esc, tocco), dai dati di Photon.
+     cfg: id, label (nome dell'elenco), query(testo) → URLSearchParams, voci(features, testo) → [{ main, sub, … }],
+     vuoto (messaggio senza risultati), trovati(n) (messaggio con n risultati), onPick(voce). */
+  function suggerimenti(input, cfg) {
     var box = input.closest('.field');
-    var listId = 'addr-suggest';
-    var list = el('ul', { id: listId, className: 'suggest', role: 'listbox', 'aria-label': 'Indirizzi suggeriti', hidden: '' });
+    var list = el('ul', { id: cfg.id, className: 'suggest', role: 'listbox', 'aria-label': cfg.label, hidden: '' });
     var live = el('p', { className: 'visually-hidden', role: 'status' });
     var items = [];
     var active = -1;
@@ -833,7 +878,7 @@
     input.setAttribute('role', 'combobox');
     input.setAttribute('aria-autocomplete', 'list');
     input.setAttribute('aria-expanded', 'false');
-    input.setAttribute('aria-controls', listId);
+    input.setAttribute('aria-controls', cfg.id);
     input.setAttribute('autocomplete', 'off');
     box.classList.add('field--suggest');
     box.appendChild(list);
@@ -850,7 +895,7 @@
       active = i;
       [].forEach.call(list.children, function (li, j) { li.setAttribute('aria-selected', j === i ? 'true' : 'false'); });
       if (i >= 0) {
-        input.setAttribute('aria-activedescendant', listId + '-' + i);
+        input.setAttribute('aria-activedescendant', cfg.id + '-' + i);
         list.children[i].scrollIntoView({ block: 'nearest' });
       } else {
         input.removeAttribute('aria-activedescendant');
@@ -861,8 +906,8 @@
       var sug = items[i];
       close();
       if (!sug) return;
-      lastQ = sug.indirizzo;
-      onPick(sug);
+      lastQ = sug.main;
+      cfg.onPick(sug);
     }
 
     function render(found) {
@@ -870,13 +915,13 @@
       list.textContent = '';
       if (!found.length) {
         close();
-        live.textContent = 'Nessun indirizzo suggerito: puoi scriverlo per intero e premere «Trova l\'indirizzo sulla mappa».';
+        live.textContent = cfg.vuoto;
         return;
       }
       found.forEach(function (sug, i) {
-        var li = el('li', { id: listId + '-' + i, role: 'option', 'aria-selected': 'false', className: 'suggest__item' }, [
-          el('span', { className: 'suggest__main', text: sug.indirizzo }),
-          el('span', { className: 'suggest__sub', text: sug.luogo })
+        var li = el('li', { id: cfg.id + '-' + i, role: 'option', 'aria-selected': 'false', className: 'suggest__item' }, [
+          el('span', { className: 'suggest__main', text: sug.main }),
+          el('span', { className: 'suggest__sub', text: sug.sub })
         ]);
         /* mousedown, non click: il campo non perde il focus prima della scelta */
         li.addEventListener('mousedown', function (ev) { ev.preventDefault(); pick(i); });
@@ -885,48 +930,30 @@
       list.hidden = false;
       input.setAttribute('aria-expanded', 'true');
       highlight(-1);
-      live.textContent = found.length === 1 ? '1 indirizzo suggerito: freccia giù per sceglierlo.' : found.length + ' indirizzi suggeriti: usa le frecce per sceglierne uno.';
+      live.textContent = cfg.trovati(found.length);
     }
 
     function search() {
       var q = input.value.trim();
       if (q.length < 3 || q === lastQ) { if (q.length < 3) close(); return; }
       lastQ = q;
-      var full = q + (cityInput.value.trim() ? ' ' + cityInput.value.trim() : '');
-      var params = new URLSearchParams({ q: full, limit: '5', bbox: ITALIA_BBOX });
-      params.append('layer', 'house');
-      params.append('layer', 'street');
-      var c = bias();
-      if (c) { params.set('lat', c.lat.toFixed(3)); params.set('lon', c.lng.toFixed(3)); }
       if (ctrl) ctrl.abort();
       ctrl = window.AbortController ? new AbortController() : null;
-      fetch(PHOTON_URL + '?' + params.toString(), { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
+      fetch(PHOTON_URL + '?' + cfg.query(q).toString(), { credentials: 'omit', signal: ctrl ? ctrl.signal : undefined })
         .then(function (r) { return r.ok ? r.json() : { features: [] }; })
         .then(function (data) {
           if (input.value.trim() !== q) return;          /* nel frattempo si è scritto altro */
           var seen = {};
-          render((data.features || []).filter(function (f) {
-            return f.properties && f.properties.countrycode === 'IT' && (f.properties.street || f.properties.name);
-          }).map(function (f) {
-            var pr = f.properties;
-            var via = pr.street || pr.name;
-            var indirizzo = via + (pr.housenumber ? ' ' + pr.housenumber : '');
-            var citta = pr.city || pr.town || pr.village || pr.county || '';
-            return {
-              indirizzo: indirizzo, citta: citta, civico: !!pr.housenumber,
-              cap: /^[0-9]{5}$/.test(pr.postcode || '') ? pr.postcode : '',
-              luogo: [pr.postcode, citta].filter(Boolean).join(' ') + (regionName(pr.state) ? ' (' + regionName(pr.state) + ')' : ''),
-              testo: indirizzo + (citta ? ', ' + citta : ''),
-              lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0]
-            };
-          }).filter(function (sug) {
-            var k = sug.testo + sug.cap;
+          render(cfg.voci((data.features || []).filter(function (f) {
+            return f.properties && f.properties.countrycode === 'IT';
+          }), q).filter(function (sug) {
+            var k = sug.main + '|' + sug.sub;
             if (seen[k]) return false;
             seen[k] = true;
             return true;
           }));
         })
-        .catch(function () { /* senza suggerimenti resta «Trova l'indirizzo sulla mappa» */ });
+        .catch(function () { /* senza suggerimenti si compila a mano */ });
     }
 
     input.addEventListener('input', function () {
@@ -944,6 +971,87 @@
       else if (ev.key === 'Escape') { ev.preventDefault(); close(); }
     });
     input.addEventListener('blur', function () { setTimeout(close, 150); });
+  }
+
+  function cittaDi(pr) {
+    return pr.city || pr.town || pr.village || pr.county || '';
+  }
+
+  /* Via mentre si scrive l'indirizzo (con la città, se c'è, e la zona della mappa) */
+  function addressSuggestions(input, cityInput, onPick, bias) {
+    suggerimenti(input, {
+      id: 'addr-suggest',
+      label: 'Indirizzi suggeriti',
+      vuoto: 'Nessun indirizzo suggerito: puoi scriverlo per intero e premere «Trova l\'indirizzo sulla mappa».',
+      trovati: function (n) { return n === 1 ? '1 indirizzo suggerito: freccia giù per sceglierlo.' : n + ' indirizzi suggeriti: usa le frecce per sceglierne uno.'; },
+      query: function (q) {
+        var params = new URLSearchParams({ q: q + (cityInput.value.trim() ? ' ' + cityInput.value.trim() : ''), limit: '5', bbox: ITALIA_BBOX });
+        params.append('layer', 'house');
+        params.append('layer', 'street');
+        var c = bias();
+        if (c) { params.set('lat', c.lat.toFixed(3)); params.set('lon', c.lng.toFixed(3)); }
+        return params;
+      },
+      voci: function (features) {
+        return features.filter(function (f) { return f.properties.street || f.properties.name; }).map(function (f) {
+          var pr = f.properties;
+          var via = pr.street || pr.name;
+          var indirizzo = via + (pr.housenumber ? ' ' + pr.housenumber : '');
+          var citta = cittaDi(pr);
+          return {
+            main: indirizzo, indirizzo: indirizzo, citta: citta, civico: !!pr.housenumber,
+            cap: /^[0-9]{5}$/.test(pr.postcode || '') ? pr.postcode : '',
+            sub: [pr.postcode, citta].filter(Boolean).join(' ') + (regionName(pr.state) ? ' (' + regionName(pr.state) + ')' : ''),
+            testo: indirizzo + (citta ? ', ' + citta : ''),
+            lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0]
+          };
+        });
+      },
+      onPick: onPick
+    });
+  }
+
+  /* Cerca il luogo per nome (11 novembre): «Pizzeria Da Mario Cagliari» → nome, tipo, indirizzo, città, CAP e punto sulla
+     mappa compilati da soli, dai dati di OpenStreetMap che Photon restituisce. Solo luoghi con un nome (locali, negozi,
+     musei, spiagge, stazioni…), non vie. Tipo di luogo dalla chiave OpenStreetMap. */
+  var TIPO_OSM = {
+    ristorante: ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'ice_cream', 'food_court', 'biergarten'],
+    museo: ['museum', 'gallery'],
+    hotel: ['hotel', 'hostel', 'guest_house', 'motel', 'apartment', 'chalet', 'camp_site', 'alpine_hut'],
+    spiaggia: ['beach', 'beach_resort'],
+    parco: ['park', 'garden', 'playground', 'nature_reserve', 'zoo'],
+    cultura: ['theatre', 'cinema', 'arts_centre', 'library', 'community_centre', 'attraction', 'monument', 'castle', 'stadium'],
+    trasporti: ['station', 'bus_station', 'ferry_terminal', 'aerodrome', 'halt']
+  };
+  var CHIAVI_LUOGO = ['amenity', 'shop', 'tourism', 'leisure', 'historic', 'railway', 'public_transport', 'office', 'natural', 'aeroway', 'amenity', 'healthcare', 'craft', 'club'];
+  function tipoDa(pr) {
+    if (pr.osm_key === 'shop' || pr.osm_value === 'marketplace' || pr.osm_value === 'pharmacy') return 'negozio';
+    return Object.keys(TIPO_OSM).filter(function (k) { return TIPO_OSM[k].indexOf(pr.osm_value) !== -1; })[0] || null;
+  }
+  function placeSearch(input, onPick) {
+    suggerimenti(input, {
+      id: 'luogo-suggest',
+      label: 'Luoghi trovati',
+      vuoto: 'Nessun luogo trovato con questo nome: compila i campi qui sotto.',
+      trovati: function (n) { return n === 1 ? '1 luogo trovato: freccia giù per sceglierlo.' : n + ' luoghi trovati: usa le frecce per sceglierne uno.'; },
+      query: function (q) { return new URLSearchParams({ q: q, limit: '8', bbox: ITALIA_BBOX }); },
+      voci: function (features) {
+        return features.filter(function (f) {
+          return f.properties.name && CHIAVI_LUOGO.indexOf(f.properties.osm_key) !== -1;
+        }).slice(0, 6).map(function (f) {
+          var pr = f.properties;
+          var indirizzo = pr.street ? pr.street + (pr.housenumber ? ' ' + pr.housenumber : '') : '';
+          var citta = cittaDi(pr);
+          return {
+            main: pr.name, nome: pr.name, tipo: tipoDa(pr), indirizzo: indirizzo, citta: citta, civico: !!pr.housenumber,
+            cap: /^[0-9]{5}$/.test(pr.postcode || '') ? pr.postcode : '',
+            sub: [indirizzo, citta].filter(Boolean).join(', ') || 'Italia',
+            lat: f.geometry.coordinates[1], lng: f.geometry.coordinates[0]
+          };
+        });
+      },
+      onPick: onPick
+    });
   }
 
   /* Mappa per indicare la posizione. Si arriva al punto in quattro modi: «Trova l'indirizzo sulla mappa» (anche con Invio
@@ -1155,7 +1263,9 @@
 
     return {
       /* scheda da correggere: punto già noto, senza proporre indirizzi */
-      set: function (lat, lng) { set(lat, lng, 'iniziale'); }
+      set: function (lat, lng) { set(lat, lng, 'iniziale'); },
+      /* luogo scelto dalla ricerca per nome: via e città le ha già date la ricerca */
+      scegli: function (lat, lng, civico, msg) { set(lat, lng, 'scelta', civico ? 18 : 17, msg); }
     };
   }
 

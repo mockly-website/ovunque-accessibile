@@ -9,7 +9,7 @@
   /* Per mappa ed elenchi basta meno (niente descrizione, slug, esempio): un terzo di dati in meno */
   var COLONNE_ELENCO = 'id,nome,categoria,indirizzo,cap,citta,provincia,regione,lat,lng,misure,facoltativi,dettagli,verifica_livello,verifica_data,stato,osm';
   var COLONNE_AVVISI = 'id,place_id,autore_nome,tipo,testo,scade_il,created_at';
-  var COLONNE_RECENSIONI = 'id,autore_nome,esigenza,data_visita,testo,risposte,risposta,risposta_at,created_at';
+  var COLONNE_RECENSIONI = 'id,autore_nome,autore_avatar,esigenza,data_visita,testo,risposte,risposta,risposta_at,created_at';
   var authListeners = [];
 
   function notify(user) {
@@ -217,8 +217,36 @@
         return sb.from('profiles').select('*').eq('id', uid()).maybeSingle()
           .then(check).then(function (p) { profileCache = p; return p; });
       },
+      /* Foto profilo (bucket pubblico «avatar», migrazione foto_profilo): nome nuovo a ogni cambio, la vecchia si cancella */
+      avatarUrl: function (path) {
+        return path ? CFG.supabaseUrl + '/storage/v1/object/public/avatar/' + path : null;
+      },
+      setAvatar: function (blob) {
+        var api = this;
+        var path = uid() + '/' + crypto.randomUUID() + '.jpg';
+        var bucket = sb.storage.from('avatar');
+        return api.profile().then(function (prof) {
+          var vecchia = prof && prof.avatar;
+          return bucket.upload(path, blob, { contentType: 'image/jpeg', upsert: false, cacheControl: '31536000' }).then(check).then(function () {
+            return api.updateProfile({ avatar: path });
+          }).then(function (p) {
+            if (vecchia) bucket.remove([vecchia]).catch(function () {});
+            return p;
+          });
+        });
+      },
+      removeAvatar: function () {
+        var api = this;
+        return api.profile().then(function (prof) {
+          var vecchia = prof && prof.avatar;
+          return api.updateProfile({ avatar: null }).then(function (p) {
+            if (vecchia) sb.storage.from('avatar').remove([vecchia]).catch(function () {});
+            return p;
+          });
+        });
+      },
       updateProfile: function (patch) {
-        return sb.from('profiles').update(patch).eq('id', uid()).select('nome_pubblico,esigenza,ruolo').single()
+        return sb.from('profiles').update(patch).eq('id', uid()).select('*').single()
           .then(check).then(function (p) { profileCache = p; return p; });
       },
 
@@ -423,6 +451,13 @@
         return bucket.list(uid(), { limit: 1000 }).then(check).then(function (files) {
           var paths = files.map(function (f) { return uid() + '/' + f.name; });
           return paths.length ? bucket.remove(paths).then(check) : null;
+        }).then(function () {
+          /* e la foto profilo */
+          var av = sb.storage.from('avatar');
+          return av.list(uid(), { limit: 100 }).then(function (r) {
+            var paths = (r.data || []).map(function (f) { return uid() + '/' + f.name; });
+            return paths.length ? av.remove(paths) : null;
+          }).catch(function () { return null; });
         }).then(function () {
           return sb.rpc('elimina_account').then(check);
         }).then(function () {
