@@ -519,6 +519,11 @@
         svuota();
         return sb.rpc('approva_proposta', { p_id: id, p_livello: livello }).then(check);
       },
+      /* Modifica diretta di una scheda (solo moderatori): livello e data della verifica restano com'erano */
+      editPlace: function (id, dati) {
+        svuota();
+        return sb.rpc('modifica_scheda', { p_place: id, p_dati: dati }).then(check);
+      },
       reject: function (id, motivo) {
         return sb.rpc('respingi_proposta', { p_id: id, p_motivo: motivo }).then(check);
       },

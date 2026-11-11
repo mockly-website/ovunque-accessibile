@@ -165,6 +165,9 @@
       api.ownerStatus ? api.ownerStatus(p.id).catch(function () { return null; }) : null
     ]).then(function (r) {
       var who = { mod: !!(r[0] && r[0].ruolo !== 'utente'), owner: r[1], gestore: !!(r[1] && r[1].stato === 'approvato') };
+      /* I moderatori modificano la scheda direttamente (segnala.html salva subito, senza proposta) */
+      var report = $('detail-report');
+      if (who.mod && report) report.lastChild.textContent = ' Modifica la scheda';
       initAlerts(p, who);
       initReviews(p, who);
       initOwner(p, who);

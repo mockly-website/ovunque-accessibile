@@ -689,17 +689,37 @@
 
     var place = null;
     var initial = null;
+    /* Moderatore che corregge una scheda: la modifica si salva subito (11 novembre), senza proposta da approvare.
+       Con ?proposta=1 anche il moderatore manda una proposta normale (serve per aggiungere foto). */
+    var modifica = false;
     var ready = Promise.resolve();
     if (id) {
-      ready = api.getPlace(id).then(function (p) {
+      ready = Promise.all([
+        api.getPlace(id),
+        params.get('proposta') ? null : api.profile().catch(function () { return null; })
+      ]).then(function (r) {
+        var p = r[0];
         if (!p) {
           message($('proposal-note'), 'Il luogo da correggere non esiste più. Puoi segnalarlo come luogo nuovo.', 'error');
           return;
         }
         place = p;
-        document.title = 'Correzione: ' + p.nome + ' – Ovunque Accessibile';
-        $('proposal-title').textContent = 'Proponi una correzione';
-        $('proposal-intro').textContent = 'Stai correggendo la scheda di «' + p.nome + '», ' + p.citta + '. Cambia solo quello che non va: i moderatori controllano ogni modifica prima di pubblicarla.';
+        modifica = !!(r[1] && r[1].ruolo !== 'utente' && api.editPlace);
+        if (modifica) {
+          document.title = 'Modifica: ' + p.nome + ' – Ovunque Accessibile';
+          $('proposal-title').textContent = 'Modifica la scheda';
+          var intro = $('proposal-intro');
+          intro.textContent = 'Stai modificando la scheda di «' + p.nome + '», ' + p.citta + ' come moderatore: quando salvi, le modifiche si vedono subito. Il livello e la data della verifica restano com\'erano; ogni modifica resta nello storico della scheda. Per aggiungere foto ';
+          intro.appendChild(el('a', { href: 'segnala.html?id=' + encodeURIComponent(p.id) + '&proposta=1', text: 'manda una proposta di correzione' }));
+          intro.appendChild(document.createTextNode('.'));
+          show($('sec-foto'), false);
+          show($('sec-nota'), false);
+          form.querySelector('[type="submit"]').textContent = 'Salva le modifiche';
+        } else {
+          document.title = 'Correzione: ' + p.nome + ' – Ovunque Accessibile';
+          $('proposal-title').textContent = 'Proponi una correzione';
+          $('proposal-intro').textContent = 'Stai correggendo la scheda di «' + p.nome + '», ' + p.citta + '. Cambia solo quello che non va: i moderatori controllano ogni modifica prima di pubblicarla.';
+        }
         placeToForm(form, p);
         refreshConditional(form);
         picker.set(p.lat, p.lng);
@@ -728,7 +748,7 @@
       if (warns.length && form.dataset.warned !== sigW) {
         form.dataset.warned = sigW;
         stepErrors(form, warns, warns.length === 1 ? 'Controlla questo valore' : 'Controlla questi valori');
-        form.querySelector('.error-summary').appendChild(el('p', { text: 'Se è tutto giusto, premi di nuovo «Invia la segnalazione».' }));
+        form.querySelector('.error-summary').appendChild(el('p', { text: 'Se è tutto giusto, premi di nuovo «' + (modifica ? 'Salva le modifiche' : 'Invia la segnalazione') + '».' }));
         return;
       }
       var nota = form.elements.nota_moderatori.value.trim() || null;
@@ -744,11 +764,15 @@
           form.dataset.farOk = sigG;
           busy(form, false);
           stepErrors(form, [{ input: $('pick-map'), text: 'Il punto sulla mappa è a circa ' + km + ' km da ' + res.dati.citta + ': controlla la posizione o il nome della città.' }], 'Controlla la posizione');
-          form.querySelector('.error-summary').appendChild(el('p', { text: 'Se il punto è giusto, premi di nuovo «Invia la segnalazione».' }));
+          form.querySelector('.error-summary').appendChild(el('p', { text: 'Se il punto è giusto, premi di nuovo «' + (modifica ? 'Salva le modifiche' : 'Invia la segnalazione') + '».' }));
           return;
         }
-        form.querySelector('[type="submit"]').textContent = 'Invio…';
+        form.querySelector('[type="submit"]').textContent = modifica ? 'Salvo…' : 'Invio…';
         return ready.then(function () {
+          if (modifica) {
+            items = [];
+            return api.editPlace(place.id, res.dati);
+          }
           var proposta = { tipo: place ? 'correzione' : 'nuovo', place_id: place ? place.id : null, dati: res.dati, nota: nota };
           if (fonteScelta) proposta.fonte = fonteScelta.value;
           return api.propose(proposta);
@@ -766,6 +790,13 @@
         if (stop) return;
         show(form, false);
         if (failed) message($('proposal-photo-note'), failed === 1 ? 'Una foto non è stata caricata. La segnalazione è arrivata: se vuoi, rimandaci la foto con una correzione.' : failed + ' foto non sono state caricate. La segnalazione è arrivata: se vuoi, rimandaci le foto con una correzione.', 'error');
+        if (modifica) {
+          $('proposal-done-title').textContent = 'Scheda aggiornata';
+          $('proposal-done-text').textContent = 'Le modifiche a «' + res.dati.nome + '» sono già visibili a tutti.';
+          var link = $('proposal-done-link');
+          link.textContent = 'Apri la scheda';
+          link.href = 'luogo.html?id=' + encodeURIComponent(place.id);
+        }
         show($('proposal-done'), true);
         $('proposal-done').classList.add('is-arrivato');
         if (navigator.vibrate) navigator.vibrate([12, 60, 18]);

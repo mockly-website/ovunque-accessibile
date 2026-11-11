@@ -26,9 +26,9 @@
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="../assets/js/oa-core.js?v=d749ee7e" defer></script>
-  <script src="assets/js/api.js?v=4db84fc3" defer></script>
+  <script src="assets/js/api.js?v=6d086019" defer></script>
   <script src="assets/js/app.js?v=11208395" defer></script>
-  <script src="assets/js/segnala.js?v=38e6d02f" defer></script>
+  <script src="assets/js/segnala.js?v=74a53c1e" defer></script>
 </head>
 <body class="app" data-page="segnala">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -148,10 +148,10 @@
       <section id="proposal-done" class="card fatto" aria-labelledby="proposal-done-title" hidden>
         <span class="fatto__segno" aria-hidden="true"><svg class="icon" focusable="false" viewBox="0 0 24 24"><path class="fatto__cerchio" d="M12 3a9 9 0 1 0 0.01 0" pathLength="1"/><path class="fatto__spunta" d="M7.5 12.5l3 3l6 -6.5" pathLength="1"/></svg></span>
         <h2 id="proposal-done-title">Grazie, segnalazione inviata</h2>
-        <p>I moderatori la controllano e, se è tutto a posto, la pubblicano. Puoi seguire lo stato nel tuo profilo.</p>
+        <p id="proposal-done-text">I moderatori la controllano e, se è tutto a posto, la pubblicano. Puoi seguire lo stato nel tuo profilo.</p>
         <p id="proposal-photo-note" class="notice" hidden></p>
         <div class="btn-row">
-          <a class="btn btn--primary" href="profilo.html">Vai al profilo</a>
+          <a id="proposal-done-link" class="btn btn--primary" href="profilo.html">Vai al profilo</a>
           <a class="btn btn--secondary" href="./">Torna alla mappa</a>
         </div>
       </section>
