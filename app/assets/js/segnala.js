@@ -304,6 +304,9 @@
     var cat = null;
     var out = { misure: { ingresso: {}, spazi: {}, piani: {}, bagno: {} }, facoltativi: {}, dettagli: {} };
     var x = {};
+    /* Moderatore che modifica una scheda incompleta (importata da OpenStreetMap): le voci obbligatorie che la scheda
+       non aveva restano facoltative, così non serve inventare un dato per correggerne un altro (17 novembre) */
+    var libere = form.oaLibere || {};
     FIELDS.forEach(function (f) {
       if (f.path === 'categoria') cat = formValue(form, f);
     });
@@ -312,7 +315,7 @@
       var v = node.hidden ? null : formValue(form, f);
       var input = f.type === 'tri' || f.type === 'choice' ? node : (f.coord && $('pick-map')) || $(fid(f.path));
       if (f.coord && errors.some(function (e) { return e.input === input; })) return;   /* un solo errore per il punto */
-      if (f.required && (v == null || v === '')) {
+      if (f.required && (v == null || v === '') && !libere[f.path]) {
         errors.push({ input: input, text: f.coord ? 'Indica dov\'è il luogo: tocca la mappa sull\'ingresso o premi «Trova sulla mappa».' : 'Compila «' + f.label + '».' });
         return;
       }
@@ -364,7 +367,7 @@
       out.misure.ingresso.corrimano = null;
     }
     /* Scheda minima: senza almeno una risposta su spazi, piani o bagno la scheda resterebbe vuota */
-    if (out.misure.spazi.valore == null && out.misure.piani.valore == null && out.misure.bagno.valore == null) {
+    if (out.misure.spazi.valore == null && out.misure.piani.valore == null && out.misure.bagno.valore == null && !libere.minimo) {
       errors.push({ input: form.querySelector('[data-path="misure.spazi.valore"]'), text: 'Rispondi ad almeno una domanda tra «Spazi e percorsi», «Piani e ascensore» e «Bagno»: senza, la scheda resterebbe vuota.' });
     }
     /* Le voci facoltative vuote non si salvano */
@@ -712,6 +715,15 @@
           intro.textContent = 'Stai modificando la scheda di «' + p.nome + '», ' + p.citta + ' come moderatore: quando salvi, le modifiche si vedono subito. Il livello e la data della verifica restano com\'erano; ogni modifica resta nello storico della scheda. Per aggiungere foto ';
           intro.appendChild(el('a', { href: 'segnala.html?id=' + encodeURIComponent(p.id) + '&proposta=1', text: 'manda una proposta di correzione' }));
           intro.appendChild(document.createTextNode('.'));
+          var m = p.misure || {};
+          var libere = { minimo: !((m.spazi || {}).valore || (m.piani || {}).valore || (m.bagno || {}).valore) };
+          if ((m.ingresso || {}).gradini == null) libere['misure.ingresso.gradini'] = true;
+          form.oaLibere = libere;
+          var req = form.querySelector('[data-path="misure.ingresso.gradini"] .field__req');
+          if (libere['misure.ingresso.gradini'] && req) req.remove();
+          if (libere.minimo || libere['misure.ingresso.gradini']) {
+            intro.appendChild(document.createTextNode(' La scheda è incompleta: le voci che mancano (come i gradini o gli spazi interni) puoi lasciarle vuote se non le sai.'));
+          }
           show($('sec-foto'), false);
           show($('sec-nota'), false);
           form.querySelector('[type="submit"]').textContent = 'Salva le modifiche';

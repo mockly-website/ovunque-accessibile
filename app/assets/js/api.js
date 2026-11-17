@@ -515,9 +515,17 @@
           });
         });
       },
-      approve: function (id, livello) {
+      /* dati: la scheda da pubblicare se diversa da quella della proposta (proposta unita alle modifiche arrivate dopo) */
+      approve: function (id, livello, dati) {
         svuota();
-        return sb.rpc('approva_proposta', { p_id: id, p_livello: livello }).then(check);
+        var args = { p_id: id, p_livello: livello };
+        if (dati) args.p_dati = dati;
+        return sb.rpc('approva_proposta', args).then(check);
+      },
+      /* Com'era la scheda in un momento (dallo storico, solo moderatori): serve a capire cosa ha cambiato una proposta */
+      placeVersionAt: function (placeId, quando) {
+        return sb.from('storico_luoghi').select('dopo,at').eq('place_id', placeId).lte('at', quando)
+          .order('at', { ascending: false }).limit(1).maybeSingle().then(check).then(function (r) { return r ? r.dopo : null; });
       },
       /* Modifica diretta di una scheda (solo moderatori): livello e data della verifica restano com'erano */
       editPlace: function (id, dati) {

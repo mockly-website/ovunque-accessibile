@@ -53,6 +53,36 @@
     };
   }
 
+  function setFlat(obj, key, v) {
+    var parti = key.split('.');
+    var o = obj;
+    parti.slice(0, -1).forEach(function (k) {
+      if (!o[k] || typeof o[k] !== 'object' || Array.isArray(o[k])) o[k] = {};
+      o = o[k];
+    });
+    if (v === undefined) delete o[parti[parti.length - 1]];
+    else o[parti[parti.length - 1]] = v;
+  }
+
+  /* Proposta arrivata prima di una modifica (17 novembre). La proposta contiene la scheda intera di quando è stata
+     mandata: approvarla così cancellerebbe le modifiche fatte dopo (per esempio da un moderatore). Qui si prendono
+     solo le voci che chi segnala ha cambiato rispetto alla scheda di allora e si mettono sulla scheda di adesso.
+     → null se la scheda non è cambiata dopo la proposta, altrimenti { dati, voci, conflitti } */
+  function unisci(proposta, allora, adesso) {
+    var P = flatten(proposta), A = flatten(allora), N = flatten(adesso);
+    function chiavi(x, y) { return Object.keys(x).concat(Object.keys(y).filter(function (k) { return !(k in x); })); }
+    var cambiataDopo = chiavi(A, N).some(function (k) { return fmt(A[k]) !== fmt(N[k]); });
+    if (!cambiataDopo) return null;
+    var voci = chiavi(P, A).filter(function (k) { return fmt(P[k]) !== fmt(A[k]); });
+    var dati = JSON.parse(JSON.stringify(adesso));
+    voci.forEach(function (k) { setFlat(dati, k, P[k]); });
+    return {
+      dati: dati,
+      voci: voci,
+      conflitti: voci.filter(function (k) { return fmt(N[k]) !== fmt(A[k]) && fmt(N[k]) !== fmt(P[k]); })
+    };
+  }
+
   /* Dati proposti (10 novembre): per sezione (Il luogo, Ingresso, Bagno…), ogni voce con sotto il valore proposto e, per
      una correzione, quello di adesso. Si legge bene anche sul telefono (prima era una tabella a due-tre colonne).
      Per una correzione solo le voci cambiate, per un luogo nuovo tutte quelle compilate; latitudine e longitudine in
@@ -184,7 +214,7 @@
       ev.preventDefault();
       if (kind === 'proposta') {
         var livello = form.querySelector('input[name="livello"]:checked').value;
-        run(function () { return api.approve(item.id, livello); }, 'Approvata: la scheda è online.');
+        run(function () { return api.approve(item.id, livello, item.unito || null); }, 'Approvata: la scheda è online.');
       } else if (kind === 'gestore') {
         run(function () { return api.decideOwner(item.id, 'approvato'); }, 'Gestore approvato: ora può rispondere alle recensioni.');
       } else {
@@ -288,9 +318,29 @@
           geoNote.hidden = false;
         });
         if (x.tipo === 'correzione') {
-          api.getPlace(x.place_id).then(function (p) {
+          Promise.all([
+            api.getPlace(x.place_id),
+            api.placeVersionAt ? api.placeVersionAt(x.place_id, x.created_at).catch(function () { return null; }) : null
+          ]).then(function (r) {
+            var p = r[0];
             diffBox.textContent = '';
-            diffBox.appendChild(p ? diffTable(x.dati, placeAsDati(p)) : el('p', { text: 'La scheda originale non esiste più.' }));
+            var u = p && r[1] ? unisci(x.dati, placeAsDati(r[1]), placeAsDati(p)) : null;
+            if (u) {
+              x.unito = u.dati;
+              var avviso = el('div', { className: 'notice notice--error' }, [el('p', {
+                text: 'La scheda è stata modificata dopo questa proposta. Se approvi, applichiamo solo ' +
+                  (u.voci.length === 1 ? 'la voce cambiata' : 'le ' + u.voci.length + ' voci cambiate') +
+                  ' da chi segnala: le altre modifiche restano come sono.'
+              })]);
+              if (u.conflitti.length) {
+                avviso.appendChild(el('p', { text: 'Queste voci sono cambiate anche dopo e la proposta le riporterebbe a un altro valore: controllale qui sotto prima di approvare.' }));
+                avviso.appendChild(el('ul', {}, u.conflitti.map(function (k) {
+                  return el('li', { text: (LABELS[k] || k).replace(' – ', ': ') });
+                })));
+              }
+              diffBox.appendChild(avviso);
+            }
+            diffBox.appendChild(p ? diffTable(u ? u.dati : x.dati, placeAsDati(p)) : el('p', { text: 'La scheda originale non esiste più.' }));
             if (p) diffBox.appendChild(el('p', {}, [el('a', { href: 'luogo.html?id=' + encodeURIComponent(p.id), text: 'Apri la scheda attuale' })]));
           });
         } else {
