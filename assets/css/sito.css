@@ -2633,8 +2633,10 @@ main > .how {
 }
 
 .locali-box {
+  min-width: 0;              /* l'indirizzo email lungo va a capo invece di allargare la colonna (320 px) */
+  overflow-wrap: anywhere;
   height: 100%;
-  padding: var(--space-xl);
+  padding: clamp(var(--space-md), 5vw, var(--space-xl));
   border: 1px solid var(--color-line);
   border-radius: var(--radius-lg);
   background: var(--color-white);
@@ -4169,4 +4171,9 @@ main > .section .locali-box--blu h2::after {
 .vuoto--elenco p {
   margin: 0;
   max-width: 40ch;
+}
+
+/* Telefono in orizzontale: la barra in alto del sito scorre via con la pagina (17 novembre) */
+@media (max-height: 30em) and (orientation: landscape) {
+  .site-header { position: static; }
 }

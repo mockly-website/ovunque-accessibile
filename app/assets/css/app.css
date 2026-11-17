@@ -2747,6 +2747,14 @@ textarea.input {
 
 .mod-tabs__n {
   margin-left: auto;
+  flex: none;
+}
+
+.mod-tabs__tab { min-width: 0; hyphens: auto; }
+
+@media (max-width: 26em) {
+  /* telefono: niente icona, così nome e numero stanno nella tessera senza spezzare le parole */
+  .mod-tabs__icona { display: none; }
 }
 
 .mod-tabs__tab[aria-selected="true"] {
@@ -3473,3 +3481,16 @@ img.review__avatar {
   display: none;
 }
 
+
+/* Telefono in orizzontale e schermi bassi (17 novembre): la barra in alto scorre via con la pagina e quella delle
+   schede in basso diventa una riga sottile (icona accanto al nome), così resta spazio per il contenuto */
+@media (max-height: 30em) and (orientation: landscape) {
+  .app .site-header { position: static; }
+
+  .app .app-nav { bottom: calc(var(--space-2xs) + env(safe-area-inset-bottom)); padding-block: 0.15rem; }
+
+  .app .app-nav__link { flex-direction: row; min-height: 2.75rem; }
+
+  /* nella riga sottile il pallino segue la scritta invece di stare sopra l'icona */
+  .app .app-nav__badge { position: static; order: 3; }
+}
