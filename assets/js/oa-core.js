@@ -628,9 +628,11 @@
   }
 
   /* Segnaposto: colore + simbolo del giudizio (il significato non dipende solo dal colore) */
-  function pinIcon(g) {
+  /* liv: livello della verifica. Sul posto = anello blu scuro; da OpenStreetMap = goccia più piccola con bordo
+     tratteggiato (17 novembre): si distinguono anche senza colori e senza aprire il segnaposto */
+  function pinIcon(g, liv) {
     return L.divIcon({
-      className: 'pin pin--' + g,
+      className: 'pin pin--' + g + (liv === 'sul-posto' ? ' pin--verificato' : liv === 'osm' ? ' pin--osm' : ''),
       iconSize: null,
       html: '<span class="pin__drop"><svg class="pin__glyph" aria-hidden="true" focusable="false"><use href="' + ICONA_STATO[g] + '"/></svg></span>'
     });
@@ -683,7 +685,7 @@
   function segnaposto(p, onSelect, focusable) {
     var g = giudizio(p, esigenza());
     var marker = L.marker([p.lat, p.lng], {
-      icon: pinIcon(g),
+      icon: pinIcon(g, p.verifica && p.verifica.livello),
       title: p.nome + ', ' + p.citta + ': ' + GIUDIZIO[g].toLowerCase(),
       keyboard: !!focusable,
       riseOnHover: true
@@ -1420,6 +1422,30 @@
     var verdict = document.getElementById('summary-verdict');
     if (!box || !verdict) return;
     var g = giudizio(p, e);
+    /* Tutte le esigenze a colpo d'occhio (17 novembre): una tessera per esigenza con il suo giudizio; premendola
+       diventa l'esigenza scelta (stesso effetto di «Valuto per») */
+    var tutte = document.getElementById('summary-tutte');
+    var sel = document.getElementById('per-chi');
+    if (tutte) {
+      tutte.textContent = '';
+      ORDINE_ESIGENZE.forEach(function (k) {
+        var gk = giudizio(p, k);
+        var b = el('button', { type: 'button', className: 'summary__tessera summary__tessera--' + gk, 'aria-pressed': k === e ? 'true' : 'false' }, [
+          icon(ESIGENZE[k].icona),
+          el('span', { className: 'summary__tessera-nome', text: ESIGENZE[k].nome }),
+          el('span', { className: 'summary__tessera-giudizio' }, [icon(ICONA_STATO[gk]), document.createTextNode(({ si: 'Accessibile', parziale: 'In parte', no: 'No', nv: 'Da verificare' })[gk] || GIUDIZIO[gk])])
+        ]);
+        b.addEventListener('click', function () {
+          if (!sel || sel.value === k) return;
+          sel.value = k;
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+          /* le tessere si ridisegnano: il focus torna su quella scelta */
+          var scelta = tutte.querySelector('[aria-pressed="true"]');
+          if (scelta) scelta.focus();
+        });
+        tutte.appendChild(el('li', {}, [b]));
+      });
+    }
     verdict.className = 'summary__verdict summary__verdict--' + g;
     verdict.textContent = '';
     verdict.appendChild(icon(ICONA_STATO[g]));
@@ -1430,7 +1456,7 @@
     ]));
     var aiuto = document.getElementById('per-chi-aiuto');
     if (aiuto) {
-      aiuto.textContent = esigenzaCorrente ? '' : 'Non hai ancora scelto la tua esigenza: per ora vedi i giudizi per la carrozzina manuale. Cambiala da «Valuto per».';
+      aiuto.textContent = esigenzaCorrente ? '' : 'Non hai ancora scelto la tua esigenza: per ora vedi i giudizi per la carrozzina manuale. Tocca la tua esigenza qui sopra.';
       aiuto.hidden = !!esigenzaCorrente;
     }
     box.textContent = '';
@@ -1689,7 +1715,7 @@
         var marker = addMarker(map, p, null, true);
         marker.openPopup();
         onEsigenza(function () {
-          marker.setIcon(pinIcon(giudizio(p, esigenza())));
+          marker.setIcon(pinIcon(giudizio(p, esigenza()), p.verifica && p.verifica.livello));
           marker.setPopupContent(popupContent(p));
         });
       }

@@ -1935,6 +1935,13 @@ textarea.input {
   border-radius: var(--radius-md);
 }
 
+/* La prima foto (di solito l'ingresso) grande, le altre in striscia accanto (17 novembre) */
+.photos--striscia > li:first-child { flex-basis: 100%; }
+
+.photos--striscia > li:first-child:not(:only-child) { flex-basis: min(92%, 32rem); }
+
+.photos--striscia > li:first-child .photo img { aspect-ratio: 4 / 3; width: 100%; object-fit: cover; }
+
 #summary-visitors .review-summary {
   margin-top: var(--space-md);
 }

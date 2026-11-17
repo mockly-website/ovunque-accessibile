@@ -2931,6 +2931,19 @@ main > .section .locali-box--blu h2::after {
 
 .pin--nv .pin__drop, .map-legend__dot.pin--nv { background: var(--color-muted); }
 
+.pin--verificato .pin__drop {
+  box-shadow: 0 0 0 3px var(--color-navy), 0 4px 10px rgba(22, 40, 65, 0.35);
+}
+
+.pin--osm .pin__drop {
+  border-style: dashed;
+  transform: rotate(-45deg) scale(0.82);
+}
+
+.map-legend__dot--verificato { box-shadow: 0 0 0 2px var(--color-white), 0 0 0 4px var(--color-navy); }
+
+.map-legend__dot--osm { transform: scale(0.85); outline: 2px dashed var(--color-muted); outline-offset: 1px; }
+
 .pin:focus-visible {
   outline: none;
 }
@@ -3746,6 +3759,68 @@ main > .section .locali-box--blu h2::after {
 .summary h2 {
   margin-bottom: var(--space-xs);
 }
+
+/* Una tessera per esigenza con il suo giudizio (17 novembre): sostituiscono il menu «Valuto per» */
+.summary__tutte {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-xs);
+  margin: 0 0 var(--space-md);
+}
+
+@media (min-width: 48em) {
+  .summary__tutte { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+.summary:has(.summary__tutte li) .summary__per { display: none; }
+
+.summary__tessera {
+  display: grid;
+  gap: 0.2rem;
+  justify-items: start;
+  width: 100%;
+  min-height: var(--target-min);
+  padding: var(--space-sm);
+  border: var(--border-control) solid var(--color-line);
+  border-radius: var(--radius-md);
+  background: var(--color-white);
+  color: var(--color-text);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+  cursor: pointer;
+}
+
+.summary__tessera > .icon { width: 1.5rem; height: 1.5rem; color: var(--color-brand); }
+
+.summary__tessera-nome { font-weight: 700; line-height: 1.2; }
+
+.summary__tessera-giudizio { display: inline-flex; align-items: center; gap: 0.3rem; font-weight: 700; }
+
+.summary__tessera-giudizio .icon {
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0.15rem;
+  border-radius: 50%;
+  background: var(--color-muted);
+  color: var(--color-white);
+}
+
+.summary__tessera--si .summary__tessera-giudizio { color: var(--color-success); }
+.summary__tessera--si .summary__tessera-giudizio .icon { background: var(--color-success); }
+.summary__tessera--parziale .summary__tessera-giudizio { color: var(--color-warning); }
+.summary__tessera--parziale .summary__tessera-giudizio .icon { background: var(--color-warning); }
+.summary__tessera--no .summary__tessera-giudizio { color: var(--color-error); }
+.summary__tessera--no .summary__tessera-giudizio .icon { background: var(--color-error); }
+.summary__tessera--nv .summary__tessera-giudizio { color: var(--color-muted); }
+
+.summary__tessera[aria-pressed="true"] {
+  border-color: var(--color-navy);
+  box-shadow: inset 0 0 0 1px var(--color-navy);
+  background: var(--color-sky);
+}
+
+.summary__tessera:focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: 2px; }
 
 .summary__verdict {
   display: flex;
