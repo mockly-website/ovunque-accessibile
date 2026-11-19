@@ -4231,3 +4231,9 @@ main > .section .locali-box--blu h2::after {
 }
 
 .installa__nota { margin: var(--space-md) 0 0; color: var(--color-muted); font-size: var(--text-sm); }
+
+/* Link nel riquadro blu «Porta Ovunque Accessibile con te»: beige come negli altri riquadri scuri (contrasto 2,2 → 9:1) */
+.apps a:not(.btn) { color: var(--color-beige); }
+
+/* Niente attesa del doppio tocco sui comandi (tocco più reattivo sui telefoni) */
+a, button, summary, label, input, select, textarea, [role="button"] { touch-action: manipulation; }
