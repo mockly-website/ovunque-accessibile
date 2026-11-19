@@ -548,6 +548,65 @@
     })();
   }
 
+  /* Mappa a schermo intero sul telefono (19 novembre). Sopra la mappa una barra con «Cerca» (apre il menu con ricerca,
+     esigenza, bagni vicini e filtri), «Elenco/Mappa» e «🚻 Bagni» (bagni accessibili vicino a me). Il menu è il
+     riquadro dei controlli che c'era già (.explore__controls): sul telefono diventa un pannello che si apre e chiude,
+     sul tablet e sul computer resta dov'era (CSS). Esc o «Chiudi» lo chiudono e il focus torna su «Cerca». */
+  function initMappaTelefono() {
+    if (page !== 'mappa') return;
+    var layout = document.querySelector('.explore__layout');
+    var controls = document.querySelector('.explore__controls');
+    var form = document.getElementById('filters');
+    var vicino = document.querySelector('.filters__near .quick__link--near');
+    var sw = document.querySelector('.view-switch');
+    if (!layout || !controls || !form) return;
+    controls.id = 'menu-mappa';
+    controls.setAttribute('role', 'region');
+    controls.setAttribute('aria-label', 'Cerca e filtra');
+
+    var apri = el('button', { type: 'button', className: 'mappa-barra__btn mappa-barra__cerca', 'aria-expanded': 'false', 'aria-controls': 'menu-mappa' }, [
+      icon('#icon-search'), el('span', { text: 'Cerca' })
+    ]);
+    var bagni = el('button', { type: 'button', className: 'mappa-barra__btn mappa-barra__bagni' }, [
+      el('span', { className: 'mappa-barra__emoji', 'aria-hidden': 'true', text: '🚻' }), el('span', { text: 'Bagni' }),
+      el('span', { className: 'visually-hidden', text: ' accessibili vicino a me' })
+    ]);
+    var barra = el('div', { className: 'mappa-barra' }, [apri, sw || null, bagni]);
+    layout.insertBefore(barra, layout.firstChild);
+
+    var chiudi = el('button', { type: 'button', className: 'btn btn--secondary btn--small menu-mappa__chiudi' }, [document.createTextNode('Chiudi')]);
+    controls.insertBefore(el('div', { className: 'menu-mappa__testa' }, [el('h2', { className: 'menu-mappa__titolo', text: 'Cerca e filtra' }), chiudi]), controls.firstChild);
+    /* la legenda dei segnaposto anche nel menu (sul telefono sotto la mappa non c'è posto) */
+    var leg = document.querySelector('.explore__map-wrap .map-legend');
+    if (leg) {
+      var copia = leg.cloneNode(true);
+      copia.classList.add('menu-mappa__legenda');
+      controls.appendChild(copia);
+    }
+    if (vicino) vicino.insertBefore(el('span', { className: 'mappa-barra__emoji', 'aria-hidden': 'true', text: '🚻' }), vicino.firstChild);
+
+    function aperto() { return layout.classList.contains('is-menu-aperto'); }
+    function setMenu(on, focusDopo) {
+      layout.classList.toggle('is-menu-aperto', on);
+      apri.setAttribute('aria-expanded', on ? 'true' : 'false');
+      if (on) {
+        var q = document.getElementById('q');
+        if (q) q.focus();
+      } else if (focusDopo !== false) {
+        apri.focus();
+      }
+    }
+    apri.addEventListener('click', function () { setMenu(!aperto()); });
+    chiudi.addEventListener('click', function () { setMenu(false); });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && aperto()) setMenu(false);
+    });
+    /* cercare o chiedere i bagni vicini chiude il menu, così si vede il risultato */
+    form.addEventListener('submit', function () { if (aperto()) setMenu(false, false); });
+    if (vicino) vicino.addEventListener('click', function () { if (aperto()) setMenu(false, false); });
+    bagni.addEventListener('click', function () { if (vicino) vicino.click(); });
+  }
+
   /* Si parte quando anche i file delle pagine (defer, dopo questo) sono stati eseguiti */
   var domPronto = new Promise(function (ok) {
     if (document.readyState === 'complete') ok();
@@ -570,6 +629,7 @@
     initPasswordToggles();
     OA.start();
     if (pagine[page]) pagine[page]();
+    initMappaTelefono();
     /* «Come ti muovi?» solo dopo il profilo: chi ha già scelto su un altro dispositivo non la vede */
     profilo.then(initBenvenuto, initBenvenuto);
   });

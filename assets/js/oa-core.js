@@ -1293,7 +1293,9 @@
     /* «Bagni accessibili vicino a me» nella stessa pagina: filtro, posizione, elenco (senza ricaricare) */
     [].forEach.call(document.querySelectorAll('a.quick__link--near'), function (a) {
       a.addEventListener('click', function (ev) {
-        if (!tools || new URL(a.href).pathname !== location.pathname) return;
+        /* «/app/» e «/app/index.html» sono la stessa pagina */
+        var stessa = function (u) { return u.replace(/index\.html$/, ''); };
+        if (!tools || stessa(new URL(a.href).pathname) !== stessa(location.pathname)) return;
         ev.preventDefault();
         var box = form.querySelector('input[name="f"][value="bagno"]');
         if (box) box.checked = true;

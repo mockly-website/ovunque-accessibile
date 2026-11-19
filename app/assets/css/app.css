@@ -3590,3 +3590,214 @@ img.review__avatar {
 
   .app .explore .needs:not(.needs--ask) .needs__option label { flex-direction: row; min-height: 2.75rem; font-size: 0.8rem; hyphens: manual; }
 }
+
+/* ==========================================================================
+   Mappa a schermo intero sul telefono (19 novembre, richiesta dei titolari).
+   Niente barra in alto né titolo: la mappa riempie lo schermo. Sopra, la barra con «Cerca» (menu), «Mappa/Elenco»
+   e «🚻 Bagni»; il menu è il riquadro dei controlli, che scende dall'alto come pannello. Tablet e computer invariati.
+   ========================================================================== */
+.mappa-barra { display: none; }
+
+@media (max-width: 47.99em) {
+  /* la barra in alto sparisce, ma dentro c'è la barra delle schede (fissa in basso), che deve restare */
+  body[data-page="mappa"] .site-header {
+    position: static;
+    padding: 0;
+    border: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  body[data-page="mappa"] .site-header .brand { display: none; }
+
+  body[data-page="mappa"] .explore__head {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  body[data-page="mappa"] .explore > .container { padding: 0; }
+
+  body[data-page="mappa"] .mappa-barra {
+    position: fixed;
+    top: calc(var(--space-sm) + env(safe-area-inset-top));
+    left: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 1002;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .mappa-barra__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 3rem;
+    padding: 0 var(--space-md);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-white);
+    color: var(--color-navy);
+    font: inherit;
+    font-weight: 700;
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+  }
+
+  .mappa-barra__btn .icon { width: 1.3rem; height: 1.3rem; }
+
+  .mappa-barra__cerca[aria-expanded="true"] { background: var(--color-navy); color: var(--color-white); }
+
+  .mappa-barra__btn:focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: 2px; }
+
+  .mappa-barra__emoji { font-size: 1.25rem; line-height: 1; }
+
+  body[data-page="mappa"] .mappa-barra .view-switch {
+    display: flex;
+    justify-self: center;
+    box-shadow: var(--shadow-md);
+  }
+
+  body[data-page="mappa"] .mappa-barra .view-switch__btn { min-width: 2.9rem; min-height: 2.6rem; padding-inline: 0.6rem; }
+
+  /* «Mappa» ed «Elenco» solo con l'icona (il nome resta per gli screen reader) */
+  body[data-page="mappa"] .mappa-barra .view-switch__btn span:not(.view-switch__count) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  /* in elenco la barra ha uno sfondo, così il testo che scorre non le passa sotto */
+  body[data-page="mappa"] .explore__layout[data-view="list"] .mappa-barra {
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: calc(var(--space-sm) + env(safe-area-inset-top)) var(--space-sm) var(--space-sm);
+    background: var(--app-bg);
+    box-shadow: 0 1px 0 var(--color-line);
+  }
+
+  .mappa-barra__cerca { justify-self: start; }
+
+  .mappa-barra__bagni { justify-self: end; }
+
+  body[data-page="mappa"] .mappa-barra .view-switch__count { display: none; }
+
+  /* la mappa riempie lo schermo, sotto la barra e sopra la barra delle schede */
+  body[data-page="mappa"] .explore__map-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+  }
+
+  body[data-page="mappa"] .explore .map {
+    height: 100vh;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    border: 0;
+  }
+
+  body[data-page="mappa"] .explore__map-wrap .map-legend,
+  body[data-page="mappa"] .explore__map-wrap .map__note { display: none; }
+
+  /* i controlli di Leaflet (zoom, «Vicino a me», «Tutta Italia») sotto la barra */
+  body[data-page="mappa"] .explore .leaflet-top { top: calc(4rem + env(safe-area-inset-top)); }
+
+  /* elenco: sotto la barra fissa */
+  body[data-page="mappa"] #results { padding: calc(4.75rem + env(safe-area-inset-top)) var(--space-md) 7rem; }
+
+  /* il menu: pannello che scende dall'alto, sopra la mappa */
+  body[data-page="mappa"] .explore__controls {
+    position: fixed;
+    top: calc(4.25rem + env(safe-area-inset-top));
+    left: var(--space-sm);
+    right: var(--space-sm);
+    z-index: 1003;
+    display: none;
+    max-height: calc(100dvh - 4.25rem - 6.5rem - env(safe-area-inset-top));
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--space-md);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-lg);
+    background: var(--app-bg);
+    box-shadow: var(--shadow-md);
+  }
+
+  body[data-page="mappa"] .explore__layout.is-menu-aperto .explore__controls { display: grid; gap: var(--space-sm); }
+
+  .menu-mappa__testa { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); }
+
+  .menu-mappa__titolo { margin: 0; font-size: var(--text-lg); }
+
+  body[data-page="mappa"] .explore__controls .needs { margin: 0; }
+
+  .menu-mappa__legenda { margin: 0; font-size: 0.85rem; }
+
+  /* nel menu c'è spazio: «Bagni vicino a me» e «Filtri» uno sotto l'altro, a tutta larghezza */
+  body[data-page="mappa"] .explore .filters { grid-template-columns: minmax(0, 1fr); }
+
+  body[data-page="mappa"] .explore .filters__near .quick__link { justify-content: flex-start; text-align: left; }
+
+
+  @media (prefers-reduced-motion: no-preference) {
+    body[data-page="mappa"] .explore__layout.is-menu-aperto .explore__controls { animation: oa-menu-giu 0.18s var(--ease-out); }
+  }
+}
+
+@keyframes oa-menu-giu {
+  from { opacity: 0; transform: translateY(-0.5rem); }
+  to { opacity: 1; transform: none; }
+}
+
+.menu-mappa__testa,
+.menu-mappa__legenda { display: none; }
+
+@media (max-width: 47.99em) {
+  body[data-page="mappa"] .menu-mappa__testa { display: flex; }
+  body[data-page="mappa"] .menu-mappa__legenda { display: flex; }
+}
+
+@media (max-width: 22.5em) {
+  /* 320 px: «Bagni» solo con il simbolo 🚻 (il nome resta per gli screen reader), così la barra ci sta */
+  body[data-page="mappa"] .mappa-barra__bagni { padding-inline: 0.75rem; }
+
+  body[data-page="mappa"] .mappa-barra__bagni > span:nth-child(2) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+  }
+
+  body[data-page="mappa"] .mappa-barra__cerca { padding-inline: 0.8rem; }
+}
+
+/* Tablet (48–64em): della barra resta solo «Mappa/Elenco», al suo posto di prima (tra i controlli e la mappa) */
+@media (min-width: 48em) and (max-width: 63.99em) {
+  body[data-page="mappa"] .mappa-barra {
+    display: flex;
+    justify-content: flex-start;
+    order: 1;
+  }
+
+  body[data-page="mappa"] .explore__controls { order: 0; }
+
+  body[data-page="mappa"] .explore__map-wrap,
+  body[data-page="mappa"] #results { order: 2; }
+
+  body[data-page="mappa"] .mappa-barra__cerca,
+  body[data-page="mappa"] .mappa-barra__bagni { display: none; }
+}
+
+/* il simbolo 🚻 prende il posto dell'icona della posizione nel link dei bagni */
+body[data-page="mappa"] .filters__near .quick__link > .icon { display: none; }
