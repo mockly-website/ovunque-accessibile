@@ -7,6 +7,17 @@
    È decorativa: per gli screen reader non esiste (pseudo-elementi di <html>). */
 (function () {
   var root = document.documentElement;
+  /* Mai dentro un riquadro di un altro sito (clickjacking): GitHub Pages non permette l'intestazione
+     frame-ancestors, quindi la pagina si nasconde e si riapre da sola a tutta finestra (19 novembre) */
+  if (window.top !== window.self) {
+    var stessoSito = false;
+    try { stessoSito = window.top.location.origin === location.origin; } catch (e) { stessoSito = false; }
+    if (!stessoSito) {
+      root.style.display = 'none';
+      try { window.top.location.href = location.href; } catch (e) { /* il sito esterno lo blocca: resta nascosta */ }
+      return;
+    }
+  }
   /* Subito, prima che la pagina si disegni: con JavaScript il menu del sito sul telefono parte chiuso (menu.js) */
   root.classList.add('js');
   /* App: la pagina nuova entra dal lato della scheda scelta (app.js salva «oa-verso» al tocco sulla barra).
