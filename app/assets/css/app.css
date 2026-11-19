@@ -3598,7 +3598,7 @@ img.review__avatar {
    ========================================================================== */
 .mappa-barra { display: none; }
 
-@media (max-width: 47.99em) {
+@media (max-width: 47.99em), (max-height: 30em) and (max-width: 63.99em) {
   /* la barra in alto sparisce, ma dentro c'è la barra delle schede (fissa in basso), che deve restare */
   body[data-page="mappa"] .site-header {
     position: static;
@@ -3762,7 +3762,7 @@ img.review__avatar {
 .menu-mappa__testa,
 .menu-mappa__legenda { display: none; }
 
-@media (max-width: 47.99em) {
+@media (max-width: 47.99em), (max-height: 30em) and (max-width: 63.99em) {
   body[data-page="mappa"] .menu-mappa__testa { display: flex; }
   body[data-page="mappa"] .menu-mappa__legenda { display: flex; }
 }
@@ -3783,7 +3783,7 @@ img.review__avatar {
 }
 
 /* Tablet (48–64em): della barra resta solo «Mappa/Elenco», al suo posto di prima (tra i controlli e la mappa) */
-@media (min-width: 48em) and (max-width: 63.99em) {
+@media (min-width: 48em) and (max-width: 63.99em) and (min-height: 30.01em) {
   body[data-page="mappa"] .mappa-barra {
     display: flex;
     justify-content: flex-start;
