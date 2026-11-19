@@ -4177,3 +4177,57 @@ main > .section .locali-box--blu h2::after {
 @media (max-height: 30em) and (orientation: landscape) {
   .site-header { position: static; }
 }
+
+/* Come mettere la web-app sulla schermata Home (19 novembre): due riquadri, iPhone e Android, con i passi numerati */
+.installa__intro { max-width: var(--measure); margin: 0 0 var(--space-lg); overflow-wrap: anywhere; }
+
+.installa {
+  display: grid;
+  gap: var(--space-md);
+}
+
+@media (min-width: 48em) {
+  .installa { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.installa__box {
+  min-width: 0;
+  padding: clamp(var(--space-md), 5vw, var(--space-xl));
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+}
+
+.installa__box h3 { margin: 0 0 var(--space-sm); }
+
+.installa__passi {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: installa;
+}
+
+.installa__passi li {
+  position: relative;
+  padding-left: 2.6rem;
+  counter-increment: installa;
+}
+
+.installa__passi li::before {
+  content: counter(installa);
+  position: absolute;
+  top: -0.1rem;
+  left: 0;
+  display: grid;
+  place-items: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 50%;
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-weight: 700;
+}
+
+.installa__nota { margin: var(--space-md) 0 0; color: var(--color-muted); font-size: var(--text-sm); }
