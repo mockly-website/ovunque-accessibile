@@ -4237,3 +4237,74 @@ main > .section .locali-box--blu h2::after {
 
 /* Niente attesa del doppio tocco sui comandi (tocco più reattivo sui telefoni) */
 a, button, summary, label, input, select, textarea, [role="button"] { touch-action: manipulation; }
+
+/* ==========================================================================
+   Tema scuro (19 novembre), segue l'impostazione del telefono o del computer.
+   I colori si scambiano: il blu scuro (testo, pulsanti scelti) diventa chiaro e il bianco (fondi, testo sui pulsanti)
+   diventa scuro, così ogni coppia testo/fondo resta leggibile senza riscrivere i componenti. I riquadri grandi blu
+   (piè di pagina, «Porta Ovunque Accessibile con te», «Come funziona», «Domande?») restano blu come nel tema chiaro:
+   dentro rimettono i colori chiari. Contrasti verificati: testo ≥ 7:1, grigio secondario ≥ 4,5:1.
+   ========================================================================== */
+@media screen and (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --color-navy: #e8eef6;
+    --color-white: #142030;
+    --color-card: #0f1824;
+    --color-sky: #1c2f46;
+    --color-beige: #a08a62;
+    --color-brand: #8fbaf0;
+    --color-path: #9b8d7a;
+    --color-error: #ff9e9e;
+    --color-success: #7fd49d;
+    --color-warning: #f2bd66;
+    --color-muted: #aeb8c7;
+    --color-line: rgba(232, 238, 246, 0.14);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3), 0 4px 12px rgba(0, 0, 0, 0.25);
+    --shadow-md: 0 2px 6px rgba(0, 0, 0, 0.3), 0 22px 50px rgba(0, 0, 0, 0.4);
+  }
+
+  .site-footer,
+  .apps,
+  main > .how,
+  .locali-box--blu {
+    --color-navy: #162841;
+    --color-white: #ffffff;
+    --color-beige: #e7d6b9;
+    --color-brand: #2f5b9c;
+    --color-sky: #e6f4fd;
+    --color-muted: #4a5568;
+    --color-line: rgba(22, 40, 65, 0.12);
+    --color-text: var(--color-navy);
+    --color-focus: var(--color-white);
+    box-shadow: 0 0 0 1px rgba(232, 238, 246, 0.08);
+  }
+
+  .site-header { background: rgba(15, 24, 36, 0.94); }
+
+  .leaflet-container { background: #1b2430; }
+
+  .leaflet-tile-pane { filter: grayscale(0.6) sepia(0.12) brightness(0.72) contrast(1.05); }
+
+  .leaflet-popup-content-wrapper,
+  .leaflet-popup-tip,
+  .leaflet-bar a,
+  .leaflet-control-attribution { background: var(--color-white) !important; color: var(--color-navy) !important; }
+
+  .leaflet-control-attribution a { color: var(--color-brand) !important; }
+
+  :root.oa-intro::before,
+  :root.oa-intro-out::before {
+    background:
+      url("../img/logo.webp") center var(--intro-centro) / auto 5.25rem no-repeat,
+      url("../img/intro-anello.svg?v=99d379b9") center var(--intro-centro) / var(--intro-anello) auto no-repeat,
+      radial-gradient(50rem 32rem at 50% 38%, #1c2a3c, #0f1824 72%);
+  }
+
+
+  .place__alert { background: #3a2e17; }
+
+  .agenzie { background: rgba(20, 32, 48, 0.6); border-color: rgba(143, 186, 240, 0.35); }
+
+  .about__foto figcaption { background: rgba(20, 32, 48, 0.94); }
+}

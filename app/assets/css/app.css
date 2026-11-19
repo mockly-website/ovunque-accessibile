@@ -3494,3 +3494,99 @@ img.review__avatar {
   /* nella riga sottile il pallino segue la scritta invece di stare sopra l'icona */
   .app .app-nav__badge { position: static; order: 3; }
 }
+
+/* Tema scuro della web-app (19 novembre): i colori vengono da sito.css; qui i fondi scritti a mano */
+@media screen and (prefers-color-scheme: dark) {
+  .app {
+    --app-bg: #0f1824;
+    background:
+      radial-gradient(42rem 22rem at 100% -4rem, rgba(127, 178, 229, 0.1), transparent 70%) no-repeat,
+      var(--app-bg);
+  }
+
+  .app .site-header { background: #142030; }
+
+  .app-nav,
+  .app .app-nav,
+  .wizard__nav { background: rgba(20, 32, 48, 0.92); border-color: rgba(232, 238, 246, 0.1); }
+
+  .notice--ok,
+  .state-pill--pubblicata,
+  .fatto__segno,
+  .avviso__icona--ok { background: #16321f; }
+
+  .notice--error,
+  .state-pill--respinta,
+  .avviso__icona--no { background: #3a1a1a; }
+
+  .alert-item { background: #3a2e17; }
+
+  .avviso--nuovo .avviso__link { background: #172a40; }
+}
+
+/* Mappa più in alto sul telefono (19 novembre). Con l'esigenza già scelta le quattro esigenze stanno su una riga
+   (icona sopra, nome sotto) e «Bagni accessibili vicino a me» sta accanto a «Filtri»: circa 130 px in meno sopra
+   la mappa. Alla prima visita (needs--ask) resta tutto com'era, con la spiegazione. */
+@media (max-width: 47.99em) {
+  .app .explore .needs:not(.needs--ask) .needs__help {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .app .explore .needs:not(.needs--ask) .needs__options {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .app .explore .needs:not(.needs--ask) .needs__option label {
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.15rem;
+    min-height: 3.4rem;
+    padding: 0.3rem 0.15rem;
+    font-size: 0.72rem;
+    line-height: 1.1;
+    text-align: center;
+    hyphens: auto;
+  }
+
+  .app .explore .needs:not(.needs--ask) .needs__option label .icon {
+    width: 1.4rem;
+    height: 1.4rem;
+  }
+
+  .app .explore .filters {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: stretch;
+  }
+
+  .app .explore .filters > .field,
+  .app .explore .filters__more[open] {
+    grid-column: 1 / -1;
+  }
+
+  .app .explore .filters__near .quick__link {
+    height: 100%;
+    min-height: var(--target-min);
+    padding-inline: var(--space-xs);
+    font-size: var(--text-sm);
+    line-height: 1.15;
+    text-align: center;
+  }
+
+  .app .explore .filters__more:not([open]) .filters__toggle {
+    height: 100%;
+    font-size: var(--text-sm);
+  }
+}
+
+@media (max-width: 22.5em) {
+  /* telefoni molto stretti (320 px): due per riga, così i nomi non vengono spezzati */
+  .app .explore .needs:not(.needs--ask) .needs__options { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .app .explore .needs:not(.needs--ask) .needs__option label { flex-direction: row; min-height: 2.75rem; font-size: 0.8rem; hyphens: manual; }
+}
