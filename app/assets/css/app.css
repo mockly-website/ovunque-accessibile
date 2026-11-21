@@ -3801,3 +3801,50 @@ img.review__avatar {
 
 /* il simbolo 🚻 prende il posto dell'icona della posizione nel link dei bagni */
 body[data-page="mappa"] .filters__near .quick__link > .icon { display: none; }
+
+/* Alto contrasto (21 novembre 2026): nella web-app il pulsante sta nel profilo, «Informazioni»; nell'intestazione
+   solo da tablet in su (sul telefono la barra in alto non c'è o è piena) */
+@media (max-width: 47.99em) {
+  .site-header .contrasto-btn { display: none; }
+}
+
+.site-header .contrasto-btn { margin-inline-start: auto; }
+
+button.menu-list__link--toggle {
+  width: 100%;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: start;
+  cursor: pointer;
+}
+
+.interruttore {
+  flex: none;
+  position: relative;
+  width: 3rem;
+  height: 1.75rem;
+  border: 2px solid var(--color-navy);
+  border-radius: 999px;
+  background: var(--color-white);
+}
+
+.interruttore::after {
+  content: "";
+  position: absolute;
+  top: 0.15rem;
+  left: 0.15rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  border-radius: 50%;
+  background: var(--color-navy);
+  transition: transform 0.15s ease;
+}
+
+[aria-pressed="true"] > .interruttore { background: var(--color-navy); }
+[aria-pressed="true"] > .interruttore::after { background: var(--color-white); transform: translateX(1.25rem); }
+
+@media (prefers-reduced-motion: reduce) {
+  .interruttore::after { transition: none; }
+}

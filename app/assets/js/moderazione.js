@@ -269,6 +269,49 @@
     apri(k >= 0 ? k : 0);
   }
 
+  /* «Questo posto ha chiuso?» dalla scheda: si controlla a mano (telefono, visita, ricerca) e poi si archivia.
+     La proposta si chiude con respingi_proposta e un motivo che spiega a chi l'ha mandata cosa è successo. */
+  function chiusoItem(x, onDone) {
+    var idp = 'chiuso-' + x.id;
+    var testo = x.nota.slice(OA.NOTA_CHIUSO.length).trim();
+    var article = el('article', { className: 'card mod-item', 'aria-labelledby': idp }, [
+      el('h3', { id: idp, text: 'Forse ha chiuso: ' + (x.dati.nome || '') + ', ' + (x.dati.citta || '') }),
+      el('p', { className: 'place__meta', text: 'Segnalato da ' + (x.autore_nome || 'utente') + ' il ' + dateIt(x.created_at) }),
+      testo ? el('blockquote', { className: 'mod-item__note' }, [el('p', { text: testo })]) : el('p', { className: 'place__meta', text: 'Senza altre informazioni.' }),
+      el('p', { text: 'Controlla prima di archiviare: una telefonata, una visita o una ricerca recente. Archiviato, il luogo sparisce da mappa ed elenchi; si può rimettere online da «Stato di una scheda».' }),
+      el('p', {}, [el('a', { href: 'luogo.html?id=' + encodeURIComponent(x.place_id), text: 'Apri la scheda' })])
+    ]);
+    var si = el('button', { type: 'button', className: 'btn btn--primary btn--small' }, [document.createTextNode('Ha chiuso: archivia il luogo')]);
+    var no = el('button', { type: 'button', className: 'btn btn--secondary btn--small' }, [document.createTextNode('È ancora aperto')]);
+    var status = el('p', { className: 'notice', hidden: '', tabindex: '-1', role: 'status' });
+    article.appendChild(el('div', { className: 'decision__actions' }, [si, no]));
+    article.appendChild(status);
+    function run(promise, text) {
+      if (si.disabled) return;
+      si.disabled = no.disabled = true;
+      promise().then(function () {
+        message(status, text, 'ok');
+        status.focus();
+        onDone();
+      }).catch(function (err) {
+        si.disabled = no.disabled = false;
+        message(status, err.message, 'error');
+        status.focus();
+      });
+    }
+    si.addEventListener('click', function () {
+      run(function () {
+        return api.setPlaceState(x.place_id, 'archiviato').then(function () {
+          return api.reject(x.id, 'Grazie: abbiamo controllato, ha chiuso davvero e l\'abbiamo tolto dalla mappa.');
+        });
+      }, 'Luogo archiviato: non si vede più su mappa ed elenchi.');
+    });
+    no.addEventListener('click', function () {
+      run(function () { return api.reject(x.id, 'Grazie: abbiamo controllato, risulta ancora aperto.'); }, 'Segnalazione chiusa: il luogo resta online.');
+    });
+    return article;
+  }
+
   function loadPending() {
     var listP = $('mod-proposals');
     var listR = $('mod-reviews');
@@ -286,6 +329,10 @@
       show($('mod-reviews-empty'), !counts.r);
 
       res.proposte.forEach(function (x) {
+        if (x.tipo === 'correzione' && x.nota && x.nota.indexOf(OA.NOTA_CHIUSO) === 0) {
+          listP.appendChild(el('li', {}, [aTendina(chiusoItem(x, function () { counts.p--; update(); }))]));
+          return;
+        }
         var article = el('article', { className: 'card mod-item', 'aria-labelledby': 'mod-p-' + x.id });
         var title = (x.tipo === 'nuovo' ? 'Nuovo luogo: ' : 'Correzione: ') + (x.dati.nome || '') + ', ' + (x.dati.citta || '');
         article.appendChild(el('h3', { id: 'mod-p-' + x.id, text: title }));

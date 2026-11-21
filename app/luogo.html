@@ -18,17 +18,17 @@
   <link rel="preload" href="../assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
-  <script src="../assets/js/intro.js?v=05da9c81"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=9e61bc75">
-  <link rel="stylesheet" href="assets/css/app.css?v=ec650ed5">
+  <script src="../assets/js/intro.js?v=6622c228"></script>
+  <link rel="stylesheet" href="../assets/css/sito.css?v=f7422476">
+  <link rel="stylesheet" href="assets/css/app.css?v=637fe7d8">
   <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="../assets/js/oa-core.js?v=28aa14dc" defer></script>
+  <script src="../assets/js/oa-core.js?v=8dc790e9" defer></script>
   <script src="assets/js/api.js?v=cbb679a8" defer></script>
   <script src="assets/js/app.js?v=4abd3978" defer></script>
-  <script src="assets/js/scheda.js?v=12edaaea" defer></script>
+  <script src="assets/js/scheda.js?v=31b12f80" defer></script>
 </head>
 <body class="app" data-page="luogo">
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -104,6 +104,7 @@
           <li><a class="app-nav__link" href="profilo.html" data-account-link><svg class="icon icon--tab" aria-hidden="true" focusable="false"><use href="#icon-tab-user"/></svg><span data-account-label>Profilo</span></a></li>
         </ul>
       </nav>
+      <button class="contrasto-btn" type="button" data-contrasto aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span class="contrasto-btn__testo">Alto contrasto</span></button>
     </div>
   </header>
 
@@ -200,6 +201,19 @@
               </form>
             </details>
             <p id="alert-login" class="place__meta" hidden><a id="alert-login-link" href="accedi.html">Accedi</a> per segnalare un problema di oggi, come un ascensore guasto.</p>
+            <details id="chiuso-new" class="more" hidden>
+              <summary class="more__toggle">Questo posto ha chiuso?</summary>
+              <form id="chiuso-form" class="more__body stack" novalidate>
+                <p class="field__help">Ce lo dici e noi controlliamo (con una telefonata o una visita) prima di toglierlo dalla mappa.</p>
+                <div class="field">
+                  <label class="field__label" for="c-testo">Come lo sai? (facoltativo)</label>
+                  <p class="field__help" id="c-testo-aiuto">Fino a 300 caratteri. Per esempio: «Ci sono passato a ottobre, c'è un altro negozio».</p>
+                  <input class="input" type="text" id="c-testo" name="testo" maxlength="300" aria-describedby="c-testo-aiuto">
+                </div>
+                <button class="btn btn--primary" type="submit">Segnala che ha chiuso</button>
+              </form>
+            </details>
+            <p id="chiuso-note" class="notice" role="status" tabindex="-1" hidden></p>
             </div>
 
             <section id="detail-summary" class="detail__section summary" aria-labelledby="summary-title">

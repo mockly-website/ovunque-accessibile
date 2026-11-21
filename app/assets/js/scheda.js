@@ -81,12 +81,7 @@
       if (isBusy(form)) return;
       var f = form.elements;
       var errors = [];
-      var d = {
-        nome: p.nome, categoria: p.categoria, indirizzo: p.indirizzo, cap: p.cap || null, citta: p.citta,
-        provincia: p.provincia || null, regione: p.regione || null, lat: p.lat, lng: p.lng, descrizione: p.descrizione || null,
-        misure: JSON.parse(JSON.stringify(p.misure || {})), facoltativi: JSON.parse(JSON.stringify(p.facoltativi || {})),
-        dettagli: JSON.parse(JSON.stringify(p.dettagli || {}))
-      };
+      var d = datiScheda(p);
       var ing = d.misure.ingresso = d.misure.ingresso || {};
       d.misure.bagno = d.misure.bagno || {};
       var risposte = 0;
@@ -122,8 +117,42 @@
     });
   }
 
+  /* «Questo posto ha chiuso?» (21 novembre 2026, richiesta di Angelo): diventa una proposta di correzione con i dati
+     attuali e la nota che inizia con OA.NOTA_CHIUSO. In moderazione si riconosce e c'è «Archivia il luogo»;
+     niente si toglie dalla mappa senza un controllo a mano. */
+  function initChiuso(p) {
+    var box = $('chiuso-new');
+    var form = $('chiuso-form');
+    if (!box || !form || !api.user()) return;
+    show(box, true);
+    form.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      if (isBusy(form)) return;
+      var testo = form.elements.testo.value.trim();
+      busy(form, true, 'Invio…');
+      api.propose({ tipo: 'correzione', place_id: p.id, dati: datiScheda(p), nota: OA.NOTA_CHIUSO + (testo ? ' ' + testo : '') }).then(function () {
+        show(box, false);
+        message($('chiuso-note'), 'Grazie! Controlliamo e, se ha chiuso davvero, lo togliamo dalla mappa. Trovi la segnalazione nel tuo profilo.', 'ok');
+        $('chiuso-note').focus();
+      }).catch(function (err) {
+        busy(form, false);
+        showErrors(form, [{ input: form.elements.testo, text: err.message }]);
+      });
+    });
+  }
+
+  function datiScheda(p) {
+    return {
+      nome: p.nome, categoria: p.categoria, indirizzo: p.indirizzo, cap: p.cap || null, citta: p.citta,
+      provincia: p.provincia || null, regione: p.regione || null, lat: p.lat, lng: p.lng, descrizione: p.descrizione || null,
+      misure: JSON.parse(JSON.stringify(p.misure || {})), facoltativi: JSON.parse(JSON.stringify(p.facoltativi || {})),
+      dettagli: JSON.parse(JSON.stringify(p.dettagli || {}))
+    };
+  }
+
   function initDetailExtras(p) {
     initVeloce(p);
+    initChiuso(p);
     var favBtn = $('fav-toggle');
     var favStatus = $('fav-status');
     var saved = false;

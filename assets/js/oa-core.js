@@ -1734,7 +1734,7 @@
       initExplore();
       initDetail();
     },
-    CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, esigenzaAttiva: esigenzaAttiva,
+    NOTA_CHIUSO: "[Segnalato come chiuso]", CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, esigenzaAttiva: esigenzaAttiva,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
     giudizio: giudizio, distanceKm: distanceKm, completezza: completezza, mancanti: mancanti,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,

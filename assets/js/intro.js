@@ -5,6 +5,28 @@
    Solo alla prima pagina della visita (sessionStorage, chiave diversa per sito e app): almeno 0,6 s, mai oltre 1,5 s;
    all'uscita la schermata sale come un sipario (0,5 s).
    È decorativa: per gli screen reader non esiste (pseudo-elementi di <html>). */
+/* Alto contrasto (21 novembre 2026, richiesta di Angelo): pulsante [data-contrasto] nelle intestazioni (e nel profilo
+   dell'app). La scelta resta su questo dispositivo (localStorage) e si applica qui, prima che la pagina si disegni. */
+(function () {
+  var root = document.documentElement;
+  var KEY = 'oa-contrasto';
+  var attivo = false;
+  try { attivo = localStorage.getItem(KEY) === 'alto'; } catch (e) { /* senza memoria: contrasto normale */ }
+  function applica() {
+    if (attivo) root.setAttribute('data-contrasto', 'alto'); else root.removeAttribute('data-contrasto');
+    [].forEach.call(document.querySelectorAll('button[data-contrasto]'), function (b) { b.setAttribute('aria-pressed', attivo ? 'true' : 'false'); });
+  }
+  applica();
+  document.addEventListener('DOMContentLoaded', applica);
+  document.addEventListener('click', function (ev) {
+    var b = ev.target.closest && ev.target.closest('button[data-contrasto]');
+    if (!b) return;
+    attivo = !attivo;
+    try { if (attivo) localStorage.setItem(KEY, 'alto'); else localStorage.removeItem(KEY); } catch (e) { /* vale solo per questa pagina */ }
+    applica();
+  });
+})();
+
 (function () {
   var root = document.documentElement;
   /* Mai dentro un riquadro di un altro sito (clickjacking): GitHub Pages non permette l'intestazione
