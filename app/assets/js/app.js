@@ -727,6 +727,7 @@
     function opzioni() { return [].slice.call(listaSugg.querySelectorAll('[role="option"]')); }
     function chiudiSugg() {
       boxSugg.hidden = true;
+      rapidi.hidden = false;
       listaSugg.textContent = '';
       attiva = -1;
       if (q) { q.setAttribute('aria-expanded', 'false'); q.removeAttribute('aria-activedescendant'); }
@@ -780,6 +781,8 @@
         });
         var tot = opzioni().length;
         boxSugg.hidden = !tot;
+        rapidi.hidden = !!tot;
+        if (tot) corpo.scrollTop = 0;
         attiva = -1;
         q.setAttribute('aria-expanded', tot ? 'true' : 'false');
         q.removeAttribute('aria-activedescendant');
@@ -811,10 +814,11 @@
 
     /* --- pannello --- */
     var corpo = el('div', { className: 'foglio__corpo', id: 'foglio-corpo' });
-    corpo.appendChild(luogo);
-    corpo.appendChild(rapidi);
+    /* i suggerimenti per primi, subito sotto il campo: con la tastiera aperta il resto del pannello è coperto */
     corpo.appendChild(boxSugg);
     corpo.appendChild(statoSugg);
+    corpo.appendChild(luogo);
+    corpo.appendChild(rapidi);
     corpo.appendChild(sugg);
     corpo.appendChild(controls);
     corpo.appendChild(results);
@@ -998,9 +1002,11 @@
     }
 
     /* --- cosa apre il pannello --- */
-    if (q) q.addEventListener('focus', function () { if (altezza === 'basso') setAltezza('meta'); });
+    /* come in Mappe: toccando la ricerca il pannello va in alto, così campo e suggerimenti restano sopra la tastiera */
+    if (q) q.addEventListener('focus', function () { if (!colonna.matches && altezza !== 'alto') setAltezza('alto'); });
     form.addEventListener('submit', function () {
-      if (altezza === 'basso') setAltezza('meta');
+      /* dopo la ricerca: pannello a metà, così si vedono i risultati sulla mappa e in elenco */
+      if (!colonna.matches && altezza !== 'meta') setAltezza('meta');
       if (q) q.blur();
     });
     if (vicino) vicino.addEventListener('click', function () { if (altezza === 'basso') setAltezza('meta'); });

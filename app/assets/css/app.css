@@ -4011,3 +4011,4 @@ button.menu-list__link--toggle {
 .numeri__num { text-align: end !important; white-space: nowrap; font-variant-numeric: tabular-nums; }
 .numeri__tabella td.numeri__num { position: relative; min-width: 6rem; }
 .numeri__barra { display: block; height: 0.35rem; margin-top: 0.2rem; margin-left: auto; border-radius: 999px; background: var(--color-brand); max-width: 100%; }
+.foglio__rapidi[hidden] { display: none; }

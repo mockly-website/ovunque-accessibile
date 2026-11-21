@@ -5,11 +5,11 @@
      per vedere la mappa anche senza connessione; dalla copia se ha meno di 7 giorni, altrimenti dalla rete.
    - Mai in cache: dati e accesso (Supabase, la copia leggera dei luoghi la tiene api.js), altri siti.
    Cambiare VERSION a ogni rilascio per buttare le copie vecchie. */
-var VERSION = 'oa-app-4e4ef1ba';
+var VERSION = 'oa-app-f3c7fec8';
 var SHELL = [
   './', 'index.html', 'luogo.html', 'accedi.html', 'registrati.html', 'password.html', 'segnala.html',
   'profilo.html', 'moderazione.html', 'privacy.html', 'bollino.html', 'locali.html', 'manifest.webmanifest',
-  'assets/css/app.css?v=bdf5b051', 'assets/js/config.js?v=90a84c77', 'assets/js/api.js?v=8addd012', 'assets/js/app.js?v=4f00e906',
+  'assets/css/app.css?v=c4db8437', 'assets/js/config.js?v=90a84c77', 'assets/js/api.js?v=8addd012', 'assets/js/app.js?v=3e8d5c9d',
   'assets/js/accesso.js?v=209771b2', 'assets/js/scheda.js?v=31b12f80', 'assets/js/segnala.js?v=c1a7e122', 'assets/js/profilo.js?v=d79286f4',
   'assets/js/moderazione.js?v=55a2d9b4', 'assets/js/bollino.js?v=28f9a403',
   'assets/vendor/supabase/supabase.js?v=2.117.3', 'assets/img/icon-192.png',
