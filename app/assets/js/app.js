@@ -708,6 +708,99 @@
         })));
       }).catch(function () { /* senza preferiti va bene lo stesso */ });
     }
+    /* Suggerimenti mentre si scrive (combobox ARIA 1.2): città e luoghi dal database (cerca_luoghi, 8 risultati),
+       dopo 2 lettere e una pausa di 250 ms. Frecce su e giù per scegliere, Invio per aprire, Esc per chiudere. */
+    var boxSugg = el('section', { className: 'foglio__gruppo foglio__suggerimenti', 'aria-labelledby': 'sugg-titolo', hidden: '' });
+    var listaSugg = el('ul', { className: 'foglio__voci', id: 'sugg-lista', role: 'listbox', 'aria-label': 'Suggerimenti' });
+    var statoSugg = el('p', { className: 'visually-hidden', role: 'status' });
+    boxSugg.appendChild(el('h2', { id: 'sugg-titolo', className: 'foglio__gruppo-titolo', text: 'Suggerimenti' }));
+    boxSugg.appendChild(listaSugg);
+    var attesa = null;
+    var giroSugg = 0;
+    var attiva = -1;
+    if (q) {
+      q.setAttribute('role', 'combobox');
+      q.setAttribute('aria-autocomplete', 'list');
+      q.setAttribute('aria-controls', 'sugg-lista');
+      q.setAttribute('aria-expanded', 'false');
+    }
+    function opzioni() { return [].slice.call(listaSugg.querySelectorAll('[role="option"]')); }
+    function chiudiSugg() {
+      boxSugg.hidden = true;
+      listaSugg.textContent = '';
+      attiva = -1;
+      if (q) { q.setAttribute('aria-expanded', 'false'); q.removeAttribute('aria-activedescendant'); }
+    }
+    function evidenzia(i) {
+      var o = opzioni();
+      if (!o.length) return;
+      attiva = (i + o.length) % o.length;
+      o.forEach(function (x, k) { x.setAttribute('aria-selected', k === attiva ? 'true' : 'false'); });
+      q.setAttribute('aria-activedescendant', o[attiva].id);
+      o[attiva].scrollIntoView({ block: 'nearest' });
+    }
+    function scegli(o) {
+      if (o.dataset.citta) {
+        q.value = o.dataset.citta;
+        chiudiSugg();
+        if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true }));
+      } else if (o.dataset.href) {
+        salvaRicerca(q.value);
+        location.href = o.dataset.href;
+      }
+    }
+    function voceSugg(id, icona, testo, sub, dati) {
+      var li = el('li', { id: id, role: 'option', 'aria-selected': 'false', className: 'foglio__voce' }, [
+        icon(icona), el('span', { className: 'foglio__voce-testo' }, [el('span', { text: testo }), sub ? el('span', { className: 'foglio__voce-sub', text: sub }) : null])
+      ]);
+      Object.keys(dati).forEach(function (k) { li.dataset[k] = dati[k]; });
+      li.addEventListener('click', function () { scegli(li); });
+      return li;
+    }
+    function suggerisci() {
+      var t = q.value.trim();
+      if (t.length < 2 || !api.searchPlaces) { chiudiSugg(); return; }
+      var mio = ++giroSugg;
+      api.searchPlaces(t, null, 8).then(function (r) {
+        if (mio !== giroSugg || q.value.trim() !== t) return;
+        var pp = (r && r.luoghi) || [];
+        var n = OA.normalize ? OA.normalize(t) : t.toLowerCase();
+        var citta = [];
+        pp.forEach(function (p) {
+          var c = (p.citta || '').trim();
+          var cn = OA.normalize ? OA.normalize(c) : c.toLowerCase();
+          if (c && cn.indexOf(n) === 0 && citta.indexOf(c) === -1) citta.push(c);
+        });
+        listaSugg.textContent = '';
+        citta.slice(0, 3).forEach(function (c, i) {
+          listaSugg.appendChild(voceSugg('sugg-c-' + i, '#icon-pin', c, 'Cerca i luoghi a ' + c, { citta: c }));
+        });
+        pp.slice(0, 6).forEach(function (p, i) {
+          listaSugg.appendChild(voceSugg('sugg-l-' + i, '#icon-store', p.nome, (OA.CATEGORIE[p.categoria] || '') + ' · ' + p.citta, { href: 'luogo.html?id=' + encodeURIComponent(p.id) }));
+        });
+        var tot = opzioni().length;
+        boxSugg.hidden = !tot;
+        attiva = -1;
+        q.setAttribute('aria-expanded', tot ? 'true' : 'false');
+        q.removeAttribute('aria-activedescendant');
+        statoSugg.textContent = tot ? (tot === 1 ? '1 suggerimento' : tot + ' suggerimenti') + ': usa le frecce per sceglierne uno.' : 'Nessun suggerimento.';
+      }).catch(function () { if (mio === giroSugg) chiudiSugg(); });
+    }
+    if (q) {
+      q.addEventListener('input', function () {
+        clearTimeout(attesa);
+        attesa = setTimeout(suggerisci, 250);
+      });
+      q.addEventListener('keydown', function (ev) {
+        if (boxSugg.hidden) return;
+        if (ev.key === 'ArrowDown') { ev.preventDefault(); evidenzia(attiva + 1); }
+        else if (ev.key === 'ArrowUp') { ev.preventDefault(); evidenzia(attiva - 1); }
+        else if (ev.key === 'Enter' && attiva >= 0) { ev.preventDefault(); scegli(opzioni()[attiva]); }
+        else if (ev.key === 'Escape') { ev.stopPropagation(); chiudiSugg(); }
+      });
+    }
+    form.addEventListener('submit', function () { clearTimeout(attesa); giroSugg++; chiudiSugg(); });
+
     function aggiornaSugg() { sugg.hidden = !!(q && q.value.trim()); }
     disegnaRecenti();
     disegnaPreferiti();
@@ -720,6 +813,8 @@
     var corpo = el('div', { className: 'foglio__corpo', id: 'foglio-corpo' });
     corpo.appendChild(luogo);
     corpo.appendChild(rapidi);
+    corpo.appendChild(boxSugg);
+    corpo.appendChild(statoSugg);
     corpo.appendChild(sugg);
     corpo.appendChild(controls);
     corpo.appendChild(results);
@@ -916,6 +1011,30 @@
       if (altezza !== 'basso' && !colonna.matches) { setAltezza('basso'); maniglia.focus(); }
     });
 
+    /* --- riquadro del luogo: distanza da chi guarda (se ha usato «Vicino a me») e indicazioni stradali --- */
+    function extraLuogo(ll, nome) {
+      var pos = null;
+      try { pos = JSON.parse(sessionStorage.getItem('oa-posizione') || 'null'); } catch (e) { pos = null; }
+      var meta = contenutoLuogo.querySelector('.popup__meta');
+      if (pos && meta && OA.distanceKm && OA.distanzaTxt) {
+        var km = OA.distanceKm({ lat: pos.lat, lng: pos.lng }, { lat: ll.lat, lng: ll.lng });
+        meta.textContent = OA.distanzaTxt(km).replace(/^a /, 'A ') + ' da te · ' + meta.textContent;
+      }
+      if (!OA.directionsLinks) return;
+      var links = OA.directionsLinks({ lat: ll.lat, lng: ll.lng, nome: nome });
+      var det = el('details', { className: 'foglio__indicazioni' }, [
+        el('summary', { className: 'btn btn--secondary btn--small' }, [icon('#icon-route'), document.createTextNode('Indicazioni')]),
+        el('ul', { className: 'foglio__voci', role: 'list' }, links.map(function (l) {
+          var ext = l[1].indexOf('geo:') !== 0;
+          return el('li', {}, [el('a', ext ? { className: 'foglio__voce', href: l[1], rel: 'noopener', target: '_blank' } : { className: 'foglio__voce', href: l[1] }, [
+            el('span', { text: l[0] }), ext ? el('span', { className: 'visually-hidden', text: ' (si apre in una nuova scheda)' }) : null
+          ])]);
+        }))
+      ]);
+      var pop = contenutoLuogo.querySelector('.popup');
+      (pop || contenutoLuogo).appendChild(det);
+    }
+
     /* --- riquadro del luogo --- */
     function chiudi(daIndietro) {
       var p = popupAperto;
@@ -937,6 +1056,7 @@
       popupAperto = d;
       contenutoLuogo.textContent = '';
       contenutoLuogo.appendChild(nodo.cloneNode(true));
+      extraLuogo(d.popup.getLatLng(), (nodo.querySelector('.popup__title') || {}).textContent || '');
       luogo.hidden = false;
       if (altezza === 'basso') setAltezza('meta'); else spingi();
       corpo.scrollTop = 0;
@@ -952,6 +1072,19 @@
       }, 30);
       if (document.activeElement && foglio.contains(document.activeElement) === false && document.activeElement.closest && document.activeElement.closest('.leaflet-container') === null) luogo.focus();
     });
+  }
+
+  /* Senza connessione: una striscia in alto lo dice, e cosa si vede (le copie salvate da api.js e sw.js) */
+  function initRete() {
+    var b = el('p', { className: 'rete-avviso', role: 'status', hidden: '' });
+    document.body.appendChild(b);
+    function aggiorna() {
+      b.hidden = navigator.onLine;
+      b.textContent = navigator.onLine ? '' : 'Senza connessione: vedi i luoghi e la mappa già salvati su questo telefono.';
+    }
+    window.addEventListener('online', aggiorna);
+    window.addEventListener('offline', aggiorna);
+    aggiorna();
   }
 
   /* Si parte quando anche i file delle pagine (defer, dopo questo) sono stati eseguiti */
@@ -974,6 +1107,7 @@
     updateChrome();
     api.onAuth(updateChrome);
     initPasswordToggles();
+    initRete();
     OA.start();
     if (pagine[page]) pagine[page]();
     initFoglio();

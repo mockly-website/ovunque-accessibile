@@ -3967,3 +3967,47 @@ button.menu-list__link--toggle {
 @media (prefers-reduced-motion: reduce) {
   .interruttore::after { transition: none; }
 }
+
+/* Suggerimenti mentre si scrive e indicazioni nel riquadro del luogo (21 novembre 2026) */
+.foglio__suggerimenti { margin-bottom: var(--space-md); }
+.foglio__suggerimenti[hidden] { display: none; }
+.foglio__voce[role="option"][aria-selected="true"] { background: var(--color-sky); box-shadow: inset 4px 0 0 var(--color-navy); }
+.foglio__voce[role="option"]:hover { background: var(--color-sky); }
+
+.foglio__indicazioni { margin-top: var(--space-xs); }
+.foglio__indicazioni > summary { display: inline-flex; list-style: none; min-height: 2.75rem; cursor: pointer; }
+.foglio__indicazioni > summary::-webkit-details-marker { display: none; }
+.foglio__indicazioni > .foglio__voci { margin-top: var(--space-xs); border: 1px solid var(--color-line); }
+.foglio__luogo .popup__link { margin-right: var(--space-xs); }
+
+/* Senza connessione */
+.rete-avviso {
+  position: fixed;
+  top: env(safe-area-inset-top);
+  left: 50%;
+  z-index: 1100;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  margin: var(--space-xs) 0 0;
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-pill);
+  background: var(--color-navy);
+  color: var(--color-white);
+  font-weight: 700;
+  font-size: var(--text-sm);
+  text-align: center;
+  box-shadow: var(--shadow-md);
+}
+.rete-avviso[hidden] { display: none; }
+
+/* Moderazione, «Numeri» */
+#numeri { display: grid; gap: var(--space-md); }
+.numeri__blocco h3 { margin-top: 0; font-size: var(--text-lg); }
+.numeri__scorri { overflow-x: auto; }
+.numeri__tabella { width: 100%; border-collapse: collapse; }
+.numeri__tabella th, .numeri__tabella td { padding: var(--space-xs) var(--space-sm); border-bottom: 1px solid var(--color-line); text-align: start; vertical-align: middle; }
+.numeri__tabella thead th { color: var(--color-muted); font-size: var(--text-sm); }
+.numeri__num { text-align: end !important; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.numeri__tabella td.numeri__num { position: relative; min-width: 6rem; }
+.numeri__barra { display: block; height: 0.35rem; margin-top: 0.2rem; margin-left: auto; border-radius: 999px; background: var(--color-brand); max-width: 100%; }

@@ -640,7 +640,9 @@
     container._oaMap = map;
     /* Testi dei controlli di Leaflet in italiano (WCAG 3.1.2) */
     L.control.zoom({ zoomInTitle: 'Avvicina', zoomOutTitle: 'Allontana' }).addTo(map);
-    L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
+    /* crossOrigin: le immagini della mappa arrivano con CORS, così il service worker della web-app può tenerne una
+       copia leggera per quando manca la connessione (con le risposte «opache» il browser conterebbe MB per ognuna) */
+    L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION, crossOrigin: true }).addTo(map);
     map.attributionControl.setPrefix(false);
     map.on('popupopen', function (ev) {
       var close = ev.popup.getElement().querySelector('.leaflet-popup-close-button');
@@ -906,6 +908,8 @@
             if (me) me.remove();
             me = L.circleMarker(ll, { radius: 9, color: '#ffffff', weight: 3, fillColor: '#162841', fillOpacity: 1, interactive: false }).addTo(map);
             map.setView(ll, 14);
+            /* resta solo in questa scheda del browser (sessionStorage), mai inviata: serve per «a 300 m da te» */
+            try { sessionStorage.setItem('oa-posizione', JSON.stringify({ lat: ll[0], lng: ll[1], t: Date.now() })); } catch (e) { /* niente */ }
             if (status) status.textContent = onLocate ? 'Mappa centrata sulla tua posizione. L\'elenco è in ordine di distanza.' : 'Mappa centrata sulla tua posizione.';
             if (onLocate) onLocate(ll[0], ll[1]);
           }, function () {
@@ -1778,6 +1782,7 @@
     statusNode: statusNode, verdictNode: verdictNode, placeCard: placeCard,
     createMap: createMap, pinIcon: pinIcon, ITALY: ITALY, italia: italia,
     /* dopo una modifica (avviso aggiunto o chiuso): i riquadri e le ricerche si richiedono al database */
-    svuotaLuoghi: function () { aree = []; ricerche = {}; }
+    svuotaLuoghi: function () { aree = []; ricerche = {}; },
+    directionsLinks: directionsLinks, distanzaTxt: distanzaTxt
   };
 })();

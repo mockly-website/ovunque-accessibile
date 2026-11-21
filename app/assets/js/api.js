@@ -151,6 +151,23 @@
       });
     }
 
+    /* Senza connessione (21 novembre 2026): sul telefono resta una copia leggera, solo in questo browser
+       (localStorage, mai inviata): le ultime 60 schede aperte o mostrate tra i preferiti, l'elenco dei preferiti e
+       l'ultima zona della mappa (fino a 300 luoghi). In tutto poche centinaia di KB; le immagini della mappa le tiene
+       il service worker (app/sw.js, al massimo 400). Si usano solo quando la rete non risponde. */
+    var OFF = { luoghi: 'oa-off-luoghi', area: 'oa-off-area', preferiti: 'oa-off-preferiti' };
+    function offLeggi(k) { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }
+    function offScrivi(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* memoria piena o bloccata: niente copia */ } }
+    function senzaRete(err) { return !navigator.onLine || /connessione|fetch|network/i.test(String(err && err.message)); }
+    function ricorda(pp) {
+      var m = offLeggi(OFF.luoghi) || {};
+      (pp || []).forEach(function (p) { if (p && p.id) { m[p.id] = { p: p, t: Date.now() }; } });
+      var ids = Object.keys(m).sort(function (a, b) { return m[b].t - m[a].t; });
+      ids.slice(60).forEach(function (id) { delete m[id]; });
+      offScrivi(OFF.luoghi, m);
+    }
+    function ricordato(id) { var m = offLeggi(OFF.luoghi); return m && m[id] ? m[id].p : null; }
+
     function allRows(query, from, acc) {
       from = from || 0;
       acc = acc || [];
@@ -206,6 +223,8 @@
       },
       signOut: function () {
         profileCache = null;
+        /* le copie per quando manca la rete restano a chi ha l'account, non a chi usa dopo lo stesso telefono */
+        try { localStorage.removeItem(OFF.preferiti); localStorage.removeItem(OFF.luoghi); } catch (e) { /* niente */ }
         return sb.auth.signOut({ scope: 'local' }).then(function () { current = null; notify(null); });
       },
       requestReset: function (email) {
@@ -274,7 +293,14 @@
         return sb.rpc('luoghi_area', {
           p_sud: q.sud, p_ovest: q.ovest, p_nord: q.nord, p_est: q.est,
           p_categoria: q.categoria, p_sensi: q.sensi, p_max: q.max, p_passo: q.passo
-        }).then(check).then(conLuoghi);
+        }).then(check).then(conLuoghi).then(function (x) {
+          if (x && x.luoghi && x.luoghi.length && x.luoghi.length <= 300) offScrivi(OFF.area, { x: x, t: Date.now() });
+          return x;
+        }, function (err) {
+          var c = senzaRete(err) && offLeggi(OFF.area);
+          if (c && c.x) { c.x.offline = c.t; return c.x; }
+          throw err;
+        });
       },
       searchPlaces: function (testo, categoria, max) {
         return sb.rpc('cerca_luoghi', { p_testo: testo, p_categoria: categoria || null, p_max: max || 200 }).then(check).then(conLuoghi);
@@ -289,17 +315,33 @@
         }
         return Promise.all(gruppi).then(function (pp) {
           return conLuoghi({ luoghi: [].concat.apply([], pp) });
-        }).then(function (x) { return x.luoghi; });
+        }).then(function (x) { ricorda(x.luoghi); return x.luoghi; }, function (err) {
+          if (!senzaRete(err)) throw err;
+          return ids.map(ricordato).filter(Boolean);
+        });
       },
       allPlacesForModeration: function () {
         return allRows(function (from, to) {
           return sb.from('places').select('id,nome,citta,stato').order('nome').order('id').range(from, to);
         });
       },
+      /* Numeri per i titolari (pannello di moderazione): solo stato, regione, livello e date di ogni scheda */
+      placeStats: function () {
+        return allRows(function (from, to) {
+          return sb.from('places').select('stato,regione,verifica_livello,verifica_data,created_at').order('id').range(from, to);
+        });
+      },
       getPlace: function (id) {
         if (!/^[0-9a-f-]{36}$/.test(id || '')) return Promise.resolve(null);
         return sb.from('places').select(COLONNE).eq('id', id).maybeSingle()
-          .then(check).then(function (r) { return r ? toPlace(r) : null; });
+          .then(check).then(function (r) { return r ? toPlace(r) : null; }).then(function (p) {
+            if (p) ricorda([p]);
+            return p;
+          }, function (err) {
+            var c = senzaRete(err) && ricordato(id);
+            if (c) { c.offline = true; return c; }
+            throw err;
+          });
       },
       reviews: function (placeId) {
         return sb.from('recensioni').select(COLONNE_RECENSIONI)
@@ -412,7 +454,13 @@
       favorites: function () {
         if (!current) return Promise.resolve([]);
         return sb.from('preferiti').select('place_id').then(check).then(function (rows) {
-          return rows.map(function (r) { return r.place_id; });
+          var ids = rows.map(function (r) { return r.place_id; });
+          offScrivi(OFF.preferiti, ids);
+          return ids;
+        }, function (err) {
+          var c = senzaRete(err) && offLeggi(OFF.preferiti);
+          if (c) return c;
+          throw err;
         });
       },
       setFavorite: function (placeId, on) {

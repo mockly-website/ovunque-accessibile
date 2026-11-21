@@ -170,6 +170,74 @@
     initOsmQueue();
     loadChecks();
     initPlaceState();
+    loadNumeri();
+  }
+
+  /* «Numeri» (21 novembre 2026): conteggi delle schede, per decidere dove andare a verificare. Tabelle vere (si
+     leggono con lo screen reader); la barra accanto al numero è solo decorativa. */
+  function loadNumeri() {
+    var box = $('numeri');
+    if (!box || !api.placeStats) return;
+    var MESI = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+    function n(x) { return x.toLocaleString('it-IT'); }
+    function tabella(titolo, intest, righe, max) {
+      var sec = el('section', { className: 'card numeri__blocco' }, [el('h3', { text: titolo })]);
+      var t = el('table', { className: 'numeri__tabella' }, [
+        el('thead', {}, [el('tr', {}, intest.map(function (h, i) { return el('th', { scope: 'col', className: i ? 'numeri__num' : '', text: h }); }))]),
+        el('tbody', {}, righe.map(function (r) {
+          return el('tr', {}, [el('th', { scope: 'row', text: r[0] })].concat(r.slice(1).map(function (v, i) {
+            var td = el('td', { className: 'numeri__num' }, [document.createTextNode(n(v))]);
+            if (i === 0 && max) {
+              var barra = el('span', { className: 'numeri__barra', 'aria-hidden': 'true' });
+              barra.style.width = Math.round(v / max * 100) + '%';   /* CSSOM: l'attributo style lo blocca la CSP */
+              td.appendChild(barra);
+            }
+            return td;
+          })));
+        }))
+      ]);
+      sec.appendChild(el('div', { className: 'numeri__scorri' }, [t]));
+      return sec;
+    }
+    api.placeStats().then(function (rows) {
+      box.textContent = '';
+      box.removeAttribute('aria-busy');
+      var online = rows.filter(function (r) { return r.stato === 'pubblicato' || r.stato === 'in-revisione'; });
+      var conta = function (arr, f) { return arr.filter(f).length; };
+      box.appendChild(tabella('Schede', ['Stato', 'Schede'], [
+        ['Online', online.length],
+        ['Da approvare (OpenStreetMap)', conta(rows, function (r) { return r.stato === 'da-approvare'; })],
+        ['Archiviate', conta(rows, function (r) { return r.stato === 'archiviato'; })]
+      ]));
+      box.appendChild(tabella('Quanto sono affidabili (schede online)', ['Livello', 'Schede'], [
+        ['Verificate sul posto', conta(online, function (r) { return r.verifica_livello === 'sul-posto'; })],
+        ['Dalla community', conta(online, function (r) { return r.verifica_livello === 'community'; })],
+        ['Da OpenStreetMap', conta(online, function (r) { return r.verifica_livello === 'osm'; })]
+      ]));
+      var oggi = new Date();
+      var mesi = [];
+      for (var i = 5; i >= 0; i--) {
+        var d = new Date(oggi.getFullYear(), oggi.getMonth() - i, 1);
+        mesi.push({ k: d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0'), nome: MESI[d.getMonth()] + ' ' + d.getFullYear() });
+      }
+      var righeMesi = mesi.map(function (m) {
+        return [m.nome,
+          conta(rows, function (r) { return (r.created_at || '').slice(0, 7) === m.k; }),
+          conta(rows, function (r) { return r.verifica_livello === 'sul-posto' && (r.verifica_data || '').slice(0, 7) === m.k; })];
+      });
+      box.appendChild(tabella('Ultimi 6 mesi', ['Mese', 'Schede create', 'Verificate sul posto'], righeMesi,
+        Math.max.apply(null, righeMesi.map(function (r) { return r[1]; }).concat([1]))));
+      var reg = {};
+      online.forEach(function (r) { var k = r.regione || 'Senza regione'; reg[k] = (reg[k] || 0) + 1; });
+      var righeReg = Object.keys(reg).sort(function (a, b) { return reg[a] - reg[b] || a.localeCompare(b, 'it'); }).map(function (k) { return [k, reg[k]]; });
+      var blocco = tabella('Regioni, dalla meno coperta (schede online)', ['Regione', 'Schede'], righeReg,
+        Math.max.apply(null, righeReg.map(function (r) { return r[1]; }).concat([1])));
+      blocco.appendChild(el('p', { className: 'place__meta', text: 'Le regioni senza nessuna scheda non compaiono.' }));
+      box.appendChild(blocco);
+    }).catch(function (err) {
+      box.removeAttribute('aria-busy');
+      message(box, err.message, 'error');
+    });
   }
 
   function decisionForm(kind, item, onDone) {
