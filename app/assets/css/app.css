@@ -4012,3 +4012,85 @@ button.menu-list__link--toggle {
 .numeri__tabella td.numeri__num { position: relative; min-width: 6rem; }
 .numeri__barra { display: block; height: 0.35rem; margin-top: 0.2rem; margin-left: auto; border-radius: 999px; background: var(--color-brand); max-width: 100%; }
 .foglio__rapidi[hidden] { display: none; }
+
+/* ==========================================================================
+   Alto contrasto nella web-app (21 novembre 2026). I colori arrivano da sito.css (data-contrasto="alto" su <html>);
+   qui i fondi scritti a mano dell'app (beige, barra semitrasparente, ombre leggere) diventano pieni e ogni
+   riquadro e pulsante ha un bordo blu di 2 px, così si distingue senza contare sulle sfumature.
+   ========================================================================== */
+html[data-contrasto="alto"] .app {
+  --app-bg: var(--color-white);
+  background: var(--color-white);
+}
+
+html[data-contrasto="alto"] .app-nav,
+html[data-contrasto="alto"] .app .app-nav,
+html[data-contrasto="alto"] .app .site-header,
+html[data-contrasto="alto"] .wizard__nav {
+  background: var(--color-white);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+html[data-contrasto="alto"] .app .app-nav { border: 2px solid var(--color-navy); box-shadow: none; }
+
+html[data-contrasto="alto"] .app-nav__link[aria-current="page"],
+html[data-contrasto="alto"] .app-nav__link.is-section { text-decoration: underline; text-decoration-thickness: 0.15em; text-underline-offset: 0.2em; }
+
+html[data-contrasto="alto"] .foglio {
+  border-top: 2px solid var(--color-navy);
+  box-shadow: none;
+}
+
+@media (min-width: 48em) and (min-height: 30.01em) {
+  html[data-contrasto="alto"] .foglio { border: 2px solid var(--color-navy); }
+}
+
+html[data-contrasto="alto"] .foglio__tacca { background: var(--color-navy); height: 0.4rem; }
+
+html[data-contrasto="alto"] .foglio__rapido,
+html[data-contrasto="alto"] .foglio__voci,
+html[data-contrasto="alto"] .foglio__luogo,
+html[data-contrasto="alto"] .foglio__chiudi,
+html[data-contrasto="alto"] .mappa-tasti__btn,
+html[data-contrasto="alto"] .mappa-tasti .map-legend,
+html[data-contrasto="alto"] .map-tools__btn,
+html[data-contrasto="alto"] .leaflet-bar,
+html[data-contrasto="alto"] .menu-list,
+html[data-contrasto="alto"] .app .card,
+html[data-contrasto="alto"] .app .place,
+html[data-contrasto="alto"] .chip label,
+html[data-contrasto="alto"] .needs__option label {
+  border: 2px solid var(--color-navy) !important;
+  box-shadow: none !important;
+}
+
+html[data-contrasto="alto"] .foglio__voci li + li,
+html[data-contrasto="alto"] .menu-list li + li { border-top: 2px solid var(--color-navy); }
+
+html[data-contrasto="alto"] .foglio__voce .icon,
+html[data-contrasto="alto"] .foglio__gruppo-titolo,
+html[data-contrasto="alto"] .foglio__voce-sub { color: var(--color-navy); }
+
+html[data-contrasto="alto"] .foglio__voce[role="option"][aria-selected="true"] {
+  background: var(--color-navy);
+  color: var(--color-white);
+  box-shadow: none;
+}
+
+html[data-contrasto="alto"] .foglio__voce[role="option"][aria-selected="true"] .icon,
+html[data-contrasto="alto"] .foglio__voce[role="option"][aria-selected="true"] .foglio__voce-sub { color: var(--color-white); }
+
+html[data-contrasto="alto"] .foglio__gruppo-azione { text-decoration: underline; }
+
+html[data-contrasto="alto"] .chip input:checked + label,
+html[data-contrasto="alto"] .needs__option input:checked + label { background: var(--color-navy); color: var(--color-white); }
+
+html[data-contrasto="alto"] .cluster { box-shadow: 0 0 0 3px var(--color-white), 0 0 0 5px #0a1730; }
+
+html[data-contrasto="alto"] .rete-avviso { border: 2px solid var(--color-white); }
+
+/* sulla mappa, fino a 64em, l'intestazione è solo il contenitore della barra in basso: resta trasparente */
+@media (max-width: 63.99em) {
+  html[data-contrasto="alto"] .mappa-mappe .site-header { background: none; }
+}

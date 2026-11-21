@@ -4451,8 +4451,8 @@ html[data-contrasto="alto"] {
   }
 }
 
-html[data-contrasto="alto"] main a:not(.btn):not(.pin),
-html[data-contrasto="alto"] .site-footer a { text-decoration: underline; text-decoration-thickness: 0.12em; }
+/* sottolineati i link nel testo (quelli senza classe: paragrafi, elenchi, note), non pulsanti, voci di menu e schede */
+html[data-contrasto="alto"] :is(main, .site-footer) a:not([class]) { text-decoration: underline; text-decoration-thickness: 0.12em; text-underline-offset: 0.18em; }
 
 html[data-contrasto="alto"] .card,
 html[data-contrasto="alto"] .input,
