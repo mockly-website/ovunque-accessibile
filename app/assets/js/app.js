@@ -548,63 +548,257 @@
     })();
   }
 
-  /* Mappa a schermo intero sul telefono (19 novembre). Sopra la mappa una barra con «Cerca» (apre il menu con ricerca,
-     esigenza, bagni vicini e filtri), «Elenco/Mappa» e «🚻 Bagni» (bagni accessibili vicino a me). Il menu è il
-     riquadro dei controlli che c'era già (.explore__controls): sul telefono diventa un pannello che si apre e chiude,
-     sul tablet e sul computer resta dov'era (CSS). Esc o «Chiudi» lo chiudono e il focus torna su «Cerca». */
-  function initMappaTelefono() {
+    /* Mappa in stile Mappe di iPhone (21 novembre 2026, scelta dei titolari).
+     La mappa riempie lo schermo; la barra in alto e le schede in basso non ci sono. Tutto il resto sta in un pannello:
+     - telefono: pannello in basso su tre altezze (basso: solo ricerca e profilo; metà; alto). Si trascina dalla
+       maniglia o dalla testa, ma c'è sempre anche il tocco sulla maniglia («Mostra di più / di meno») e Esc, quindi
+       niente richiede di trascinare (WCAG 2.5.7);
+     - tablet e computer (da 48em, schermi non bassi): colonna fissa a sinistra, sempre aperta.
+     Nel pannello: ricerca e foto del profilo, pulsanti rapidi (🚻 Bagni, Esigenza, Filtri), elenco dei luoghi.
+     Toccando un segnaposto il riquadro del luogo si apre nel pannello (evento oa-riquadro da oa-core.js), non sulla
+     mappa. Sulla mappa, in alto a destra sotto «Vicino a me» e «Tutta Italia»: Segnala (+) e Legenda. */
+  function initFoglio() {
     if (page !== 'mappa') return;
     var layout = document.querySelector('.explore__layout');
     var controls = document.querySelector('.explore__controls');
     var form = document.getElementById('filters');
-    var vicino = document.querySelector('.filters__near .quick__link--near');
-    var sw = document.querySelector('.view-switch');
-    if (!layout || !controls || !form) return;
-    controls.id = 'menu-mappa';
-    controls.setAttribute('role', 'region');
-    controls.setAttribute('aria-label', 'Cerca e filtra');
+    var results = document.getElementById('results');
+    var mapBox = document.getElementById('explore-map');
+    var wrap = document.querySelector('.explore__map-wrap');
+    if (!layout || !controls || !form || !results || !mapBox || !wrap) return;
+    document.body.classList.add('mappa-mappe');
+    layout.setAttribute('data-view', 'map');
+    var colonna = window.matchMedia('(min-width: 48em) and (min-height: 30.01em)');
+    var ridotto = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-    var apri = el('button', { type: 'button', className: 'mappa-barra__btn mappa-barra__cerca', 'aria-expanded': 'false', 'aria-controls': 'menu-mappa' }, [
-      icon('#icon-search'), el('span', { text: 'Cerca' })
-    ]);
-    var bagni = el('button', { type: 'button', className: 'mappa-barra__btn mappa-barra__bagni' }, [
-      el('span', { className: 'mappa-barra__emoji', 'aria-hidden': 'true', text: '🚻' }), el('span', { text: 'Bagni' }),
-      el('span', { className: 'visually-hidden', text: ' accessibili vicino a me' })
-    ]);
-    var barra = el('div', { className: 'mappa-barra' }, [apri, sw || null, bagni]);
-    layout.insertBefore(barra, layout.firstChild);
-
-    var chiudi = el('button', { type: 'button', className: 'btn btn--secondary btn--small menu-mappa__chiudi' }, [document.createTextNode('Chiudi')]);
-    controls.insertBefore(el('div', { className: 'menu-mappa__testa' }, [el('h2', { className: 'menu-mappa__titolo', text: 'Cerca e filtra' }), chiudi]), controls.firstChild);
-    /* la legenda dei segnaposto anche nel menu (sul telefono sotto la mappa non c'è posto) */
-    var leg = document.querySelector('.explore__map-wrap .map-legend');
-    if (leg) {
-      var copia = leg.cloneNode(true);
-      copia.classList.add('menu-mappa__legenda');
-      controls.appendChild(copia);
+    /* --- testa: ricerca + profilo --- */
+    var cerca = form.querySelector('.search');
+    var q = document.getElementById('q');
+    var profilo = document.querySelector('.app-nav__link[data-account-link]');
+    var segnala = document.querySelector('.app-nav__link[href="segnala.html"]');
+    [q, cerca && cerca.querySelector('button')].forEach(function (c) { if (c) c.setAttribute('form', 'filters'); });
+    if (q) {
+      q.setAttribute('aria-label', 'Cerca un luogo o una città');
+      q.placeholder = 'Cerca un luogo o una città';
     }
-    if (vicino) vicino.insertBefore(el('span', { className: 'mappa-barra__emoji', 'aria-hidden': 'true', text: '🚻' }), vicino.firstChild);
-
-    function aperto() { return layout.classList.contains('is-menu-aperto'); }
-    function setMenu(on, focusDopo) {
-      layout.classList.toggle('is-menu-aperto', on);
-      apri.setAttribute('aria-expanded', on ? 'true' : 'false');
-      if (on) {
-        var q = document.getElementById('q');
-        if (q) q.focus();
-      } else if (focusDopo !== false) {
-        apri.focus();
-      }
+    var testa = el('div', { className: 'foglio__testa' }, [cerca]);
+    if (profilo) {
+      profilo.classList.add('foglio__profilo');
+      testa.appendChild(profilo);
     }
-    apri.addEventListener('click', function () { setMenu(!aperto()); });
-    chiudi.addEventListener('click', function () { setMenu(false); });
-    document.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape' && aperto()) setMenu(false);
+
+    /* --- pulsanti rapidi --- */
+    var vicino = form.querySelector('.filters__near .quick__link--near');
+    var needs = document.getElementById('come-ti-muovi');
+    var more = document.getElementById('filters-more');
+    var rapidi = el('div', { className: 'foglio__rapidi', role: 'group', 'aria-label': 'Scelte rapide' });
+    if (vicino) {
+      vicino.className = 'quick__link--near foglio__rapido';
+      vicino.textContent = '';
+      vicino.appendChild(el('span', { className: 'foglio__emoji', 'aria-hidden': 'true', text: '🚻' }));
+      vicino.appendChild(el('span', { text: 'Bagni' }));
+      vicino.appendChild(el('span', { className: 'visually-hidden', text: ' accessibili vicino a me' }));
+      rapidi.appendChild(vicino);
+    }
+    function bottoneSezione(testo, sezione, id) {
+      if (!sezione) return null;
+      sezione.id = sezione.id || id;
+      var b = el('button', { type: 'button', className: 'foglio__rapido', 'aria-expanded': 'false', 'aria-controls': sezione.id }, [
+        el('span', { className: 'foglio__rapido-testo', text: testo }), icon('#icon-chevron')
+      ]);
+      rapidi.appendChild(b);
+      return b;
+    }
+    var bEsigenza = bottoneSezione('Esigenza', needs, 'come-ti-muovi');
+    var bFiltri = bottoneSezione('Filtri', more, 'filters-more');
+    var attivi = document.getElementById('filters-active');
+    if (bFiltri && attivi) bFiltri.insertBefore(attivi, bFiltri.lastChild);
+
+    function nomeEsigenza() {
+      var r = needs && needs.querySelector('input[name="esigenza"]:checked');
+      var lab = r && needs.querySelector('label[for="' + r.id + '"]');
+      return lab ? lab.textContent.trim() : 'Esigenza';
+    }
+    function aggiornaEsigenza() {
+      if (bEsigenza) bEsigenza.querySelector('.foglio__rapido-testo').textContent = nomeEsigenza();
+    }
+    if (needs) needs.addEventListener('change', aggiornaEsigenza);
+    aggiornaEsigenza();
+    setTimeout(aggiornaEsigenza, 500);   /* l'esigenza salvata nel profilo arriva dopo */
+
+    /* Esigenza e Filtri: sezioni chiuse finché non si toccano (la tendina dei filtri perde il suo «summary») */
+    if (more) {
+      more.open = true;
+      var sum = more.querySelector('summary');
+      if (sum) sum.hidden = true;
+    }
+    function apriSezione(b, sezione, on) {
+      b.setAttribute('aria-expanded', on ? 'true' : 'false');
+      sezione.hidden = !on;
+    }
+    [[bEsigenza, needs], [bFiltri, more]].forEach(function (x) {
+      if (!x[0]) return;
+      apriSezione(x[0], x[1], false);
+      x[0].addEventListener('click', function () {
+        var on = x[0].getAttribute('aria-expanded') !== 'true';
+        apriSezione(x[0], x[1], on);
+        if (on && altezza === 'basso') setAltezza('meta');
+      });
     });
-    /* cercare o chiedere i bagni vicini chiude il menu, così si vede il risultato */
-    form.addEventListener('submit', function () { if (aperto()) setMenu(false, false); });
-    if (vicino) vicino.addEventListener('click', function () { if (aperto()) setMenu(false, false); });
-    bagni.addEventListener('click', function () { if (vicino) vicino.click(); });
+
+    /* --- riquadro del luogo nel pannello --- */
+    var luogo = el('div', { className: 'foglio__luogo', hidden: '', tabindex: '-1', role: 'region', 'aria-label': 'Luogo scelto sulla mappa' });
+    var chiudiLuogo = el('button', { type: 'button', className: 'foglio__chiudi' }, [icon('#icon-no'), el('span', { className: 'visually-hidden', text: 'Chiudi il luogo' })]);
+    var contenutoLuogo = el('div', { className: 'foglio__luogo-corpo' });
+    luogo.appendChild(chiudiLuogo);
+    luogo.appendChild(contenutoLuogo);
+    var popupAperto = null;
+
+    /* --- pannello --- */
+    var corpo = el('div', { className: 'foglio__corpo', id: 'foglio-corpo' });
+    corpo.appendChild(luogo);
+    corpo.appendChild(rapidi);
+    corpo.appendChild(controls);
+    corpo.appendChild(results);
+    var maniglia = el('button', { type: 'button', className: 'foglio__maniglia', 'aria-controls': 'foglio-corpo', 'aria-expanded': 'false' }, [
+      el('span', { className: 'foglio__tacca', 'aria-hidden': 'true' }), el('span', { className: 'visually-hidden foglio__maniglia-testo', text: 'Mostra i luoghi' })
+    ]);
+    var foglio = el('section', { className: 'foglio', 'aria-label': 'Cerca e luoghi', 'data-altezza': 'basso' }, [maniglia, testa, corpo]);
+    layout.insertBefore(foglio, layout.firstChild);
+
+    /* --- pulsanti sulla mappa: Segnala e Legenda --- */
+    var tasti = el('div', { className: 'mappa-tasti' });
+    if (segnala) {
+      segnala.className = 'mappa-tasti__btn mappa-tasti__segnala';
+      var lab = segnala.querySelector('span');
+      if (lab) lab.className = 'visually-hidden';
+      if (lab) lab.textContent = 'Segnala un luogo';
+      tasti.appendChild(segnala);
+    }
+    var leg = wrap.querySelector('.map-legend');
+    if (leg) {
+      leg.id = 'mappa-legenda';
+      var bLeg = el('button', { type: 'button', className: 'mappa-tasti__btn', 'aria-expanded': 'false', 'aria-controls': 'mappa-legenda' }, [
+        el('span', { className: 'mappa-tasti__i', 'aria-hidden': 'true', text: 'i' }), el('span', { className: 'visually-hidden', text: 'Legenda dei segnaposto' })
+      ]);
+      tasti.appendChild(bLeg);
+      tasti.appendChild(leg);
+      leg.hidden = true;
+      bLeg.addEventListener('click', function () {
+        var on = leg.hidden;
+        leg.hidden = !on;
+        bLeg.setAttribute('aria-expanded', on ? 'true' : 'false');
+      });
+    }
+    wrap.appendChild(tasti);
+    /* la mappa ora è a tutto schermo: Leaflet ricalcola le dimensioni */
+    window.dispatchEvent(new Event('resize'));
+    setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 300);
+
+    /* --- altezze --- */
+    var ALTEZZE = ['basso', 'meta', 'alto'];
+    var altezza = 'basso';
+    function setAltezza(a) {
+      altezza = a;
+      foglio.setAttribute('data-altezza', a);
+      var chiuso = a === 'basso' && !colonna.matches;
+      corpo.inert = chiuso;
+      if (chiuso) corpo.setAttribute('aria-hidden', 'true'); else corpo.removeAttribute('aria-hidden');
+      maniglia.setAttribute('aria-expanded', a === 'basso' ? 'false' : 'true');
+      maniglia.querySelector('.foglio__maniglia-testo').textContent = a === 'alto' ? 'Riduci il pannello' : a === 'meta' ? 'Allarga il pannello' : 'Mostra i luoghi';
+    }
+    maniglia.addEventListener('click', function () {
+      if (trascinato) { trascinato = false; return; }
+      setAltezza(altezza === 'basso' ? 'meta' : altezza === 'meta' ? 'alto' : 'basso');
+    });
+    colonna.addEventListener('change', function () { setAltezza(altezza); });
+    setAltezza(location.hash === '#results' ? 'meta' : 'basso');
+
+    /* trascinare (solo telefono): maniglia e testa, non il campo di ricerca */
+    var inizio = null;
+    var trascinato = false;
+    function suInizio(ev) {
+      if (colonna.matches || ev.button > 0) return;
+      if (ev.target.closest('input, a, button:not(.foglio__maniglia)')) return;
+      inizio = { y: ev.clientY, h: foglio.getBoundingClientRect().height };
+      trascinato = false;
+      foglio.classList.add('is-trascina');
+      foglio.setPointerCapture && foglio.setPointerCapture(ev.pointerId);
+    }
+    function suMossa(ev) {
+      if (!inizio) return;
+      var dy = inizio.y - ev.clientY;
+      if (Math.abs(dy) > 6) trascinato = true;
+      if (trascinato) foglio.style.height = Math.max(80, Math.min(window.innerHeight - 40, inizio.h + dy)) + 'px';
+    }
+    function suFine() {
+      if (!inizio) return;
+      foglio.classList.remove('is-trascina');
+      if (trascinato) {
+        var h = foglio.getBoundingClientRect().height;
+        foglio.style.height = '';
+        var vh = window.innerHeight;
+        var vicine = ALTEZZE.map(function (a) { return { a: a, d: Math.abs(h - (a === 'basso' ? 90 : a === 'meta' ? vh * 0.5 : vh - 48)) }; })
+          .sort(function (x, y) { return x.d - y.d; });
+        setAltezza(vicine[0].a);
+      }
+      inizio = null;
+    }
+    maniglia.addEventListener('pointerdown', suInizio);
+    testa.addEventListener('pointerdown', suInizio);
+    foglio.addEventListener('pointermove', suMossa);
+    foglio.addEventListener('pointerup', suFine);
+    foglio.addEventListener('pointercancel', suFine);
+
+    /* --- cosa apre il pannello --- */
+    if (q) q.addEventListener('focus', function () { if (altezza === 'basso') setAltezza('meta'); });
+    form.addEventListener('submit', function () {
+      if (altezza === 'basso') setAltezza('meta');
+      if (q) q.blur();
+    });
+    if (vicino) vicino.addEventListener('click', function () { if (altezza === 'basso') setAltezza('meta'); });
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key !== 'Escape') return;
+      if (leg && !leg.hidden) { leg.hidden = true; tasti.querySelector('[aria-controls="mappa-legenda"]').setAttribute('aria-expanded', 'false'); return; }
+      if (popupAperto) { chiudi(); return; }
+      if (altezza !== 'basso' && !colonna.matches) { setAltezza('basso'); maniglia.focus(); }
+    });
+
+    /* --- riquadro del luogo --- */
+    function chiudi() {
+      var p = popupAperto;
+      popupAperto = null;
+      luogo.hidden = true;
+      contenutoLuogo.textContent = '';
+      if (p) p.map.closePopup(p.popup);
+    }
+    chiudiLuogo.addEventListener('click', chiudi);
+    mapBox.addEventListener('oa-riquadro', function (ev) {
+      var d = ev.detail;
+      if (!d.aperto) {
+        if (popupAperto && popupAperto.popup === d.popup) { popupAperto = null; luogo.hidden = true; contenutoLuogo.textContent = ''; }
+        return;
+      }
+      var nodo = d.popup.getElement() && d.popup.getElement().querySelector('.popup');
+      if (!nodo) return;
+      popupAperto = d;
+      contenutoLuogo.textContent = '';
+      contenutoLuogo.appendChild(nodo.cloneNode(true));
+      luogo.hidden = false;
+      if (altezza === 'basso') setAltezza('meta');
+      corpo.scrollTop = 0;
+      /* il segnaposto resta visibile: se finisce sotto il pannello, la mappa si sposta */
+      setTimeout(function () {
+        var pt = d.map.latLngToContainerPoint(d.popup.getLatLng());
+        var r = foglio.getBoundingClientRect();
+        var box = mapBox.getBoundingClientRect();
+        var dx = 0, dy = 0;
+        if (colonna.matches) { if (pt.x + box.left < r.right + 40) dx = pt.x + box.left - (r.right + (box.right - r.right) / 2); }
+        else if (pt.y + box.top > r.top - 40) dy = pt.y + box.top - r.top / 2;
+        if (dx || dy) d.map.panBy([dx, dy], { animate: !ridotto.matches });
+      }, 30);
+      if (document.activeElement && foglio.contains(document.activeElement) === false && document.activeElement.closest && document.activeElement.closest('.leaflet-container') === null) luogo.focus();
+    });
   }
 
   /* Si parte quando anche i file delle pagine (defer, dopo questo) sono stati eseguiti */
@@ -629,7 +823,7 @@
     initPasswordToggles();
     OA.start();
     if (pagine[page]) pagine[page]();
-    initMappaTelefono();
+    initFoglio();
     /* «Come ti muovi?» solo dopo il profilo: chi ha già scelto su un altro dispositivo non la vede */
     profilo.then(initBenvenuto, initBenvenuto);
   });

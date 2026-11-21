@@ -623,6 +623,11 @@
         close.setAttribute('aria-label', 'Chiudi');
         close.setAttribute('title', 'Chiudi');
       }
+      /* La web-app mostra il riquadro nel suo pannello (stile Mappe, app/assets/js/app.js): le dice cosa si è aperto */
+      container.dispatchEvent(new CustomEvent('oa-riquadro', { detail: { aperto: true, map: map, popup: ev.popup } }));
+    });
+    map.on('popupclose', function (ev) {
+      container.dispatchEvent(new CustomEvent('oa-riquadro', { detail: { aperto: false, map: map, popup: ev.popup } }));
     });
     return map;
   }
@@ -1192,11 +1197,18 @@
         aggiornaSegnaposto(layer, markers, tutti, highlight);
         if (ricerca && !keepView) {
           if (tutti.length) {
-            /* Nell'app la barra in basso copre il fondo della mappa: i luoghi restano sopra la barra */
-            var nav = document.querySelector('.app-nav');
-            var sotto = nav && getComputedStyle(nav).position === 'fixed' ? nav.offsetHeight + 16 : 0;
+            /* Nell'app il pannello (stile Mappe) copre una parte della mappa: i luoghi restano nella parte libera.
+               Telefono: pannello in basso (a metà schermo dopo la ricerca); tablet e computer: colonna a sinistra. */
+            var tl = [40, 40];
+            var br = [40, 40];
+            var foglio = document.querySelector('.foglio');
+            if (foglio) {
+              var fr = foglio.getBoundingClientRect();
+              if (fr.left > 4) tl[0] = fr.right + 24;
+              else br[1] = 24 + Math.max(fr.height, foglio.getAttribute('data-altezza') === 'basso' ? 0 : window.innerHeight * 0.5);
+            }
             map.fitBounds(L.latLngBounds(tutti.map(function (p) { return [p.lat, p.lng]; })),
-              { paddingTopLeft: [40, 40], paddingBottomRight: [40, 40 + sotto], maxZoom: 14 });
+              { paddingTopLeft: tl, paddingBottomRight: br, maxZoom: 14 });
           } else {
             map.setView(ITALY.center, ITALY.zoom);
           }
