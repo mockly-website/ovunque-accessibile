@@ -602,6 +602,30 @@
     }, { passive: true });
   }
 
+  /* Margini della parte di mappa libera dal pannello della web-app (.foglio, stile Mappe): in basso sul telefono
+     (a metà schermo se è aperto), colonna a sinistra su tablet e computer. Senza pannello: margini uguali. */
+  function margini(m) {
+    var tl = [m, m];
+    var br = [m, m];
+    var foglio = document.querySelector('.foglio');
+    if (foglio) {
+      var fr = foglio.getBoundingClientRect();
+      if (fr.left > 4) tl[0] = fr.right + 24;
+      else br[1] = 24 + Math.max(window.innerHeight - fr.top, foglio.getAttribute('data-altezza') === 'basso' ? 0 : window.innerHeight * 0.5);
+    }
+    return { tl: tl, br: br };
+  }
+
+  /* «Tutta Italia»: con il pannello dell'app l'Italia sta nella parte libera; altrimenti la vista di sempre */
+  function italia(map) {
+    if (!document.querySelector('.foglio')) {
+      map.setView(ITALY.center, ITALY.zoom);
+      return;
+    }
+    var mg = margini(16);
+    map.fitBounds([[36.6, 6.6], [47.1, 18.6]], { paddingTopLeft: mg.tl, paddingBottomRight: mg.br });
+  }
+
   function createMap(container, options) {
     if (!window.L) return null;
     var opts = Object.assign({}, options || {});
@@ -613,6 +637,7 @@
       tapTolerance: 20            /* un tocco un po' mosso conta ancora come tocco (dita tremanti, carrozzina in movimento) */
     }, opts, { zoomControl: false }));
     if (cooperative) dueDita(map);
+    container._oaMap = map;
     /* Testi dei controlli di Leaflet in italiano (WCAG 3.1.2) */
     L.control.zoom({ zoomInTitle: 'Avvicina', zoomOutTitle: 'Allontana' }).addTo(map);
     L.tileLayer(TILE_URL, { maxZoom: 19, attribution: ATTRIBUTION }).addTo(map);
@@ -644,12 +669,18 @@
   }
 
   /* Cerchio con il numero dei luoghi (gruppi di segnaposto e zone) */
-  function iconaGruppo(n) {
+  /* si: quanti sono accessibili per l'esigenza scelta (solo nei gruppi di segnaposto, non nelle zone): pallino verde
+     con la spunta e il numero (21 novembre 2026) */
+  function iconaGruppo(n, si) {
     var t = n.toLocaleString('it-IT');
+    var conSi = typeof si === 'number';
     return L.divIcon({
       className: 'cluster' + (n > 999 ? ' cluster--tanti' : ''),
       iconSize: L.point(48, 48),
-      html: '<span aria-hidden="true">' + t + '</span><span class="visually-hidden">' + t + ' luoghi in questa zona: premi per avvicinarti</span>'
+      html: '<span aria-hidden="true">' + t + '</span>' +
+        (conSi && si > 0 ? '<span class="cluster__si" aria-hidden="true">✓' + si.toLocaleString('it-IT') + '</span>' : '') +
+        '<span class="visually-hidden">' + t + ' luoghi in questa zona' +
+        (conSi ? ', ' + (si === 1 ? '1 accessibile' : si.toLocaleString('it-IT') + ' accessibili') : '') + ': premi per avvicinarti</span>'
     });
   }
 
@@ -665,9 +696,9 @@
       maxClusterRadius: 48,
       spiderfyDistanceMultiplier: 1.6,
       iconCreateFunction: function (cluster) {
-        return iconaGruppo(zone
-          ? cluster.getAllChildMarkers().reduce(function (s, m) { return s + m.options.n; }, 0)
-          : cluster.getChildCount());
+        if (zone) return iconaGruppo(cluster.getAllChildMarkers().reduce(function (s, m) { return s + m.options.n; }, 0));
+        var figli = cluster.getAllChildMarkers();
+        return iconaGruppo(cluster.getChildCount(), figli.filter(function (m) { return m._oaG === 'si'; }).length);
       }
     });
   }
@@ -882,7 +913,7 @@
           }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 });
         }
         all.addEventListener('click', function () {
-          map.setView(ITALY.center, ITALY.zoom);
+          italia(map);
           if (status) status.textContent = 'Mappa di tutta Italia.';
         });
         return box;
@@ -1199,18 +1230,11 @@
           if (tutti.length) {
             /* Nell'app il pannello (stile Mappe) copre una parte della mappa: i luoghi restano nella parte libera.
                Telefono: pannello in basso (a metà schermo dopo la ricerca); tablet e computer: colonna a sinistra. */
-            var tl = [40, 40];
-            var br = [40, 40];
-            var foglio = document.querySelector('.foglio');
-            if (foglio) {
-              var fr = foglio.getBoundingClientRect();
-              if (fr.left > 4) tl[0] = fr.right + 24;
-              else br[1] = 24 + Math.max(fr.height, foglio.getAttribute('data-altezza') === 'basso' ? 0 : window.innerHeight * 0.5);
-            }
+            var mg = margini(40);
             map.fitBounds(L.latLngBounds(tutti.map(function (p) { return [p.lat, p.lng]; })),
-              { paddingTopLeft: tl, paddingBottomRight: br, maxZoom: 14 });
+              { paddingTopLeft: mg.tl, paddingBottomRight: mg.br, maxZoom: 14 });
           } else {
-            map.setView(ITALY.center, ITALY.zoom);
+            italia(map);
           }
         }
       }
@@ -1752,7 +1776,7 @@
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,
     el: el, icon: icon, formatDate: formatDate, normalize: normalize,
     statusNode: statusNode, verdictNode: verdictNode, placeCard: placeCard,
-    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY,
+    createMap: createMap, pinIcon: pinIcon, ITALY: ITALY, italia: italia,
     /* dopo una modifica (avviso aggiunto o chiuso): i riquadri e le ricerche si richiedono al database */
     svuotaLuoghi: function () { aree = []; ricerche = {}; }
   };

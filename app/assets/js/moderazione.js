@@ -301,9 +301,7 @@
     }
     si.addEventListener('click', function () {
       run(function () {
-        return api.setPlaceState(x.place_id, 'archiviato').then(function () {
-          return api.reject(x.id, 'Grazie: abbiamo controllato, ha chiuso davvero e l\'abbiamo tolto dalla mappa.');
-        });
+        return api.archiveClosed(x.id, x.place_id);
       }, 'Luogo archiviato: non si vede più su mappa ed elenchi.');
     });
     no.addEventListener('click', function () {

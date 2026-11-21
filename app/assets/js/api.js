@@ -538,6 +538,19 @@
       moderateReview: function (id, stato, motivo) {
         return sb.rpc('modera_recensione', { p_id: id, p_stato: stato, p_motivo: motivo || null }).then(check);
       },
+      /* «Ha chiuso: archivia il luogo» (migrazione 20261121000000_luogo_chiuso.sql). Se la migrazione non c'è
+         ancora: archivia e chiude la segnalazione come «non approvata» con un motivo che spiega */
+      archiveClosed: function (proposta, placeId) {
+        svuota();
+        return sb.rpc('archivia_chiuso', { p_id: proposta }).then(function (r) {
+          if (r.error && (r.error.code === 'PGRST202' || /archivia_chiuso/.test(r.error.message || ''))) {
+            return sb.rpc('stato_luogo', { p_id: placeId, p_stato: 'archiviato' }).then(check).then(function () {
+              return sb.rpc('respingi_proposta', { p_id: proposta, p_motivo: 'Grazie: abbiamo controllato, ha chiuso davvero e l\'abbiamo tolto dalla mappa.' }).then(check);
+            });
+          }
+          return check(r);
+        });
+      },
       setPlaceState: function (id, stato) {
         svuota();
         return sb.rpc('stato_luogo', { p_id: id, p_stato: stato }).then(check);

@@ -78,7 +78,7 @@
     return form.dataset.busy === '1';
   }
 
-  var STATO_PROPOSTA = { 'in-attesa': 'In attesa di controllo', approvata: 'Approvata', respinta: 'Non approvata' };
+  var STATO_PROPOSTA = { 'in-attesa': 'In attesa di controllo', approvata: 'Approvata', respinta: 'Non approvata', chiusa: 'Luogo chiuso: tolto dalla mappa' };
   var STATO_RECENSIONE = { 'in-attesa': 'In attesa di controllo', pubblicata: 'Pubblicata', respinta: 'Non pubblicata' };
 
   function statePill(stato, labels) {
@@ -554,9 +554,10 @@
        maniglia o dalla testa, ma c'è sempre anche il tocco sulla maniglia («Mostra di più / di meno») e Esc, quindi
        niente richiede di trascinare (WCAG 2.5.7);
      - tablet e computer (da 48em, schermi non bassi): colonna fissa a sinistra, sempre aperta.
-     Nel pannello: ricerca e foto del profilo, pulsanti rapidi (🚻 Bagni, Esigenza, Filtri), elenco dei luoghi.
+     La barra delle schede resta (scelta del 21 novembre, dopo una prova senza): il pannello le sta sopra.
+     Nel pannello: ricerca, pulsanti rapidi (🚻 Bagni, Esigenza, Filtri), elenco dei luoghi.
      Toccando un segnaposto il riquadro del luogo si apre nel pannello (evento oa-riquadro da oa-core.js), non sulla
-     mappa. Sulla mappa, in alto a destra sotto «Vicino a me» e «Tutta Italia»: Segnala (+) e Legenda. */
+     mappa. Sulla mappa, in alto a destra sotto «Vicino a me» e «Tutta Italia»: Legenda. */
   function initFoglio() {
     if (page !== 'mappa') return;
     var layout = document.querySelector('.explore__layout');
@@ -574,18 +575,12 @@
     /* --- testa: ricerca + profilo --- */
     var cerca = form.querySelector('.search');
     var q = document.getElementById('q');
-    var profilo = document.querySelector('.app-nav__link[data-account-link]');
-    var segnala = document.querySelector('.app-nav__link[href="segnala.html"]');
     [q, cerca && cerca.querySelector('button')].forEach(function (c) { if (c) c.setAttribute('form', 'filters'); });
     if (q) {
       q.setAttribute('aria-label', 'Cerca un luogo o una città');
       q.placeholder = 'Cerca un luogo o una città';
     }
     var testa = el('div', { className: 'foglio__testa' }, [cerca]);
-    if (profilo) {
-      profilo.classList.add('foglio__profilo');
-      testa.appendChild(profilo);
-    }
 
     /* --- pulsanti rapidi --- */
     var vicino = form.querySelector('.filters__near .quick__link--near');
@@ -654,10 +649,78 @@
     luogo.appendChild(contenutoLuogo);
     var popupAperto = null;
 
+    /* --- ricerche recenti e preferiti, come in Mappe: si vedono con il campo di ricerca vuoto --- */
+    var sugg = el('div', { className: 'foglio__sugg' });
+    var KEY_RICERCHE = 'oa-ricerche';
+    function recenti() {
+      try { var r = JSON.parse(localStorage.getItem(KEY_RICERCHE) || '[]'); return Array.isArray(r) ? r.filter(function (t) { return typeof t === 'string'; }).slice(0, 5) : []; }
+      catch (e) { return []; }
+    }
+    function salvaRicerca(t) {
+      t = (t || '').trim().slice(0, 80);
+      if (t.length < 2) return;
+      var r = recenti().filter(function (x) { return x.toLowerCase() !== t.toLowerCase(); });
+      r.unshift(t);
+      try { localStorage.setItem(KEY_RICERCHE, JSON.stringify(r.slice(0, 5))); } catch (e) { /* solo per questa visita */ }
+    }
+    var boxRecenti = el('section', { className: 'foglio__gruppo', 'aria-labelledby': 'sugg-recenti', hidden: '' });
+    var boxPreferiti = el('section', { className: 'foglio__gruppo', 'aria-labelledby': 'sugg-preferiti', hidden: '' });
+    sugg.appendChild(boxRecenti);
+    sugg.appendChild(boxPreferiti);
+    function disegnaRecenti() {
+      var r = recenti();
+      boxRecenti.textContent = '';
+      boxRecenti.hidden = !r.length;
+      if (!r.length) return;
+      var cancella = el('button', { type: 'button', className: 'foglio__gruppo-azione', text: 'Cancella' });
+      cancella.appendChild(el('span', { className: 'visually-hidden', text: ' le ricerche recenti' }));
+      boxRecenti.appendChild(el('div', { className: 'foglio__gruppo-testa' }, [el('h2', { id: 'sugg-recenti', className: 'foglio__gruppo-titolo', text: 'Ricerche recenti' }), cancella]));
+      boxRecenti.appendChild(el('ul', { className: 'foglio__voci', role: 'list' }, r.map(function (t) {
+        var b = el('button', { type: 'button', className: 'foglio__voce' }, [icon('#icon-clock'), el('span', { text: t })]);
+        b.addEventListener('click', function () {
+          q.value = t;
+          if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true }));
+        });
+        return el('li', {}, [b]);
+      })));
+      cancella.addEventListener('click', function () {
+        try { localStorage.removeItem(KEY_RICERCHE); } catch (e) { /* niente */ }
+        disegnaRecenti();
+        if (q) q.focus();
+      });
+    }
+    function disegnaPreferiti() {
+      if (!api.user() || !api.favorites || !api.placesByIds) return;
+      api.favorites().then(function (ids) {
+        return ids.length ? api.placesByIds(ids.slice(0, 8)) : [];
+      }).then(function (pp) {
+        boxPreferiti.textContent = '';
+        boxPreferiti.hidden = !pp.length;
+        if (!pp.length) return;
+        boxPreferiti.appendChild(el('div', { className: 'foglio__gruppo-testa' }, [
+          el('h2', { id: 'sugg-preferiti', className: 'foglio__gruppo-titolo', text: 'I tuoi preferiti' }),
+          el('a', { className: 'foglio__gruppo-azione', href: 'profilo.html#preferiti', text: 'Tutti' }, [el('span', { className: 'visually-hidden', text: ' i preferiti' })])
+        ]));
+        boxPreferiti.appendChild(el('ul', { className: 'foglio__voci', role: 'list' }, pp.map(function (p) {
+          return el('li', {}, [el('a', { className: 'foglio__voce', href: 'luogo.html?id=' + encodeURIComponent(p.id) }, [
+            icon('#icon-heart'), el('span', { className: 'foglio__voce-testo' }, [el('span', { text: p.nome }), el('span', { className: 'foglio__voce-sub', text: p.citta || '' })])
+          ])]);
+        })));
+      }).catch(function () { /* senza preferiti va bene lo stesso */ });
+    }
+    function aggiornaSugg() { sugg.hidden = !!(q && q.value.trim()); }
+    disegnaRecenti();
+    disegnaPreferiti();
+    aggiornaSugg();
+    if (q) q.addEventListener('input', aggiornaSugg);
+    form.addEventListener('submit', function () { if (q) salvaRicerca(q.value); disegnaRecenti(); aggiornaSugg(); });
+    form.addEventListener('reset', function () { setTimeout(aggiornaSugg, 0); });
+
     /* --- pannello --- */
     var corpo = el('div', { className: 'foglio__corpo', id: 'foglio-corpo' });
     corpo.appendChild(luogo);
     corpo.appendChild(rapidi);
+    corpo.appendChild(sugg);
     corpo.appendChild(controls);
     corpo.appendChild(results);
     var maniglia = el('button', { type: 'button', className: 'foglio__maniglia', 'aria-controls': 'foglio-corpo', 'aria-expanded': 'false' }, [
@@ -668,13 +731,6 @@
 
     /* --- pulsanti sulla mappa: Segnala e Legenda --- */
     var tasti = el('div', { className: 'mappa-tasti' });
-    if (segnala) {
-      segnala.className = 'mappa-tasti__btn mappa-tasti__segnala';
-      var lab = segnala.querySelector('span');
-      if (lab) lab.className = 'visually-hidden';
-      if (lab) lab.textContent = 'Segnala un luogo';
-      tasti.appendChild(segnala);
-    }
     var leg = wrap.querySelector('.map-legend');
     if (leg) {
       leg.id = 'mappa-legenda';
@@ -691,6 +747,22 @@
       });
     }
     wrap.appendChild(tasti);
+    /* Barra delle schede (in basso fino a 64em) e intestazione (in alto da 64em): il pannello e la mappa le evitano */
+    function misura() {
+      var nav = document.querySelector('.app-nav');
+      var head = document.querySelector('.site-header');
+      var nr = nav && nav.getBoundingClientRect();
+      var basso = nr && nr.height && getComputedStyle(nav).position === 'fixed' && nr.top > window.innerHeight / 2 ? window.innerHeight - nr.top : 0;
+      var hr = head && head.getBoundingClientRect();
+      var alto = hr && hr.height > 8 && !basso ? hr.bottom : 0;
+      document.body.style.setProperty('--barra-h', Math.round(basso) + 'px');
+      document.body.style.setProperty('--testa-h', Math.round(alto) + 'px');
+    }
+    misura();
+    window.addEventListener('resize', misura);
+    /* con la tastiera aperta la barra delle schede si nasconde (CSS): il pannello scende con lei */
+    document.addEventListener('focusin', function () { setTimeout(misura, 60); });
+    document.addEventListener('focusout', function () { setTimeout(misura, 60); });
     /* la mappa ora è a tutto schermo: Leaflet ricalcola le dimensioni */
     window.dispatchEvent(new Event('resize'));
     setTimeout(function () { window.dispatchEvent(new Event('resize')); }, 300);
@@ -698,7 +770,7 @@
     /* --- altezze --- */
     var ALTEZZE = ['basso', 'meta', 'alto'];
     var altezza = 'basso';
-    function setAltezza(a) {
+    function setAltezza(a, daIndietro) {
       altezza = a;
       foglio.setAttribute('data-altezza', a);
       var chiuso = a === 'basso' && !colonna.matches;
@@ -706,15 +778,56 @@
       if (chiuso) corpo.setAttribute('aria-hidden', 'true'); else corpo.removeAttribute('aria-hidden');
       maniglia.setAttribute('aria-expanded', a === 'basso' ? 'false' : 'true');
       maniglia.querySelector('.foglio__maniglia-testo').textContent = a === 'alto' ? 'Riduci il pannello' : a === 'meta' ? 'Allarga il pannello' : 'Mostra i luoghi';
+      if (a !== 'basso') spingi();
+      else if (!daIndietro && !popupAperto) consuma();
     }
     maniglia.addEventListener('click', function () {
       if (trascinato) { trascinato = false; return; }
       setAltezza(altezza === 'basso' ? 'meta' : altezza === 'meta' ? 'alto' : 'basso');
     });
     colonna.addEventListener('change', function () { setAltezza(altezza); });
-    setAltezza(location.hash === '#results' ? 'meta' : 'basso');
 
-    /* trascinare (solo telefono): maniglia e testa, non il campo di ricerca */
+    /* «Indietro» del telefono (Android, gesto su iPhone): chiude prima il luogo, poi riduce il pannello.
+       Una sola voce nella cronologia finché il pannello è aperto; chiudendo a mano la si consuma. */
+    var inStoria = false;
+    var ignora = false;
+    function spingi() {
+      if (colonna.matches || inStoria) return;
+      history.pushState({ oaFoglio: true }, '', location.href);
+      inStoria = true;
+    }
+    function consuma() {
+      if (!inStoria) return;
+      inStoria = false;
+      ignora = true;
+      history.back();
+    }
+    window.addEventListener('popstate', function () {
+      if (ignora) { ignora = false; return; }
+      inStoria = false;
+      if (popupAperto) {
+        chiudi(true);
+        if (altezza !== 'basso') spingi();
+        return;
+      }
+      if (altezza !== 'basso') setAltezza('basso', true);
+    });
+
+    /* aggancio all'altezza più vicina, dopo un trascinamento */
+    function aggancia(h) {
+      foglio.style.height = '';
+      foglio.classList.remove('is-trascina');
+      var vh = window.innerHeight;
+      var vicine = ALTEZZE.map(function (a) { return { a: a, d: Math.abs(h - (a === 'basso' ? 108 + (parseInt(document.body.style.getPropertyValue('--barra-h'), 10) || 0) : a === 'meta' ? vh * 0.5 : vh - 48)) }; })
+        .sort(function (x, y) { return x.d - y.d; });
+      setAltezza(vicine[0].a);
+    }
+    function trascina(h) {
+      foglio.classList.add('is-trascina');
+      foglio.style.height = Math.max(80, Math.min(window.innerHeight - 40, h)) + 'px';
+    }
+
+    /* trascinare (solo telefono) dalla maniglia e dalla testa, non dal campo di ricerca */
     var inizio = null;
     var trascinato = false;
     function suInizio(ev) {
@@ -722,26 +835,17 @@
       if (ev.target.closest('input, a, button:not(.foglio__maniglia)')) return;
       inizio = { y: ev.clientY, h: foglio.getBoundingClientRect().height };
       trascinato = false;
-      foglio.classList.add('is-trascina');
-      foglio.setPointerCapture && foglio.setPointerCapture(ev.pointerId);
+      if (foglio.setPointerCapture) foglio.setPointerCapture(ev.pointerId);
     }
     function suMossa(ev) {
       if (!inizio) return;
       var dy = inizio.y - ev.clientY;
       if (Math.abs(dy) > 6) trascinato = true;
-      if (trascinato) foglio.style.height = Math.max(80, Math.min(window.innerHeight - 40, inizio.h + dy)) + 'px';
+      if (trascinato) trascina(inizio.h + dy);
     }
     function suFine() {
       if (!inizio) return;
-      foglio.classList.remove('is-trascina');
-      if (trascinato) {
-        var h = foglio.getBoundingClientRect().height;
-        foglio.style.height = '';
-        var vh = window.innerHeight;
-        var vicine = ALTEZZE.map(function (a) { return { a: a, d: Math.abs(h - (a === 'basso' ? 90 : a === 'meta' ? vh * 0.5 : vh - 48)) }; })
-          .sort(function (x, y) { return x.d - y.d; });
-        setAltezza(vicine[0].a);
-      }
+      if (trascinato) aggancia(foglio.getBoundingClientRect().height);
       inizio = null;
     }
     maniglia.addEventListener('pointerdown', suInizio);
@@ -749,6 +853,54 @@
     foglio.addEventListener('pointermove', suMossa);
     foglio.addEventListener('pointerup', suFine);
     foglio.addEventListener('pointercancel', suFine);
+
+    /* ...e dall'elenco, come in Mappe: a metà schermo il dito allarga o riduce il pannello; a tutto schermo l'elenco
+       scorre, e solo quando è in cima un trascinamento verso il basso riduce il pannello */
+    var tocco = null;
+    corpo.addEventListener('touchstart', function (ev) {
+      if (colonna.matches || ev.touches.length > 1) { tocco = null; return; }
+      if (ev.target.closest('input, select, textarea, .chips, .foglio__rapidi')) { tocco = null; return; }
+      tocco = { y: ev.touches[0].clientY, h: foglio.getBoundingClientRect().height, attivo: false };
+    }, { passive: true });
+    corpo.addEventListener('touchmove', function (ev) {
+      if (!tocco) return;
+      var dy = tocco.y - ev.touches[0].clientY;
+      if (!tocco.attivo) {
+        if (altezza !== 'alto' && Math.abs(dy) > 8) tocco.attivo = true;
+        else if (altezza === 'alto' && corpo.scrollTop <= 0 && dy < -8) tocco.attivo = true;
+        else if (Math.abs(dy) > 8) { tocco = null; return; }
+      }
+      if (tocco.attivo) {
+        if (ev.cancelable) ev.preventDefault();
+        trascina(tocco.h + dy);
+      }
+    }, { passive: false });
+    function fineTocco() {
+      if (tocco && tocco.attivo) aggancia(foglio.getBoundingClientRect().height);
+      tocco = null;
+    }
+    corpo.addEventListener('touchend', fineTocco);
+    corpo.addEventListener('touchcancel', fineTocco);
+
+    setAltezza(location.hash === '#results' ? 'meta' : 'basso');
+
+    /* all'apertura l'Italia sta nella parte di mappa libera dal pannello (non quando si arriva da una ricerca) */
+    var p0 = new URLSearchParams(location.search);
+    if (!p0.get('q') && p0.get('vicino') !== '1' && mapBox._oaMap && OA.italia) {
+      setTimeout(function () { OA.italia(mapBox._oaMap); }, 350);
+      /* «Vicino a me» da solo, ma solo se il permesso della posizione c'è già (non lo chiediamo mai all'apertura)
+         e una volta per visita: tornando dalla scheda di un luogo la mappa resta dov'era */
+      var giaFatto = false;
+      try { giaFatto = sessionStorage.getItem('oa-vicino-auto') === '1'; } catch (e) { giaFatto = true; }
+      if (!giaFatto && navigator.permissions && navigator.permissions.query) {
+        navigator.permissions.query({ name: 'geolocation' }).then(function (st) {
+          if (st.state !== 'granted') return;
+          try { sessionStorage.setItem('oa-vicino-auto', '1'); } catch (e) { /* niente */ }
+          var b = mapBox.querySelector('.map-tools__btn');
+          if (b) setTimeout(function () { b.click(); }, 450);
+        }).catch(function () { /* il browser non lo dice: niente */ });
+      }
+    }
 
     /* --- cosa apre il pannello --- */
     if (q) q.addEventListener('focus', function () { if (altezza === 'basso') setAltezza('meta'); });
@@ -765,14 +917,15 @@
     });
 
     /* --- riquadro del luogo --- */
-    function chiudi() {
+    function chiudi(daIndietro) {
       var p = popupAperto;
       popupAperto = null;
       luogo.hidden = true;
       contenutoLuogo.textContent = '';
       if (p) p.map.closePopup(p.popup);
+      if (daIndietro !== true && altezza === 'basso') consuma();
     }
-    chiudiLuogo.addEventListener('click', chiudi);
+    chiudiLuogo.addEventListener('click', function () { chiudi(); });
     mapBox.addEventListener('oa-riquadro', function (ev) {
       var d = ev.detail;
       if (!d.aperto) {
@@ -785,7 +938,7 @@
       contenutoLuogo.textContent = '';
       contenutoLuogo.appendChild(nodo.cloneNode(true));
       luogo.hidden = false;
-      if (altezza === 'basso') setAltezza('meta');
+      if (altezza === 'basso') setAltezza('meta'); else spingi();
       corpo.scrollTop = 0;
       /* il segnaposto resta visibile: se finisce sotto il pannello, la mappa si sposta */
       setTimeout(function () {

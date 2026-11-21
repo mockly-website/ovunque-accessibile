@@ -2933,6 +2933,26 @@ main > .section .locali-box--blu h2::after {
   filter: saturate(0.9) brightness(1.03);
 }
 
+/* Nei gruppi di segnaposto: quanti sono accessibili (pallino verde in alto a destra) */
+.cluster { position: relative; }
+
+.cluster__si {
+  position: absolute;
+  top: -0.45rem;
+  right: -0.7rem;
+  min-width: 1.6rem;
+  padding: 0.1rem 0.35rem;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #1d5b35;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-align: center;
+  white-space: nowrap;
+}
+
 /* Segnaposto: goccia con il simbolo del giudizio (divIcon di Leaflet).
    Il contenitore lo posiziona Leaflet con transform: rotazione e zoom solo sull'elemento interno. */
 .pin {

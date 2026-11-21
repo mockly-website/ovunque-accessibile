@@ -3,15 +3,15 @@
    - File statici (CSS, JS, font, icone): dalla copia salvata, aggiornata in sottofondo.
    - Mai in cache: dati e accesso (Supabase), immagini della mappa, altri siti.
    Cambiare VERSION a ogni rilascio per buttare le copie vecchie. */
-var VERSION = 'oa-app-ad217803';
+var VERSION = 'oa-app-f380fc25';
 var SHELL = [
   './', 'index.html', 'luogo.html', 'accedi.html', 'registrati.html', 'password.html', 'segnala.html',
   'profilo.html', 'moderazione.html', 'privacy.html', 'bollino.html', 'locali.html', 'manifest.webmanifest',
-  'assets/css/app.css?v=a6dfd666', 'assets/js/config.js?v=90a84c77', 'assets/js/api.js?v=cbb679a8', 'assets/js/app.js?v=649577fa',
+  'assets/css/app.css?v=0c835eb9', 'assets/js/config.js?v=90a84c77', 'assets/js/api.js?v=5cc40f7e', 'assets/js/app.js?v=4d8917f1',
   'assets/js/accesso.js?v=209771b2', 'assets/js/scheda.js?v=31b12f80', 'assets/js/segnala.js?v=c1a7e122', 'assets/js/profilo.js?v=d79286f4',
-  'assets/js/moderazione.js?v=150a3842', 'assets/js/bollino.js?v=28f9a403',
+  'assets/js/moderazione.js?v=dc3a83b4', 'assets/js/bollino.js?v=28f9a403',
   'assets/vendor/supabase/supabase.js?v=2.117.3', 'assets/img/icon-192.png',
-  '../assets/css/sito.css?v=f7422476', '../assets/js/oa-core.js?v=8ef10dda',
+  '../assets/css/sito.css?v=215964cc', '../assets/js/oa-core.js?v=7d9a6254',
   '../assets/vendor/leaflet/leaflet.js', '../assets/vendor/leaflet/leaflet.css',
   '../assets/vendor/markercluster/leaflet.markercluster.js', '../assets/vendor/markercluster/MarkerCluster.css',
   '../assets/fonts/atkinson-hyperlegible-400-latin.woff2', '../assets/fonts/atkinson-hyperlegible-700-latin.woff2',
