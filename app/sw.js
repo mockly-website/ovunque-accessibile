@@ -5,7 +5,7 @@
      per vedere la mappa anche senza connessione; dalla copia se ha meno di 7 giorni, altrimenti dalla rete.
    - Mai in cache: dati e accesso (Supabase, la copia leggera dei luoghi la tiene api.js), altri siti.
    Cambiare VERSION a ogni rilascio per buttare le copie vecchie. */
-var VERSION = 'oa-app-3802846e';
+var VERSION = 'oa-app-19d3138e';
 var SHELL = [
   './', 'index.html', 'luogo.html', 'accedi.html', 'registrati.html', 'password.html', 'segnala.html',
   'profilo.html', 'moderazione.html', 'privacy.html', 'bollino.html', 'locali.html', 'manifest.webmanifest',
@@ -13,7 +13,7 @@ var SHELL = [
   'assets/js/accesso.js?v=209771b2', 'assets/js/scheda.js?v=867968a6', 'assets/js/segnala.js?v=d1c4d370', 'assets/js/profilo.js?v=d79286f4',
   'assets/js/mappa.js?v=59da74b1', 'assets/js/moderazione.js?v=55a2d9b4', 'assets/js/bollino.js?v=28f9a403',
   'assets/vendor/supabase/supabase.js?v=2.117.3', 'assets/img/icon-192.png',
-  '../assets/css/sito.css?v=114d2991', '../assets/js/oa-core.js?v=b35e2d0e',
+  '../assets/css/sito.css?v=a3c0e17b', '../assets/js/oa-core.js?v=b35e2d0e',
   '../assets/vendor/leaflet/leaflet.js', '../assets/vendor/leaflet/leaflet.css',
   '../assets/vendor/markercluster/leaflet.markercluster.js', '../assets/vendor/markercluster/MarkerCluster.css',
   '../assets/fonts/atkinson-hyperlegible-400-latin.woff2', '../assets/fonts/atkinson-hyperlegible-700-latin.woff2',

@@ -1886,12 +1886,24 @@ main > .section .apps h2::after {
   text-underline-offset: 0.2em;
 }
 
-/* senza il titolo visibile (24 novembre 2026, richiesta dei titolari): logo e, accanto, pulsante e link */
-.apps--breve .apps__actions { grid-column: auto; }
+/* senza il titolo visibile (24 novembre 2026, richiesta dei titolari): tutto al centro, su una riga sul computer
+   (logo, pulsante, link, nota Android), che va a capo restando centrato su schermi stretti. Prima restava metà
+   riquadro vuota a destra. */
+.apps.apps--breve {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-md) var(--space-xl);
+  text-align: center;
+}
 
-@media (min-width: 48em) {
-  .apps--breve { grid-template-columns: auto minmax(0, 1fr); }
-  .apps--breve .apps__actions { justify-items: start; }
+.apps--breve .apps__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-sm) var(--space-xl);
 }
 
 /* Pagina installa.html */
