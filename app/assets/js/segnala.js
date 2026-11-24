@@ -47,12 +47,10 @@
     ] },
     { id: 'ingresso', title: 'Ingresso', intro: 'Serve almeno il numero di gradini. Per il resto lascia «Non so» se non lo sai: lo segneremo come «da verificare».', fields: [
       { path: 'misure.ingresso.gradini', label: 'Quanti gradini per entrare?', help: 'Scrivi 0 se non ce ne sono.', type: 'number', required: true, min: 0, max: 100, short: true, warnAbove: [30, 'più di 30 gradini all\'ingresso sono tanti'] },
-      { path: 'misure.ingresso.gradino_cm', label: 'Altezza del gradino più alto', unit: 'cm', type: 'number', min: 1, max: 50, short: true, when: gradiniPresenti, warnAbove: [25, 'un gradino più alto di 25 cm è raro'] },
       { path: 'misure.ingresso.corrimano', label: 'Ci sono corrimano?', type: 'tri', when: gradiniPresenti },
       { path: 'misure.ingresso.rampa', label: 'C\'è una rampa?', type: 'tri' },
       { path: 'misure.ingresso.rampa_pendenza', label: 'Com\'è la rampa?', type: 'choice', options: [['lieve', 'Lieve: in carrozzina si sale da soli'], ['media', 'Media: serve un po\' di forza o una spinta'], ['ripida', 'Ripida: difficile anche con aiuto']], showIf: ['misure.ingresso.rampa', true] },
       { path: 'x.nessuna_porta', label: 'Non c\'è una porta (spiaggia, parco, pontile…)', type: 'checkbox' },
-      { path: 'misure.ingresso.porta_cm', label: 'Larghezza della porta', help: 'Lo spazio libero quando è aperta.', unit: 'cm', type: 'number', min: 40, max: 300, short: true, showIf: ['x.nessuna_porta', false], warnBelow: [60, 'una porta più stretta di 60 cm è molto stretta'] },
       { path: 'misure.ingresso.nota', label: 'Note sull\'ingresso', type: 'textarea', max: 500, more: true },
       { path: 'misure.ingresso.nota_porta', label: 'Note sulla porta', type: 'textarea', max: 500, showIf: ['x.nessuna_porta', false], more: true }
     ] },
@@ -63,15 +61,11 @@
     { id: 'piani', title: 'Piani e ascensore', fields: [
       { path: 'misure.piani.valore', label: 'Come si raggiungono i piani?', type: 'choice', options: [['uno', 'È tutto su un piano'], ['ascensore', 'C\'è un ascensore'], ['scale', 'Solo con le scale']] },
       { path: 'misure.piani.ascensore_persone', label: 'Quante persone porta l\'ascensore?', help: 'È scritto sulla targhetta dentro la cabina, per esempio «6 persone – 450 kg».', type: 'choice', options: [['fino-5', 'Fino a 5 persone'], ['6-7', '6 o 7 persone'], ['8-piu', '8 persone o più']], showIf: ['misure.piani.valore', 'ascensore'] },
-      { path: 'x.ascensore_l', label: 'Se l\'hai misurata: larghezza della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina larga meno di 70 cm è molto piccola'] },
-      { path: 'x.ascensore_p', label: 'Se l\'hai misurata: profondità della cabina', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.piani.valore', 'ascensore'], warnBelow: [70, 'una cabina profonda meno di 70 cm è molto piccola'] },
       { path: 'misure.piani.corrimano_scale', label: 'Le scale hanno il corrimano?', type: 'tri', showIf: ['misure.piani.valore', 'scale'] },
       { path: 'misure.piani.nota', label: 'Note su piani e ascensore', type: 'textarea', max: 500, more: true }
     ] },
     { id: 'bagno', title: 'Bagno', fields: [
       { path: 'misure.bagno.valore', label: 'C\'è un bagno accessibile?', type: 'choice', options: [['attrezzato', 'Sì, attrezzato per persone con disabilità'], ['non-attrezzato', 'C\'è, ma non è attrezzato'], ['assente', 'No, nessun bagno accessibile'], ['non-previsto', 'In questo luogo non è previsto un bagno']] },
-      { path: 'misure.bagno.rotazione', label: 'In carrozzina ci si gira davanti al WC?', help: 'Serve uno spazio libero tondo di circa 150 cm: quanto una carrozzina che gira su sé stessa.', type: 'choice', options: [['si', 'Sì, senza fare manovre'], ['manovra', 'Sì, ma con qualche manovra'], ['no', 'No, lo spazio non basta']], showIf: ['misure.bagno.valore', 'attrezzato'] },
-      { path: 'misure.bagno.rotazione_cm', label: 'Se l\'hai misurato: spazio libero davanti al WC', help: 'Il diametro del cerchio libero, da un lato all\'altro.', unit: 'cm', type: 'number', min: 50, max: 400, short: true, showIf: ['misure.bagno.valore', 'attrezzato'] },
       { path: 'misure.bagno.maniglioni', label: 'Ci sono i maniglioni?', type: 'tri', showIf: ['misure.bagno.valore', 'attrezzato'] },
       { path: 'misure.bagno.nota', label: 'Note sul bagno', type: 'textarea', max: 500, more: true }
     ] },
@@ -281,9 +275,7 @@
       regione: p.regione, descrizione: p.descrizione, lat: p.lat, lng: p.lng,
       misure: p.misure, facoltativi: fac, dettagli: p.dettagli || {},
       x: {
-        nessuna_porta: p.misure.ingresso.porta_cm === 0,
-        ascensore_l: p.misure.piani.ascensore_cm ? p.misure.piani.ascensore_cm[0] : null,
-        ascensore_p: p.misure.piani.ascensore_cm ? p.misure.piani.ascensore_cm[1] : null
+        nessuna_porta: p.misure.ingresso.porta_cm === 0
       }
     };
     FIELDS.forEach(function (f) {
@@ -295,7 +287,13 @@
       if (d) d.open = true;
     });
     /* La pendenza misurata in % (schede verificate) resta, finché non si cambia la rampa */
-    form.oaKeep = { rampa_pct: p.misure.ingresso.rampa_pct, rampa_pendenza: p.misure.ingresso.rampa_pendenza || null };
+    form.oaKeep = { rampa_pct: p.misure.ingresso.rampa_pct, rampa_pendenza: p.misure.ingresso.rampa_pendenza || null,
+      /* Misure non più chieste nel modulo (24 novembre 2026, scelta dei titolari): quelle già nella scheda restano */
+      gradino_cm: p.misure.ingresso.gradino_cm == null ? null : p.misure.ingresso.gradino_cm,
+      porta_cm: p.misure.ingresso.porta_cm || null,
+      ascensore_cm: p.misure.piani.ascensore_cm || null,
+      rotazione: (p.misure.bagno || {}).rotazione || null,
+      rotazione_cm: (p.misure.bagno || {}).rotazione_cm == null ? null : p.misure.bagno.rotazione_cm };
   }
 
   /* Legge il modulo → { dati, errors } nella stessa forma delle schede (proposta_valida nel database) */
@@ -346,19 +344,21 @@
     if (out.citta && (out.citta === out.citta.toUpperCase() || out.citta === out.citta.toLowerCase())) {
       out.citta = out.citta.toLowerCase().replace(/(^|[\s'’-])(\S)/g, function (m, sep, ch) { return sep + ch.toUpperCase(); });
     }
-    out.misure.ingresso.porta_cm = x.nessuna_porta ? 0 : (out.misure.ingresso.porta_cm == null ? null : out.misure.ingresso.porta_cm);
-    if (x.nessuna_porta) out.misure.ingresso.nota_porta = null;
-    var asc = null;
-    if (out.misure.piani.valore === 'ascensore' && (x.ascensore_l != null || x.ascensore_p != null)) {
-      if (x.ascensore_l == null || x.ascensore_p == null) {
-        errors.push({ input: $(fid(x.ascensore_l == null ? 'x.ascensore_l' : 'x.ascensore_p')), text: 'Per la cabina servono sia la larghezza sia la profondità (o nessuna delle due).' });
-      } else {
-        asc = [x.ascensore_l, x.ascensore_p];
-      }
-    }
-    out.misure.piani.ascensore_cm = asc;
-    if (out.misure.piani.valore !== 'scale') out.misure.piani.corrimano_scale = null;
     var keep = form.oaKeep || {};
+    /* Altezza del gradino, larghezza della porta, cabina dell'ascensore e spazio davanti al WC non si chiedono più
+       (24 novembre 2026): nelle correzioni restano i valori che la scheda aveva già */
+    out.misure.ingresso.porta_cm = x.nessuna_porta ? 0 : (keep.porta_cm || null);
+    if (x.nessuna_porta) out.misure.ingresso.nota_porta = null;
+    out.misure.ingresso.gradino_cm = keep.gradino_cm == null ? null : keep.gradino_cm;
+    out.misure.piani.ascensore_cm = out.misure.piani.valore === 'ascensore' ? (keep.ascensore_cm || null) : null;
+    if (out.misure.bagno.valore === 'attrezzato') {
+      out.misure.bagno.rotazione = keep.rotazione || null;
+      out.misure.bagno.rotazione_cm = keep.rotazione_cm == null ? null : keep.rotazione_cm;
+    } else {
+      out.misure.bagno.rotazione = null;
+      out.misure.bagno.rotazione_cm = null;
+    }
+    if (out.misure.piani.valore !== 'scale') out.misure.piani.corrimano_scale = null;
     out.misure.ingresso.rampa_pct = out.misure.ingresso.rampa === true && keep.rampa_pct != null &&
       (out.misure.ingresso.rampa_pendenza || null) === keep.rampa_pendenza ? keep.rampa_pct : null;
     if (out.misure.ingresso.rampa !== true) out.misure.ingresso.rampa_pendenza = null;
@@ -510,7 +510,8 @@
     { titolo: 'Il luogo', sezioni: ['sec-luogo'] },
     { titolo: 'Ingresso', sezioni: ['sec-ingresso'] },
     { titolo: 'Dentro', sezioni: ['sec-spazi', 'sec-piani', 'sec-bagno'] },
-    { titolo: 'In più', sezioni: ['sec-descrizione', 'sec-altre', 'sec-sensi', 'sec-dettagli', 'sec-foto', 'sec-nota'] }
+    /* le foto in cima al passo 4, prima delle altre informazioni (24 novembre 2026, richiesta dei titolari) */
+    { titolo: 'In più', sezioni: ['sec-foto', 'sec-descrizione', 'sec-altre', 'sec-sensi', 'sec-dettagli', 'sec-nota'] }
   ];
 
   function initWizard(form, box, tutti) {

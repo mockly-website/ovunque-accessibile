@@ -3496,34 +3496,7 @@ img.review__avatar {
   .app .app-nav__badge { position: static; order: 3; }
 }
 
-/* Tema scuro della web-app (19 novembre): i colori vengono da sito.css; qui i fondi scritti a mano */
-@media screen and (prefers-color-scheme: dark) {
-  .app {
-    --app-bg: #0f1824;
-    background:
-      radial-gradient(42rem 22rem at 100% -4rem, rgba(127, 178, 229, 0.1), transparent 70%) no-repeat,
-      var(--app-bg);
-  }
 
-  .app .site-header { background: #142030; }
-
-  .app-nav,
-  .app .app-nav,
-  .wizard__nav { background: rgba(20, 32, 48, 0.92); border-color: rgba(232, 238, 246, 0.1); }
-
-  .notice--ok,
-  .state-pill--pubblicata,
-  .fatto__segno,
-  .avviso__icona--ok { background: #16321f; }
-
-  .notice--error,
-  .state-pill--respinta,
-  .avviso__icona--no { background: #3a1a1a; }
-
-  .alert-item { background: #3a2e17; }
-
-  .avviso--nuovo .avviso__link { background: #172a40; }
-}
 
 /* Mappa più in alto sul telefono (19 novembre). Con l'esigenza già scelta le quattro esigenze stanno su una riga
    (icona sopra, nome sotto) e «Bagni accessibili vicino a me» sta accanto a «Filtri»: circa 130 px in meno sopra

@@ -29,7 +29,7 @@
     return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
   }
 
-  /* «Ci sei stato?»: fino a tre domande veloci su quello che manca (gradini e rampa, porta, bagno). Le risposte
+  /* «Ci sei stato?»: fino a due domande veloci su quello che manca (gradini e rampa, bagno). Le risposte
      diventano una proposta di correzione come le altre: la scheda attuale con solo quei valori cambiati, che i
      moderatori vedono con le differenze evidenziate e approvano. */
   function initVeloce(p) {
@@ -68,9 +68,6 @@
       form.appendChild(rampa);
       $('v-gradini').addEventListener('input', function () { show(rampa, Number(this.value) > 0); });
     }
-    if (manca.indexOf('porta') !== -1) {
-      form.appendChild(numero('v-porta', 'Quanto è larga la porta d\'ingresso? (cm)', 'Lo spazio libero quando è aperta, se l\'hai misurato.', 40, 300));
-    }
     if (manca.indexOf('bagno') !== -1) {
       form.appendChild(radios('v-bagno', 'C\'è un bagno accessibile?', [['attrezzato', 'Sì, attrezzato'], ['non-attrezzato', 'C\'è, ma non è attrezzato'], ['assente', 'No'], ['non-previsto', 'Qui non c\'è un bagno']]));
     }
@@ -95,11 +92,6 @@
           var r = form.querySelector('input[name="v-rampa"]:checked');
           if (g > 0 && r) { ing.rampa = r.value === 'true'; if (!ing.rampa) ing.rampa_pendenza = null; }
         }
-      }
-      if (f['v-porta'] && f['v-porta'].value !== '') {
-        var c = Number(f['v-porta'].value);
-        if (!(c >= 40 && c <= 300)) errors.push({ input: f['v-porta'], text: 'Scrivi una larghezza tra 40 e 300 cm.' });
-        else { ing.porta_cm = Math.round(c); risposte++; }
       }
       var b = form.querySelector('input[name="v-bagno"]:checked');
       if (b) { d.misure.bagno.valore = b.value; risposte++; }

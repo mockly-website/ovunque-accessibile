@@ -467,13 +467,13 @@
   }
 
 
-  /* Le tre cose che chi passa di lì sa dire in pochi secondi e che spesso mancano: gradini, porta, bagno */
+  /* Le cose che chi passa di lì sa dire in pochi secondi e che spesso mancano: gradini e bagno
+     (la larghezza della porta non si chiede più dal 24 novembre 2026, scelta dei titolari) */
   function mancanti(p) {
     var m = p.misure || {};
     var ing = m.ingresso || {};
     var out = [];
     if (ing.gradini == null) out.push('gradini');
-    if (ing.porta_cm == null) out.push('porta');
     if ((m.bagno || {}).valore == null) out.push('bagno');
     return out;
   }

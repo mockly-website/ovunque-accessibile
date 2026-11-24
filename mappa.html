@@ -18,11 +18,11 @@
   <link rel="stylesheet" href="assets/vendor/markercluster/MarkerCluster.css">
   <script src="assets/js/intro.js?v=6622c228"></script>
   <script src="assets/js/menu.js?v=a2c7634c" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=c4036237">
+  <link rel="stylesheet" href="assets/css/sito.css?v=e56b4fe8">
   <script src="assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
   <script src="app/assets/js/config.js?v=90a84c77" defer></script>
-  <script src="assets/js/oa-core.js?v=52d6ab2c" defer></script>
+  <script src="assets/js/oa-core.js?v=b35e2d0e" defer></script>
   <script src="assets/js/sito.js?v=6caddfb8" defer></script>
 </head>
 <body>
@@ -102,7 +102,7 @@
           <li><a class="nav__link" href="locali.html">Per i locali</a></li>
         </ul>
       </nav>
-      <button class="contrasto-btn" type="button" data-contrasto aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span class="contrasto-btn__testo">Alto contrasto</span></button>
+      <button class="contrasto-btn" type="button" data-contrasto aria-pressed="false" title="Alto contrasto"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span class="contrasto-btn__testo">Alto contrasto</span></button>
       <a class="btn btn--primary btn--small site-header__app" href="app/">Apri la web-app</a>
     </div>
   </header>
@@ -190,8 +190,8 @@
           <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
             <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
             <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
-            <li><span class="map-legend__dot map-legend__dot--verificato pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Con l'anello blu: verificato sul posto da noi</li>
-            <li><span class="map-legend__dot map-legend__dot--osm pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Con il bordo a trattini: dati presi da OpenStreetMap, ancora da verificare</li>
+            <li><span class="map-legend__dot map-legend__dot--verificato pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Verificato sul posto da noi</li>
+            <li><span class="map-legend__dot map-legend__dot--osm pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Da OpenStreetMap, da verificare</li>
           </ul>
           <p id="map-status" class="visually-hidden" role="status"></p>
           <p class="map__note">La mappa mostra gli stessi luoghi dell'elenco. Con la tastiera usa l'elenco: ogni luogo ha il pulsante «Mostra sulla mappa». Sulla mappa le frecce la spostano e + e − cambiano lo zoom.</p>

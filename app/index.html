@@ -19,13 +19,13 @@
   <link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="../assets/vendor/markercluster/MarkerCluster.css">
   <script src="../assets/js/intro.js?v=6622c228"></script>
-  <link rel="stylesheet" href="../assets/css/sito.css?v=c4036237">
-  <link rel="stylesheet" href="assets/css/app.css?v=d8b903d7">
+  <link rel="stylesheet" href="../assets/css/sito.css?v=e56b4fe8">
+  <link rel="stylesheet" href="assets/css/app.css?v=de5017f3">
   <script src="assets/js/config.js?v=90a84c77" defer></script>
   <script src="assets/vendor/supabase/supabase.js?v=2.117.3" defer></script>
   <script src="../assets/vendor/leaflet/leaflet.js" defer></script>
   <script src="../assets/vendor/markercluster/leaflet.markercluster.js" defer></script>
-  <script src="../assets/js/oa-core.js?v=52d6ab2c" defer></script>
+  <script src="../assets/js/oa-core.js?v=b35e2d0e" defer></script>
   <script src="assets/js/api.js?v=8addd012" defer></script>
   <script src="assets/js/app.js?v=f4916fce" defer></script>
   <script src="assets/js/mappa.js?v=59da74b1" defer></script>
@@ -106,7 +106,7 @@
           <li><a class="app-nav__link" href="profilo.html" data-account-link><svg class="icon icon--tab" aria-hidden="true" focusable="false"><use href="#icon-tab-user"/></svg><span data-account-label>Profilo</span></a></li>
         </ul>
       </nav>
-      <button class="contrasto-btn" type="button" data-contrasto aria-pressed="false"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span class="contrasto-btn__testo">Alto contrasto</span></button>
+      <button class="contrasto-btn" type="button" data-contrasto aria-pressed="false" title="Alto contrasto"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor"/></svg><span class="contrasto-btn__testo">Alto contrasto</span></button>
     </div>
   </header>
 
@@ -196,8 +196,8 @@
           <ul class="map-legend" role="list" aria-label="Legenda dei segnaposto">
             <li><span class="map-legend__dot pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Accessibile</li>
             <li><span class="map-legend__dot pin--parziale"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-partial"/></svg></span>In parte</li>
-            <li><span class="map-legend__dot map-legend__dot--verificato pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Con l'anello blu: verificato sul posto da noi</li>
-            <li><span class="map-legend__dot map-legend__dot--osm pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Con il bordo a trattini: dati presi da OpenStreetMap, ancora da verificare</li>
+            <li><span class="map-legend__dot map-legend__dot--verificato pin--si"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-yes"/></svg></span>Verificato sul posto da noi</li>
+            <li><span class="map-legend__dot map-legend__dot--osm pin--nv"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-unknown"/></svg></span>Da OpenStreetMap, da verificare</li>
           </ul>
           <p id="map-status" class="visually-hidden" role="status"></p>
           <p class="map__note">La mappa mostra gli stessi luoghi dell'elenco. Con la tastiera usa l'elenco: ogni luogo ha il pulsante «Mostra sulla mappa». Sulla mappa le frecce la spostano e + e − cambiano lo zoom.</p>
