@@ -1886,9 +1886,12 @@ main > .section .apps h2::after {
   text-underline-offset: 0.2em;
 }
 
+/* senza il titolo visibile (24 novembre 2026, richiesta dei titolari): logo e, accanto, pulsante e link */
+.apps--breve .apps__actions { grid-column: auto; }
+
 @media (min-width: 48em) {
-  .apps--breve { grid-template-columns: auto minmax(0, 1fr) auto; }
-  .apps--breve .apps__actions { grid-column: auto; justify-items: start; }
+  .apps--breve { grid-template-columns: auto minmax(0, 1fr); }
+  .apps--breve .apps__actions { justify-items: start; }
 }
 
 /* Pagina installa.html */
@@ -4343,7 +4346,7 @@ main > .section .locali-box--blu h2::after {
 
 .installa__nota { margin: var(--space-md) 0 0; color: var(--color-muted); font-size: var(--text-sm); }
 
-/* Link nel riquadro blu «Porta Ovunque Accessibile con te»: beige come negli altri riquadri scuri (contrasto 2,2 → 9:1) */
+/* Link nel riquadro blu della web-app: beige come negli altri riquadri scuri (contrasto 2,2 → 9:1) */
 .apps a:not(.btn) { color: var(--color-beige); }
 
 /* Niente attesa del doppio tocco sui comandi (tocco più reattivo sui telefoni) */
