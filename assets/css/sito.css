@@ -2674,6 +2674,43 @@ main > .how {
   margin: 0;
 }
 
+/* Pagina per i locali accorciata (24 novembre 2026): consigli in una tendina, «Domande?» su una riga */
+.locali-consigli {
+  margin-top: var(--space-lg);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-lg);
+  background: var(--color-white);
+}
+
+.locali-consigli > summary {
+  display: flex;
+  align-items: center;
+  min-height: 3rem;
+  padding: var(--space-sm) var(--space-md);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.locali-consigli > summary::-webkit-details-marker { display: none; }
+.locali-consigli > summary::before { content: "›"; margin-right: var(--space-xs); font-size: 1.4rem; line-height: 1; transition: transform 0.15s ease; }
+.locali-consigli[open] > summary::before { transform: rotate(90deg); }
+
+.locali-consigli > summary:focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: 2px; border-radius: var(--radius-lg); }
+
+.locali-consigli ul {
+  display: grid;
+  gap: var(--space-2xs);
+  margin: 0;
+  padding: 0 var(--space-md) var(--space-md) calc(var(--space-md) + 1.25rem);
+}
+
+.locali-box--riga { display: grid; gap: var(--space-sm); height: auto; }
+.locali-box--riga h2 { margin: 0; }
+
+@media (min-width: 64em) {
+  .locali-box--riga { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: var(--space-xl); }
+}
+
 .locali-box--blu {
   border-color: transparent;
   background: var(--color-navy);

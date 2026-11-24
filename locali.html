@@ -16,7 +16,7 @@
   <link rel="preload" href="assets/fonts/fredoka-latin.woff2" as="font" type="font/woff2" crossorigin>
   <script src="assets/js/intro.js?v=6622c228"></script>
   <script src="assets/js/menu.js?v=a2c7634c" defer></script>
-  <link rel="stylesheet" href="assets/css/sito.css?v=e56b4fe8">
+  <link rel="stylesheet" href="assets/css/sito.css?v=dd3b0633">
 </head>
 <body>
   <svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
@@ -98,11 +98,12 @@
   </header>
 
   <main id="main" tabindex="-1">
+    <!-- Pagina accorciata il 24 novembre 2026 (richiesta dei titolari): prima 6 sezioni, ora 3 -->
     <section class="locali-hero" aria-labelledby="locali-title">
       <div class="container locali-hero__inner">
         <div>
           <h1 id="locali-title">Fatevi trovare da chi cerca dove entrare davvero</h1>
-          <p class="locali-hero__lead">Ristoranti, negozi, musei, hotel: chi si muove in carrozzina o cammina con fatica sceglie prima di partire. La scheda del vostro locale è gratis.</p>
+          <p class="locali-hero__lead">La scheda del vostro locale è gratis.</p>
           <p class="locali__azioni">
             <a class="btn btn--primary" href="app/locali.html">Gestisci il tuo locale</a>
             <a class="btn btn--secondary" href="mappa.html">Cercalo sulla mappa</a>
@@ -122,64 +123,31 @@
       <div class="container">
         <h2 id="passi-title">Come funziona</h2>
         <ol class="passi" role="list">
-          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg></span><h3>Trovate il locale</h3><p>Sulla mappa. Se non c'è, segnalatelo dall'app.</p></li>
-          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><h3>Chiedete di gestirlo</h3><p>«Sei il titolare?»: nome, telefono, email e una foto dell'ingresso. Vi chiamiamo per confermare.</p></li>
-          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-qr"/></svg></span><h3>Mettete il QR in vetrina</h3><p>Appena confermati lo scaricate, con il nostro logo: vetrina, cassa o social.</p></li>
-          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><h3>Chiedete la verifica</h3><p>Veniamo a misurare: il QR diventa il bollino «Verificato sul posto».</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-search"/></svg></span><h3>Trovate il locale</h3><p>Sulla mappa, o segnalatelo dall'app.</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-store"/></svg></span><h3>Chiedete di gestirlo</h3><p>Vi chiamiamo per confermare.</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-qr"/></svg></span><h3>Mettete il QR in vetrina</h3><p>Chi lo inquadra apre la scheda.</p></li>
+          <li><span class="passi__icona"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-shield"/></svg></span><h3>Chiedete la verifica</h3><p>Veniamo a misurare: arriva il bollino.</p></li>
         </ol>
+        <details class="locali-consigli">
+          <summary>Piccoli interventi che fanno la differenza</summary>
+          <ul role="list">
+            <li>Un campanello all'ingresso, a 80–90 cm da terra.</li>
+            <li>Una rampa mobile per uno o due gradini.</li>
+            <li>Passaggi di almeno 90 cm tra tavoli e scaffali.</li>
+            <li>Il bagno sgombro davanti al WC.</li>
+            <li>Bordi dei gradini colorati.</li>
+            <li>Personale pronto ad aiutare.</li>
+          </ul>
+        </details>
       </div>
     </section>
 
-    <section class="section" aria-labelledby="guardiamo-title">
-      <div class="container locali-due">
-        <div>
-          <h2 id="guardiamo-title">Cosa guardiamo</h2>
-          <ul class="etichette" role="list">
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-door"/></svg>Ingresso e porta</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-lift"/></svg>Spazi e piani</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wc"/></svg>Bagno</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-parking"/></svg>Parcheggio e sedute</li>
-          </ul>
-        </div>
-        <div>
-          <h2 id="esigenze-title">Un giudizio per ogni esigenza</h2>
-          <ul class="etichette etichette--chiare" role="list">
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair"/></svg>Carrozzina manuale</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-wheelchair-e"/></svg>Carrozzina elettrica</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-walk"/></svg>Difficoltà a camminare</li>
-            <li><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-elder"/></svg>Persona anziana</li>
-          </ul>
-          <p class="locali-nota">Non serve essere perfetti: anche «accessibile in parte» aiuta chi deve decidere se partire.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section section--bianca" aria-labelledby="consigli-title">
+    <section class="section" aria-labelledby="domande-title">
       <div class="container">
-        <h2 id="consigli-title">Piccoli interventi che fanno la differenza</h2>
-        <p class="locali-intro">Spesso bastano attenzioni che costano poco.</p>
-        <ul class="consigli" role="list">
-          <li><h3>Un campanello all'ingresso</h3><p>A 80–90 cm da terra, con un numero da chiamare se ci sono gradini.</p></li>
-          <li><h3>Una rampa mobile</h3><p>Per uno o due gradini, pronta vicino alla porta, con un cartello.</p></li>
-          <li><h3>Passaggi di almeno 90 cm</h3><p>Tra tavoli, espositori e scaffali, anche nelle ore piene.</p></li>
-          <li><h3>Il bagno sgombro</h3><p>Niente scatole o seggioloni nello spazio davanti al WC.</p></li>
-          <li><h3>Bordi dei gradini colorati</h3><p>Una striscia a contrasto aiuta a vederli in tempo.</p></li>
-          <li><h3>Personale pronto ad aiutare</h3><p>Chiedere prima di spingere una carrozzina; una sedia per chi aspetta.</p></li>
-        </ul>
-        <p class="locali-nota">Per rampe fisse, bagni e ascensori le regole sono nel DM 236/1989: chiedete a un tecnico, poi aggiornate la scheda.</p>
-      </div>
-    </section>
-
-    <section class="section" aria-labelledby="bollino-title">
-      <div class="container locali-due">
-        <div class="locali-box">
-          <h2 id="bollino-title">Il bollino</h2>
-          <p>Dice che abbiamo misurato il locale di persona, in quella data. Non è una certificazione di legge: dopo 24 mesi la scheda torna «da ricontrollare».</p>
-        </div>
-        <div class="locali-box locali-box--blu">
+        <div class="locali-box locali-box--blu locali-box--riga">
           <h2 id="domande-title">Domande?</h2>
           <p>Scriveteci a <a href="mailto:ovunqueaccessibile@gmail.com">ovunqueaccessibile@gmail.com</a> o chiamateci al <a href="tel:+393518332819">351 833 2819</a>.</p>
-          <p class="locali-box__azioni"><a class="btn btn--light" href="https://wa.me/393518332819"><svg class="icon" aria-hidden="true" focusable="false"><use href="#icon-whatsapp"/></svg>Scrivici su WhatsApp</a></p>
+          <p class="locali-box__azioni"><a class="btn btn--light" href="https://wa.me/393518332819">Scrivici su WhatsApp</a></p>
         </div>
       </div>
     </section>
