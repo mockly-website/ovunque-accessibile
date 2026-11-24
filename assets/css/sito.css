@@ -1898,12 +1898,26 @@ main > .section .apps h2::after {
   text-align: center;
 }
 
-/* pulsante e, sotto, il link per aggiungerla al telefono e la nota Android */
+/* Striscia sottile (24 novembre 2026, scelta dei titolari): logo piccolo, «Apri la web-app» e «Aggiungila al
+   telefono» su una riga sola; sui telefoni va a capo restando centrata */
+.apps.apps--breve {
+  gap: var(--space-sm) var(--space-lg);
+  padding: var(--space-sm) var(--space-xl);
+  border-radius: var(--radius-pill);
+}
+
+.apps--breve .apps__logo { width: 2.75rem; height: 2.75rem; padding: 0.3rem; }
+
 .apps--breve .apps__actions {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
+  justify-content: center;
   align-items: center;
-  gap: var(--space-xs);
+  gap: var(--space-xs) var(--space-lg);
+}
+
+@media (max-width: 47.99em) {
+  .apps.apps--breve { border-radius: var(--radius-lg); padding: var(--space-md); }
 }
 
 /* Pagina installa.html */
