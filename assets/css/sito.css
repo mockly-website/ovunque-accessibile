@@ -1898,12 +1898,12 @@ main > .section .apps h2::after {
   text-align: center;
 }
 
+/* pulsante e, sotto, il link per aggiungerla al telefono e la nota Android */
 .apps--breve .apps__actions {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: var(--space-sm) var(--space-xl);
+  gap: var(--space-xs);
 }
 
 /* Pagina installa.html */
