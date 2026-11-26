@@ -298,8 +298,36 @@
     return form;
   }
 
+  /* Riepilogo «Da fare» in cima (26 novembre 2026): un pulsante per ogni sezione con qualcosa in attesa */
+  var conteggi = {};
+  var VOCI_RIEPILOGO = [['mod-proposals-count', 'tab-proposals', 'segnalazione da controllare', 'segnalazioni da controllare'],
+    ['mod-reviews-count', 'tab-reviews', 'recensione da controllare', 'recensioni da controllare'],
+    ['mod-osm-count', 'tab-osm', 'luogo OpenStreetMap da approvare', 'luoghi OpenStreetMap da approvare'],
+    ['mod-owners-count', 'tab-owners', 'richiesta di gestione', 'richieste di gestione'],
+    ['mod-checks-count', 'tab-checks', 'verifica da organizzare', 'verifiche da organizzare']];
+  function riepilogo() {
+    var box = $('mod-riepilogo');
+    if (!box) return;
+    var pronti = VOCI_RIEPILOGO.every(function (v) { return v[0] in conteggi; });
+    var voci = VOCI_RIEPILOGO.filter(function (v) { return conteggi[v[0]] && conteggi[v[0]].n; });
+    box.textContent = '';
+    if (!pronti && !voci.length) return;
+    if (!voci.length) {
+      box.appendChild(el('p', { className: 'mod-riepilogo__ok', text: 'Tutto in ordine: niente in attesa.' }));
+      return;
+    }
+    box.appendChild(el('h2', { className: 'mod-riepilogo__titolo', text: 'Da fare' }));
+    box.appendChild(el('ul', { className: 'mod-riepilogo__voci', role: 'list' }, voci.map(function (v) {
+      var b = el('button', { className: 'mod-riepilogo__voce', type: 'button', text: conteggi[v[0]].n + ' ' + (conteggi[v[0]].n === 1 ? v[2] : v[3]) });
+      b.addEventListener('click', function () { var t = $(v[1]); t.click(); t.focus(); });
+      return el('li', {}, [b]);
+    })));
+  }
+
   function setCount(id, n, one, many) {
     $(id).textContent = n === 1 ? '1 ' + one : n + ' ' + many;
+    conteggi[id] = { n: n };
+    riepilogo();
     /* lo stesso numero sulla linguetta della sezione (nascosto se è zero) */
     var tab = document.querySelector('[data-conta="' + id + '"]');
     if (tab) {

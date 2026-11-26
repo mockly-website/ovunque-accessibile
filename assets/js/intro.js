@@ -2,30 +2,11 @@
    Si carica nel <head> senza defer: mette la classe "oa-intro" su <html> prima che la pagina si disegni,
    così il CSS copre la pagina con il logo dentro un anello che gira, il nome e la frase del progetto
    (assets/img/intro-anello.svg; sito.css, sezione 12).
-   Solo alla prima pagina della visita (sessionStorage, chiave diversa per sito e app): almeno 0,6 s, mai oltre 1,5 s;
+   Solo alla prima pagina della visita (sessionStorage, chiave diversa per sito e app): almeno 2 s, mai oltre 3,5 s;
    all'uscita la schermata sale come un sipario (0,5 s).
    È decorativa: per gli screen reader non esiste (pseudo-elementi di <html>). */
-/* Alto contrasto (21 novembre 2026, richiesta di Angelo): pulsante [data-contrasto] nelle intestazioni (e nel profilo
-   dell'app). La scelta resta su questo dispositivo (localStorage) e si applica qui, prima che la pagina si disegni. */
-(function () {
-  var root = document.documentElement;
-  var KEY = 'oa-contrasto';
-  var attivo = false;
-  try { attivo = localStorage.getItem(KEY) === 'alto'; } catch (e) { /* senza memoria: contrasto normale */ }
-  function applica() {
-    if (attivo) root.setAttribute('data-contrasto', 'alto'); else root.removeAttribute('data-contrasto');
-    [].forEach.call(document.querySelectorAll('button[data-contrasto]'), function (b) { b.setAttribute('aria-pressed', attivo ? 'true' : 'false'); });
-  }
-  applica();
-  document.addEventListener('DOMContentLoaded', applica);
-  document.addEventListener('click', function (ev) {
-    var b = ev.target.closest && ev.target.closest('button[data-contrasto]');
-    if (!b) return;
-    attivo = !attivo;
-    try { if (attivo) localStorage.setItem(KEY, 'alto'); else localStorage.removeItem(KEY); } catch (e) { /* vale solo per questa pagina */ }
-    applica();
-  });
-})();
+/* Alto contrasto tolto il 26 novembre 2026 (richiesta dei titolari): si cancella la scelta rimasta salvata. */
+try { localStorage.removeItem('oa-contrasto'); } catch (e) { /* niente da pulire */ }
 
 (function () {
   var root = document.documentElement;
@@ -65,7 +46,7 @@
   }
   var start = Date.now();
   var calm = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var min = calm ? 300 : 600;
+  var min = calm ? 1200 : 2000;   /* 26 novembre: più lenta, la frase si deve poter leggere */
   var done = false;
   root.className += ' oa-intro';
 
@@ -80,5 +61,5 @@
   }
   if (document.readyState === 'complete') ready();
   else window.addEventListener('load', ready);
-  setTimeout(end, 1500);
+  setTimeout(end, 3500);
 })();

@@ -1253,14 +1253,15 @@ html:has(> body > .site-header) {
   left: 0;
   right: 0;
   margin-inline: auto;
-  max-width: 26rem;
+  max-width: 32rem;
   padding-inline: 1.5rem;
   line-height: 1.4;
   top: calc(50% - 3.5rem + var(--intro-anello) / 2 + 4.6rem);
   z-index: 2147483001;
   color: var(--color-muted, #4a5568);
   font-family: var(--font-body, sans-serif);
-  font-size: 1.05rem;
+  font-size: 1.4rem;
+  font-weight: 600;
   text-align: center;
   pointer-events: none;
   animation: oa-intro-nome 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
@@ -1669,7 +1670,7 @@ main > .section .apps h2::after {
 
 @media (min-width: 40em) {
   .needs-home__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -2527,7 +2528,7 @@ main > .how {
   position: absolute;
   top: var(--space-md);
   right: var(--space-lg);
-  color: var(--color-beige);
+  color: var(--color-brand);   /* blu: in beige non si leggevano (26 novembre 2026) */
   font-family: var(--font-heading);
   font-size: 2.5rem;
   line-height: 1;
@@ -2732,6 +2733,9 @@ main > .how {
   margin: 0;
   padding: 0 var(--space-md) var(--space-md) calc(var(--space-md) + 1.25rem);
 }
+
+.locali-legge { margin-top: var(--space-sm); }
+.locali-legge__nota { margin: 0; padding: 0 var(--space-md) var(--space-md); color: var(--color-muted); font-size: 0.95rem; }
 
 .locali-box--riga { display: grid; gap: var(--space-sm); height: auto; }
 .locali-box--riga h2 { margin: 0; }
@@ -3040,13 +3044,17 @@ main > .section .locali-box--blu h2::after {
   transform: rotate(45deg);
 }
 
-.pin--si .pin__drop, .map-legend__dot.pin--si { background: var(--color-success); }
+/* Colori dei segnaposto più accesi (26 novembre 2026, richiesta dei titolari). Solo per i segnaposto: i testi
+   usano ancora i colori scuri. Simbolo bianco sul colore almeno 3:1 (WCAG 1.4.11). */
+:root { --pin-si: #12a150; --pin-parziale: #e06a00; --pin-no: #dc2626; --pin-nv: #6b7280; }
 
-.pin--parziale .pin__drop, .map-legend__dot.pin--parziale { background: var(--color-warning); }
+.pin--si .pin__drop, .map-legend__dot.pin--si { background: var(--pin-si); }
 
-.pin--no .pin__drop, .map-legend__dot.pin--no { background: var(--color-error); }
+.pin--parziale .pin__drop, .map-legend__dot.pin--parziale { background: var(--pin-parziale); }
 
-.pin--nv .pin__drop, .map-legend__dot.pin--nv { background: var(--color-muted); }
+.pin--no .pin__drop, .map-legend__dot.pin--no { background: var(--pin-no); }
+
+.pin--nv .pin__drop, .map-legend__dot.pin--nv { background: var(--pin-nv); }
 
 .pin--verificato .pin__drop {
   box-shadow: 0 0 0 3px var(--color-navy), 0 4px 10px rgba(22, 40, 65, 0.35);
@@ -3069,17 +3077,17 @@ main > .section .locali-box--blu h2::after {
   right: -0.35rem;
   display: grid;
   place-items: center;
-  width: 1.05rem;
-  height: 1.05rem;
-  border: 2px solid #ffffff;
+  width: 1.3rem;
+  height: 1.3rem;
+  border: 2px solid #162841;
   border-radius: 50%;
-  background: #162841;
-  color: #ffffff;
-  font-size: 0.6rem;
+  background: #ffc21a;         /* stella dorata: non si confonde con il verde di «Accessibile» */
+  color: #162841;
+  font-size: 0.8rem;
   line-height: 1;
 }
 
-.map-legend__dot--verificato::after { top: -0.5rem; right: -0.55rem; width: 1.05rem; height: 1.05rem; font-size: 0.65rem; }
+.map-legend__dot--verificato::after { top: -0.55rem; right: -0.6rem; width: 1.15rem; height: 1.15rem; font-size: 0.7rem; }
 
 /* anello e trattini stanno fuori dal pallino: un po' di spazio prima della scritta */
 .map-legend__dot--verificato,
@@ -3911,7 +3919,7 @@ main > .section .locali-box--blu h2::after {
 }
 
 @media (min-width: 48em) {
-  .summary__tutte { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .summary__tutte { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 
 .summary:has(.summary__tutte li) .summary__per { display: none; }
@@ -4378,99 +4386,4 @@ main > .section .locali-box--blu h2::after {
 /* Niente attesa del doppio tocco sui comandi (tocco più reattivo sui telefoni) */
 a, button, summary, label, input, select, textarea, [role="button"] { touch-action: manipulation; }
 
-/* Tema scuro automatico tolto il 24 novembre 2026 (richiesta dei titolari): il sito resta sempre color panna;
-   l'unica variante è «Alto contrasto». */
-
-
-/* ==========================================================================
-   Alto contrasto (21 novembre 2026, richiesta di Angelo). Si accende con il pulsante «Alto contrasto»
-   (assets/js/intro.js mette data-contrasto="alto" su <html>). Restano i colori blu del sito: il blu si scurisce,
-   i grigi diventano blu pieno, bordi e linee più marcati, link sempre sottolineati, focus più spesso.
-   ========================================================================== */
-.contrasto-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  flex: none;
-  min-height: 2.75rem;
-  min-width: 2.75rem;
-  justify-content: center;
-  padding: 0 var(--space-sm);
-  border: 2px solid var(--color-navy);
-  border-radius: 999px;
-  background: transparent;
-  color: var(--color-navy);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.contrasto-btn .icon { width: 1.25rem; height: 1.25rem; stroke: currentColor; stroke-width: 2; fill: none; }
-
-.contrasto-btn[aria-pressed="true"] { background: var(--color-navy); color: var(--color-white); }
-
-.contrasto-btn:focus-visible { outline: 3px solid var(--color-focus); outline-offset: 3px; }
-
-/* tra 64 e 80em (computer piccoli, tablet in orizzontale) accanto al logo non c'è posto per il nome: solo il logo */
-@media (min-width: 64em) and (max-width: 79.99em) {
-  .site-header .brand__name {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
-    clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-  }
-}
-
-@media (min-width: 64em) {
-  .site-header__inner { flex-wrap: nowrap; }
-  .site-header .nav { order: 1; }
-  .site-header .contrasto-btn { order: 2; }
-  .site-header .site-header__app { order: 3; }
-}
-
-/* Nell'intestazione il pulsante è sempre tondo con la sola icona (il nome resta per gli screen reader e nel
-   suggerimento): con la scritta la riga andava a capo (24 novembre 2026). Nel menu del telefono la scritta c'è. */
-@media all {
-  .contrasto-btn { padding: 0; }
-  .contrasto-btn__testo {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;
-    clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
-  }
-}
-
-@media (max-width: 63.99em) {
-  .site-header__panel .contrasto-btn {
-    width: 100%;
-    margin-top: var(--space-sm);
-    padding: 0 var(--space-md);
-  }
-  .site-header__panel .contrasto-btn__testo {
-    position: static; width: auto; height: auto; margin: 0; overflow: visible; clip: auto; white-space: normal;
-  }
-}
-
-html[data-contrasto="alto"] {
-  --color-navy: #0a1730;
-  --color-brand: #0a1730;
-  --color-muted: #0a1730;
-  --color-path: #0a1730;
-  --color-card: #ffffff;
-  --color-sky: #ffffff;
-  --color-line: rgba(10, 23, 48, 0.6);
-  --color-error: #7a0f0f;
-  --color-success: #0f4425;
-  --color-warning: #5c3800;
-}
-
-
-
-/* sottolineati i link nel testo (quelli senza classe: paragrafi, elenchi, note), non pulsanti, voci di menu e schede */
-html[data-contrasto="alto"] :is(main, .site-footer) a:not([class]) { text-decoration: underline; text-decoration-thickness: 0.12em; text-underline-offset: 0.18em; }
-
-html[data-contrasto="alto"] .card,
-html[data-contrasto="alto"] .input,
-html[data-contrasto="alto"] .select,
-html[data-contrasto="alto"] textarea,
-html[data-contrasto="alto"] .btn--secondary { border: 2px solid var(--color-navy); }
-
-html[data-contrasto="alto"] :focus-visible { outline-width: 4px !important; outline-offset: 3px; }
-
+/* Tema scuro (24 novembre) e alto contrasto (26 novembre 2026) tolti su richiesta dei titolari: il sito resta sempre color panna. */

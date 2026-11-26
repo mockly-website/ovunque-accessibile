@@ -27,9 +27,6 @@
   panel.className = 'site-header__panel';
   btn.after(panel);
   panel.appendChild(nav);
-  /* «Alto contrasto»: sul telefono nel pannello, con la scritta; sul computer resta nella riga (ordine nel CSS) */
-  var contrasto = header.querySelector('.contrasto-btn');
-  if (contrasto) panel.appendChild(contrasto);
   if (app) panel.appendChild(app);
 
   var velo = document.createElement('div');

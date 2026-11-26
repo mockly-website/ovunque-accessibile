@@ -3512,7 +3512,7 @@ img.review__avatar {
   }
 
   .app .explore .needs:not(.needs--ask) .needs__options {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 4px;
   }
 
@@ -3581,7 +3581,6 @@ img.review__avatar {
     box-shadow: none;
   }
   .mappa-mappe .site-header .brand,
-  .mappa-mappe .site-header .contrasto-btn { display: none; }
 }
 
 @media (min-width: 64em) {
@@ -3894,14 +3893,6 @@ img.review__avatar {
   .foglio[data-altezza="meta"] { height: 60dvh; }
 }
 
-/* Alto contrasto (21 novembre 2026): nella web-app il pulsante sta nel profilo, «Informazioni»; nell'intestazione
-   solo da tablet in su (sul telefono la barra in alto non c'è o è piena) */
-@media (max-width: 47.99em) {
-  .site-header .contrasto-btn { display: none; }
-}
-
-.site-header .contrasto-btn { margin-inline-start: auto; }
-
 button.menu-list__link--toggle {
   width: 100%;
   border: 0;
@@ -3986,84 +3977,14 @@ button.menu-list__link--toggle {
 .numeri__barra { display: block; height: 0.35rem; margin-top: 0.2rem; margin-left: auto; border-radius: 999px; background: var(--color-brand); max-width: 100%; }
 .foglio__rapidi[hidden] { display: none; }
 
-/* ==========================================================================
-   Alto contrasto nella web-app (21 novembre 2026). I colori arrivano da sito.css (data-contrasto="alto" su <html>);
-   qui i fondi scritti a mano dell'app (beige, barra semitrasparente, ombre leggere) diventano pieni e ogni
-   riquadro e pulsante ha un bordo blu di 2 px, così si distingue senza contare sulle sfumature.
-   ========================================================================== */
-html[data-contrasto="alto"] .app {
-  --app-bg: var(--color-white);
-  background: var(--color-white);
-}
 
-html[data-contrasto="alto"] .app-nav,
-html[data-contrasto="alto"] .app .app-nav,
-html[data-contrasto="alto"] .app .site-header,
-html[data-contrasto="alto"] .wizard__nav {
-  background: var(--color-white);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-html[data-contrasto="alto"] .app .app-nav { border: 2px solid var(--color-navy); box-shadow: none; }
-
-html[data-contrasto="alto"] .app-nav__link[aria-current="page"],
-html[data-contrasto="alto"] .app-nav__link.is-section { text-decoration: underline; text-decoration-thickness: 0.15em; text-underline-offset: 0.2em; }
-
-html[data-contrasto="alto"] .foglio {
-  border-top: 2px solid var(--color-navy);
-  box-shadow: none;
-}
-
-@media (min-width: 48em) and (min-height: 30.01em) {
-  html[data-contrasto="alto"] .foglio { border: 2px solid var(--color-navy); }
-}
-
-html[data-contrasto="alto"] .foglio__tacca { background: var(--color-navy); height: 0.4rem; }
-
-html[data-contrasto="alto"] .foglio__rapido,
-html[data-contrasto="alto"] .foglio__voci,
-html[data-contrasto="alto"] .foglio__luogo,
-html[data-contrasto="alto"] .foglio__chiudi,
-html[data-contrasto="alto"] .mappa-tasti__btn,
-html[data-contrasto="alto"] .mappa-tasti .map-legend,
-html[data-contrasto="alto"] .map-tools__btn,
-html[data-contrasto="alto"] .leaflet-bar,
-html[data-contrasto="alto"] .menu-list,
-html[data-contrasto="alto"] .app .card,
-html[data-contrasto="alto"] .app .place,
-html[data-contrasto="alto"] .chip label,
-html[data-contrasto="alto"] .needs__option label {
-  border: 2px solid var(--color-navy) !important;
-  box-shadow: none !important;
-}
-
-html[data-contrasto="alto"] .foglio__voci li + li,
-html[data-contrasto="alto"] .menu-list li + li { border-top: 2px solid var(--color-navy); }
-
-html[data-contrasto="alto"] .foglio__voce .icon,
-html[data-contrasto="alto"] .foglio__gruppo-titolo,
-html[data-contrasto="alto"] .foglio__voce-sub { color: var(--color-navy); }
-
-html[data-contrasto="alto"] .foglio__voce[role="option"][aria-selected="true"] {
-  background: var(--color-navy);
-  color: var(--color-white);
-  box-shadow: none;
-}
-
-html[data-contrasto="alto"] .foglio__voce[role="option"][aria-selected="true"] .icon,
-html[data-contrasto="alto"] .foglio__voce[role="option"][aria-selected="true"] .foglio__voce-sub { color: var(--color-white); }
-
-html[data-contrasto="alto"] .foglio__gruppo-azione { text-decoration: underline; }
-
-html[data-contrasto="alto"] .chip input:checked + label,
-html[data-contrasto="alto"] .needs__option input:checked + label { background: var(--color-navy); color: var(--color-white); }
-
-html[data-contrasto="alto"] .cluster { box-shadow: 0 0 0 3px var(--color-white), 0 0 0 5px #0a1730; }
-
-html[data-contrasto="alto"] .rete-avviso { border: 2px solid var(--color-white); }
-
-/* sulla mappa, fino a 64em, l'intestazione è solo il contenitore della barra in basso: resta trasparente */
-@media (max-width: 63.99em) {
-  html[data-contrasto="alto"] .mappa-mappe .site-header { background: none; }
-}
+/* Moderazione: riepilogo «Da fare» sopra le linguette (26 novembre 2026) */
+.mod-riepilogo:empty { display: none; }
+.mod-riepilogo { margin-bottom: var(--space-sm); padding: var(--space-sm) var(--space-md); border: 1.5px solid rgba(22, 40, 65, 0.14); border-radius: var(--radius-md); background: var(--color-white); }
+.mod-riepilogo__titolo { margin: 0 0 var(--space-xs); font-size: var(--text-base, 1rem); }
+.mod-riepilogo__ok { margin: 0; font-weight: 700; color: var(--color-success); }
+.mod-riepilogo__voci { display: flex; flex-wrap: wrap; gap: var(--space-xs); margin: 0; padding: 0; list-style: none; }
+.mod-riepilogo__voce { min-height: 2.75rem; padding: var(--space-2xs, 0.25rem) var(--space-sm); border: 0; border-radius: var(--radius-pill); background: var(--color-sky); color: var(--color-navy); font: inherit; font-weight: 700; cursor: pointer; }
+.mod-riepilogo__voce:hover { background: var(--color-navy); color: var(--color-white); }
+.mod-riepilogo__voce:focus-visible { outline: var(--focus-width) solid var(--color-focus); outline-offset: 2px; }
+@media (min-width: 48em) { .mod-tabs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

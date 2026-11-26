@@ -71,7 +71,7 @@
   var ESIGENZE = {
     manuale: { nome: 'Carrozzina manuale', breve: 'Manuale', icona: '#icon-wheelchair', voci: FISICHE, card: CARD_FISICHE },
     elettrica: { nome: 'Carrozzina elettrica', breve: 'Elettrica', icona: '#icon-wheelchair-e', voci: FISICHE, card: CARD_FISICHE },
-    cammino: { nome: 'Difficoltà a camminare', breve: 'Camminare', icona: '#icon-walk', voci: FISICHE, card: CARD_FISICHE },
+    cammino: { nome: 'Difficoltà a camminare', breve: 'Camminare', icona: '#icon-walk', voci: FISICHE.concat(['sedute']), card: CARD_FISICHE },
     anziani: { nome: 'Persona anziana', breve: 'Anziani', icona: '#icon-elder', voci: FISICHE.concat(['sedute']), card: CARD_FISICHE },
     vista: { nome: 'Disabilità visiva', breve: 'Vista', icona: '#icon-eye', voci: ['cane', 'orientamento', 'leggere', 'ostacoli'], card: ['cane', 'orientamento', 'leggere'], sensi: true },
     udito: { nome: 'Disabilità uditiva', breve: 'Udito', icona: '#icon-ear', voci: ['comunicare', 'contatti', 'ascolto'], card: ['comunicare', 'contatti', 'ascolto'], sensi: true }
@@ -79,7 +79,12 @@
   /* Vista e udito sono spente per ora (29 ottobre 2026): non si scelgono e non hanno giudizio né sezione nella scheda,
      ma le definizioni qui sopra e i dati già raccolti restano (e il modulo «Segnala» li conserva nelle correzioni).
      Per riaccenderle: rimetterle in fondo a questo elenco e riportare le parti tolte dalle pagine (DOCUMENTAZIONE.md). */
-  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino', 'anziani'];
+  /* «Persona anziana» unita a «Difficoltà a camminare» (26 novembre 2026, richiesta dei titolari): stesse soglie,
+     comprese le sedute. Chi aveva scelto «anziani» (browser, indirizzo, profilo) passa a «cammino». */
+  var ORDINE_ESIGENZE = ['manuale', 'elettrica', 'cammino'];
+  function normEsigenza(e) {
+    return e === 'anziani' ? 'cammino' : e;
+  }
   function esigenzaAttiva(e) {
     return ORDINE_ESIGENZE.indexOf(e) !== -1;
   }
@@ -183,7 +188,20 @@
   /* Portata scritta sulla targhetta dell'ascensore (modulo «Segnala»), quando la cabina non è misurata */
   var PERSONE_ASCENSORE = { 'fino-5': 'fino a 5 persone', '6-7': '6–7 persone', '8-piu': '8 persone o più' };
 
+  /* Più ascensori e montacarichi (26 novembre 2026): il numero si aggiunge al testo; con le sole scale un montacarichi
+     rende i piani raggiungibili «in parte» anche in carrozzina (di solito va chiesto al personale) */
+  var NUMERO_ASCENSORI = { '2': '2 ascensori', '3-piu': '3 o più ascensori' };
   function valutaPiani(m, e) {
+    var r = valutaPiani1(m, e);
+    if (m.valore === 'ascensore' && NUMERO_ASCENSORI[m.ascensori]) {
+      var resto = r[1].replace(/^Ascensore ?/, '');
+      r = [r[0], NUMERO_ASCENSORI[m.ascensori] + (resto ? ', ' + resto : '')];
+    }
+    if (m.valore === 'scale' && m.montacarichi === true && r[0] === 'no') r = ['parziale', 'Scale, ma c\'è un montacarichi'];
+    else if (m.montacarichi === true && m.valore === 'scale') r = [r[0], r[1] + ', c\'è anche un montacarichi'];
+    return r;
+  }
+  function valutaPiani1(m, e) {
     var s = SOGLIE[e];
     if (m.valore === 'uno') return ['si', 'Tutto su un piano'];
     if (m.valore === 'ascensore') {
@@ -368,10 +386,10 @@
   var ascoltatori = [];
 
   function esigenzaSalvata() {
-    var fromUrl = new URLSearchParams(location.search).get('per');
+    var fromUrl = normEsigenza(new URLSearchParams(location.search).get('per'));
     if (esigenzaAttiva(fromUrl)) return fromUrl;
     try {
-      var v = localStorage.getItem(STORAGE_KEY);
+      var v = normEsigenza(localStorage.getItem(STORAGE_KEY));
       return esigenzaAttiva(v) ? v : null;
     } catch (err) {
       return null;
@@ -385,6 +403,7 @@
   }
 
   function setEsigenza(e) {
+    e = normEsigenza(e);
     if (!esigenzaAttiva(e)) return;
     esigenzaCorrente = e;
     try { localStorage.setItem(STORAGE_KEY, e); } catch (err) { /* navigazione privata: resta solo per questa pagina */ }
@@ -1525,7 +1544,7 @@
       ]));
       return;
     }
-    var keys = ESIGENZE[e].sensi ? ESIGENZE[e].voci : ['ingresso', 'porta', 'piani', 'bagno'].concat(e === 'anziani' ? ['sedute'] : []);
+    var keys = ESIGENZE[e].sensi ? ESIGENZE[e].voci : ['ingresso', 'porta', 'piani', 'bagno'].concat(aPiedi(e) ? ['sedute'] : []);
     keys.forEach(function (k) {
       var v = voce(k);
       var st = v.valuta(p, e);
@@ -1774,7 +1793,7 @@
       initExplore();
       initDetail();
     },
-    NOTA_CHIUSO: "[Segnalato come chiuso]", CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, esigenzaAttiva: esigenzaAttiva,
+    NOTA_CHIUSO: "[Segnalato come chiuso]", CATEGORIE: CATEGORIE, ESEMPI_CATEGORIE: ESEMPI_CATEGORIE, ESIGENZE: ESIGENZE, ORDINE_ESIGENZE: ORDINE_ESIGENZE, normEsigenza: normEsigenza, esigenzaAttiva: esigenzaAttiva,
     GIUDIZIO: GIUDIZIO, ICONA_STATO: ICONA_STATO, TITOLO_DETTAGLI: TITOLO_DETTAGLI, AVVISI: AVVISI,
     giudizio: giudizio, distanceKm: distanceKm, completezza: completezza, mancanti: mancanti,
     esigenza: esigenza, scelta: function () { return esigenzaCorrente; }, setEsigenza: setEsigenza, onEsigenza: onEsigenza,

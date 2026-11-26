@@ -60,7 +60,9 @@
     ] },
     { id: 'piani', title: 'Piani e ascensore', fields: [
       { path: 'misure.piani.valore', label: 'Come si raggiungono i piani?', type: 'choice', options: [['uno', 'È tutto su un piano'], ['ascensore', 'C\'è un ascensore'], ['scale', 'Solo con le scale']] },
-      { path: 'misure.piani.ascensore_persone', label: 'Quante persone porta l\'ascensore?', help: 'È scritto sulla targhetta dentro la cabina, per esempio «6 persone – 450 kg».', type: 'choice', options: [['fino-5', 'Fino a 5 persone'], ['6-7', '6 o 7 persone'], ['8-piu', '8 persone o più']], showIf: ['misure.piani.valore', 'ascensore'] },
+      /* Più ascensori e montacarichi (26 novembre 2026, richiesta dei titolari); la portata è in «Altre informazioni» */
+      { path: 'misure.piani.ascensori', label: 'Quanti ascensori ci sono?', type: 'choice', options: [['1', 'Uno'], ['2', 'Due'], ['3-piu', 'Tre o più']], showIf: ['misure.piani.valore', 'ascensore'] },
+      { path: 'misure.piani.montacarichi', label: 'C\'è un montacarichi o una piattaforma elevatrice?', help: 'Anche se si usa solo su richiesta, con l\'aiuto del personale.', type: 'tri', when: function (v) { var x = v('misure.piani.valore'); return x === 'ascensore' || x === 'scale'; } },
       { path: 'misure.piani.corrimano_scale', label: 'Le scale hanno il corrimano?', type: 'tri', showIf: ['misure.piani.valore', 'scale'] },
       { path: 'misure.piani.nota', label: 'Note su piani e ascensore', type: 'textarea', max: 500, more: true }
     ] },
@@ -70,6 +72,7 @@
       { path: 'misure.bagno.nota', label: 'Note sul bagno', type: 'textarea', max: 500, more: true }
     ] },
     { id: 'altre', title: 'Altre informazioni', optional: true, fields: [
+      { path: 'misure.piani.ascensore_persone', label: 'Quante persone porta l\'ascensore?', help: 'È scritto sulla targhetta dentro la cabina, per esempio «6 persone – 450 kg».', type: 'choice', options: [['fino-5', 'Fino a 5 persone'], ['6-7', '6 o 7 persone'], ['8-piu', '8 persone o più']], showIf: ['misure.piani.valore', 'ascensore'] },
       { path: 'facoltativi.porta_tipo', label: 'Com\'è la porta?', type: 'choice', options: [['automatica', 'Automatica'], ['manuale', 'Da aprire a mano'], ['pesante', 'Pesante da aprire']], showIf: ['x.nessuna_porta', false] },
       { path: 'facoltativi.pavimento', label: 'Com\'è il pavimento?', type: 'choice', options: [['liscio', 'Liscio'], ['irregolare', 'Irregolare (sampietrini, legno, sabbia)'], ['ghiaia', 'Ghiaia']] },
       { path: 'facoltativi.sedute', label: 'Ci sono sedute lungo il percorso?', type: 'tri' },
@@ -359,6 +362,8 @@
       out.misure.bagno.rotazione_cm = null;
     }
     if (out.misure.piani.valore !== 'scale') out.misure.piani.corrimano_scale = null;
+    if (out.misure.piani.valore !== 'ascensore') { out.misure.piani.ascensori = null; out.misure.piani.ascensore_persone = null; }
+    if (out.misure.piani.valore !== 'ascensore' && out.misure.piani.valore !== 'scale') out.misure.piani.montacarichi = null;
     out.misure.ingresso.rampa_pct = out.misure.ingresso.rampa === true && keep.rampa_pct != null &&
       (out.misure.ingresso.rampa_pendenza || null) === keep.rampa_pendenza ? keep.rampa_pct : null;
     if (out.misure.ingresso.rampa !== true) out.misure.ingresso.rampa_pendenza = null;
