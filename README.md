@@ -13,6 +13,7 @@
   <a href="https://mockly-website.github.io/ovunque-accessibile/">Sito</a> ·
   <a href="https://mockly-website.github.io/ovunque-accessibile/app/">Web-app</a> ·
   <a href="https://www.instagram.com/ovunque_accessibile">Instagram</a> ·
+  <a href="https://www.facebook.com/profile.php?id=61592189935247">Facebook</a> ·
   <a href="mailto:ovunqueaccessibile@gmail.com">Email</a> ·
   <a href="https://wa.me/393518332819">WhatsApp</a>
 </p>
@@ -104,6 +105,7 @@ poi aprire `http://localhost:8000/`.
 ## Contatti
 
 - Instagram: [@ovunque_accessibile](https://www.instagram.com/ovunque_accessibile)
+- Facebook: [Ovunque Accessibile](https://www.facebook.com/profile.php?id=61592189935247)
 - Email: [ovunqueaccessibile@gmail.com](mailto:ovunqueaccessibile@gmail.com)
 - WhatsApp e telefono: [351 833 2819](https://wa.me/393518332819)
 
